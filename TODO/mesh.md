@@ -7453,6 +7453,14 @@ exchange `pod-relay`; rule Q3 (`docs/decisions.md`, "The crates of PodUtils/podc
 from the import podssh makes fixes only, and once podssh takes the crate the work is done in
 PodUtils/podcrates, which podssh takes by the next tag; a test of the moved code then runs there.
 
+2026-11-14: podcrates answered on COORD-058 (#235): its T-550, Nostr's ephemeral events as a meeting point of a
+code, is on its `main` at `3894eff` and goes into its next tag. podssh's part after the take: fill
+`pod_relay::code::run::Ends::relays` with the `relay` endpoint of each `pod_services::of_kind("nostr-relay")`, in
+rank order; a switch that empties it, as `PODSSH_MQTT` does for the brokers; and the line of the third party,
+the event `relay.code.nostr` (`NOSTR_WORDS`), before the first byte. The order is Q77's: the mailboxes, the Nostr
+relays, the trackers (podcrates' T-551, for T-695), then the brokers. The Blocker holds until that tag.
+
+
 # T-546: Trackers as meeting points: whether a BitTorrent or WebTorrent tracker passes the pairing's messages
 
 **Source:** the operator's ruling Q77 (2026-11-02).
