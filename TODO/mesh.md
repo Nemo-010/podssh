@@ -13540,6 +13540,17 @@ PodUtils/podcrates, which podssh took (work on a taken crate is done there): T-7
 podcrates is asked for the transport, its services and its place in `pod-relay`'s runs of a code as COORD-058
 (#235); podssh's part is its glue, its manual and a live run, once it takes that tag.
 
+2026-11-14: podcrates answered on COORD-058 (#235): its T-551, WebTorrent's trackers as a meeting point of a
+code, is on its `main` at `0425ec0` and goes into its next tag with T-550. podssh's part after the take: fill
+`pod_relay::code::run::Ends::trackers` with the `tracker` endpoint of each
+`pod_services::of_kind("webtorrent-tracker")`, in rank order; a switch that empties it, as `PODSSH_MQTT` does;
+the line of the third party, the event `relay.code.tracker` (`TRACKER_WORDS`); and in the manual each tracker's
+facts `filter-list`, `filter-list-part` and `filter-category` (both public trackers are in hagezi's `anti.piracy`
+list, which some networks apply). Two facts differ from the ask: the messages go as a note in the field `sdp`, as
+a public tracker refuses an offer with none; and the giver speaks only in an answer to an offer. The order is the
+mailboxes, the Nostr relays, the trackers, then the brokers. The Blocker holds until that tag.
+
+
 # T-711: One switch `PODSSH_PUBLIC` over each third-party service, and `status --json` gives the set
 
 **Source:** PodUtils/podcrates#35, cfb's ask A-S-04 (COORD-014, PodUtils/podcrates#38)
