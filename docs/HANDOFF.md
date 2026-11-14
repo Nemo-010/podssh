@@ -22,8 +22,8 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## Each podcrates take
 
-podssh pins every podcrates crate at `tag = "v0.45.0"` (COORD-097, PodUtils/podcrates#157; podssh's answer is
-COORD-068). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
+podssh pins every podcrates crate at `tag = "v0.46.0"` (COORD-099, PodUtils/podcrates#159; podssh's answer is
+COORD-069). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
 
 - Taken: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`,
   `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`, `pod-relay`
@@ -47,7 +47,10 @@ COORD-068). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; 
 - `v0.45.0` (taken 2026-11-14) carries podcrates T-579, pod-session's wait for a spare that doubles after a spare
   that moved no byte (COORD-065, #242, closed; T-781 keeps its rule for the tunnels of HTTP), T-560, pod-relay's
   one-POST form over HTTP/2, a fix of pod-proxy that names no password of a Unix proxy's URL, and `Road::dial_alpn`
-  (podssh builds no `Road` by a literal): no change of podssh's code.
+  (the harness of the HTTP road names it, `None`).
+- `v0.46.0` (taken 2026-11-14) carries pod-guest's warm start for podvm and pod-link's S3 carrier and split session
+  for podnet; `pod-link`'s `Poll::max_connections` meets no literal of podssh: the bump of the tag only. Checked
+  with each feature of podssh-relay and the CLI's iroh, tor and gsr, tests included.
 
 ## Open COORD issues
 
