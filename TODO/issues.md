@@ -309,6 +309,7 @@ and num-bigint 0.5) are T-754.
 | #243 | COORD-066: podssh took podcrates v0.43.0 at b88985f (to podcrates) | closed 2026-11-14: podcrates recorded the take of `v0.43.0` | T-684 |
 | #244 | COORD-067: podssh took podcrates v0.44.0 (to podcrates) | closed 2026-11-14: podcrates recorded the take of `v0.44.0` | T-684 |
 | #245 | COORD-068: podssh took podcrates v0.45.0 at 16d53cb (to podcrates) | closed 2026-11-14: podcrates recorded the take of `v0.45.0` | T-684 |
+| #246 | COORD-069: podssh took podcrates v0.46.0 at 5ac90a3 (to podcrates) | open (2026-11-14: posted) | T-684 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,
