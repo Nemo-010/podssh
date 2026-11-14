@@ -2522,6 +2522,8 @@ and again after the faults' clock started, the client's from its new address: ea
 and no session's bytes ended. Here it passed five runs in five (29 to 35 s each), with the tag's pod-session.
 It passed each gate of the six before this one. It waits for its next failure, as the first did.
 
+The next gate, at `213968e` (run 43621390272, 2026-11-14), passed the step whole, its iroh road after a new address among them.
+
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes
 
 **Source:** the live job of T-565 in `last-roads-live.yml` (runs 42989086142, 42994885604 and 43560494966).
