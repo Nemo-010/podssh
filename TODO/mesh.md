@@ -5913,8 +5913,8 @@ T-086 is done: the pairing's exchange exists over a mailbox.
 podssh makes fixes only, and once podssh takes the crate the work is done in PodUtils/podcrates,
 which podssh takes by the next tag; a test of the moved code then runs there.
 
-2026-11-14: podcrates answered on COORD-060 (#237): its T-554, an ntfy topic as a meeting point of a code, is on
-its `main` at `b534e68` and goes into its next tag with T-550 and T-551. podssh's part after the take: fill
+2026-11-14: podcrates answered on COORD-060 (#237): its entry 554, an ntfy topic as a meeting point of a code, is on
+its `main` at `b534e68` and goes into its next tag with its entries 550 and 551. podssh's part after the take: fill
 `pod_relay::code::run::Ends::ntfy` from `pod_services::of_kind("ntfy-server")` in rank order with
 `ntfy::Point::parse(&service.endpoint("server")?.url())`, or with the server that `PODSSH_PAIR_NTFY` names, and
 empty for `no`; set `Ends::upgrade_refused` when podssh's probe found the WebSocket upgrade refused (ntfy then
@@ -7464,12 +7464,12 @@ exchange `pod-relay`; rule Q3 (`docs/decisions.md`, "The crates of PodUtils/podc
 from the import podssh makes fixes only, and once podssh takes the crate the work is done in
 PodUtils/podcrates, which podssh takes by the next tag; a test of the moved code then runs there.
 
-2026-11-14: podcrates answered on COORD-058 (#235): its T-550, Nostr's ephemeral events as a meeting point of a
+2026-11-14: podcrates answered on COORD-058 (#235): its entry 550, Nostr's ephemeral events as a meeting point of a
 code, is on its `main` at `3894eff` and goes into its next tag. podssh's part after the take: fill
 `pod_relay::code::run::Ends::relays` with the `relay` endpoint of each `pod_services::of_kind("nostr-relay")`, in
 rank order; a switch that empties it, as `PODSSH_MQTT` does for the brokers; and the line of the third party,
 the event `relay.code.nostr` (`NOSTR_WORDS`), before the first byte. The order is Q77's: the mailboxes, the Nostr
-relays, the trackers (podcrates' T-551, for T-695), then the brokers. The Blocker holds until that tag.
+relays, the trackers (podcrates' entry 551, for T-695), then the brokers. The Blocker holds until that tag.
 
 
 # T-546: Trackers as meeting points: whether a BitTorrent or WebTorrent tracker passes the pairing's messages
@@ -13551,8 +13551,8 @@ PodUtils/podcrates, which podssh took (work on a taken crate is done there): T-7
 podcrates is asked for the transport, its services and its place in `pod-relay`'s runs of a code as COORD-058
 (#235); podssh's part is its glue, its manual and a live run, once it takes that tag.
 
-2026-11-14: podcrates answered on COORD-058 (#235): its T-551, WebTorrent's trackers as a meeting point of a
-code, is on its `main` at `0425ec0` and goes into its next tag with T-550. podssh's part after the take: fill
+2026-11-14: podcrates answered on COORD-058 (#235): its entry 551, WebTorrent's trackers as a meeting point of a
+code, is on its `main` at `0425ec0` and goes into its next tag with its entry 550. podssh's part after the take: fill
 `pod_relay::code::run::Ends::trackers` with the `tracker` endpoint of each
 `pod_services::of_kind("webtorrent-tracker")`, in rank order; a switch that empties it, as `PODSSH_MQTT` does;
 the line of the third party, the event `relay.code.tracker` (`TRACKER_WORDS`); and in the manual each tracker's
