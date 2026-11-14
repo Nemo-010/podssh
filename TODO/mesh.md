@@ -5913,6 +5913,17 @@ T-086 is done: the pairing's exchange exists over a mailbox.
 podssh makes fixes only, and once podssh takes the crate the work is done in PodUtils/podcrates,
 which podssh takes by the next tag; a test of the moved code then runs there.
 
+2026-11-14: podcrates answered on COORD-060 (#237): its T-554, an ntfy topic as a meeting point of a code, is on
+its `main` at `b534e68` and goes into its next tag with T-550 and T-551. podssh's part after the take: fill
+`pod_relay::code::run::Ends::ntfy` from `pod_services::of_kind("ntfy-server")` in rank order with
+`ntfy::Point::parse(&service.endpoint("server")?.url())`, or with the server that `PODSSH_PAIR_NTFY` names, and
+empty for `no`; set `Ends::upgrade_refused` when podssh's probe found the WebSocket upgrade refused (ntfy then
+goes first); and the line of the third party, the event `relay.code.ntfy` (`NTFY_WORDS`). Facts that differ from
+the ask: a message is 4,095 bytes at most (ntfy keeps one of 4,096 as an attachment); ntfy.sh allows 250 messages
+a day for each address, and a pairing posts seven; on HTTP/1.1 the client polls each 1 s. The order is the
+mailboxes, ntfy, the Nostr relays, the trackers, then the brokers. The Blocker holds until that tag.
+
+
 # T-497: A second public Piping Server, `piping.onrender.com`
 
 **Source:** T-442 (2026-11-02); the operator's ruling Q65.
