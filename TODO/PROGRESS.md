@@ -72,7 +72,7 @@ Read on 2026-11-13.
 **First, from 2026-11-15 (the operator's ruling, `docs/decisions.md`): T-684 is fast-tracked.** podssh asks
 podcrates for Q101's waves 3 and 4 (COORD-071, #248), freezes each module as podcrates names it, and takes each
 tag at once; `v1.1.0-beta.4` waits for the move, then goes out with its testers' guide (a GitHub issue). Beside
-it, while podcrates builds: T-707's live test (Q106), the cell of an outage (T-786), the netem lab of T-625,
+it, while podcrates builds: the GSRN road's live test (done), the cell of an outage (T-786), the netem lab of T-625,
 T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
@@ -138,7 +138,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 743 entries: 47 open, 32 partial, 11 blocked, 653 done.
+`TODO/INDEX.md` holds 743 entries: 47 open, 31 partial, 11 blocked, 654 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
@@ -178,8 +178,8 @@ operator interrupts it.
    rest of M10, in this order: T-660, T-670, T-665 and T-666 (each waits for a run that its
    `## Done` names), their follow-up and what the netem run found (done); then the open
    entries of GitHub #127 to #148 by their priority, beside M10 (Q85, Q100).
-6. podssh's own order by priority beside M10's order below. T-707 (the GSRN road) is built on
-   `pod-gsr` and waits for Q106, its live test alone. cfb's asks (`each`, `run` and `job` on a node and
+6. podssh's own order by priority beside M10's order below. The GSRN road is done (2026-11-15,
+   live through gsocket's relay). cfb's asks (`each`, `run` and `job` on a node and
    on an `iroh:` or `derp:` ticket, and `mcp --read-only`: done, 2026-11-14) stay behind podssh's own
    work order, M10 included (the owner's ruling "Priority"; Q105 is settled).
 7. The holds are released (Q92): T-107 to T-113, T-117, T-118, T-222 and
@@ -280,7 +280,7 @@ it can start.
 
 ## Questions for the operator
 
-**Q106 (2026-11-14): settled by the operator on 2026-11-15, allowed as recommended** (`docs/decisions.md`): a short live test against the GSRN relay; T-707 runs it next.
+**Q106 (2026-11-14): settled by the operator on 2026-11-15, allowed as recommended** (`docs/decisions.md`): a short live test against the GSRN relay, which passed (2026-11-15).
 
 Questions asked so far and how they were settled, each
 ruling in `docs/decisions.md`. The operator ruled on the questions of the triage (Q1 to

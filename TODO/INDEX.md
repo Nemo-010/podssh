@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**743 entries: 47 open, 32 partial, 11 blocked, 653 done.**
+**743 entries: 47 open, 31 partial, 11 blocked, 654 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 3 | 4 | 3 | 75 | 85 |
 | P2 | 8 | 19 | 2 | 279 | 308 |
-| P3 | 36 | 9 | 6 | 298 | 349 |
-| **All** | 47 | 32 | 11 | 653 | 743 |
+| P3 | 36 | 8 | 6 | 299 | 349 |
+| **All** | 47 | 31 | 11 | 654 | 743 |
 
 ## Entries
 
@@ -737,7 +737,7 @@ repository and CI).
 | [T-704](relay.md) | P3 | S | M10 | feature | done | `podssh relay serve` has flags for the idle cut, the session time, the byte cap and the connect time |
 | [T-705](machine.md) | P3 | S | none | defect | done | `doctor --full` names a QUIC handshake and stream probes that `--quick` does not run, in the help, the manual and the MCP schema |
 | [T-706](cli.md) | P3 | M | M5 | feature | done | `podssh doctor --tier`: one verdict of the host's capabilities and what each closes |
-| [T-707](roads.md) | P3 | L | backlog | feature | partial | A road of the GSRN relay network, by a shared secret |
+| [T-707](roads.md) | P3 | L | backlog | feature | done | A road of the GSRN relay network, by a shared secret |
 | [T-708](multi.md) | P1 | M | M10 | feature | done | `each`, `run` and `job` reach a node, a net name, an `iroh:` or a `derp:` destination |
 | [T-709](serve.md) | P1 | M | M10 | feature | open | A node as a hardened system service of a named user: `--print-unit`, `--install --system --run-as` |
 | [T-710](reverse.md) | P1 | M | M10 | measurement | open | A node stays reachable for months: pair renewal and legs by key, proven over 90 days and in a beta |

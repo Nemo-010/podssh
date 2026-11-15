@@ -10267,7 +10267,7 @@ line on the direct road, and the pin of the four-byte sniff.
 **Milestone:** backlog
 **Priority:** P3
 **Effort:** L
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -10423,6 +10423,13 @@ First live run from Actions, 2026-11-15 (`last-roads-live.yml` run 43661434700):
 2)". Repaired: the node asks again for an address in use from 250 ms, doubling to 5 s, and says nothing of it; the
 client asks again where no peer listens, each 500 ms for 20 s (`podssh_gsr::nobody_listens`, `address_in_use`,
 their test `the_relay_s_status_1_and_2_are_told_apart`). The live job runs again after the push.
+
+Done, 2026-11-15: the live test passed from GitHub Actions (`last-roads-live.yml` run 43666424727, job
+`a_node_at_the_gsrn_relay_serves_a_client_that_holds_its_secret`, `--features gsr`, Q106): the node registered at
+`c.gs.thc.org:443`; `greet` through the GSRN road, answered in 944 ms; then 1 MiB down, whole, its road answered in
+5.6 s as the client asked again while the node registered after the first pairing (23.6 s in all). The planted
+stranger, a client that names another node's key, was refused ("refused the node: the node has the key ..., not
+..."). The static build with the feature and `scripts/check-static.sh` wait for the release check (T-251).
 
 # T-718: Access service-token headers from files on each WebSocket road
 
