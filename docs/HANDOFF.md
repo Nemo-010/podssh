@@ -66,7 +66,6 @@ COORD-077). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; 
 | Issue | Waits for |
 | --- | --- |
 | #248 (COORD-071) | podcrates' order of Q101's waves 3 and 4; then each tag, taken at once (T-684) |
-| #260 (COORD-077) | podcrates' record of the take of `v0.51.0` (T-684) |
 | #262 (COORD-078) | pod-relay's fix: a new link of the layer off the pooled HTTP/2 connection (T-789) |
 
 ## The live runs and interop harnesses

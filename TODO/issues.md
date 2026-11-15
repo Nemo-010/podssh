@@ -323,7 +323,7 @@ and num-bigint 0.5) are T-754.
 | #257 | `[gh action] requested`: the gate on `main` after T-665's default | closed 2026-11-15: the gate passed (run 43704942887, `6732178`) | T-665 |
 | #258 | `[gh action] requested`: T-786's outage cell with the role's road | closed 2026-11-15: run 43709370293 read (T-786 done, T-789 filed) | T-786, T-789 |
 | #259 | `[gh action] requested`: T-789's outage cell of the role's road with `-v` | closed 2026-11-15: run 43710388009 read | T-789 |
-| #260 | COORD-077: podssh took podcrates v0.51.0 at 3f6a9fe (to podcrates) | open 2026-11-15: waits for podcrates to record the take of `v0.51.0` | T-684, T-787 |
+| #260 | COORD-077: podssh took podcrates v0.51.0 at 3f6a9fe (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.51.0` | T-684, T-787 |
 | #261 | `[gh action] requested`: the gate on `main` after the take of v0.51.0 | open 2026-11-15: waits for the owner's agent | T-684 |
 | #262 | COORD-078: pod-relay: a spare link of the resumable layer rides the pooled HTTP/2 connection of the silent link it replaces (to podcrates) | open 2026-11-15: asks pod-relay for a connection of its own for a new link | T-789 |
 
