@@ -77,8 +77,11 @@ jobs:
           "$lab/venv/bin/pip" install -q wisp-python==0.11.0
           "$lab/venv/bin/pip" freeze > "$lab/versions.txt"
           # The demo server's published bound, 500 kB/s for each address.
+          # wisp-python bounds the mean since the address's first byte in a
+          # fixed window, each way apart, so a quiet start banks credit for
+          # a burst: a window of 1 s makes it near a steady rate (T-625).
           nohup "$lab/venv/bin/python3" -m wisp.server --host 127.0.0.1 --port 6011 --allow-loopback \
-            --limits --bandwidth 500 --threads 1 > "$lab/wisp.log" 2>&1 &
+            --limits --bandwidth 500 --window 1 --threads 1 > "$lab/wisp.log" 2>&1 &
           echo $! > "$lab/wisp.pid"
           for i in $(seq 1 60); do
             grep -q "listening on" "$lab/wisp.log" 2> /dev/null && grep -q "listening on" "$lab/sshd.log" && break

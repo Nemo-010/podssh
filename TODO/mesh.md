@@ -12746,6 +12746,19 @@ ISP's queues, middleboxes or NAT.
 
 2026-11-15, the lab's first run (`wisp-rate.yml`, run 43670347317, `lab=far`: 60 ms each way, 50 Mbit/s, on the Wisp server's port): open and login 1.31, 1.01 and 1.01 s; 4 MiB down in 6.09, 4.03 and 4.01 s (0.657, 0.993 and 0.998 MiB/s); 4 MiB up in 1.10, 1.41 and 1.40 s (3.641, 2.846 and 2.863 MiB/s). Down is above `--bandwidth 500` (0.477 MiB/s) and up is not bounded at all: wisp-python's limit is not the bound that its flag names, or it bounds one way only. Next: read wisp-python 0.11.0's limiter, then record what the lab's bound is before the rates go into `docs/carriers.md`.
 
+2026-11-15 (next session): wisp-python 0.11.0's limiter (`wisp/server/ratelimit.py` of its wheel) bounds the mean
+bytes a second since the address's first byte in a fixed window (`--window`, 60 s by default), each way apart, and
+empties its counts at each window's end; so a quiet start banks credit, and a transfer after it bursts. That is why
+rounds 2 and 3 of run 43670347317 came down near 1 MiB/s. `wisp-rate.yml` now passes `--window 1`. Measured here
+with no netem (this kernel has none), `podssh ssh --forwarder wisp+ws://127.0.0.1:6011/` to a local sshd, two
+rounds of 4 MiB each way: down 0.482 and 0.493 MiB/s with the window of 60 s, 0.499 and 0.512 MiB/s with 1 s;
+up was bounded (8.05 to 8.23 s, 0.52 MiB/s) in some rounds and not in others (0.21 to 0.25 s), with either window
+and whatever the far command (`cat > FILE`, `cat > /dev/null`, `wc -c`). Each round delivered 4194304 bytes, and
+podssh and OpenSSH waited alike for a slow stdin on the direct road, so the bound of the upload is wisp-python's,
+not podssh's. The lab's down rate therefore holds the demo server's published bound; its up rate is the shaped
+link's and podssh's, not that bound's, and the record says so. UNVERIFIED: `wisp-rate.yml` with `lab=far` and
+`--window 1`.
+
 # T-626: I2P, Nym and cjdns: whether an overlay of peer addresses carries a podssh pair: the research
 
 **Source:** the operator's archive `ff-relay` of 2026-11-04 (its docs/carriers.md, "Dead or
