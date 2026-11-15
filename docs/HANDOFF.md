@@ -6,8 +6,8 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## The state of `main`
 
-- The gate is green at `8536613` (2026-11-15, run 43737282670 on its rerun, asked by #272): the take of podcrates
-  `v0.52.0` and T-794; its first attempt hung in m6 (T-780).
+- The gate is green at `687d17c` (2026-11-15, run 43745453729, asked by #273): the take of podcrates `v0.52.0`,
+  T-794, and m6's iroh client with `-v` (T-780).
 - The record agrees (`cargo todo check`), and `python scripts/check-repo.py` passes.
 - No draft waits for its merge ("Drafts" in `TODO/PROGRESS.md`).
 

@@ -8,8 +8,8 @@ this page keeps no history (git does).
 
 Read on 2026-11-15.
 
-1. **The gate.** Green at `8536613` (2026-11-15, run 43737282670 on its rerun, #272): the takes of podcrates
-   `v0.51.0` and `v0.52.0`, and T-794's repair of `cold_connect`; its first attempt hung in m6 (T-780, a fourth shape). This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
+1. **The gate.** Green at `687d17c` (2026-11-15, run 43745453729, #273, first attempt): the takes of podcrates
+   `v0.51.0` and `v0.52.0`, T-794's repair of `cold_connect`, and m6's iroh client with `-v` (T-780). This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
    owner's agent by an issue `[gh action] requested` (`docs/HANDOFF.md`, "How to test"), one new issue for each ask,
    never an amended one (the agent ran #255's first block). The record agrees (`cargo todo check`), and
    `python scripts/check-repo.py` passes. A push cancels the gate of the one before it, so a commit's gate is
