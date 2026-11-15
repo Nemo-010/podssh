@@ -164,6 +164,7 @@ pub(crate) fn check(args: &NodeArgs) -> Result<(), Refusal> {
 /// ticket, and the servers that it may move to.
 pub(crate) struct Online {
     node: Node,
+    say: derp::Say, // the node's own lines
     first: Conn,
     pub ticket: Ticket,
     servers: Vec<Server>,
@@ -185,7 +186,8 @@ pub(crate) async fn online(
     let (secret, dial) = (Arc::new(Secret::of_node(identity)), dial::tls(trust.clone(), proxy.clone()));
     let probe = |server: &Server| servers::answers(server.clone(), trust.clone(), proxy.clone());
     // The first server that answers and lets the node's key in (T-534).
-    let (found, missed) = derp::far::home(&secret, &dial, &say, servers, probe).await;
+    let (events, names) = (derp::events(say.clone()), derp::names());
+    let (found, missed) = derp::far::home(&secret, &dial, &events, &names, servers, probe).await;
     let Some((home, first)) = found else {
         let message = format!(
             "no DERP server answered {} ({}); podssh doctor checks the way to them, and --opentunnel serves the \
@@ -198,9 +200,9 @@ pub(crate) async fn online(
     for why in &missed {
         say(format!("a DERP server did not answer: {why}"));
     }
-    let node = Node { secret, server: home.clone(), dial, say };
+    let node = Node { secret, server: home.clone(), dial, events, names };
     let ticket = Ticket { node: identity.public(), derp: first.key(), server: home };
-    Ok(Online { node, first, ticket, servers: servers.to_vec(), tell: Default::default() })
+    Ok(Online { node, say, first, ticket, servers: servers.to_vec(), tell: Default::default() })
 }
 
 impl Online {
@@ -226,11 +228,11 @@ impl Online {
         O: Fn() -> F + Clone + Send + Sync + 'static,
         F: Future<Output = Result<A, String>> + Send + 'static,
     {
-        let Online { node, first, ticket, servers, tell } = self;
-        let say = node.say.clone();
+        let Online { node, say, first, ticket, servers, tell } = self;
         let moved: far::Moved = Arc::new(move |server: &Server| {
             let now = Ticket { server: server.clone(), ..ticket.clone() };
-            say(format!("the home moved to the DERP server {server}{}; the ticket is now {now}", server.fleet_note()));
+            let note = servers::fleet_note(server);
+            say(format!("the home moved to the DERP server {server}{note}; the ticket is now {now}"));
             tell.derp(&now);
         });
         far::serve_roaming(node, Roam { servers, moved }, Some(first), settings, budget, open, keeper).await;
@@ -378,7 +380,7 @@ async fn serve(ready: Ready, err: &mut dyn Write) -> i32 {
         err,
         "podssh node: {label}: home {}, the first DERP server that answered{}",
         road.home(),
-        road.home().fleet_note()
+        servers::fleet_note(road.home())
     );
     let _ = writeln!(err, "podssh node: {label}: ticket {}", road.ticket);
     if let Door::Allow(allow) = &door {

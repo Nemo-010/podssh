@@ -181,7 +181,7 @@ impl<'a> RecordRoads<'a> {
             return Err("its record names no DERP home".into());
         };
         let dialer = self.derp_dialer(&ticket, servers)?;
-        dialer.link().await.map(Road::Derp)
+        dialer.link().await.map(Road::Derp).map_err(|e| e.to_string())
     }
 
     /// The dialer of `ticket`: the one made for it, else a new one, the

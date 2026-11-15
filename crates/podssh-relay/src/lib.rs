@@ -138,8 +138,15 @@ pub mod keyed;
 #[cfg(feature = "localtunnel")]
 pub mod localtunnel;
 pub mod open;
+// The OpenTunnel road (T-530): pod-opentunnel of PodUtils/podcrates (T-684),
+// with podssh's variable.
 #[cfg(feature = "opentunnel")]
-pub mod opentunnel;
+pub mod opentunnel {
+    pub use pod_opentunnel::*;
+
+    /// `no` turns the road off; an `https://` URL names another service.
+    pub const ENV: &str = "PODSSH_OPENTUNNEL";
+}
 #[cfg(feature = "pair")]
 pub mod pair;
 #[cfg(feature = "pinggy")]
@@ -149,8 +156,9 @@ pub mod pinggy;
 pub mod hyperdht;
 #[cfg(any(feature = "tox", feature = "yggdrasil"))]
 pub mod packet_stream;
+// The Piping Server road (T-437): pod-piping of PodUtils/podcrates (T-684).
 #[cfg(feature = "piping")]
-pub mod piping;
+pub use pod_piping as piping;
 pub mod pool;
 #[cfg(feature = "serveo")]
 pub mod serveo;

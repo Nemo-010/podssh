@@ -1578,6 +1578,10 @@ a session carries 1 MiB each way and survives the carrier's loss by moving to an
 Live, short (Q65): one session through Least Authority's server from GitHub Actions. Planted:
 the wrong side's line, and the meeting fails.
 
+## Correction
+
+The test target `transit` of `podssh-relay` moved to `pod-transit` of PodUtils/podcrates when podssh took the crate: `cargo test -p pod-transit --all-features --test transit` there runs it, with its name.
+
 ## Done
 
 2026-11-02: drafted by an agent of this session in a worktree, then merged, built and measured
@@ -1611,8 +1615,9 @@ here.
   two clients never take each other for the node.
 - `cargo test -p podssh-cli --test node`: 4 passed, with the variable's refusal. The whole suite
   of podssh-cli passed, as `ssh node://` with a pair now goes through the race.
-- Planted (`scripts/plants/t436-transit-same-side.patch`, group `host-transit`):
-  `sh scripts/plant-each.sh --here t436-transit-same-side`: caught, the 1 MiB test FAILED.
+- Planted (scripts/plants/t436-transit-same-side.patch, group `host-transit`):
+  `sh scripts/plant-each.sh --here t436-transit-same-side`: caught, the 1 MiB test FAILED. The
+  plant and the tests went to pod-transit with the code (PodUtils/podcrates@T-027).
 - Live, short (Q65), from this cloud session's host through its proxy:
   `cargo test -p podssh-relay --test transit -- --ignored`, ten runs in a row: two ends met at
   Least Authority's relay and carried 1 MiB each way, and a session of the layer echoed 1 MiB,
@@ -1662,7 +1667,7 @@ A proxy that refuses the WebSocket upgrade leaves podssh with no public road wit
 2026-11-02 (the drafting agent), each a defensible call by `AGENTS.md`, section 2:
 
 1. **The meeting point is the pair's secret.** The key is the HMAC of the connect token over the
-   pair's name (`crates/podssh-relay/src/piping/paths.rs`): both ends hold the token (the node the
+   pair's name (crates/podssh-relay/src/piping/paths.rs at `b9c04657`): both ends hold the token (the node the
    whole pair, an operator its part), and no path shows it. The node waits at a door, a GET of one
    path of the key; a client's hello there names a random link id, with a tag of the key, and the
    link's two ways have paths of that id, each beginning with a mark that the receiver checks.
@@ -1673,7 +1678,7 @@ A proxy that refuses the WebSocket upgrade leaves podssh with no public road wit
 2. **Unasked, the road follows a probe.** A node probes once at its start: an upgrade of its
    socket's path at the relay with no token, which the relay refuses with its own word
    (`403 reverse: forbidden`, docs/relay.md); a refusal of 400, 403, 405 or 501 in words that are
-   not the relay's, or a `426`, is a refusal on the way (`crates/podssh-relay/src/piping/probe.rs`).
+   not the relay's, or a `426`, is a refusal on the way (crates/podssh-relay/src/piping/probe.rs at `b9c04657`).
    Then the node serves the road alone, until the pair expires (77). A connection that ends with no
    answer, or a gateway's `5xx`, is no cue: a relay that went away, as in the CLI's tests of a
    stand-in relay, looks the same, and the road would then reach `ppng.io` from a test. A client takes the road when its pair's leg finds the
@@ -1695,9 +1700,9 @@ A proxy that refuses the WebSocket upgrade leaves podssh with no public road wit
    under Q44. The draft left a question for the merge: the node's door on HTTP/1.1 is one more
    connection while a session runs, which no ruling names. Decided at the merge (2026-11-02, the
    main session), within Q44 and with no question to the operator: over HTTP/1.1 the node closes
-   its door while a link runs (`crates/podssh-relay/src/piping/far.rs`, one link at a time), and a
+   its door while a link runs (crates/podssh-relay/src/piping/far.rs at `b9c04657`, one link at a time), and a
    streamed way ends each idle kept connection before it dials
-   (`crates/podssh-relay/src/piping/exchange.rs`), so each end holds two connections at most.
+   (crates/podssh-relay/src/piping/exchange.rs at `b9c04657`), so each end holds two connections at most.
    Lost: the door kept open on HTTP/1.1 while a session runs (a third connection, beyond Q44; a
    second client waits for the first link's end instead); one HTTP/1.1 connection for the door and
    each way in turn (a link that waits for the door's next answer).
@@ -1750,7 +1755,7 @@ server, over HTTP/2 and HTTP/1.1 through the Rust server, and in numbered pieces
 stand-in proxy that holds bodies; a client of another pair finds no node; the stand-in's refusal
 of the upgrade is the road's cue. Live, short (Q65): 64 KiB each way through `ppng.io`, directly
 and through the box's proxy of names (`piping.yml`). Planted: the client's two ways swapped
-(`scripts/plants/t437-paths-swapped.plant`), and the test of the ends' paths and each session
+(scripts/plants/t437-paths-swapped.plant at `b9c04657`), and the test of the ends' paths and each session
 fail.
 
 ## Done
@@ -1758,7 +1763,7 @@ fail.
 2026-11-02: drafted by an agent of this session in a worktree, then merged, built and measured
 here.
 
-- The road in `crates/podssh-relay/src/piping/` (feature `piping`, which podssh-cli enables): the
+- The road in crates/podssh-relay/src/piping/ at `b9c04657` (feature `piping`, which podssh-cli enables): the
   server's URL, the paths and the hello, TLS with ALPN `h2` and `http/1.1`, HTTP/1.1's framing,
   HTTP/2 on one connection with PINGs, the exchanges with a kept HTTP/1.1 connection, the
   streamed and the numbered links, the client and its `carry`, the node at its door, and the
@@ -3265,7 +3270,7 @@ fails it.
 2026-11-02, the gate's libs step at `0b6fcdb` (41406146247) named a test of the relay suite that
 fails at random: `derp_link`'s `a_node_whose_home_went_away_moves_and_a_client_of_the_old_ticket_finds_it`
 waited its whole 180 s for a move, and the same commit's next push passed it. The cause, confirmed:
-the DERP stand-in (`crates/podssh-relay/tests/derp_stand_in/mod.rs`) answered a client before it
+the DERP stand-in (`PodUtils/podcrates:crates/pod-derp/src/standin.rs`) answered a client before it
 registered the client's key, so the test's cut of that key, right after the client had its answer,
 found no client and did nothing; planted, a delay of 200 ms between the answer and the
 registration failed the test the same way at its 180 s. Repaired: the stand-in registers first;
@@ -4510,8 +4515,8 @@ with no upgrade. podssh does not speak it.
   certificates a day for one tunnel.
 - The node's TLS can be podssh-ws's server, which signs P-256 in pure Rust:
   `crates/podssh-ws/src/tls_server.rs:1` says "TLS for a server of podssh's". The CSR of a name is
-  made by the binary's ACME client, on aws-lc-rs: `crates/podssh-cli/src/acme/certs.rs:91` says
-  "pub fn csr". The crate `opentunnel` takes rustls with ring
+  made by the binary's ACME client, on aws-lc-rs: PodUtils/podcrates:crates/pod-acme/src/certs.rs (`pod-acme`, since
+  PodUtils/podcrates@T-034) holds "pub fn csr". The crate `opentunnel` takes rustls with ring
   (`anomalyco/opentunnel:crates/opentunnel/Cargo.toml`), C that rule 4 of `AGENTS.md` (section 5)
   keeps out of the library crates.
 - Each carrier of the reverse road is a module of `podssh-relay` behind a feature of its own
@@ -4541,7 +4546,7 @@ with no upgrade. podssh does not speak it.
 Made by the drafting agent of 2026-11-03, each with the alternative that lost:
 
 1. A `429` or a `503` whose `Retry-After` is longer than the 8 s that a retry of the protocol waits
-   is said at once, with its wait (`crates/podssh-relay/src/opentunnel/retry.rs`, `too_long`). Lost:
+   is said at once, with its wait (crates/podssh-relay/src/opentunnel/retry.rs at `b9c04657`, `too_long`). Lost:
    six retries of 8 s, as OpenTunnel's own clients make them: none can pass a limit of half an hour,
    and each costs the service a request.
 2. A kept tunnel whose token the service refuses (`401`) or that it does not know (`404`) is made
@@ -4585,11 +4590,11 @@ Read again on 2026-11-03 at the cited lines and in `anomalyco/opentunnel` at the
 (its documents of the protocol and of the server, the crate of its client and its vectors), through the
 services of web.pkgforge.dev:
 
-- The CSR: `crates/podssh-cli/src/acme/certs.rs:91` says "pub fn csr", but that CSR has no subject
+- The CSR: PodUtils/podcrates:crates/pod-acme/src/certs.rs holds "pub fn csr", but that CSR has no subject
   and one name, as an ACME order takes it; the service refuses each CSR whose common name is not
   the tunnel's name or whose names are not exactly that name and its wildcard
   (`anomalyco/opentunnel:docs/server.md`, "Only a tunnel's own names"). So the binary needs a CSR of its own form beside it (T-531), behind
-  the trait `Credentials` of `crates/podssh-relay/src/opentunnel/record.rs`.
+  the trait `Credentials` of crates/podssh-relay/src/opentunnel/record.rs at `b9c04657`.
 - Not each carrier is behind a feature: `crates/podssh-relay/src/lib.rs` builds `transit` with
   none. The derp and piping roads are, and so is this one, `opentunnel`.
 - The hosted API sits behind Cloudflare (`anomalyco/opentunnel:docs/protocol.md`, "Retries and
@@ -4600,15 +4605,20 @@ services of web.pkgforge.dev:
 - The bridge's frames, control messages, routes and names follow the protocol's vectors
   (`anomalyco/opentunnel:spec/vectors/control.json`, and its `frames.json`, `names.json` and
   `routes.json`), which the unit tests
-  of `crates/podssh-relay/src/opentunnel/wire.rs` hold. The documents leave open what the service
+  of crates/podssh-relay/src/opentunnel/wire.rs at `b9c04657` hold. The documents leave open what the service
   answers to a bridge's upgrade for an unknown tunnel: the code takes a `404` there as final, and
   each other refusal as worth a retry.
-- The Prove's run against OpenTunnel's server in containers is `.github/workflows/opentunnel-interop.yml`:
+- The Prove's run against OpenTunnel's server in containers is .github/workflows/opentunnel-interop.yml at `b9c04657`:
   the server built from its source at v0.6.1 on the runner, with the runner's MySQL 8 and squid, and
   no container image, as `scripts/check-repo.py` reads images from `images/` alone. Its dials go to
   the server's address through squid, with the test's domain in TLS alone, as no resolver knows that
   domain. The native test is against a stand-in written from the documents,
   `crates/podssh-relay/tests/opentunnel_stand_in/`.
+
+2026-11-15: the test targets opentunnel_link, opentunnel_interop and opentunnel_live of
+podssh-relay left with the road, which `pod-opentunnel` of PodUtils/podcrates holds
+(PodUtils/podcrates@T-033): its Prove runs there as
+`cargo test -p pod-opentunnel --test opentunnel_link`.
 
 ## Done
 
@@ -4617,7 +4627,7 @@ day, and run against OpenTunnel's own server in Actions.
 
 What changed:
 
-- `crates/podssh-relay/src/opentunnel/` (new, feature `opentunnel`, pure Rust): `mod.rs` (the
+- crates/podssh-relay/src/opentunnel/ at `b9c04657` (new, feature `opentunnel`, pure Rust): `mod.rs` (the
   service, `PODSSH_OPENTUNNEL`), `wire.rs` (the control messages, the data frames, the routes),
   `retry.rs` (the protocol's retries), `api.rs` (the HTTP API on podssh-ws's HTTP/1.1), `dial.rs`
   (TLS to the API through the proxy; TCP to a tunnel's name), `record.rs` (the record, its store,
@@ -4628,10 +4638,10 @@ What changed:
   `scripts/gate.sh`: the feature in the build and the tests of the library crates with no C
   compiler, and in the check on their minimum Rust.
 - `crates/podssh-relay/tests/opentunnel_stand_in/` (new): the stand-in server, its CA and the
-  credentials of a test's node; `crates/podssh-relay/tests/opentunnel_link.rs` (new): 7 tests;
-  `crates/podssh-relay/tests/opentunnel_interop.rs` (new): the run against OpenTunnel's server;
-  `.github/workflows/opentunnel-interop.yml` (new), by hand.
-- `scripts/plants/t530-tunnel-not-kept.patch` and `.plant`: the record never saved.
+  credentials of a test's node; crates/podssh-relay/tests/opentunnel_link.rs at `b9c04657` (new): 7 tests;
+  crates/podssh-relay/tests/opentunnel_interop.rs at `b9c04657` (new): the run against OpenTunnel's server;
+  .github/workflows/opentunnel-interop.yml at `b9c04657` (new), by hand.
+- scripts/plants/t530-tunnel-not-kept.patch at `b9c04657` and `.plant`: the record never saved.
 - `docs/carriers.md` (the reverse road, item 6), `docs/STATUS.md` (a section of the road).
 
 Results:
@@ -4647,7 +4657,7 @@ Results:
   MySQL 8, its local CA and squid (run 41675551360 at `69df297`): the node kept its tunnel and a
   client echoed 1 MiB through squid (1 passed); the planted CSR of the tunnel's name alone failed,
   "certificate not valid for name", as it must.
-- Planted (`scripts/plants/t530-tunnel-not-kept.plant`): caught:
+- Planted (scripts/plants/t530-tunnel-not-kept.plant at `b9c04657`): caught:
   `a_node_started_again_keeps_its_tunnel_and_binds_no_new_csr` failed.
 
 # T-531: The OpenTunnel road in the command line: `podssh node --opentunnel` and `ssh node://`
@@ -4766,8 +4776,8 @@ What changed:
 - `crates/podssh-cli/src/node_opentunnel.rs` (new): the node of the road, its flags, its door,
   `unasked` (Q76), the binary's `Keys` (the key and the CSR of a tunnel), its lines, the pair's road
   beside it with one keeper; unit tests.
-- `crates/podssh-cli/src/acme/certs.rs`: `tunnel_csr`, the CSR of a tunnel's name and its
-  wildcard; a test in `crates/podssh-cli/src/acme/certs_tests.rs` reads it with x509-parser.
+- crates/podssh-cli/src/acme/certs.rs (now pod-acme's): `tunnel_csr`, the CSR of a tunnel's name and its
+  wildcard; a test in crates/podssh-cli/src/acme/certs_tests.rs reads it with x509-parser.
 - `crates/podssh-cli/src/ssh/opentunnel.rs` (new): `--opentunnel-name`, the name kept under NAME,
   the dialer; `crates/podssh-cli/src/ssh/roads.rs` and `crates/podssh-cli/src/ssh/road_link.rs`:
   the road in the race; `crates/podssh-cli/src/ssh/node.rs`: `run` and `resolved`, moved from
@@ -4786,10 +4796,10 @@ What changed:
   `crates/podssh-cli/src/flags/node.rs`: the rows; `crates/podssh-cli/src/man/notes_pair.rs`,
   `crates/podssh-cli/src/man/notes_ssh.rs`, `crates/podssh-cli/src/man/notes_doctor.rs`,
   `crates/podssh-cli/src/man/facts/roads.rs`: the notes and `PODSSH_OPENTUNNEL`.
-- `crates/podssh-relay/src/opentunnel/api.rs`: `remove`, for the live run's throwaway tunnel.
+- crates/podssh-relay/src/opentunnel/api.rs at `b9c04657`: `remove`, for the live run's throwaway tunnel.
 - `crates/podssh-cli/tests/opentunnel_road.rs` (new): 3 tests;
-  `crates/podssh-relay/tests/opentunnel_live.rs` (new, ignored) and
-  `.github/workflows/opentunnel-live.yml` (new), by hand.
+  crates/podssh-relay/tests/opentunnel_live.rs at `b9c04657` (new, ignored) and
+  .github/workflows/opentunnel-live.yml at `b9c04657` (new), by hand.
 - `scripts/plants/t531-no-door.patch` and `.plant`.
 - `docs/cli.md`, `docs/reverse.md` ("The OpenTunnel road"), `docs/carriers.md`, `docs/mesh.md`,
   `SECURITY.md`, `docs/STATUS.md`.
@@ -4912,12 +4922,12 @@ moved code then runs there.
 
 - The Correction of 2026-11-05 above: podssh has taken no `pod-opentunnel`, nor `pod-cloudflare`
   (`TODO/PROGRESS.md`, state item 7, lists the crates taken, and says that no file of podssh is
-  frozen), so the OpenTunnel road (`crates/podssh-relay/src/opentunnel/`) and T-180's origin
+  frozen), so the OpenTunnel road (crates/podssh-relay/src/opentunnel/ at `b9c04657`) and T-180's origin
   (`crates/podssh-relay/src/quick/funnel.rs`) are podssh's code, changed here.
 - Premise, item 1 holds: `crates/podssh-relay/src/quick/funnel.rs:32` says "pub const TLS_LINE".
   Item 2: `docs/carriers.md` (the reverse road, item 6) says that the service reads the SNI alone
   and that TLS ends at the client; the route `@` of the tunnel's own name is the protocol's, in
-  `crates/podssh-relay/src/opentunnel/wire.rs` (`ROOT_ROUTE`), not in that page.
+  crates/podssh-relay/src/opentunnel/wire.rs at `b9c04657` (`ROOT_ROUTE`), not in that page.
 - Approach, item 1: T-180's origin reads one request on each pipe and drops a chunked answer's
   framing, as the edge takes a body's bytes alone; on a visitor's own connection the answer keeps
   its framing and says `Connection: close` (Decision 3).
@@ -4936,7 +4946,7 @@ run by the main session. The merge found a defect of the OpenTunnel road that th
 not see: a connection's end went out on the control queue, which the bridge's biased writer
 drains before the data queue, so the end of a visitor's connection could pass its last frames
 and the server cut the answer (curl's exit 52 or 18, three runs in five). It is repaired in
-`crates/podssh-relay/src/opentunnel/conn.rs` (`Queued`, `Outbox::end_after`: the end goes in
+crates/podssh-relay/src/opentunnel/conn.rs at `b9c04657` (`Queued`, `Outbox::end_after`: the end goes in
 the data queue, behind the frames) and `bridge.rs` (the writer sends either kind in order); the
 same defect could cut a node's sessions, and the node's road takes the repair too. The unit test
 of `conn.rs` now asserts the end's place behind the last frame.
@@ -4952,7 +4962,7 @@ What changed:
   and `--warp` and with `PODSSH_OPENTUNNEL=no` (64), the fallback of Q76, and the quick tunnel's
   URL once the edge registered it; `crates/podssh-cli/src/lib.rs`: the module;
   `crates/podssh-cli/src/node_opentunnel.rs`: `kept_line` shared.
-- `crates/podssh-relay/src/opentunnel/far.rs`: `Node::acceptor` and `bridges`, the loop of the
+- crates/podssh-relay/src/opentunnel/far.rs at `b9c04657`: `Node::acceptor` and `bridges`, the loop of the
   bridge shared by the node and the funnel, with no change of the node's behaviour or lines.
 - `crates/podssh-relay/src/quick/funnel.rs`: `Funnel::on_own_connections`; two unit tests in
   `crates/podssh-relay/src/quick/funnel_tests.rs`.
@@ -6016,9 +6026,9 @@ POST: the lines came to the GET only after the POST's body ended, and the transf
 Premise's second server holds a streamed body until its end; which hop holds it was not measured
 (Inferred: the platform's front, or Cloudflare before it, as `docs/carriers.md:850` says "Render's
 origin behind Cloudflare"). On it the road's streamed link gets no answer, and a client takes
-numbered pieces once its wait ends (`crates/podssh-relay/src/piping/flow.rs:24` says "pub const
+numbered pieces once its wait ends (crates/podssh-relay/src/piping/flow.rs:24 at `b9c04657` says "pub const
 HELLO_LIMIT: Duration = Duration::from_secs(15);"), again in each run
-(`crates/podssh-relay/src/piping/client.rs:126` says "this client's links go in numbered pieces
+(crates/podssh-relay/src/piping/client.rs:126 at `b9c04657` says "this client's links go in numbered pieces
 from now on"). The Premise holds otherwise. The Approach gains:
 
 4. A server whose streamed link was held is kept so in the cache for a day, with the egress that
@@ -6034,6 +6044,11 @@ stand-in) goes to `pod-piping` of PodUtils/podcrates (T-684; the waves are in Q1
 fixes only, and once podssh takes the crate the work is done in PodUtils/podcrates, which podssh
 takes by the next tag; a test of the moved code then runs there.
 
+2026-11-15: the test targets piping and piping_live of podssh-relay left with the road, which
+`pod-piping` of PodUtils/podcrates holds (PodUtils/podcrates@T-032): its Prove runs there as
+`cargo test -p pod-piping --test piping` and
+`cargo test -p pod-piping --test piping_live -- --ignored`.
+
 ## Done
 
 2026-11-06, at podcrates `v0.6.0`, which lifted the entry's blocker (`piping.onrender.com` as a
@@ -6041,7 +6056,7 @@ service of pod-services, asked in COORD-004, GitHub #158, closed):
 
 - `piping::server::public()`, the servers of kind `piping` of pod-services in their order
   (`ppng.io`, then `piping.onrender.com`), and `Server::holds_bodies` from the fact
-  `streams-request-body` (`crates/podssh-relay/src/piping/server.rs`).
+  `streams-request-body` (crates/podssh-relay/src/piping/server.rs at `b9c04657`).
 - The node (`far.rs`): `Node::fallbacks`; its door at the first server that answers, the next
   when a door fails (not a 400, another receiver of the path), back to the first after a refresh
   with no link running at the later one; the connections of a server that it leaves are closed.
@@ -6056,7 +6071,7 @@ service of pod-services, asked in COORD-004, GitHub #158, closed):
   each server in its line; doctor asks each server's `/version`; the manual (`facts/roads.rs`,
   `notes_net.rs`, `notes_pair.rs`, `notes_public.rs`) and `docs/cli.md`.
 - Tests: `the_node_and_the_client_meet_at_the_second_server_when_the_first_is_down`
-  (`crates/podssh-relay/tests/piping.rs`), with nwtgck/piping-server 1.12.9 and
+  (crates/podssh-relay/tests/piping.rs at `b9c04657`), with nwtgck/piping-server 1.12.9 and
   piping-server-rust 0.18.0 on the loopback, the first server a port where nothing listens and the
   second behind the stand-in that holds each body: the session meets at the second, numbered;
   `exchange_tests.rs` (the words of each server's answer, Render's cut one among them); the public
@@ -6603,8 +6618,8 @@ that they let podssh in.
 ## Premise
 
 - `docs/decisions.md:42` says "Q74: Tailscale's main DERP fleet, after tailcat's".
-- `crates/podssh-relay/src/derp/servers.rs:22` says "The servers of tailcat's map, in the order
-  of its regions: New York,", and `crates/podssh-relay/src/derp/servers.rs:185` says "pub fn
+- `PodUtils/podcrates:crates/pod-derp/src/servers.rs` says "The servers of tailcat's map, in the order
+  of its regions: New York,", and `PodUtils/podcrates:crates/pod-derp/src/servers.rs` says "pub fn
   for_client(home: &Server) -> Vec<Server> {": a client tries the ticket's server, then the
   rest of tailcat's four.
 - `docs/carriers.md:752` says "88 servers in 28 regions in Tailscale's map, 85 of which
@@ -6612,9 +6627,9 @@ that they let podssh in.
   of who may relay, and whether Tailscale's servers run with `--verify-clients` was not read.
   Headscale's documents read the map at `https://controlplane.tailscale.com/derpmap/default`
   (`docs/carriers.md`, the reverse road, item 2).
-- `crates/podssh-relay/src/derp/key.rs:126` says "acknowledge, and the name of the program,
+- `PodUtils/podcrates:crates/pod-derp/src/key.rs` says "acknowledge, and the name of the program,
   which a server may count by,": a server may refuse podssh by the name of its program.
-- `crates/podssh-relay/tests/derp_live.rs:3` says "server of the fleet whose probe answers
+- `PodUtils/podcrates:crates/pod-derp/tests/derp_live.rs` says "server of the fleet whose probe answers
   through the proxy of the": the live test of tailcat's fleet, 64 KiB each way, run by hand.
 - `AGENTS.md:319` says "Short, to learn whether it lets podssh in": short runs from GitHub Actions and the session's host.
 
@@ -6671,9 +6686,11 @@ PodUtils/podcrates") applies: from the import podssh makes fixes only, and once 
 crate the work is done in PodUtils/podcrates, which podssh takes by the next tag; a test of the
 moved code then runs there.
 
+The test target `derp_live` of `podssh-relay` moved to `pod-derp` of PodUtils/podcrates when podssh took the crate (its T-031): `cargo test -p pod-derp --test derp_live -- --ignored` there runs it, with its name, and so `derp_main_live`.
+
 ## Done
 
-2026-11-06. Step 1, the test: `crates/podssh-relay/tests/derp_main_live.rs`, ignored and run
+2026-11-06. Step 1, the test: `PodUtils/podcrates:crates/pod-derp/tests/derp_main_live.rs`, ignored and run
 by hand with `PODSSH_DERP_MAP_FILE` naming Tailscale's default map (pod-services' service
 `tailscale-derp-map`, `https://login.tailscale.com/derpmap/default`, read that day: 28 regions); for
 the first server of each region in the order of the ids, DERP's handshake with a random key and
@@ -6690,11 +6707,11 @@ regions, read on 2026-11-06, each endpoint named `CODE-N`).
 
 Done, 2026-11-06, at podcrates `v0.6.0`: steps 2 to 4.
 
-- `crates/podssh-relay/src/derp/servers.rs`: `main_fleet()` (the first of each region in the order
+- `PodUtils/podcrates:crates/pod-derp/src/servers.rs`: `main_fleet()` (the first of each region in the order
   of the regions' ids, then the others), `fleet_with`, `fleet()` and `from_environment` with the
   main fleet after tailcat's four unless `PODSSH_DERP_MAIN=no` (`main_wanted`; another word is
   refused), `Server::fleet_name` and `fleet_note`.
-- `crates/podssh-relay/src/derp/far.rs`: `home`, the first server whose probe answers and whose
+- `PodUtils/podcrates:crates/pod-derp/src/far.rs`: `home`, the first server whose probe answers and whose
   handshake completes, so a server that closes after the client's info (derper's
   `--verify-clients`) sends the node to the next; the main fleet is searched for 60 s at most
   (`MAIN_SEARCH`), as 91 probes of 5 s in a cage would hold the node for minutes.
@@ -6707,7 +6724,7 @@ Done, 2026-11-06, at podcrates `v0.6.0`: steps 2 to 4.
   services (`notes_pair.rs`, `notes_ssh.rs`, `notes_public.rs`); `docs/cli.md`.
 - Tests: `derp::servers` (the order, a client's order for a home of the main fleet, the fleet's
   words, `PODSSH_DERP_MAIN`); `a_server_that_closes_after_the_client_s_info_sends_the_node_to_the_next`
-  (`crates/podssh-relay/tests/derp_link.rs`, the stand-in with `refuses`, as derper's
+  (`PodUtils/podcrates:crates/pod-derp/tests/derp_link.rs`, the stand-in with `refuses`, as derper's
   `--verify-clients` closes).
 
 Measured: `cargo test -p podssh-relay --features derp --lib derp::servers` and `--test derp_link`,
@@ -6717,7 +6734,7 @@ stops at a failed handshake fails the stand-in test. Live, short (Q74): `derp_li
 `Tailscale's main fleet derp1f.tailscale.com answered /derp/probe in 198 ms`. `derp_main_live` now
 reads the list that podssh uses (pod-services) when no map is named, and asks that most regions
 relay; run so from this host, 27 of the 28 regions' first servers relayed 64 KiB each way
-(`derp24b.tailscale.com`, hnl, reset during TLS again). The run from GitHub Actions of step 1: `.github/workflows/derp-main-live.yml`, by hand,
+(`derp24b.tailscale.com`, hnl, reset during TLS again). The run from GitHub Actions of step 1: `PodUtils/podcrates:.github/workflows/live.yml`, by hand,
 asked of the owner's agent with the next gate (`docs/development.md`, "A run of GitHub Actions asked
 of the owner's agent"). `cargo test -p podssh-cli` (2,015 passed), `cargo test -p podssh-relay
 --features derp,piping` (534 passed), and clippy as the gate runs it.
@@ -10058,6 +10075,11 @@ kind `piping` by rank, `holds_bodies()` reads the fact, and `PODSSH_PIPING` keep
 
 2026-11-14. The blocker ended with podcrates `v0.42.0`. It said: PodUtils/podcrates: the road reads its public servers from `pod-services`, in the order of their `[rank]`, and holds no host of its own; the catalog at podssh's tag (`v0.40.0`) has `ppng-piping` and `onrender-piping` only. COORD-061 (GitHub #238, 2026-11-14) asks for `serv00-piping`, rank 2, with `streams-request-body = false`. Once a tag holds it, podssh takes the tag, extends `the_public_servers_are_ppng_io_then_onrender_which_holds_bodies` and the test of the order to the third server, and runs the short live exchange.
 
+2026-11-15: the test targets piping and piping_live of podssh-relay left with the road, which
+`pod-piping` of PodUtils/podcrates holds (PodUtils/podcrates@T-032): its Prove runs there as
+`cargo test -p pod-piping --test piping` and
+`cargo test -p pod-piping --test piping_live -- --ignored`.
+
 ## Done
 
 2026-11-14, on podcrates `v0.42.0`, whose `pod-services` has `serv00-piping` (rank 2, `streams-request-body =
@@ -10072,7 +10094,7 @@ by rank, and `holds_bodies()` reads the fact.
   links are numbered. piping-server-rust is not here, so its arms said that they did not run.
 - Live, short (T-548's Decision): `PODSSH_PIPING=https://p.kokoro.serv00.net cargo test -p podssh-relay --features
   piping --test piping_live -- --ignored a_session_through`: passed in 15 s, over HTTP/2, in numbered pieces.
-- Planted (`scripts/plants/t575-third-before-second.plant`, the third server before the second): caught.
+- Planted (scripts/plants/t575-third-before-second.plant at `b9c04657`, the third server before the second): caught.
 
 # T-576: HTTP Relay's demo server as a last fallback, in the Piping Server road's pieces
 
@@ -10481,7 +10503,7 @@ the roads over TCP.
   with a request of ID 0x401 and the address; `docs/carriers.md:2246` says "UDP alone, which the
   hosts of podssh's design do not have".
 - `crates/podssh-relay/src/quick/probe.rs:1` says "The probe of UDP before QUIC (T-400): one QUIC
-  packet of a reserved", and `crates/podssh-relay/Cargo.toml:56` says "The quick tunnel over
+  packet of a reserved", and `crates/podssh-relay/Cargo.toml:60` says "The quick tunnel over
   QUIC (src/quick/quic.rs, T-301): noq, the QUIC of the": a probe of UDP and a QUIC with no C
   exist.
 
@@ -10609,7 +10631,7 @@ road with no relay. podssh does not speak it (Q82).
 - `docs/carriers.md:2258-2259` says "a token of 32 bytes that the TLS keying material exporter
   derives", and `docs/carriers.md:2261-2262` says "as the server never answers a command";
   `docs/carriers.md:2264` says "are mihomo, shoes, sing-box and Itsusinn's tuic".
-- `crates/podssh-relay/Cargo.toml:56` says "The quick tunnel over QUIC (src/quick/quic.rs,
+- `crates/podssh-relay/Cargo.toml:60` says "The quick tunnel over QUIC (src/quick/quic.rs,
   T-301): noq, the QUIC of the".
 
 ## Approach
@@ -10671,7 +10693,7 @@ fixes only, and once podssh takes the crate the work is done in PodUtils/podcrat
 takes by the next tag; a test of the moved code then runs there.
 
 2026-11-12. The Premise holds: `docs/decisions.md:34`, `docs/carriers.md:2258-2264` and
-`crates/podssh-relay/Cargo.toml:56` say what it quotes. `pod-egress` is not taken (`TODO/PROGRESS.md`,
+`crates/podssh-relay/Cargo.toml:60` say what it quotes. `pod-egress` is not taken (`TODO/PROGRESS.md`,
 State, item 7), so the road is in `podssh-ws` (`tuic/`, behind its feature `quic`) until it is, as T-739's
 VMess is; podcrates imports it with the other roads of `pod-egress`. The QUIC that it needs is `pod-quic`'s,
 taken on 2026-11-12 (the endpoint, the connection within its wait, the probe of UDP), used as it is: no
@@ -11862,7 +11884,7 @@ podssh takes by the next tag; a test of the moved code then runs there.
 
 2026-11-13, the draft. podssh has not taken `pod-iroh` or `pod-opentunnel`: neither is in the list
 of crates taken (`TODO/PROGRESS.md`, state item 7, at `v0.40.0`), and that item says that no file of
-podssh is frozen now. So `crates/podssh-iroh/src/pkarr_record.rs`, `crates/podssh-relay/src/opentunnel/`
+podssh is frozen now. So `crates/podssh-iroh/src/pkarr_record.rs`, crates/podssh-relay/src/opentunnel/ at `b9c04657`
 and the command line's files of this entry are podssh's to change, and the work is done here. The
 Prove's second command needs the feature `iroh-test`, not `iroh`: the server of pkarr on the
 loopback (`podssh_iroh::test_pkarr`) is built with `podssh-iroh/test-relay` alone, as the test of
@@ -12460,7 +12482,7 @@ would be another provider, which the record does not know.
    passes or goes as base64 in JSON); whether a reader gets the events that came before it; how
    long a stream of events lives; its rate limits; its category in a filter list.
 2. The shape for podssh: a link of two channels, one for each way, named from the pair's secret as
-   the Piping Server road names its paths (`crates/podssh-relay/src/piping/paths.rs`), under the
+   the Piping Server road names its paths (crates/podssh-relay/src/piping/paths.rs at `b9c04657`), under the
    end-to-end channel and the resumable layer, as anyone with a channel's URL reads it.
 3. The verdict in `docs/carriers.md` with its sources: a feature entry, a last fallback (Q78) after
    the Piping Server road, with the line of T-548's step 5; or out, for a reason that it names.
@@ -12643,7 +12665,7 @@ say of it, need podssh's own number.
   of 4 MiB that moved no byte (results/http-piping.json); through the demo server, one stream on
   port 80 moved 5,054,472 bytes in its window, 903 ms of it the upgrade
   (results/wisp-throughput.json).
-- T-437's live run measured no rate: `TODO/mesh.md:1800` says "carried 64 KiB each way each time
+- T-437's live run measured no rate: `TODO/mesh.md:1805` says "carried 64 KiB each way each time
   (about 4 s)".
 
 ## Approach
@@ -12939,7 +12961,7 @@ podssh's relay role speaks TCP alone.
 2026-11-05, with the draft (read in noq 1.4.0 and the crates that `Cargo.lock` holds):
 
 1. **QUIC is noq in podssh-relay, behind a feature `quic`.** The quick tunnel's QUIC (T-301) is noq
-   with no ring and no aws-lc (`crates/podssh-relay/Cargo.toml:60`), its TLS on podssh-ws's
+   with no ring and no aws-lc (`crates/podssh-relay/Cargo.toml:64`), its TLS on podssh-ws's
    provider, so rule 4 holds in the library crate, and Approach 3's other branch, a crate of its
    own, is needless; `quic` is `quick` with the role's endpoint and the client's race, and takes its
    noq, its endpoint and its probe. Lost: quinn, which is not in the lock and which noq forks.
@@ -13795,7 +13817,7 @@ cannot be the meeting point of its own net. The ask: the same listener also spea
 
 - `crates/podssh-relay/src/serve/mod.rs:206`-`256`: the routes are `/health`, `/v1/*`, `/relays.json`,
   `/trace`, `/llms-full.txt` and `/connect/`. No route speaks DERP or iroh's relay protocol.
-- `crates/podssh-relay/src/derp/conn.rs:9`: podssh's DERP code is a client and the node's end of a link.
+- `PodUtils/podcrates:crates/pod-derp/src/conn.rs`: podssh's DERP code is a client and the node's end of a link.
   It never forwards a frame between two other keys.
 - `Cargo.toml:43`, `vendor/iroh-relay`: iroh's relay is a client only here.
 
@@ -15230,7 +15252,7 @@ both. podssh does not use it.
 - `docs/carriers.md:1119` says "a last fallback, T-741" of smee.io, and `docs/carriers.md:1008`
   says "Through a proxy: plain HTTPS by name on 443, no upgrade": the verdict of T-623, with the
   protocol read in the server's source.
-- `crates/podssh-relay/src/piping/paths.rs:1` is the derivation of the Piping Server road's paths
+- crates/podssh-relay/src/piping/paths.rs:1 at `b9c04657` is the derivation of the Piping Server road's paths
   from the pair's secret, which this road follows for its channel names.
 
 ## Approach
@@ -15316,7 +15338,7 @@ names.
 ## Correction
 
 2026-11-12 (a drafting agent). The Premise holds at each cited line (`docs/decisions.md:38`,
-`docs/carriers.md:1112` and `:1001`, `crates/podssh-relay/src/piping/paths.rs:1`). Two facts change
+`docs/carriers.md:1112` and `:1001`, crates/podssh-relay/src/piping/paths.rs:1 at `b9c04657`). Two facts change
 the Approach:
 
 - smee.io is no service of `pod-services` at the tag that podssh pins (`v0.30.0`, `613058c`: no file
@@ -15325,7 +15347,7 @@ the Approach:
   with an endpoint `server`, and asks podcrates for that service by a COORD issue `(to podcrates)`;
   until a tag lists it, the road is off unless `PODSSH_SMEE` names a server. The short live run of
   step 1 goes through that listed server, so it waits for the tag.
-- `pod-piping` has not taken the Piping Server road (`crates/podssh-relay/src/piping/` is
+- `pod-piping` has not taken the Piping Server road (crates/podssh-relay/src/piping/ at `b9c04657` is
   podssh's, and no file is frozen: `TODO/PROGRESS.md`, State, item 7), so step 5's module sits in
   `podssh-relay` beside it: `crates/podssh-relay/src/smee/`, behind the feature `smee`.
 

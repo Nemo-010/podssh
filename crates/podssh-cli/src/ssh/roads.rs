@@ -148,7 +148,7 @@ impl<'a> Roads<'a> {
         if let Some((dialer, asked)) = &self.derp {
             // A kept ticket is the fallback: only when each road before it failed.
             let start = if *asked { Start::After(HEAD_START) } else { Start::WhenAllFailed };
-            list.push((start, Box::pin(async move { dialer.link().await.map(Road::Derp) })));
+            list.push((start, Box::pin(async move { dialer.link().await.map(Road::Derp).map_err(|e| e.to_string()) })));
             kinds.push(Kind::Derp);
         }
         if let Some((dialer, asked)) = &self.opentunnel {
@@ -178,7 +178,8 @@ impl<'a> Roads<'a> {
         }
         if let Some(dialer) = &self.transit {
             // Q65's fallback: only when each road before it failed.
-            list.push((Start::WhenAllFailed, Box::pin(async move { dialer.link().await.map(Road::Transit) })));
+            let link = async move { dialer.link().await.map(Road::Transit).map_err(|e| e.to_string()) };
+            list.push((Start::WhenAllFailed, Box::pin(link)));
             kinds.push(Kind::Transit);
         }
         if let Some(croc) = &self.croc {

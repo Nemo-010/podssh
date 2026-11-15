@@ -67,7 +67,7 @@ impl Credentials for Keys {
 /// `PODSSH_OPENTUNNEL`, read: a value that is none of its forms is a setting
 /// that cannot be used (78).
 pub(crate) fn setting() -> Result<Setting, Refusal> {
-    opentunnel::setting(std::env::var(opentunnel::ENV).ok().as_deref()).map_err(Refusal::config)
+    opentunnel::setting(opentunnel::ENV, std::env::var(opentunnel::ENV).ok().as_deref()).map_err(Refusal::config)
 }
 
 /// The service of the road, when the road is on.
@@ -244,8 +244,14 @@ async fn serve(ready: Ready, err: &mut dyn Write) -> i32 {
         })
     };
     let identity = Arc::new(key.identity);
-    let api = Api::new(service.clone(), dial::tls(trust_for(&service, &trust), ProxyChoice::FromEnvironment));
-    let reach = far::online(api, Store::cache(&service, &label), &Keys, say.clone());
+    let api = Api::new(
+        service.clone(),
+        dial::tls(Arc::new(podssh_ws::client::way(&ProxyChoice::FromEnvironment)), trust_for(&service, &trust)),
+        &podssh_ws::dial::user_agent(),
+    );
+    let store =
+        Store::in_dirs(podssh_relay::cache::read_dirs(), podssh_relay::cache::candidate_dirs(), &service, &label);
+    let reach = far::online(api, store, &Keys, podssh_ws::tls::context().provider().clone(), say.clone());
     // Unasked, a node that cannot reach the service ends soon, as it would
     // with no road; asked, it takes the service's own retries.
     let reached = match unasked {

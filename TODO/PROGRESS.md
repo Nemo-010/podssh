@@ -40,16 +40,14 @@ Read on 2026-11-13.
    take of `v0.42.0`, which answered each. cfb's asks, T-708 to T-731 (#195), wait behind podssh's own work order, M10
    included (the owner's ruling "Priority").
 7. **The move to PodUtils/podcrates** (T-684, Q101, Rule Q3). podssh pins each podcrates crate at
-   `v0.42.0` (COORD-085, PodUtils/podcrates#145). Taken, so worked on in PodUtils/podcrates: `pod-todo`,
-   `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`, `pod-dns`,
-   `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e` and `pod-relay`
-   (2026-11-12), and `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue); podssh keeps glue over them (`resolve.rs` of `podssh-ws`; `code/`, `session/`,
-   `src/e2e/` and the relay client's modules over `context.rs` of `podssh-relay`). **Frozen from
-   2026-11-15** (COORD-071, #248: podcrates imports them at podssh's `b9c04657`; fixes only, each sent by a
-   COORD issue): `crates/podssh-relay/src/transit/` (not `link.rs`) for `pod-transit`,
-   `crates/podssh-cli/src/acme/` for `pod-acme`, `crates/podssh-relay/src/piping/` for `pod-piping`,
-   `crates/podssh-relay/src/opentunnel/` for `pod-opentunnel` and `crates/podssh-relay/src/derp/` for
-   `pod-derp`: one tag (`v0.50.0`). **Frozen from 2026-11-15 too** (step 2, at podssh's `2ffb7cd7`), for
+   `v0.50.0` (COORD-104, PodUtils/podcrates#164; podssh's answer is COORD-076). Taken, so worked on in
+   PodUtils/podcrates: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`,
+   `pod-proxy`, `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`
+   and `pod-relay` (2026-11-12), `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue), and
+   step 1 of COORD-071 (#248), `pod-transit`, `pod-acme`, `pod-piping`, `pod-opentunnel` and `pod-derp`
+   (2026-11-15, `v0.50.0`); podssh keeps glue over them (`resolve.rs` of `podssh-ws`; `code/`, `session/`,
+   `src/e2e/`, `transit/mod.rs` and the relay client's modules over `context.rs` of `podssh-relay`;
+   `acme/mod.rs` of `podssh-cli`). **Frozen from 2026-11-15** (step 2, at podssh's `2ffb7cd7`), for
    `pod-egress`: `crates/podssh-ws/src/` `via/`, `forwarder/`, `wstunnel/`, `wisp/`, `meek.rs`, `meek/`,
    `webtunnel.rs`, `pt.rs`, `cloudflare.rs`, `vless/`, `vmess/`, `trojan/`, `shadowsocks/`, `eice/` and `iap/`. Then `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
    `pod-relay-serve` last.
@@ -78,8 +76,8 @@ T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 **Hand-off of 2026-11-15 (the session ended at the operator's word).** Pushed and green up to `a99de1d`'s gate; the
 commits after it are pushed with this note. For the next session, in order:
 1. Read the gate of the last push; repair a failure first.
-2. T-684: watch for podcrates `v0.50.0` (step 1: transit, acme, piping, opentunnel, derp) and take it at once
-   (`docs/HANDOFF.md`, "A take of podcrates"); answer with COORD-076. Step 2 (pod-egress) stays frozen.
+2. T-684: podcrates `v0.50.0` (step 1: transit, acme, piping, opentunnel, derp) is taken (2026-11-15,
+   COORD-076). Step 2 (pod-egress) stays frozen; take `v0.51.0` at once when it is tagged.
 3. COORD-075 (#253, T-787, blocked): when podcrates fixes `pod-quic`, take the tag and un-ignore
    `crates/podssh-relay/tests/quic_socket_fails.rs`.
 4. The netem labs (T-665, T-625, T-786), each partial with its next step in its entry: T-665's IPv6 tc filter

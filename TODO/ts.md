@@ -811,7 +811,7 @@ Not measured: whether the proxy of a sandbox allows `tcp.ts.relay.ajam.dev:443` 
    (`crates/podssh-relay/src/serve/derp.rs`, `derp_hub.rs`), not a stand-in of the test. The new
    Approach names "podssh's relay role ... where it carries DERP", and the role had no DERP route
    (see the Correction of 2026-11-13). Lost: the stand-in DERP server of the tests
-   (`crates/podssh-relay/tests/derp_stand_in`), which is podssh's own code on both sides of no real
+   (`PodUtils/podcrates:crates/pod-derp/src/standin.rs`), which is podssh's own code on both sides of no real
    user's path, and shows nothing that the user can run; and a test against headscale's DERP alone,
    which T-334 already runs.
 2. **Its admission is a file of node keys, read again at each login**, the operator's relay's rule
@@ -1014,7 +1014,7 @@ Read: the row is at `crates/podssh-cli/src/flags.rs`, lines 293-294 at `efee2fc`
 (`crates/podssh-cli/src/ts.rs`, lines 314-316 at `efee2fc`, `crates/podssh-ts/src/status.rs:17-21`), and `-W` writes the
 stream (`crates/podssh-cli/src/ts.rs`, lines 391-393 at `efee2fc`). `proxy --jsonl` is refused at parse, with the reason
 (`crates/podssh-cli/src/tree.rs`, lines 179-187 at `efee2fc`, `crates/podssh-cli/src/non_interactive.rs`, lines 309-320 at `efee2fc`).
-`serde_json` is already a dependency of the binary (`crates/podssh-cli/Cargo.toml:156`).
+`serde_json` is already a dependency of the binary (`crates/podssh-cli/Cargo.toml:154`).
 
 ## Approach
 

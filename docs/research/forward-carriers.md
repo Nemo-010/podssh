@@ -318,11 +318,11 @@ in the entry); "new" that the record does not hold it.
 | 1 | No public service of the forward shape over HTTP: the hunt found one relay, which wants a key; the sweep of 541 names found none. | `docs/carriers.md:22-24`: no provider with no account carries any TCP target over a WebSocket. | confirms, for plain HTTP too |
 | 2 | One POST whose body is the way up and whose answer is the way down carries SSH where no hop holds a body; the same hangs where one does. | XHTTP's stream-one inside VLESS (`crates/podssh-ws/src/vless/xhttp.rs:10-11`); the HTTP road's split and serial forms for hops that hold bodies (T-319); no raw form. | new; T-622 |
 | 3 | The discriminator: a response byte before the request's body ends. | `doctor`'s stream probe measures whether a request's body passes as it comes (`crates/podssh-cli/src/doctor/stream/mod.rs:1-3`, T-325). | known |
-| 4 | A carrier that buffers passes a bulk test and hangs a session. | The Piping road's numbered pieces after 15 s (`crates/podssh-relay/src/piping/flow.rs:21-24`); T-319's forms. | known |
+| 4 | A carrier that buffers passes a bulk test and hangs a session. | The Piping road's numbered pieces after 15 s (crates/podssh-relay/src/piping/flow.rs:21-24 at `b9c04657`); T-319's forms. | known |
 | 5 | TURN with RFC 6062 to a coturn carries SSH, directly and through a CONNECT proxy, on two connections. | No TURN client in podssh; `docs/carriers.md:371`, `docs/carriers.md:1016-1020`, `docs/carriers.md:1563-1564`. | new; T-621 |
 | 6 | Cloudflare's Realtime TURN and LiveKit's public TURN refuse a TCP allocation (`508`). | `docs/carriers.md:371` and `docs/carriers.md:1019`: no RFC 6062 at Cloudflare. | confirms (LiveKit's is new; both need an account) |
 | 7 | `ppng.io`: streams, both ways, binary; about 0.12 to 0.20 MiB/s for one transfer, 0.59 for four; one of 4 MiB moved nothing. | `docs/carriers.md:892`: "Limits: not published, and not determined"; T-437's live runs carried 64 KiB each way. | new (a rate); T-625 |
-| 8 | `ppng.io:8443` not reached from that egress. | `docs/carriers.md:873-874` names the Rust server on 8443; the road uses 443 (`crates/podssh-relay/src/piping/server.rs:22`). | confirms |
+| 8 | `ppng.io:8443` not reached from that egress. | `docs/carriers.md:873-874` names the Rust server on 8443; the road uses 443 (crates/podssh-relay/src/piping/server.rs:22 at `b9c04657`). | confirms |
 | 9 | `piping.onrender.com` and a second server on its platform hold a streamed body until its end. | T-497 takes it as the second server, with nothing on buffering (`docs/carriers.md:846-857`). | new; Correction in T-497 |
 | 10 | serv00's Piping Server holds a streamed body. | T-575, step 1: "whether it streams". | answers step 1; Correction in T-575 |
 | 11 | A Piping Server 0.18.0 on a company's cluster streams, 3.10 MiB/s at 8 MiB. | None; no operator offers it to others. | new, not used (Q79; T-497's rule of a public server) |
@@ -405,7 +405,7 @@ and httpstream/forward.rs (78 lines: the session, the bytes up in chunks of
   (`crates/podssh-ws/src/vless/xhttp.rs:21-23`); the HTTP road of podssh's
   relay role for hops that refuse the upgrade and hold bodies (T-319); and
   chunked HTTP/1.1 in the Piping Server road
-  (`crates/podssh-relay/src/piping/http1.rs`).
+  (crates/podssh-relay/src/piping/http1.rs at `b9c04657`).
 - What the reading finds in it: HTTP/1.1 alone; no form for a hop that
   holds the body (its own "Limits"); an answer read as chunked whatever its
   head says, so an answer with a `Content-Length`, or one that ends at the

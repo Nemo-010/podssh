@@ -138,8 +138,8 @@ pub(crate) struct Ready {
 /// road is off.
 pub(crate) async fn unasked(pair: &Pair, trust: &Trust) -> Option<(Vec<Server>, String)> {
     let Ok(Want::Unasked(servers)) = piping_road::want() else { return None };
-    let proxy = ProxyChoice::FromEnvironment;
-    match probe::upgrade(&pair.relay, &pair.name, trust, &proxy, PROBE_LIMIT).await {
+    let way = podssh_ws::client::way(&ProxyChoice::FromEnvironment);
+    match probe::upgrade(&pair.relay, &pair.name, &way, trust, PROBE_LIMIT).await {
         Probe::Refused(why) => Some((servers, why)),
         Probe::Passes | Probe::Unknown(_) => None,
     }

@@ -1998,8 +1998,8 @@ derp_link`) read `(0, 0)` logins where it wants `(0, 1)`; and on macOS
 
 ## Premise
 
-- Read: `crates/podssh-relay/tests/derp_link.rs:323` asserts the two stand-ins' logins; the stand-in
-  (`crates/podssh-relay/tests/derp_stand_in/mod.rs`) counted a login after it had sent its answer, so
+- Read: `PodUtils/podcrates:crates/pod-derp/tests/derp_link.rs` asserts the two stand-ins' logins; the stand-in
+  (`PodUtils/podcrates:crates/pod-derp/src/standin.rs`) counted a login after it had sent its answer, so
   a client that had the answer could read the count first.
 - Read: `crates/podssh-relay/tests/quick_publish.rs` started Python with its stderr dropped, so a
   server that ended at once and one that was slow looked alike.
@@ -2021,10 +2021,14 @@ cargo test -p podssh-relay --features quick --test quick_publish
 Planted: the stand-in's count after its answer, with 50 ms between, and the DERP test fails as the
 gate's did.
 
+## Correction
+
+The test target `derp_link` of `podssh-relay` moved to `pod-derp` of PodUtils/podcrates when podssh took the crate (its T-031): `cargo test -p pod-derp --all-features --test derp_link` there runs it, with its name.
+
 ## Done
 
 Partial, 2026-11-10. The stand-in of DERP counts each login before its answer
-(`crates/podssh-relay/tests/derp_stand_in/mod.rs`); planted, the old order with 50 ms before the
+(`PodUtils/podcrates:crates/pod-derp/src/standin.rs`); planted, the old order with 50 ms before the
 count, `a_server_that_closes_after_the_client_s_info_sends_the_node_to_the_next` failed with
 `left: (0, 0)`, the gate's words; put back, `--test derp_link` passed 25 runs in 25. The funnel's
 test keeps Python's stderr (`crates/podssh-relay/tests/quick_publish.rs`), fails at once with it
@@ -2154,7 +2158,7 @@ echo; `a_bridge_that_the_service_ends_attaches_again_and_the_session_resumes` (`
   still unread, against its own comment "What it sent before it exited still goes".
 - Read: no line of `sh` or `dd` came in the job's log (their stderr is the test's); the program ended
   without its answer reaching the pump, and the log does not say why.
-- Read: the OpenTunnel test (`crates/podssh-relay/tests/opentunnel_link.rs`, `echo_mib`) cut the bridges
+- Read: the OpenTunnel test (crates/podssh-relay/tests/opentunnel_link.rs at `b9c04657`, `echo_mib`) cut the bridges
   after a third of the echo came back, with all 3 MiB written at once: the bytes in flight could finish
   the echo, and then only the CLOSE met the cut, a `Lost` and a `Retry` for it, with no resume.
 
@@ -2173,6 +2177,13 @@ export CARGO_BUILD_JOBS=4
 cargo test -p podssh-cli --lib pipe::datagram
 cargo test -p podssh-relay --features opentunnel --test opentunnel_link
 ```
+
+## Correction
+
+2026-11-15: the test targets opentunnel_link, opentunnel_interop and opentunnel_live of
+podssh-relay left with the road, which `pod-opentunnel` of PodUtils/podcrates holds
+(PodUtils/podcrates@T-033): its Prove runs there as
+`cargo test -p pod-opentunnel --test opentunnel_link`.
 
 ## Done
 

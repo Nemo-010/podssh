@@ -119,7 +119,7 @@ impl PinggyRoads {
             let (log, shown) = (log.clone(), shown.to_string());
             Arc::new(move |line: String| log.verbose(&format!("{shown}: {line}")))
         };
-        let visit = dial::tcp(ProxyChoice::FromEnvironment);
+        let visit = dial::tcp(Arc::new(podssh_ws::client::way(&ProxyChoice::FromEnvironment)));
         let (log, shown, last) = (log.clone(), shown.to_string(), Mutex::new(None));
         Some(PinggyRoads { given, kept, record, visit, say, service, said: AtomicBool::new(false), last, log, shown })
     }

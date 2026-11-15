@@ -153,7 +153,7 @@ impl Certs {
             }
             Source::Acme { name, directory, ca_file } => {
                 let trust = crate::pairs::trust(ca_file.as_deref());
-                let ca = Acme::new(&name, directory.as_deref(), trust)?;
+                let ca = acme::new(&name, directory.as_deref(), trust)?;
                 let path = ca.store.pem_path();
                 let files = Files { cert: path.clone(), key: path.clone(), seen: Mutex::new(None) };
                 let host = ca.host();

@@ -67,8 +67,14 @@ pub(crate) async fn serve(
 ) -> i32 {
     let say: opentunnel::Say = Arc::new(|line: String| podssh_ssh::err_line!("podssh funnel: {line}"));
     // SSL_CERT_FILE replaces the roots, as for each name podssh checks.
-    let api = Api::new(service.clone(), dial::tls(crate::pairs::trust(None), ProxyChoice::FromEnvironment));
-    let reach = far::online(api, Store::cache(&service, LABEL), &Keys, say.clone());
+    let api = Api::new(
+        service.clone(),
+        dial::tls(Arc::new(podssh_ws::client::way(&ProxyChoice::FromEnvironment)), crate::pairs::trust(None)),
+        &podssh_ws::dial::user_agent(),
+    );
+    let store =
+        Store::in_dirs(podssh_relay::cache::read_dirs(), podssh_relay::cache::candidate_dirs(), &service, LABEL);
+    let reach = far::online(api, store, &Keys, podssh_ws::tls::context().provider().clone(), say.clone());
     let reached = match unasked {
         Some(_) => tokio::time::timeout(UNASKED_LIMIT, reach)
             .await

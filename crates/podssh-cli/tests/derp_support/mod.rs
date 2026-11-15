@@ -1,14 +1,13 @@
 //! Stand-in DERP servers on the loopback for the tests of the command line
-//! (T-379): podssh-relay's own stand-in (`tests/derp_stand_in`, which keeps
-//! its frames apart from the library's), behind TLS of the test's own CA.
+//! (T-379): pod-derp's own stand-in (`pod_derp::standin`, which keeps its
+//! frames apart from the library's), behind TLS of the test's own CA.
 //! Each connection is bridged to a pipe of the stand-in; a front that stops
 //! closes its listener and each of its connections, as a server that went
 //! away.
 
 #![allow(dead_code)]
 
-#[path = "../../../podssh-relay/tests/derp_stand_in/mod.rs"]
-pub mod derp_stand_in;
+pub use pod_derp::standin as derp_stand_in;
 
 use std::net::Ipv4Addr;
 use std::sync::{Arc, Mutex};

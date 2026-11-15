@@ -30,7 +30,11 @@ pub(super) async fn check(report: &mut Report<'_>, trust: &Trust) {
     // relay's --ca-file; a service of the variable's takes the run's.
     let trust = if service == Service::hosted() { crate::pairs::trust(None) } else { trust.clone() };
     let label = format!("OpenTunnel {}", service.authority());
-    let api = Api::new(service, dial::tls(trust, ProxyChoice::FromEnvironment));
+    let api = Api::new(
+        service,
+        dial::tls(std::sync::Arc::new(podssh_ws::client::way(&ProxyChoice::FromEnvironment)), trust),
+        &podssh_ws::dial::user_agent(),
+    );
     let started = Instant::now();
     match api.health().await {
         Ok(status) if (200..300).contains(&status) => {

@@ -1,6 +1,6 @@
 //! A node's record names each of its roads (T-445), offline: a server of
 //! pkarr on the loopback, which reads each `PUT` with iroh-dns's own check,
-//! and podssh-relay's stand-in DERP server in memory. A record with the iroh
+//! and pod-derp's stand-in DERP server in memory. A record with the iroh
 //! home relay, the DERP home and the quick tunnel is put and read back
 //! whole, by podssh and, for its iroh part, by iroh's own client of pkarr. A
 //! node keeps its record as its DERP road comes online, and a client with
@@ -9,8 +9,6 @@
 //! refused. A planted record with no DERP home fails that test.
 
 mod cleanup;
-#[path = "../../podssh-relay/tests/derp_stand_in/mod.rs"]
-mod derp_stand_in;
 
 use std::future::Future;
 use std::path::PathBuf;
@@ -19,11 +17,11 @@ use std::sync::Arc;
 use std::task::{Context, Poll};
 use std::time::{Duration, Instant};
 
-use derp_stand_in::StandIn;
 use iroh::address_lookup::PkarrRelayClient;
 use iroh::endpoint_info::EndpointInfo;
 use iroh::tls::CaTlsConfig;
 use iroh::{EndpointAddr, RelayUrl, SecretKey};
+use pod_derp::standin::StandIn;
 use podssh_iroh::pkarr::{self, record, Finder, Record, Roads, Server};
 use podssh_iroh::test_pkarr::{self, TestPkarr};
 use podssh_iroh::{Dialer, Options, Udp};
@@ -226,7 +224,8 @@ async fn a_client_with_the_node_s_key_alone_reaches_it_over_derp_when_iroh_is_re
         secret: Arc::new(Secret::of_node(&identity)),
         server: StandIn::server(),
         dial: derp.dial(),
-        say: say("node"),
+        events: derp_road::events(say("node")),
+        names: derp_road::names(),
     };
     let first = far::connect(&node).await.expect("the node's connection to its DERP home");
     let ticket = Ticket { node: identity.public(), derp: first.key(), server: StandIn::server() };
@@ -255,10 +254,15 @@ async fn a_client_with_the_node_s_key_alone_reaches_it_over_derp_when_iroh_is_re
     let client = podssh_iroh::bind(&options).await.expect("the client's endpoint");
     let addr = found.relays.iter().cloned().fold(EndpointAddr::new(secret.public()), EndpointAddr::with_relay_url);
     let iroh = Dialer::new(client.clone(), addr);
-    let over_derp = derp_road::Dialer::new(found.derp.as_ref().unwrap(), derp.dial(), say("client")).unwrap();
+    let (ticket, fleet) = (found.derp.as_ref().unwrap(), derp_road::servers::fleet_with(true));
+    let (events, names) = (derp_road::events(say("client")), derp_road::names());
+    let over_derp = derp_road::Dialer::new(ticket, &fleet, derp.dial(), events, names).unwrap();
     let roads: Vec<(Start, Going<'_>)> = vec![
         (Start::After(HEAD_START), Box::pin(async { iroh.link().await.map(Link::Iroh).map_err(|e| e.to_string()) })),
-        (Start::After(HEAD_START), Box::pin(async { over_derp.link().await.map(Link::Derp) })),
+        (
+            Start::After(HEAD_START),
+            Box::pin(async { over_derp.link().await.map(Link::Derp).map_err(|e| e.to_string()) }),
+        ),
     ];
     let (won, _) = tokio::time::timeout(LIMIT, in_turn(roads)).await.expect("in time").expect("a road answers");
     assert_eq!(won.at, 1, "the DERP road carries the session");

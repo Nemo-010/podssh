@@ -181,7 +181,8 @@ async fn transit_line(report: &mut Report<'_>, url: &WsUrl, trust: &Trust) {
     let least = WsUrl::parse(&transit::default_url()).is_ok_and(|least| least == *url);
     let trust = if least { crate::pairs::trust(None) } else { trust.clone() };
     let started = Instant::now();
-    let dialed = tokio::time::timeout(WAIT, transit::far::dial(url, &trust, &ProxyChoice::FromEnvironment)).await;
+    let config = transit::config(url.clone(), &trust, &ProxyChoice::FromEnvironment, std::sync::Arc::new(|_| {}));
+    let dialed = tokio::time::timeout(WAIT, transit::far::dial(&config)).await;
     match dialed {
         Ok(Ok(session)) => {
             let ms = started.elapsed().as_millis();
@@ -189,7 +190,7 @@ async fn transit_line(report: &mut Report<'_>, url: &WsUrl, trust: &Trust) {
             let line = format!("the WebSocket opened in {ms} ms, certificate verified; no line said, nothing paired");
             report.ok(&label, line);
         }
-        Ok(Err(why)) => report.fail(&label, why),
+        Ok(Err(why)) => report.fail(&label, why.to_string()),
         Err(_) => report.fail(&label, format!("no WebSocket within {} s", WAIT.as_secs())),
     }
 }

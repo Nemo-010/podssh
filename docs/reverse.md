@@ -663,7 +663,7 @@ ends, as each relay and each carrier but one needs the upgrade. A Piping
 Server needs none: it streams the body of a `POST /PATH` into the answer to
 a `GET /PATH`, over plain HTTPS ([carriers.md](carriers.md), item 5 of the
 reverse road). podssh's road through one (T-437, drafted 2026-11-02;
-`crates/podssh-relay/src/piping/`) keeps these rules:
+crates/podssh-relay/src/piping/ at `b9c04657`) keeps these rules:
 
 1. A path is the only meeting point, so each comes from the pair's secret:
    the HMAC of the connect token over the pair's name, which both ends hold
@@ -716,7 +716,7 @@ the node itself ([carriers.md](carriers.md), item 6 of the reverse road):
 the node's leg is a WebSocket through `HTTPS_PROXY`, and a client's is TLS
 by name on port 443, with no upgrade, so a client behind a proxy that
 refuses the upgrade has this road beside Piping Server's. podssh's road
-(T-530 and T-531, drafted 2026-11-03; `crates/podssh-relay/src/opentunnel/`)
+(T-530 and T-531, drafted 2026-11-03; crates/podssh-relay/src/opentunnel/ at `b9c04657`)
 keeps these rules:
 
 1. A node makes one tunnel for its life (Q76), keeps it with its token, its

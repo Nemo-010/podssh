@@ -22,12 +22,12 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## Each podcrates take
 
-podssh pins every podcrates crate at `tag = "v0.49.0"` (COORD-103, PodUtils/podcrates#163; podssh's answer is
-COORD-074). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
+podssh pins every podcrates crate at `tag = "v0.50.0"` (COORD-104, PodUtils/podcrates#164; podssh's answer is
+COORD-076). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
 
 - Taken: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`,
-  `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`, `pod-relay`
-  and `pod-warp` (`crates/podssh-warp` is its glue: podssh's way out, its proxy and its resolver). Work on them is done in PodUtils/podcrates (Rule Q3); podssh keeps the glue.
+  `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`, `pod-relay`,
+  `pod-transit`, `pod-acme`, `pod-piping`, `pod-opentunnel`, `pod-derp` and `pod-warp` (`crates/podssh-warp` is its glue: podssh's way out, its proxy and its resolver). Work on them is done in PodUtils/podcrates (Rule Q3); podssh keeps the glue.
 - `v0.40.0` (taken 2026-11-13) brought the forms of the file hosts (COORD-053, #230, closed; T-738 reads
   `fetch-link-prefix` and `on-by-default`) and `pod-netstack`'s tests of T-599's cases (COORD-054, #231,
   closed; T-599 and T-771 name them).
@@ -57,6 +57,9 @@ COORD-074). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; 
 - `v0.48.0` (taken 2026-11-15) changes `pod-guest` alone: the bump of the tag only.
 - `v0.49.0` (taken 2026-11-15) carries podcrates' entry 634, the fix of the run of a code over the Nostr relays
   (COORD-070, closed): podssh fills `Ends::relays` (T-545 done).
+- `v0.50.0` (taken 2026-11-15) is step 1 of the move of COORD-071 (#248): `pod-transit`, `pod-acme`, `pod-piping`,
+  `pod-opentunnel` and `pod-derp`, from podssh at `b9c04657`. Their modules leave podssh: `transit/mod.rs` and
+  `acme/mod.rs` stay as glue; `piping/`, `opentunnel/` and `derp/` go whole. Step 2 (`pod-egress`) stays frozen.
 
 ## Open COORD issues
 

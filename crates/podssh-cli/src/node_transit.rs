@@ -113,7 +113,8 @@ pub(crate) fn road(label: &str, pair: &Pair, stored: bool, trust: &Trust, url: W
     ));
     let keys = keys_now(label, pair, stored);
     let trust = trust_for(&url, trust, crate::pairs::trust(None));
-    Some(far::Node { url, keys, side, trust, proxy: ProxyChoice::FromEnvironment, say })
+    let config = transit::config(url, &trust, &ProxyChoice::FromEnvironment, say);
+    Some(far::Node { config, keys, side })
 }
 
 /// `pair_road` with the transit road `road` beside it, under `keeper`,
@@ -247,7 +248,7 @@ pub(crate) fn dialer(url: WsUrl, part: &OperatorPart, trust: &Trust, log: &Arc<L
     };
     let keys = Keys::of_pair(&part.name, part.connect_token());
     let trust = trust_for(&url, trust, crate::pairs::trust(None));
-    match Dialer::new(url, keys, trust, ProxyChoice::FromEnvironment, say) {
+    match Dialer::new(transit::config(url, &trust, &ProxyChoice::FromEnvironment, say), keys) {
         Ok(dialer) => Some(dialer),
         Err(e) => {
             log.verbose(&format!("{shown}: no transit road: {e}"));

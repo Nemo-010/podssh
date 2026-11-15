@@ -122,8 +122,9 @@ pub(crate) fn dialer_of(name: &Name, trust: &Trust, log: &Arc<Log>, shown: &str)
         let (log, shown) = (log.clone(), shown.to_string());
         Arc::new(move |line: String| log.verbose(&format!("{shown}: {line}")))
     };
-    let visit = dial::tcp(ProxyChoice::FromEnvironment);
-    Dialer::new(name.clone(), visit, trust_for(name, trust), say)
+    let way = Arc::new(podssh_ws::client::way(&ProxyChoice::FromEnvironment));
+    let visit = dial::tcp(way.clone());
+    Dialer::new(name.clone(), visit, way, trust_for(name, trust), say)
 }
 
 #[cfg(test)]

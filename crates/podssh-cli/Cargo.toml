@@ -98,7 +98,11 @@ podssh-ws = { path = "../podssh-ws", features = ["quic"] }
 # The services of other parties: the facts of doctor's checks, STUN, the
 # DERP map, the zone of OpenTunnel, the ACME directory, the relay of
 # `podssh ts`.
-pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.49.0" }
+pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.50.0" }
+# The ACME client of `relay serve --acme` (src/acme/): pod-acme of
+# PodUtils/podcrates (T-034 there); pod-core for the type of its lines.
+pod-acme = { git = "https://github.com/PodUtils/podcrates", tag = "v0.50.0" }
+pod-core = { git = "https://github.com/PodUtils/podcrates", tag = "v0.50.0" }
 # The leaf of a release's Sigstore bundle, read (T-375): no C, as its
 # feature `verify` (ring) is off; the signatures are podssh-ws's own.
 x509-parser = { version = "0.18", default-features = false }
@@ -143,14 +147,8 @@ podssh-ssh = { path = "../podssh-ssh" }
 # The JWT of a service account's key for IAP (T-351), signed RS256 in
 # aws-lc-rs, whose RSA is constant-time, never with the `rsa` crate
 # (RUSTSEC-2023-0071): the version and features that podssh-ssh builds, so
-# nothing new is compiled. ACME's P-256 keys and their signatures too
-# (T-447): the account's JWS, the CSR and TLS-ALPN-01's certificate.
+# nothing new is compiled. ACME's keys are pod-acme's, of p256.
 aws-lc-rs = "1.16.2"
-# The DER of ACME's CSR and of TLS-ALPN-01's certificate, with its
-# acmeIdentifier (T-447): no crypto feature, so no ring and no C of its own;
-# each signature is aws-lc-rs's. The lock has it (the tests' certificates
-# below), and it brings yasna and bit-vec, pure Rust, into the binary.
-rcgen = { version = "0.14", default-features = false }
 # `signal`: `podssh node` stops on Ctrl-C and SIGTERM.
 tokio = { workspace = true, features = ["signal", "process", "fs"] }
 serde_json = { workspace = true }
@@ -176,7 +174,7 @@ zeroize = { workspace = true }
 futures-util = { version = "0.3", default-features = false, features = ["alloc"] }
 # `podssh session` (T-186): where a kept stream of output may start, and its
 # ring (the grammar of T-221), and when the output has stopped.
-pod-term = { git = "https://github.com/PodUtils/podcrates", tag = "v0.49.0" }
+pod-term = { git = "https://github.com/PodUtils/podcrates", tag = "v0.50.0" }
 # `podssh session capture`: the screen that a terminal shows after the
 # session's output. The model of the terminal oracle (T-200), pure Rust over
 # vte, with no build script that compiles C; the lock has it already.
@@ -230,7 +228,7 @@ windows-sys = { version = "0.61", features = [
 ] }
 
 [dev-dependencies]
-pod-testkit = { git = "https://github.com/PodUtils/podcrates", tag = "v0.49.0", features = ["screen"] }
+pod-testkit = { git = "https://github.com/PodUtils/podcrates", tag = "v0.50.0", features = ["screen"] }
 # `test-util` gives the tests a paused clock: the limit of a stuck write is
 # 60 s (tests/direct_write_limit.rs).
 tokio = { workspace = true, features = ["macros", "rt", "test-util"] }
@@ -241,17 +239,16 @@ russh = { version = "0.65.0", default-features = false, features = ["aws-lc-rs",
 # model terminal that the tests of podssh-ssh run, so no crate is added.
 vt100 = { workspace = true }
 # The stand-in release of `tests/update.rs` (T-375): its certificates, of
-# its own Fulcio and of its TLS server, made by rcgen (a dependency above)
-# with no crypto feature and signed by P-256 keys of p256, as podssh-relay's
+# its own Fulcio and of its TLS server, made by rcgen with no crypto feature
+# (pod-acme takes it too) and signed by P-256 keys of p256, as podssh-relay's
 # tests make theirs, so that no C is compiled; the server's TLS, of
-# tokio-rustls, which podssh-ws builds. The lock has each one. p256 also
-# checks ACME's signatures in the tests (T-447), a second implementation.
+# tokio-rustls, which podssh-ws builds. The lock has each one.
+rcgen = { version = "0.14", default-features = false }
 p256 = { workspace = true, features = ["getrandom"] }
 tokio-rustls = { workspace = true }
-# The stand-in DERP server of `tests/derp_road.rs` (T-379), podssh-relay's
-# own (`tests/derp_stand_in`), which opens the client's info with NaCl's box:
-# the version and features that podssh-relay builds, so no crate is added.
-crypto_box = { version = "0.9", default-features = false, features = ["alloc", "salsa20"] }
+# The stand-in DERP server of `tests/derp_road.rs` (T-379): pod-derp's own
+# (its feature `standin`), which opens the client's info with NaCl's box.
+pod-derp = { git = "https://github.com/PodUtils/podcrates", tag = "v0.50.0", features = ["standin"] }
 
 # The pseudo console of `tests/console.rs` (T-132): the version above, with
 # the console's functions, which podssh-ssh builds too; and the job objects of

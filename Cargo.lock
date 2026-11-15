@@ -5057,9 +5057,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "pod-acme"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
+dependencies = [
+ "base64 0.23.1",
+ "p256 0.14.0",
+ "pod-core",
+ "pod-proxy",
+ "pod-services",
+ "pod-tls",
+ "rcgen",
+ "rustls",
+ "rustls-pki-types",
+ "serde_json",
+ "sha2 0.11.1",
+ "tokio",
+ "x509-parser",
+ "zeroize",
+]
+
+[[package]]
 name = "pod-core"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "libc",
  "rand 0.10.3",
@@ -5068,9 +5089,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "pod-derp"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
+dependencies = [
+ "crypto_box",
+ "hkdf 0.13.0",
+ "pod-core",
+ "pod-identity",
+ "pod-proxy",
+ "pod-services",
+ "pod-session",
+ "pod-ws",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
 name = "pod-devtunnel"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "pod-core",
  "pod-proxy",
@@ -5087,8 +5128,8 @@ dependencies = [
 
 [[package]]
 name = "pod-dns"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "base64 0.23.1",
  "bytes",
@@ -5108,8 +5149,8 @@ dependencies = [
 
 [[package]]
 name = "pod-e2e"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "aes-gcm 0.11.1",
  "chacha20poly1305 0.11.0",
@@ -5127,8 +5168,8 @@ dependencies = [
 
 [[package]]
 name = "pod-gsr"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "foreign-types",
  "openssl",
@@ -5143,8 +5184,8 @@ dependencies = [
 
 [[package]]
 name = "pod-hostprobe"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "linux-raw-sys",
  "pod-core",
@@ -5153,8 +5194,8 @@ dependencies = [
 
 [[package]]
 name = "pod-identity"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "base64 0.23.1",
  "ed25519-dalek 2.2.0",
@@ -5168,8 +5209,8 @@ dependencies = [
 
 [[package]]
 name = "pod-netstack"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "atomic-waker",
  "pod-core",
@@ -5179,9 +5220,51 @@ dependencies = [
 ]
 
 [[package]]
+name = "pod-opentunnel"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
+dependencies = [
+ "pod-core",
+ "pod-proxy",
+ "pod-services",
+ "pod-session",
+ "pod-tls",
+ "pod-ws",
+ "rand 0.10.3",
+ "rustls",
+ "serde_json",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
+name = "pod-piping"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
+dependencies = [
+ "bytes",
+ "h2",
+ "hmac 0.13.0",
+ "http",
+ "pod-core",
+ "pod-proxy",
+ "pod-relay",
+ "pod-services",
+ "pod-session",
+ "pod-tls",
+ "pod-ws",
+ "rand 0.10.3",
+ "rustls",
+ "sha2 0.11.1",
+ "tokio",
+ "tokio-rustls",
+ "zeroize",
+]
+
+[[package]]
 name = "pod-proxy"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "base64 0.23.1",
  "libc",
@@ -5197,8 +5280,8 @@ dependencies = [
 
 [[package]]
 name = "pod-quic"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "atomic-waker",
  "hmac 0.13.0",
@@ -5212,8 +5295,8 @@ dependencies = [
 
 [[package]]
 name = "pod-relay"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "base64 0.23.1",
  "bytes",
@@ -5245,8 +5328,8 @@ dependencies = [
 
 [[package]]
 name = "pod-services"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "pod-core",
  "toml 1.2.1+spec-1.1.0",
@@ -5254,8 +5337,8 @@ dependencies = [
 
 [[package]]
 name = "pod-session"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "hkdf 0.13.0",
  "hmac 0.13.0",
@@ -5270,16 +5353,16 @@ dependencies = [
 
 [[package]]
 name = "pod-term"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "unicode-width",
 ]
 
 [[package]]
 name = "pod-testkit"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "libc",
  "pod-hostprobe",
@@ -5288,8 +5371,8 @@ dependencies = [
 
 [[package]]
 name = "pod-tls"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "aes 0.9.4",
  "aes-gcm 0.11.1",
@@ -5320,13 +5403,30 @@ dependencies = [
 
 [[package]]
 name = "pod-todo"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
+
+[[package]]
+name = "pod-transit"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
+dependencies = [
+ "hkdf 0.13.0",
+ "hmac 0.13.0",
+ "pod-core",
+ "pod-services",
+ "pod-session",
+ "pod-ws",
+ "rand 0.10.3",
+ "sha2 0.11.1",
+ "tokio",
+ "zeroize",
+]
 
 [[package]]
 name = "pod-turn"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "hmac 0.13.0",
  "sha1 0.11.0",
@@ -5335,8 +5435,8 @@ dependencies = [
 
 [[package]]
 name = "pod-warp"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "base64 0.23.1",
  "bytes",
@@ -5363,8 +5463,8 @@ dependencies = [
 
 [[package]]
 name = "pod-wg"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "curve25519-dalek 5.0.0",
  "pod-core",
@@ -5374,8 +5474,8 @@ dependencies = [
 
 [[package]]
 name = "pod-wormhole"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "bytes",
  "crypto_secretbox",
@@ -5396,8 +5496,8 @@ dependencies = [
 
 [[package]]
 name = "pod-ws"
-version = "0.49.0"
-source = "git+https://github.com/PodUtils/podcrates?tag=v0.49.0#212d45d26fe4c585316f1e92d942d11cfe51d66f"
+version = "0.50.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.50.0#26fb91f5c3caf07d57ccc33efcbbab1fc309bf3f"
 dependencies = [
  "base64 0.23.1",
  "bytes",
@@ -5421,11 +5521,13 @@ dependencies = [
  "aws-lc-rs",
  "base64 0.23.1",
  "clap",
- "crypto_box",
  "futures-util",
  "iroh",
  "libc",
  "p256 0.14.0",
+ "pod-acme",
+ "pod-core",
+ "pod-derp",
  "pod-services",
  "pod-term",
  "pod-testkit",
@@ -5483,7 +5585,6 @@ name = "podssh-iroh"
 version = "1.1.0-beta.3"
 dependencies = [
  "base64 0.23.1",
- "crypto_box",
  "iroh",
  "iroh-dns",
  "iroh-relay",
@@ -5491,6 +5592,7 @@ dependencies = [
  "n0-error",
  "n0-future",
  "noq-proto",
+ "pod-derp",
  "pod-services",
  "podssh-iroh",
  "podssh-relay",
@@ -5536,14 +5638,18 @@ dependencies = [
  "p256 0.14.0",
  "peeroxide",
  "pod-core",
+ "pod-derp",
  "pod-devtunnel",
  "pod-e2e",
  "pod-identity",
+ "pod-opentunnel",
+ "pod-piping",
  "pod-proxy",
  "pod-quic",
  "pod-relay",
  "pod-services",
  "pod-session",
+ "pod-transit",
  "pod-wormhole",
  "podssh-ws",
  "proptest",

@@ -53,7 +53,7 @@ impl Ending {
                  address"
             ))
         })?;
-        let ca = Acme::new(&name, directory, trust)?;
+        let ca = acme::new(&name, directory, trust)?;
         let (served, held) = match ca.held(acme::order::now_secs()) {
             Ok(Some((pair, leaf))) => (Served::new(Some(pair)), Some(leaf)),
             // A store that cannot be read is ordered again, as the role does.

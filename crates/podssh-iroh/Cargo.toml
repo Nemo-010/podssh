@@ -34,7 +34,7 @@ podssh-relay = { path = "../podssh-relay", features = ["derp", "pinggy", "opentu
 podssh-ws = { path = "../podssh-ws" }
 # The services of other parties: n0's relays and pkarr, the zone of the
 # quick tunnel.
-pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.49.0" }
+pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.50.0" }
 tokio = { workspace = true }
 # The types of iroh's interfaces: the relay's certificate verifier (rustls),
 # the proxy's URL (url), and the resolver's errors (n0-error), at the
@@ -94,7 +94,6 @@ iroh = { version = ">=1.4.1, <1.5", default-features = false, features = ["tls-a
 podssh-iroh = { path = ".", features = ["test-relay"] }
 sha2 = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
-# podssh-relay's stand-in DERP server (`tests/derp_stand_in`), for the node
-# that a client finds by its record alone (`tests/record_roads.rs`, T-445):
-# the version and features that podssh-relay builds, so no crate is added.
-crypto_box = { version = "0.9", default-features = false, features = ["alloc", "salsa20"] }
+# pod-derp's stand-in DERP server (its feature `standin`), for the node
+# that a client finds by its record alone (`tests/record_roads.rs`, T-445).
+pod-derp = { git = "https://github.com/PodUtils/podcrates", tag = "v0.50.0", features = ["standin"] }

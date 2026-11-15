@@ -232,7 +232,7 @@ and num-bigint 0.5) are T-754.
 | #160 | `[gh action] requested`: the gate on `main` after `db1e6307` | closed 2026-11-06: the gate passed each job (run 42254589426, `285b0562`) | T-684 (the gate after the takes of v0.4.0 and v0.5.0, and the drafts of the day) |
 | #161 | COORD-006: podssh moved each podcrates tag to v0.6.0 (to podcrates) | closed 2026-11-09, `main` pins v0.6.0 since `28fa1170` | T-684 (the move at `28fa1170`, written to the podcrates session) |
 | #162 | `[gh action] requested`: the gate on `main` at `8c7519c0` | closed 2026-11-09: its run red (42290205000, the job `windows`), repaired by T-696; the gate passed each job at `47e1eba3` (run 42627967826) | T-684 (the gate after the take of v0.6.0, T-497 and T-534), T-696 |
-| #163 | `[gh action] requested`: `derp-main-live.yml`, the main DERP fleet from GitHub Actions | closed 2026-11-09, the run passed (42290196915, `8c7519c0`) | T-534 (step 1's run from Actions) |
+| #163 | `[gh action] requested`: `PodUtils/podcrates:.github/workflows/live.yml`, the main DERP fleet from GitHub Actions | closed 2026-11-09, the run passed (42290196915, `8c7519c0`) | T-534 (step 1's run from Actions) |
 | #164 | The GSRN road: accountless SRP authentication on one TCP connection to port 443 | closed 2026-11-11 as stale; T-707 stays open until the owner takes up `pod-gsr` | T-707 (blocked: the owner deferred `pod-gsr` on 2026-11-09) |
 | #165 | Forwarder roads re-derive the half-close discipline per road | closed 2026-11-09 (`cdb46f81`), its entry done | T-699 |
 | #166 | `doctor`: one verdict of the host's capabilities that names what each restriction closes | closed 2026-11-09, its entry done | T-706 (M5, beside T-248) |

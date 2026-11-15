@@ -4671,8 +4671,8 @@ The operator's ruling of 2026-10-31 (Q50, `docs/decisions.md`): Tailscale's tail
   one more file to make whole, when the ticket carries the DERP key either way. A client's key is
   new for each run: one derived from the client's identity would make two processes of one user
   one client connected twice, which derper's policy for duplicates disables or switches.
-- The adapter: selective repeat of podssh's own (`crates/podssh-relay/src/derp/send.rs`,
-  `crates/podssh-relay/src/derp/recv.rs`). Lost: noq's streams over DERP's packets, which need a
+- The adapter: selective repeat of podssh's own (`PodUtils/podcrates:crates/pod-derp/src/send.rs`,
+  `PodUtils/podcrates:crates/pod-derp/src/recv.rs`). Lost: noq's streams over DERP's packets, which need a
   socket of QUIC over DERP, TLS 1.3 inside it with podssh-ws's provider, and a second layer of
   sessions beside the resumable layer's; a measurement of both was not made, and the Prove
   measures the one built. A loss is found by the order of the sends, as a server keeps one
@@ -4692,7 +4692,7 @@ The operator's ruling of 2026-10-31 (Q50, `docs/decisions.md`): Tailscale's tail
   for a fleet of four servers.
 - A rate that a server names in its info is kept by waiting. Lost: Go's client's drop of what
   exceeds it, which here only makes the adapter send again.
-- The tests: a stand-in DERP server in memory (`crates/podssh-relay/tests/derp_stand_in/mod.rs`),
+- The tests: a stand-in DERP server in memory (`PodUtils/podcrates:crates/pod-derp/src/standin.rs`),
   over pipes and with frames of its own, so that no test listens and a defect of the library's
   frames is not the stand-in's too. Lost: the library's frames in the stand-in; TLS on the
   loopback, a listener and certificates for nothing that the interop with derper does not prove.
@@ -4734,11 +4734,13 @@ services of web.pkgforge.dev (`docs/design.md`, section 8; `docs/carriers.md`, [
 
 The Approach stands; item 4 moves to T-379 (the Decision).
 
+The test target `derp_link` of `podssh-relay` moved to `pod-derp` of PodUtils/podcrates when podssh took the crate (its T-031): `cargo test -p pod-derp --all-features --test derp_link` there runs it, with its name.
+
 ## Done
 
 2026-10-31: drafted (branch `draft-derp`, `35e0b44`), then merged and measured.
 
-- `crates/podssh-relay/src/derp/`, feature `derp`: DERP's frames (`frame.rs`), its keys and
+- `PodUtils/podcrates:crates/pod-derp/src/`, feature `derp`: DERP's frames (`frame.rs`), its keys and
   NaCl's box (`key.rs`), a link's packets (`packet.rs`), the adapter (`send.rs`, `recv.rs`,
   `rtt.rs`), a link and its task (`link.rs`), a connection, its handshake, its reader, writer,
   pings and pacing (`conn.rs`), TLS through the proxy and the upgrade (`dial.rs`), the fleet,
@@ -7135,8 +7137,8 @@ ask, and nothing does so.
 - Read: the race of T-164 orders two roads (`PodUtils/podssh:crates/podssh-relay/src/session/race.rs:59-61`), and
   the race of the command line is in a build with the feature `iroh` only
   (`crates/podssh-cli/src/ssh/iroh.rs:8-11`).
-- Read: T-349's node and dialer (`crates/podssh-relay/src/derp/far.rs`,
-  `crates/podssh-relay/src/derp/client.rs`); a client's DERP key is new for each run, so the
+- Read: T-349's node and dialer (`PodUtils/podcrates:crates/pod-derp/src/far.rs`,
+  `PodUtils/podcrates:crates/pod-derp/src/client.rs`); a client's DERP key is new for each run, so the
   node's allowlist checks the key that the end-to-end channel proves.
 
 ## Approach
@@ -7168,7 +7170,7 @@ automatic fallback of the reverse road, tried when the user did not ask.
   would lose with no word.
 - A node moves home after 3 failed connections in a row to its home (`far::MOVE_AFTER`): to the first
   other server of its list, from the top, that takes a connection, and it stays there
-  (`crates/podssh-relay/src/derp/far.rs`). Lost: a move at the first failure, which a derper that
+  (`PodUtils/podcrates:crates/pod-derp/src/far.rs`). Lost: a move at the first failure, which a derper that
   restarts would turn into a move of each node and a longer try of each client; a new probe of the
   whole list, where a connection that completes DERP's handshake proves more than an empty GET; a
   move back when the first server returns, which moves each client again with a home that flaps.
@@ -7216,7 +7218,7 @@ automatic fallback of the reverse road, tried when the user did not ask.
 - The resolver's split (item 2): its environment (`Env`, `ca_file`) moves to
   `crates/podssh-cli/src/ssh/resolve_env.rs`, re-exported, so no caller changes, with each comment.
   Lost: the transport's choice moved out, which changes more callers' paths.
-- The test: podssh-relay's own stand-in (`crates/podssh-relay/tests/derp_stand_in/mod.rs`, frames of
+- The test: podssh-relay's own stand-in (`PodUtils/podcrates:crates/pod-derp/src/standin.rs`, frames of
   its own, now with `/derp/probe`) behind TLS of the test's own CA on the loopback
   (`crates/podssh-cli/tests/derp_support/mod.rs`), as the command line is a process of its own. Lost:
   Tailscale's derper, which `scripts/interop-derp.sh` runs for the library in Podman: the road's
@@ -7252,7 +7254,7 @@ measured here and live from this session's host.
 
 - podssh-relay: `session::race::in_turn` and `Start`, a race of more than two roads of one link
   (`PodUtils/podssh:crates/podssh-relay/src/session/race.rs`); a node that moves home, `far::serve_roaming`, `Roam`,
-  `MOVE_AFTER` and `connect_to` (`crates/podssh-relay/src/derp/far.rs`); a client of the user's own
+  `MOVE_AFTER` and `connect_to` (`PodUtils/podcrates:crates/pod-derp/src/far.rs`); a client of the user's own
   list, `servers::for_client_in` and `Dialer::with_servers`; the stand-in answers `/derp/probe`.
 - podssh-cli: `podssh node --derp` and `--derp-server`, the DERP road alone, beside the pair's road,
   or beside the iroh road and the pair's road, with one keeper (`crates/podssh-cli/src/node_derp.rs`,
@@ -10127,7 +10129,7 @@ reachable one way and not the other. No record says which rule the shared reader
 - Callers of the shared reader: `crates/podssh-cli/src/ssh/transport/after.rs:114` (10 s),
   `crates/podssh-cli/src/doctor/net.rs:198` (5 s) and `crates/podssh-cli/src/doctor/hop.rs:84`.
 - `docs/design.md:173` documents the roost's rule, and no document says what the direct road
-  follows. T-363's Decision item 7 (`TODO/roads.md:6020`) chose one read and rejected a peek,
+  follows. T-363's Decision item 7 (`TODO/roads.md:6022`) chose one read and rejected a peek,
   because a proxy's stream offers none.
 - Not a defect: the issue's split example `SSH-2.0-` then `OpenSSH_9.9` passes today at
   `crates/podssh-cli/src/ssh/banner.rs:26`, because the first read starts a line with `SSH-`. The

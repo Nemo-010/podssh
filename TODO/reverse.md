@@ -4169,7 +4169,7 @@ Read at `2042200`:
 - The client: `PodUtils/podssh:crates/podssh-relay/src/pair/renew.rs:70-83` and the line and JSON of
   `crates/podssh-cli/src/relay_status.rs:49-66`; `relay` has no subcommand for it
   (`crates/podssh-cli/src/relay_cmd.rs:160-167`).
-- A `503` is no refusal on the way (`crates/podssh-relay/src/piping/probe.rs:27-33`), so no other road
+- A `503` is no refusal on the way (crates/podssh-relay/src/piping/probe.rs:27-33 at `b9c04657`), so no other road
   starts on it.
 
 ## Approach
@@ -4750,7 +4750,7 @@ which `piping.yml` installs, and the second's API and edge are Cloudflare's alon
   (`PodUtils/podssh:crates/podssh-relay/src/identity/file.rs:97` says "Place::Ephemeral => Ok(Key { identity:
   make(entropy)?, path: None, made: true }),"), and it is the iroh road's endpoint
   (`crates/podssh-cli/src/node_iroh.rs:272` says "secret: Some(key.secret.clone()),") and the DERP road's
-  key at its server (`crates/podssh-cli/src/node_derp.rs:185` says "let (secret, dial) =
+  key at its server (`crates/podssh-cli/src/node_derp.rs:186` says "let (secret, dial) =
   (Arc::new(Secret::of_node(identity)), dial::tls(trust.clone(), proxy.clone()));"): a new key is a new ticket. A quick tunnel's name is new at each
   request (`crates/podssh-cli/src/node_quick.rs:4` says "The name is new each run"), which the node made
   at each start before (`crates/podssh-cli/src/node_quick.rs:258` says "asked = api::request(&trust,
@@ -4758,7 +4758,7 @@ which `piping.yml` installs, and the second's API and edge are Cloudflare's alon
 - The Approach's "the road's own connection is made again" needs nothing more on two roads: the Piping
   Server's door comes from the pair's secret (`crates/podssh-cli/src/node_piping.rs:233` says "let secret
   = Arc::new(Secret::of_pair(&pair.name, pair.connect_token()));"), and the OpenTunnel road's route is in
-  its record of the cache (`crates/podssh-relay/src/opentunnel/record.rs:47` says "pub route: String,"),
+  its record of the cache (crates/podssh-relay/src/opentunnel/record.rs:47 at `b9c04657` says "pub route: String,"),
   save a tunnel that no directory took (Decision, item 6).
 - Two kinds of node cannot move whole, which the Approach did not name: an iroh session of `--no-e2e` is
   a pipe that a task copies to TARGET (`crates/podssh-cli/src/channel.rs:412` says "let (ours, mut theirs)

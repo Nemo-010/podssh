@@ -2699,7 +2699,7 @@ command uses `podssh-probe`.
 2. Move `podssh-core` and `podssh-transport` to the dev-dependencies: an
    example can use a dev-dependency, and the binary does not declare them.
 3. Move `libc` to the dependencies for Unix only, as
-   `crates/podssh-relay/Cargo.toml:223` does; else the lint of step 4 fails on
+   `crates/podssh-relay/Cargo.toml:238` does; else the lint of step 4 fails on
    Windows.
 4. The check: `#![cfg_attr(not(test), deny(unused_crate_dependencies))]` in
    `crates/podssh-cli/src/lib.rs`. rustc then refuses a dependency that the
@@ -4022,7 +4022,7 @@ identities (x25519-dalek, `podssh-ws` and `podssh-relay`), and its AEAD
 
 ## Premise
 
-- Read: `crates/podssh-ssh/Cargo.toml:23` and `crates/podssh-cli/Cargo.toml:161`
+- Read: `crates/podssh-ssh/Cargo.toml:23` and `crates/podssh-cli/Cargo.toml:159`
   ask for `sha1` 0.10.7, and the root `Cargo.toml:141` for `hmac` 0.12;
   `Cargo.lock` holds `sha1` 0.10.7 and 0.11.0, `hmac` 0.12.1 and 0.13.0,
   and `digest` 0.10.7 and 0.11.3, as russh 0.64.1 (vendor/russh/Cargo.toml)
@@ -5821,7 +5821,18 @@ ignored.
 `cargo clippy --workspace --all-targets`: clean; `cargo test --workspace --no-fail-fast`: 3982 passed, 0 failed, 94
 ignored.
 
-Next: the waves of Q101.
+2026-11-15, podcrates `v0.50.0` (`26fb91f`, COORD-104, PodUtils/podcrates#164), step 1 of COORD-071 (#248):
+`pod-transit`, `pod-acme`, `pod-piping`, `pod-opentunnel` and `pod-derp`, from podssh at `b9c04657`. The five
+patches of `adoption/podssh/` went on one after the other with `git apply --3way`; each conflict was the tag of a
+manifest (`v0.50.0` taken), a crate that an earlier patch had added (kept), or a citation (main's, then moved to
+its line by hand where the patch had changed the cited file). No commit of `main` after `b9c04657` touched a
+frozen module, so no fix is lost. `transit/mod.rs` and `acme/mod.rs` stay as glue; `piping/`, `opentunnel/` and
+`derp/` left podssh, with their tests, plants and workflows. Each of the 49 steps of the five `.run` files
+passed (271 tests, 0 failed; `interop-acme.sh` 8 of 8 against Pebble; `cargo deny` bans and sources ok; the
+consumer checks of podcrates: 7 pins at 1.99, 16 test targets). `cargo clippy --workspace --all-targets`:
+clean; `cargo test --workspace --no-fail-fast`: 4046 passed, 0 failed, 87 ignored.
+
+Next: the waves of Q101; step 2 (`pod-egress`) comes in `v0.51.0`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
 
 **Source:** the operator, 2026-11-05: "we use whatever is necessary, including c, zig, modern rust,

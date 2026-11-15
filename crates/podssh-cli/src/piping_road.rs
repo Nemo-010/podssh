@@ -77,9 +77,11 @@ pub fn race() -> Result<Option<Race>, Refusal> {
     })
 }
 
-/// The HTTP client of `server`, through the proxy of the environment.
+/// The HTTP client of `server`, through podssh's way out for the proxy of
+/// the environment, with podssh's user agent.
 pub fn http(server: &Server, trust: &Trust) -> Http {
-    Http::new(server.clone(), dial::tls(trust.clone(), ProxyChoice::FromEnvironment))
+    let way = Arc::new(podssh_ws::client::way(&ProxyChoice::FromEnvironment));
+    Http::new(server.clone(), dial::tls(way, trust.clone()), &podssh_ws::dial::user_agent())
 }
 
 /// A dialer of the node of the pair of `part`, through `race`'s servers; its

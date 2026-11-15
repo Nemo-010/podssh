@@ -915,7 +915,7 @@ The candidates, ranked:
      server's own. Node's server speaks HTTP/2 on its TLS port alone, with
      HTTP/1.1 beside it; the Rust server speaks both on its plain port too,
      HTTP/2 by prior knowledge.
-   - Built (T-437, drafted 2026-11-02; `crates/podssh-relay/src/piping/`):
+   - Built (T-437, drafted 2026-11-02; crates/podssh-relay/src/piping/ at `b9c04657`):
      the node waits at a door whose path comes from the pair's secret; a
      client's hello there names a random link, whose two ways have paths of
      their own and begin with a mark that the receiver checks. Each end
@@ -960,7 +960,7 @@ The candidates, ranked:
      is the node's door, as on DERP.
    - Rust and C: the crate `opentunnel` takes rustls with ring, which holds
      C [W14]; podssh would speak the protocol itself on podssh-ws, with a CSR
-     of the binary's ACME client (`crates/podssh-cli/src/acme/certs.rs:91`)
+     of the binary's ACME client (PodUtils/podcrates:crates/pod-acme/src/certs.rs)
      and the TLS of podssh-ws's server. The tests: its server from its
      source, with MySQL 8 and its local test CA, in containers [W12].
      Effort: L for the link, M for the command line.
@@ -1030,7 +1030,7 @@ The candidates, ranked:
     user's own is podssh's relay role, on a host of the user's (T-427).
 On 2026-11-06 the first server of each of the 28 regions relayed podssh's own DERP link (its key and its program
 name) with 64 KiB each way, but `derp24b` (hnl), reset during TLS on the test's host: the main fleet lets podssh
-in (T-534, `crates/podssh-relay/tests/derp_main_live.rs`).
+in (T-534, `PodUtils/podcrates:crates/pod-derp/tests/derp_main_live.rs`).
 
 Meeting points carry signals only. As carriers of bytes, they are shared
 services with small messages and rate limits.

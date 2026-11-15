@@ -537,7 +537,7 @@ Read:
   `crates/podssh-ssh/src/hostkey.rs:228-235` (no terminal). `accept-new`
   records the plain key (`crates/podssh-ssh/src/hostkey.rs:198`). GitHub #29
   cites line 91 at `22c3b88`, which builds the question about other key types.
-- `ssh-key` 0.7.0-rc.11 is in the tree (`Cargo.lock:7188-7189`).
+- `ssh-key` 0.7.0-rc.11 is in the tree (`Cargo.lock:7294-7295`).
   `Certificate::validate_at` checks the signature, the SHA-256 fingerprint of
   the CA and the validity window. The caller must check the certificate type,
   the principals and the critical options (the crate's documentation).
@@ -4360,7 +4360,7 @@ Read on 2026-11-03 by the drafting agent, at `e176606` (the tree of `3bb42ea` wi
   here: the run of item 1 confirms it.
 - On `main`, `ssh node://NAME` with a good pair goes through the race of the roads
   (`crates/podssh-cli/src/ssh/node_roads.rs:208-214`, moved from `ssh/mod.rs` by T-531 and to `node_roads.rs` by T-551), not through `node::connect`, as the transit road is
-  on by default (`crates/podssh-relay/src/transit/mod.rs:61`) since T-436; at `35a0d19`, the
+  on by default (`crates/podssh-relay/src/transit/mod.rs:26`, pod-transit's `setting`) since T-436; at `35a0d19`, the
   tester's build, it went through `node::connect`. The record is in the login of `podssh-ssh`,
   which both roads share, and both count what their layer carries.
 

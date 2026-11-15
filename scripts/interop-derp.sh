@@ -1,11 +1,11 @@
 #!/bin/sh
-# scripts/interop-derp.sh - the DERP road of podssh-relay (T-349) through
+# scripts/interop-derp.sh - the DERP road (T-349, pod-derp of PodUtils/podcrates) through
 # Tailscale's derper, a DERP server that podssh did not write, in Podman:
 # DERP's handshake over its WebSocket and 8 MiB each way over one link with
 # equal digests; a client that gives up on a key that is not on the server;
 # and a session of the resumable layer, echoed whole.
 #
-#   sh scripts/interop-derp.sh
+#   PODCRATES=DIR sh scripts/interop-derp.sh
 #
 # derper is built from its tag with Go, in the image that
 # images/derper/Dockerfile pins, and serves TLS on the loopback with the
@@ -17,10 +17,13 @@
 # prints ok or FAIL; the exit code is 1 when one failed. The planted defect
 # of the adapter is in T-349's Done: derper drops nothing here, and the
 # stand-in with drops of `--test derp_link` is the test that fails on it.
+# The road and its tests are pod-derp of PodUtils/podcrates (its T-031):
+# PODCRATES names a checkout of podcrates, whose tests run here.
 
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/.." && pwd)
+: "${PODCRATES:?PODCRATES=DIR, a checkout of PodUtils/podcrates with pod-derp}"
 # shellcheck source=scripts/interop-lib.sh
 . "$HERE/interop-lib.sh"
 
@@ -98,15 +101,15 @@ done
 wait_port "$PORT"
 
 echo "== the tests, built once"
-cd "$REPO" || die "no repository at $REPO"
-timeout 1800 cargo test -q -p podssh-relay --features derp --test derp_link --no-run >"$W/cargo.log" 2>&1 ||
+cd "$PODCRATES" || die "no checkout of podcrates at $PODCRATES"
+timeout 1800 cargo test -q -p pod-derp --features standin --test derp_link --no-run >"$W/cargo.log" 2>&1 ||
     { tail -40 "$W/cargo.log"; die "the tests of the DERP road did not build"; }
 
 # through NAME: the ignored test NAME of derp_link against this derper; its
 # exit code, its output in $W/NAME.log.
 through() {
     timeout 300 env PODSSH_DERP_TEST_SERVER="127.0.0.1:$PORT" PODSSH_DERP_TEST_CA="$CA" \
-        cargo test -q -p podssh-relay --features derp --test derp_link -- --ignored --exact "$1" \
+        cargo test -q -p pod-derp --features standin --test derp_link -- --ignored --exact "$1" \
         >"$W/$1.log" 2>&1
 }
 
