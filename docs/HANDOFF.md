@@ -66,7 +66,6 @@ COORD-076). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; 
 | Issue | Waits for |
 | --- | --- |
 | #248 (COORD-071) | podcrates' order of Q101's waves 3 and 4; then each tag, taken at once (T-684) |
-| #254 (COORD-076) | podcrates' record of the take of `v0.50.0` (T-684) |
 
 ## The live runs and interop harnesses
 
