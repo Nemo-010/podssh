@@ -1,15 +1,25 @@
 name: wisp rate
 
-# The rate of the Wisp demo server through podssh (T-625): from GitHub
-# Actions alone (the operator's ruling Q56), to the operator's server of
-# PODSSH_THROUGHPUT_SSH with the key of PODSSH_THROUGHPUT_KEY (Q38), through
-# `--forwarder wisp`. Three runs, each of a session that runs `true` (the
+# The rate of the Wisp road through podssh (T-625). By default in the netem
+# lab (the operator's ruling of 2026-11-15): Mercury Workshop's wisp-python,
+# pinned, on this runner's loopback with the demo server's published bound
+# (`--limits --bandwidth 500`, kB/s for each address), in front of the
+# runner's own sshd with a throwaway key, and `tc netem` shaping the Wisp
+# server's port as the input `lab` names (scripts/feel_netem.py ports). A
+# lab shows no real ISP's queues, middleboxes or NAT. With `lab` empty: the
+# demo server itself, from GitHub Actions alone (Q56), to the operator's
+# server of PODSSH_THROUGHPUT_SSH with the key of PODSSH_THROUGHPUT_KEY
+# (Q38), through `--forwarder wisp`. Three runs, each of a session that runs `true` (the
 # open and the login), then 4 MiB down by `head -c 4194304 /dev/zero`, then
 # 4 MiB up into `cat > /dev/null`; each rate is the bytes over the session's
 # time less the time of `true`. Short (Q88); by hand; it publishes nothing.
 
 on:
   workflow_dispatch:
+    inputs:
+      lab:
+        description: "The lab's link: none, far, cellular, wifi or slow (scripts/fake_shape.py); empty for the demo server and the operator's host"
+        default: "far"
 
 permissions:
   contents: read
@@ -26,27 +36,86 @@ jobs:
       CARGO_BUILD_JOBS: "4"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: the inputs
+        env:
+          LAB: ${{ inputs.lab }}
+        run: |
+          case "$LAB" in
+            none|far|cellular|wifi|slow|'') ;;
+            *) echo "lab: none, far, cellular, wifi, slow, or empty"; exit 2 ;;
+          esac
       - name: build podssh
         run: cargo build --locked -p podssh-cli
-      - name: three runs through the Wisp demo server
+      # The lab: sshd for the runner's user on the loopback, as
+      # scripts/feel-matrix.py starts it; wisp-python at a pinned version in
+      # a venv of its own, allowed to dial the loopback; netem and ethtool.
+      - name: the lab's sshd, Wisp server and netem
+        if: inputs.lab != ''
+        timeout-minutes: 10
         env:
+          LAB: ${{ inputs.lab }}
+        run: |
+          set -eu
+          command -v /usr/sbin/sshd > /dev/null || { sudo apt-get update -q && sudo apt-get install -y -q openssh-server; }
+          command -v ethtool > /dev/null || { sudo apt-get update -q && sudo apt-get install -y -q ethtool; }
+          if ! sudo modprobe sch_netem; then
+            sudo apt-get update -q
+            sudo apt-get install -y -q "linux-modules-extra-$(uname -r)"
+            sudo modprobe sch_netem
+          fi
+          lab="$RUNNER_TEMP/lab"
+          mkdir -p "$lab"
+          chmod 700 "$lab"
+          ssh-keygen -q -t ed25519 -N '' -f "$lab/host_key"
+          ssh-keygen -q -t ed25519 -N '' -f "$lab/client_key"
+          cp "$lab/client_key.pub" "$lab/authorized_keys"
+          printf '%s\n' "ListenAddress 127.0.0.1" "Port 2222" "HostKey $lab/host_key" \
+            "AuthorizedKeysFile $lab/authorized_keys" "StrictModes no" "UsePAM no" \
+            "PasswordAuthentication no" "KbdInteractiveAuthentication no" "PidFile $lab/sshd.pid" > "$lab/sshd_config"
+          /usr/sbin/sshd -f "$lab/sshd_config" -E "$lab/sshd.log"
+          python3 -m venv "$lab/venv"
+          "$lab/venv/bin/pip" install -q wisp-python==0.11.0
+          "$lab/venv/bin/pip" freeze > "$lab/versions.txt"
+          # The demo server's published bound, 500 kB/s for each address.
+          nohup "$lab/venv/bin/python3" -m wisp.server --host 127.0.0.1 --port 6011 --allow-loopback \
+            --limits --bandwidth 500 --threads 1 > "$lab/wisp.log" 2>&1 &
+          echo $! > "$lab/wisp.pid"
+          for i in $(seq 1 60); do
+            grep -q "listening on" "$lab/wisp.log" 2> /dev/null && grep -q "listening on" "$lab/sshd.log" && break
+            sleep 0.5
+          done
+          grep -q "listening on" "$lab/wisp.log" || { cat "$lab/wisp.log"; exit 1; }
+          grep -q "listening on" "$lab/sshd.log" || { cat "$lab/sshd.log"; exit 1; }
+          python3 -I scripts/feel_netem.py ports "$LAB" "$RUNNER_TEMP/netem" 6011
+          cat "$lab/versions.txt"
+      - name: three runs through the Wisp road
+        env:
+          LAB: ${{ inputs.lab }}
           DEST: ${{ secrets.PODSSH_THROUGHPUT_SSH }}
           DEST_KEY: ${{ secrets.PODSSH_THROUGHPUT_KEY }}
         run: |
           set -u
-          if [ -z "$DEST" ] || [ -z "$DEST_KEY" ]; then
-            echo "FAIL the secrets PODSSH_THROUGHPUT_SSH and PODSSH_THROUGHPUT_KEY are not both set"
-            exit 1
-          fi
           # The key in a file of the runner's own, read by its owner alone,
           # and removed with the runner.
           key="$RUNNER_TEMP/dest-key"
           umask 077
-          printf '%s\n' "$DEST_KEY" > "$key"
+          if [ -n "$LAB" ]; then
+            cp "$RUNNER_TEMP/lab/client_key" "$key"
+            DEST="$(id -un)@127.0.0.1"
+            set -- --forwarder wisp+ws://127.0.0.1:6011/ -p 2222
+            echo "the lab, link $LAB: wisp-python with the demo server's bound"
+          else
+            if [ -z "$DEST" ] || [ -z "$DEST_KEY" ]; then
+              echo "FAIL the secrets PODSSH_THROUGHPUT_SSH and PODSSH_THROUGHPUT_KEY are not both set"
+              exit 1
+            fi
+            printf '%s\n' "$DEST_KEY" > "$key"
+            set -- --forwarder wisp
+          fi
           head -c 4194304 /dev/zero > "$RUNNER_TEMP/up.bin"
           # The first host key seen, kept for the run: a measurement, not a
           # trust decision.
-          set -- --forwarder wisp -i "$key" -o BatchMode=yes \
+          set -- "$@" -i "$key" -o BatchMode=yes \
             -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts" -o StrictHostKeyChecking=accept-new
           now() { date +%s.%N; }
           failed=0
@@ -83,3 +152,14 @@ jobs:
           EOF
           done
           exit "$failed"
+      - name: the loopback as it was
+        if: always() && inputs.lab != ''
+        run: |
+          sudo tc -s qdisc show dev lo || true
+          sudo tc qdisc del dev lo root 2> /dev/null || true
+          sudo ip link set dev lo mtu 65536 || true
+          for f in wisp sshd; do
+            [ -f "$RUNNER_TEMP/lab/$f.pid" ] && kill "$(cat "$RUNNER_TEMP/lab/$f.pid")" 2> /dev/null || true
+          done
+          tail -20 "$RUNNER_TEMP/lab/wisp.log" 2> /dev/null || true
+          rm -rf "$RUNNER_TEMP/lab"

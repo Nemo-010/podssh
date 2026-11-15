@@ -12718,6 +12718,10 @@ that the entry names; it needs no secret. A run on the operator's real path (Q38
 `PODSSH_THROUGHPUT_SSH` and `PODSSH_THROUGHPUT_KEY` are ever set; the record says that a lab shows no real
 ISP's queues, middleboxes or NAT.
 
+2026-11-15 (main session), a correction of the note above: `wisp-rate.yml` has no Wisp server of the lab, and podssh serves no Wisp (it is a client of `wisp+wss://` alone). The lab's step 2 therefore needs a Wisp server of another party on the runner (Mercury Workshop's `wisp-server-python` or `wisp-server-node`), in front of the runner's sshd, with `--forwarder wisp+ws://127.0.0.1:PORT/` and netem's far link on its port. That measures podssh's Wisp client on a shaped link, not the demo server's own bound: the demo server cannot reach a runner, so its rate needs a public far end, and that stays the optional real path (Q38). The demo server's bound stays as it publishes it (500 kB/s for each address, `docs/carriers.md`), cited as published, not measured. Next: the lab's run of step 2, by `wisp-rate.yml` with an input `lab`, as `iroh-ab.yml` takes one.
+
+2026-11-15 (main session): `wisp-rate.yml` takes the input `lab` (none, far, cellular, wifi, slow; default far; empty for the demo server and the operator's host). The lab runs Mercury Workshop's `wisp-python` 0.11.0, pinned, in a venv, with `--limits --bandwidth 500` (the demo server's published bound) and `--allow-loopback`, in front of the runner's sshd with a throwaway key; `scripts/feel_netem.py ports LINK OUT 6011` shapes the Wisp server's port. Tried here with no netem (this kernel has none): `podssh ssh --forwarder wisp+ws://127.0.0.1:6011/` to a local sshd, `true` in 0.15 s, then 4 MiB down in 8.16 s, 0.490 MiB/s, the bound of 500 kB/s (0.477 MiB/s) as the server enforces it. UNVERIFIED: the lab's run in Actions.
+
 # T-626: I2P, Nym and cjdns: whether an overlay of peer addresses carries a podssh pair: the research
 
 **Source:** the operator's archive `ff-relay` of 2026-11-04 (its docs/carriers.md, "Dead or

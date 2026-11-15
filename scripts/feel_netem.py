@@ -224,11 +224,15 @@ class Links:
 
 def main(argv):
     """`feel_netem.py udp PROFILE OUT`: the loopback set up and shaped for
-    UDP as `shape_udp`, left so for a run that follows (iroh-ab.yml's lab);
-    the workflow's last step puts the loopback back. Exit 0 shaped, 1 the
-    host cannot shape, 2 a wrong word."""
-    if len(argv) != 3 or argv[0] != "udp":
-        print("usage: feel_netem.py udp none|far|cellular|wifi|slow OUT", file=sys.stderr)
+    UDP as `shape_udp` (iroh-ab.yml's lab); `feel_netem.py ports PROFILE
+    OUT PORT...`: for the packets of those ports as `shape` (wisp-rate.yml's
+    lab). Each is left so for a run that follows; the workflow's last step
+    puts the loopback back. Exit 0 shaped, 1 the host cannot shape, 2 a
+    wrong word."""
+    ports = argv[3:]
+    if len(argv) < 3 or argv[0] not in ("udp", "ports") or (argv[0] == "udp") != (not ports) \
+            or not all(p.isdigit() and 0 < int(p) < 65536 for p in ports):
+        print("usage: feel_netem.py udp PROFILE OUT | ports PROFILE OUT PORT...", file=sys.stderr)
         return 2
     name, out = argv[1], Path(argv[2])
     if name != "none" and name not in fake_shape.PROFILES:
@@ -238,7 +242,10 @@ def main(argv):
     links = Links(out)
     try:
         links.setup()
-        links.shape_udp(name)
+        if ports:
+            links.shape(name, [int(p) for p in ports])
+        else:
+            links.shape_udp(name)
     except Unavailable as e:
         print(f"feel_netem: {e}", file=sys.stderr)
         try:
@@ -246,7 +253,8 @@ def main(argv):
         except Unavailable:
             pass  # nothing of ours was set where the tools are missing
         return 1
-    print(f"feel_netem: UDP on {DEV} as {name}: {links.record['shapes'][name].get('netem', 'unshaped')}")
+    what = f"ports {' '.join(ports)}" if ports else "UDP"
+    print(f"feel_netem: {what} on {DEV} as {name}: {links.record['shapes'][name].get('netem', 'unshaped')}")
     return 0
 
 
