@@ -328,7 +328,9 @@ and num-bigint 0.5) are T-754.
 | #262 | COORD-078: pod-relay: a spare link of the resumable layer rides the pooled HTTP/2 connection of the silent link it replaces (to podcrates) | open 2026-11-15: asks pod-relay for a connection of its own for a new link | T-789 |
 | #263 | COORD-079: podssh took podcrates v0.52.0 at 94ee6ac (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.52.0` | T-684 |
 | #264 | `[gh action] requested`: the gate on `main` after the take of v0.52.0 | closed 2026-11-15: run 43719624106 red in `ssh` (the Shadowsocks CLI test's old proxy wording), repaired; asked again in #265 | T-684 |
-| #265 | `[gh action] requested`: the gate after the repair of the Shadowsocks CLI test | open 2026-11-15: waits for the owner's agent | T-684 |
+| #265 | `[gh action] requested`: the gate after the repair of the Shadowsocks CLI test | closed 2026-11-15: run 43726773977 red in `ssh`, `cold_connect` at random; asked again in #266 | T-684 |
+| #266 | `[gh action] requested`: the lines of `cold_connect`'s failure in run 43726773977, and a rerun | open 2026-11-15: waits for the owner's agent | T-684 |
+| #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,

@@ -270,4 +270,6 @@
 262 issue open
 263 issue closed
 264 issue closed
-265 issue open
+265 issue closed
+266 issue open
+267 issue open
