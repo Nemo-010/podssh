@@ -8,8 +8,8 @@ this page keeps no history (git does).
 
 Read on 2026-11-15.
 
-1. **The gate.** Green at `6732178` (2026-11-15, run 43704942887, #257): the take of podcrates `v0.50.0`
-   (`13c52be`, first green at `e7cb4b6`, run 43687960063) and T-665's default. This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
+1. **The gate.** Green at `3f6a9fe` (2026-11-15, run 43711731169, #261): the take of podcrates `v0.51.0`, after
+   those of `v0.50.0` (`e7cb4b6`) and T-665's default (`6732178`). This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
    owner's agent by an issue `[gh action] requested` (`docs/HANDOFF.md`, "How to test"), one new issue for each ask,
    never an amended one (the agent ran #255's first block). The record agrees (`cargo todo check`), and
    `python scripts/check-repo.py` passes. A push cancels the gate of the one before it, so a commit's gate is
