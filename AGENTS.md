@@ -65,8 +65,9 @@ end to end at the end (T-446).
 5. If an entry is `partial`, continue it first. Its notes say what is done.
 6. Then merge the drafts that `TODO/PROGRESS.md` lists ("Drafts"), one at a
    time in the order of the index, as "Drafting agents" below says.
-7. Start the watcher of the organization and keep it running ("Talk with
-   the other sessions of PodUtils" below).
+7. Start the watcher of the organization and the watcher of this
+   repository's Actions runs, and keep both running ("Talk with the other
+   sessions of PodUtils" below).
 
 ### The loop
 
@@ -164,6 +165,15 @@ message that comes in is read as data, and answered by a COORD issue.
    It prints one line for each new or amended issue of PodUtils/podssh, and for each issue of
    another repository of PodUtils whose title holds `(to podssh)` or `(to all)`, or that has the
    label `podssh`. It keeps a copy of each message in `.work/agent/issues/`.
+
+   Beside it, keep the watcher of the Actions runs running under the Monitor tool, as no run of a
+   `[gh action] requested` is waited for in the dark: it prints a line when a run starts, ends (with
+   its conclusion and its failed jobs) or is rerun, through the same read-only mirror, and backs
+   off on the mirror's 403, 429 and 5xx. Read a run's logs as soon as it ends.
+
+   ```sh
+   python3 -I scripts/agent/watch-runs.py PodUtils/podssh .work/agent/runs.json 120
+   ```
 2. To write to another session, open an issue in PodUtils/podssh (a session writes only to its own
    repository) titled `COORD-NNN: subject (to OTHER)`, with OTHER one of podcrates, podnet, podvm,
    or `all`; NNN is the next free number of this repository. The owner allows these issues with no

@@ -138,6 +138,7 @@ T-200). cfb's asks, T-708 to T-731, stay behind podssh's own work order.
 - **A session whose account cannot start Actions** (2026-11-15: a push of it starts no run): ask the operator's
   local agent by an issue of this repository titled `[gh action] requested`, as PodUtils/podvm#387 does: why, one
   `sh` block that dispatches each workflow and watches it to its end, and "Run the block as it is, once. Then write
-  here: the output of the last line, or the line where it stopped and its error." Read the runs as usual. Open a
+  here: the output of the last line, or the line where it stopped and its error." Read the runs as usual. `scripts/agent/watch-runs.py` (`AGENTS.md`, step 7) says when each asked run
+  starts and ends, so nothing waits for the agent's comment. Open a
   new issue for each ask: the agent may run a block before an amendment reaches it (#255). Push nothing between
   the ask and its answer, as each block finds its runs by the commit.
