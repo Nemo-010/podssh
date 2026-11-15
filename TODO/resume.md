@@ -4266,7 +4266,7 @@ repair: the guard moved from `tries` into `layer_alive::apply`, as rustfmt took 
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** blocked
+**Status:** partial
 
 ## Problem
 
@@ -4298,11 +4298,6 @@ osewa does not, but it loses about 12 s where a link that redials at once would 
 `feel-netem.yml` with `shapes=outage` and `roads=role`, from Actions: the first byte within 2 s of the return in
 each round, and T-781's tunnels of HTTP still make progress (`last-roads-live.yml`).
 
-## Blocker
-
-PodUtils/podcrates (COORD-078, #262): pod-relay's open of a new link of the resumable layer must not take the pooled
-HTTP/2 connection that carries the link it replaces.
-
 ## Correction
 
 2026-11-15. The Premise's cause is wrong. The stamped `-v` of `feel-netem.yml` run 43710388009 (#259) showed the first
@@ -4321,4 +4316,11 @@ child's stderr after the seconds since the round's start, with "feel: the cut be
 the same clock (`Stamped`). Here, with a stand-in cut that does nothing: the layer's lines ("opened resumable session",
 its heartbeat) and the two marks, stamped, in `role.outage.err`; `--self-test` passed. UNVERIFIED: the run from
 Actions (`feel-netem.yml`, `shapes=outage`, `roads=role`) and what its lines show of the spares.
+
+## Done
+
+Partial, 2026-11-15. podcrates `v0.53.0` holds COORD-078's fix (`pod-ws`'s numbered HTTP/2 connections: a link that
+replaces another takes only a newer one, and a silent connection leaves the pool), taken with `v0.54.0`. The workspace
+passes on it (3837 tests, T-684). UNVERIFIED: the outage cell of the role's road from Actions (`feel-netem.yml`,
+`shapes=outage`, `roads=role`, `-v`), the first byte within 2 s of the return in each round.
 

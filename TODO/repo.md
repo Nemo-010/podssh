@@ -5858,6 +5858,13 @@ names it by `Proxy::label` of pod-proxy, "the proxy http://127.0.0.1:PORT", the 
 credential. The test's expectation follows the new form. Run in the build image with Alpine's `shadowsocks-rust`, as the
 gate's step `ssh`: `cargo test -p podssh-cli --test shadowsocks_cli` 9 passed, 0 failed.
 
+2026-11-15, podcrates `v0.53.0` (COORD-111, PodUtils/podcrates#185) and `v0.54.0` (`32f7a723`, COORD-113,
+PodUtils/podcrates#188), taken together as a bump of the tag, no patch for podssh: `v0.53.0` carries COORD-078's fix (a link
+that replaces another takes only a newer HTTP/2 connection, and a silent one leaves the pool; T-789) and drops one
+`node-*` id of `pod-services`; `v0.54.0` carries `pod-lab` and `pod-manual` part 1 (T-791, T-790). `cargo build`,
+`cargo clippy --workspace --all-targets`: clean; `cargo test --workspace --no-fail-fast`: 3837 passed, 0 failed, 82
+ignored.
+
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
@@ -6539,7 +6546,7 @@ with `BOX_PTRACE=refused`; the gate's box job requires 22 properties (`.github/w
 **Milestone:** M10
 **Priority:** P1
 **Effort:** M
-**Status:** blocked
+**Status:** open
 
 ## Problem
 
@@ -6570,9 +6577,9 @@ sh scripts/interop-man.sh target/debug/podssh
 
 The planted drift (a variable read with no fact) fails the new test.
 
-## Blocker
+## Correction
 
-PodUtils/podcrates (COORD-108, its T-700): the tag that holds `pod-manual`.
+2026-11-15. `pod-manual` part 1 is in podcrates `v0.54.0`, which podssh took: the entry is open.
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
 
@@ -6611,7 +6618,8 @@ so.
 
 ## Blocker
 
-PodUtils/podcrates (COORD-107, its T-692): `pod-lab` part 1 in a tag.
+PodUtils/podcrates (COORD-107, its T-692 part 2 and T-701): `pod-lab` part 1 is in `v0.54.0`, but it holds none of podssh's
+network classes (`proxy-only` and the others of COORD-081) yet.
 
 # T-792: The state of each GitHub issue written from the record by podcrates' workflow
 
