@@ -26,7 +26,7 @@ on:
         description: "Links, separated by commas: none, far, cellular, wifi, slow; and outage, a cut of 15 s (T-786)"
         default: "none,far,cellular,wifi,slow"
       roads:
-        description: "Roads, separated by commas: openssh, direct, osewa-quic, osewa-ws"
+        description: "Roads, separated by commas: openssh, direct, osewa-quic, osewa-ws; and role, with the outage shape alone (T-786)"
         default: "openssh,direct,osewa-quic,osewa-ws"
       runs:
         description: "Cold connects of each cell, 1 to 20"
