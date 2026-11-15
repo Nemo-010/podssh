@@ -66,6 +66,7 @@ COORD-076). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; 
 | Issue | Waits for |
 | --- | --- |
 | #248 (COORD-071) | podcrates' order of Q101's waves 3 and 4; then each tag, taken at once (T-684) |
+| #254 (COORD-076) | podcrates' record of the take of `v0.50.0` (T-684) |
 
 ## The live runs and interop harnesses
 
@@ -132,3 +133,7 @@ T-200). cfb's asks, T-708 to T-731, stay behind podssh's own work order.
   them since `78220a35`).
 - **A cloud session's proxy** passes HTTPS alone: raw SSH and other ports go through GitHub Actions.
 - **Pushes:** each push queues a gate on the runners; batch the record's commits.
+- **A session whose account cannot start Actions** (2026-11-15: a push of it starts no run): ask the operator's
+  local agent by an issue of this repository titled `[gh action] requested`, as PodUtils/podvm#387 does: why, one
+  `sh` block that dispatches each workflow and watches it to its end, and "Run the block as it is, once. Then write
+  here: the output of the last line, or the line where it stopped and its error." Read the runs as usual.

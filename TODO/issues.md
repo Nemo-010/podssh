@@ -317,6 +317,7 @@ and num-bigint 0.5) are T-754.
 | #251 | COORD-073: podssh took podcrates v0.48.0 at 3e7c5a2 (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.48.0` | T-684 |
 | #252 | COORD-074: podssh took podcrates v0.49.0 at a99de1d (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.49.0` | T-545, T-684 |
 | #253 | COORD-075: pod-quic spins a core on a way whose reads keep failing (to podcrates) | open 2026-11-15: asks pod-quic to bound failed reads | T-787 |
+| #254 | COORD-076: podssh took podcrates v0.50.0 at 13c52be (to podcrates) | open 2026-11-15: waits for podcrates to record the take of `v0.50.0` | T-684 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,
