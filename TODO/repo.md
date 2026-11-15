@@ -4538,7 +4538,7 @@ Each can stop a release, or the gate, for a reason outside podssh.
   download must be checked; the pinned SHA-256 checks the exact bytes.
 - Read: the armv7 job installs Alpine's own `rust` and `cargo` (`.github/workflows/release.yml:196-204`),
   in Alpine 3.24 (`images/armv7/Dockerfile`); the CLI declares Rust 1.89
-  (`crates/podssh-cli/Cargo.toml:8`), and Q48 lets the minimum rise (`docs/decisions.md:69`).
+  (`crates/podssh-cli/Cargo.toml:8`), and Q48 lets the minimum rise (`docs/decisions.md:70`).
   Inferred: Alpine 3.24's rust is 1.89 or later, as the job built `v1.0.0-beta.2`.
 - Read: `pipx run check-jsonschema` names no version (`.github/workflows/build.yml` lines 175 and
   177 at `1a46970`).
@@ -6531,3 +6531,85 @@ with `BOX_PTRACE=refused`; the gate's box job requires 22 properties (`.github/w
   EPERM`.
 - On the host as root, outside any filter: `bindjail sys` says `allowed` for each of the four, and leaves no
   mount and no directory.
+
+# T-790: The help and the manual from `pod-manual`, mechanically free of drift
+
+**Source:** the owner's ruling "Discipline", relayed in COORD-108 (PodUtils/podcrates#181), `docs/decisions.md` (2026-11-15).
+**Category:** chore
+**Milestone:** M10
+**Priority:** P1
+**Effort:** M
+**Status:** blocked
+
+## Problem
+
+Each command line of PodUtils takes its help and its manual from one shared crate, `pod-manual` (podcrates T-700), so
+that no help text is written by hand in a second place and a test fails on any drift. podssh's manual
+(`crates/podssh-cli/src/man/mod.rs`, its writers and about 60 topics) is its own today.
+
+## Premise
+
+- `crates/podssh-cli/src/man/mod.rs:1` says "`podssh man`: the manual of this binary, generated from its own tables."
+- What podssh needs of the crate is COORD-080 (#267): a model that the program fills, other names, a section by name,
+  tables of the program's own, text, roff for groff and mandoc, JSON, the pager by a probe, and a test of each row.
+
+## Approach
+
+1. Take `pod-manual` on its tag (after `pod-lab` part 1): podssh fills the crate's model from `flags.rs` and its
+   facts, and its writers become the crate's.
+2. The checks of the ruling: the variables and the exit codes as one typed table; a test that fails when the man page
+   or `llms.txt` differs from the model, or when the code reads a variable or gives an exit code with no fact.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-cli --lib man::
+sh scripts/interop-man.sh target/debug/podssh
+```
+
+The planted drift (a variable read with no fact) fails the new test.
+
+## Blocker
+
+PodUtils/podcrates (COORD-108, its T-700): the tag that holds `pod-manual`.
+
+# T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
+
+**Source:** the owner's ruling "Discipline", relayed in COORD-107 (PodUtils/podcrates#180), `docs/decisions.md` (2026-11-15).
+**Category:** chore
+**Milestone:** M10
+**Priority:** P1
+**Effort:** M
+**Status:** blocked
+
+## Problem
+
+No release of a project of PodUtils may go out before it ran in the lab's profiles of its users' hosts. podssh's
+check of a host today is its Podman box (`scripts/test_in_box.sh`, `scripts/sandbox-check.sh`) and the release
+check of T-251, not `pod-lab`.
+
+## Premise
+
+- podssh named its host classes and its lane in COORD-081 (#268), from `docs/target-environment.md:16` and the
+  testers' reports.
+
+## Approach
+
+1. Once `pod-lab` part 1 is tagged: `podlab check` and `podlab run PROFILE -- CMD` for each profile of COORD-081,
+   with the commands of podssh's lane; the box's checks become profiles where `pod-lab` holds them.
+2. The release steps of `AGENTS.md` and `docs/development.md` name the run, and `v1.1.0-beta.4` goes out only after it.
+
+## Prove
+
+```sh
+podlab run proxy-only -- sh scripts/release-short.sh BINARY --net
+```
+
+Each profile of COORD-081 that `pod-lab` holds runs the lane and passes; a profile that does not hold on the host says
+so.
+
+## Blocker
+
+PodUtils/podcrates (COORD-107, its T-692): `pod-lab` part 1 in a tag.
+
