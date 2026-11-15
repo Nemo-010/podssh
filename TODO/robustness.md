@@ -2551,8 +2551,12 @@ did not end within 600 s. The client said only its known host; the node's lines 
 after "the open tunnels ended with RST (--stop-after)", the client's proxy logged a CONNECT to the stand-in relay
 (`relay-i.test`) again and again, and no session's bytes moved after it. So four shapes now, each a session that
 stops moving after a fault and never ends, two of them on the iroh road after its relay's link was cut. The other
-ten tests of the step passed (1,307 s). Its rerun is asked in #272. Next, as before: run the step here until it fails,
-with each end's lines at their most.
+ten tests of the step passed (1,307 s). Its rerun passed (attempt 2, #272). Here: the test alone 6 runs in 6 (13 s
+each), and the whole step as the gate runs it (`cargo test -q -p podssh-cli --features podssh-cli/iroh-test --test
+m6_exit -- --ignored --test-threads 1`) 3 runs in 3 (655 to 693 s). As the client of the iroh road ran with no `-v`, the
+failure's text held its known host alone: `Road::carry` of `crates/podssh-cli/tests/m6_exit.rs` now runs `ssh -v`
+(`podssh node` has no `-v`; its lines are kept already), so the next failure in the gate says where the session stopped.
+Next: read that failure's lines.
 
 
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes

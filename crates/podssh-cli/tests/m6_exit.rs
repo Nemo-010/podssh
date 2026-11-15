@@ -415,7 +415,10 @@ mod iroh {
         /// 20 MiB up and back to the node's TARGET: the client's stderr and
         /// log of the client's proxy, and the time that it took.
         fn carry(&self) -> (String, String, Duration) {
-            let mut args = vec!["ssh".to_string()];
+            // `-v`: a run in CI hung after the relay's link was cut with the
+            // client's known host alone in its stderr (T-780); its lines of
+            // the layer and the road show where the session stopped.
+            let mut args = vec!["ssh".to_string(), "-v".into()];
             args.extend(self.session.common());
             args.extend([
                 "--ca-file".to_string(),
