@@ -277,4 +277,4 @@
 269 issue open
 270 issue open
 271 issue closed
-272 issue open
+272 issue closed
