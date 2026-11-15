@@ -621,7 +621,7 @@ scripts. The facts about OpenSSH on this page were measured with OpenSSH
   `CONNECT` packet of its own, so the URL has no `{host}` or `{port}` (64)
   and its path ends with `/` (64; without it a Wisp server reads the older
   wsproxy's form). podssh-ws speaks it itself, from its document
-  (`crates/podssh-ws/src/wisp/`): the upgrade offers the protocol
+  (`pod_egress::wisp` of PodUtils/podcrates): the upgrade offers the protocol
   `wisp-v2`; a server that sends its `INFO` speaks version 2, and podssh
   answers with the version that both take and the extensions that both
   list (the message of the day, shown with `-v`, and stream open
@@ -1453,7 +1453,7 @@ destination from its client, is a road with no relay.
 `--wstunnel wss://HOST[:PORT]` makes it the road, in place of the relay, for
 `ssh`, each command that reaches its server as `ssh` does, and `proxy`. The
 protocol is read in wstunnel's source at v11.1.0, and at v10.0.1 and v9.7.4
-for the versions before it (`crates/podssh-ws/src/wstunnel/`):
+for the versions before it (`pod_egress::wstunnel` of PodUtils/podcrates):
 
 - podssh dials the server as it dials the relay, through `HTTPS_PROXY` when
   one is set, then TLS checked for HOST with podssh's trust (`--ca-file`,

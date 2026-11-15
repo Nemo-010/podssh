@@ -7,11 +7,9 @@
 //! forwarders that the binary names is on (T-370), as a line that measured
 //! nothing (T-509).
 
-use std::sync::Arc;
-
 use podssh_relay::relay::RelayList;
 use podssh_ws::dial::{self, ProxyChoice};
-use podssh_ws::forwarder::{AtEnd, Dial};
+use podssh_ws::forwarder::{self, AtEnd};
 use podssh_ws::{Trust, Verdict};
 
 use super::relay_checks::{forward_host, github_keys, judge_unlisted, published_keys, TIMEOUT};
@@ -59,13 +57,7 @@ pub(super) async fn check(report: &mut Report<'_>, forwarders: &[Forwarder], tru
             }
         }
         let name = &forwarder.name;
-        let road = Dial {
-            trust,
-            proxy: &ProxyChoice::FromEnvironment,
-            timeout: TIMEOUT,
-            at_end: AtEnd::Now,
-            note: Arc::new(|_: &str| {}),
-        };
+        let road = forwarder::dial(trust, &ProxyChoice::FromEnvironment, TIMEOUT, AtEnd::Now, forwarder::silent());
         let carried = match podssh_ws::forwarder::open(&forwarder.template, forward_host(), 22, &road).await {
             Ok(carried) => carried,
             Err(e) => {

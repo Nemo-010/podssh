@@ -1844,7 +1844,7 @@ close reasons, and its demo server takes the destination from the client.
 ## Decision
 
 - The protocol is spoken by podssh-ws itself, from its document, branch v2 of
-  MercuryWorkshop/wisp-protocol:protocol.md, in `crates/podssh-ws/src/wisp/`. Lost: the crate `wisp-mux`
+  MercuryWorkshop/wisp-protocol:protocol.md, in `PodUtils/podcrates:crates/pod-egress/src/wisp/`. Lost: the crate `wisp-mux`
   (LGPL-3.0-only, a relinking duty on a static 0BSD binary, and a dependency tree of its own),
   and any code of wisp-server-python (AGPL-3.0), which the tests run and nothing copies.
 - A Wisp server is a forwarder of the list, `wisp+wss://HOST/PATH/`, so `--forwarder`,
@@ -1882,7 +1882,7 @@ ignored, and the test of flow control fails.
 
 ## Correction
 
-The words are a table of `podssh_ws::forwarder::builtin` (`crates/podssh-ws/src/forwarder/builtin.rs`),
+The words are a table of `podssh_ws::forwarder::builtin` (`PodUtils/podcrates:crates/pod-egress/src/forwarder/builtin.rs`),
 which `podssh_cli::forwarder` parses and whose fallback it runs
 (`crates/podssh-cli/src/forwarder/fallback.rs`). Version 2 has a fifth packet, `INFO`, which opens
 the connection where the upgrade offers a protocol; the demo server runs wisp-server-python, whose
@@ -1893,16 +1893,16 @@ version 0.9.0 speaks version 1 only (read in its source on 2026-11-02, [carriers
 2026-11-02: drafted by an agent of this session in a worktree, then merged, built and measured
 here.
 
-- The client: `crates/podssh-ws/src/wisp/` (the packets, the opening of version 1 and 2, the
+- The client: `PodUtils/podcrates:crates/pod-egress/src/wisp/` (the packets, the opening of version 1 and 2, the
   streams with the credit, the forwarder's road); `wisp+wss://` and `wisp+ws://` in
-  `crates/podssh-ws/src/forwarder/template.rs`; the word `wisp` last in
-  `crates/podssh-ws/src/forwarder/builtin.rs`; `Sec-WebSocket-Protocol` offered by
+  `PodUtils/podcrates:crates/pod-egress/src/forwarder/template.rs`; the word `wisp` last in
+  `PodUtils/podcrates:crates/pod-egress/src/forwarder/builtin.rs`; `Sec-WebSocket-Protocol` offered by
   `podssh_ws::url::dial_offering`.
 - `cargo test -p podssh-ws --lib`: 140 passed (the codec against byte strings written from the
   document's tables, the answer to an `INFO`, the template, the words).
 - `cargo test -p podssh-ws --test wisp`, with `PODSSH_TEST_WISP_PYTHON` naming a virtualenv of
   `wisp-python==0.9.0` and `websockets==15.0.1`, and `PODSSH_TEST_WISP_REQUIRED=1`: 8 passed,
-  against the stand-in of `crates/podssh-ws/tests/wisp_support/mod.rs` and two against
+  against the stand-in of `PodUtils/podcrates:crates/pod-egress/tests/wisp_support/mod.rs` and two against
   wisp-server-python 0.9.0 on the loopback (two streams at once each carry their bytes; a stream
   that the server closes gives its reason).
 - `cargo test -p podssh-ws --test forwarder` 5 and `--test live_forwarder` (built, its four live
@@ -1999,6 +1999,10 @@ Against Caddy with forwardproxy and squid over TLS in containers, through the bo
 GitHub's banner from a fixture through each, and two sessions on one HTTP/2 connection with
 Caddy. Planted: the credential left out, and the `407` is said with its words.
 
+## Correction
+
+The test target `via` of `podssh-ws` moved to `pod-egress` of PodUtils/podcrates when podssh took the crate: `cargo test -p pod-egress --all-features --test via` there runs it, with its name.
+
 ## Done
 
 2026-11-02: drafted by an agent in a worktree of its own, and merged, built and measured here;
@@ -2012,7 +2016,7 @@ to each proxy by its name; `podssh doctor --via` naming Caddy and HTTP/2; and no
 the proxies' password. This host's containers reach Go's module proxy and Alpine's packages only
 through the session's own proxy, so the whole run is the runner's.
 
-- podssh-ws, `crates/podssh-ws/src/via/`: the URL and its credentials, the versions offered, the
+- podssh-ws, `PodUtils/podcrates:crates/pod-egress/src/via/`: the URL and its credentials, the versions offered, the
   client that keeps HTTP/2's connection and falls back to HTTP/1.1, and a refusal's words
   (`mod.rs`); HTTP/1.1's CONNECT (`http1.rs`); HTTP/2's CONNECT as `AsyncRead` and `AsyncWrite`
   (`http2.rs`). podssh-cli, `crates/podssh-cli/src/via/`: the road of `ssh`, `proxy` and `pipe`'s
@@ -2031,7 +2035,7 @@ through the session's own proxy, so the whole run is the runner's.
   `--test flag_table`, `man_flag_parity`, `man_page`, `man_json`, `leading_dash`, `doctor`,
   `proxy` and `pipe_http` passed. Clippy (`-D warnings`, one needless borrow repaired) and
   `cargo fmt --check` of the packages: clean.
-- Planted (`scripts/plants/t439-via-no-credential.plant`): the test of the credential failed
+- Planted (`t439-via-no-credential.plant`, now `egress-via-no-credential.plant` of PodUtils/podcrates): the test of the credential failed
   with "refused CONNECT 127.0.0.1:...: 407 Proxy Authentication Required; it asks for Basic".
 - The first run of `via-interop.yml` (41386992760, at the merge's push) failed on three faults
   of the script, none of podssh's: forwardproxy's module has no `cmd/caddy` at the pinned
@@ -2258,7 +2262,7 @@ v10.0.1 and v9.7.4 (read through the services of web.pkgforge.dev):
 - **One token for 9.1 to 11.** wstunnel's client signs its JWT with a key of each process since
   10.1 (its commit 1522882, 2024-08-26), and its server checks no signature since then; 9.1 to
   10.0 sign and check with the key `champignonfrais` of their public source. podssh signs with
-  that key (`crates/podssh-ws/src/wstunnel/token.rs`), so that each server from 9.1 reads the
+  that key (`PodUtils/podcrates:crates/pod-egress/src/wstunnel/token.rs`), so that each server from 9.1 reads the
   token. It is a constant that each of those clients sends, no credential. Lost: a random key, as
   v11's client, which a server of 10.0 refuses with the same 400 as a wrong secret.
 - **The secret file** (`--wstunnel-secret-file`, `PODSSH_WSTUNNEL_SECRET_FILE`), read as
@@ -2285,7 +2289,7 @@ v10.0.1 and v9.7.4 (read through the services of web.pkgforge.dev):
   `wss://`, which no intermediary reads. Lost: frames with no mask, as wstunnel's client sends by
   default, which an intermediary that checks the bit refuses; a fresh key, which corrupts each
   byte at a server of the defaults.
-- **The session is the forwarders' carry** (`crates/podssh-ws/src/forwarder/carry.rs`), with
+- **The session is the forwarders' carry** (`PodUtils/podcrates:crates/pod-egress/src/carry.rs`), with
   the peer's name in its words, as a wstunnel server sends binary frames and Pings, and dials the
   target before its 101. Lost: a copy of its two tasks.
 - **The version's words.** Each refusal is a 400 whose body names no cause: "Invalid request"
@@ -2306,7 +2310,7 @@ v10.0.1 and v9.7.4 (read through the services of web.pkgforge.dev):
   that holds the prefix and the Basic, so that no secret goes in argv); OpenSSH's sshd as the
   target in place of a fixture of GitHub's banner, as T-439's run does; and a plain squid as the
   host's proxy. The crate's test runs stand-ins that read a client as v11.1.0's and 10.0.1's
-  servers do (`crates/podssh-ws/tests/wstunnel.rs`).
+  servers do (`PodUtils/podcrates:crates/pod-egress/tests/wstunnel.rs`).
 
 ## Prove
 
@@ -2334,7 +2338,7 @@ subprotocol `v1`, which podssh refuses with words of its own (69).
 2026-11-02: drafted by an agent in a worktree of its own (branch `worktree-agent-t441-wstunnel`),
 which built and ran nothing; merged onto T-440 and measured by the main session the same day.
 
-- podssh-ws, `crates/podssh-ws/src/wstunnel/`: the server's URL, the secret file and its check,
+- podssh-ws, `PodUtils/podcrates:crates/pod-egress/src/wstunnel/`: the server's URL, the secret file and its check,
   the error and its lines, and `open` (`mod.rs`); the JWT, its claims and the UUID (`token.rs`);
   the request and the answer in the words of its version (`upgrade.rs`); unit tests with vectors
   of Python's hmac (`tests.rs`). `RelaySession::with_zero_mask` (`session.rs`, `wire.rs`); the
@@ -5635,7 +5639,7 @@ tested by the main session after the take of podcrates v0.4.0: it built and pass
   program of another party, so it always runs: `cargo test -p podssh-cli --test shadowsocks_cli`, 8
   passed. Planted: text
   messages in place of binary ones (`send_binary` as `send_text` in
-  `crates/podssh-ws/src/forwarder/carry.rs`'s up task): the stand-in closes the stream as
+  `PodUtils/podcrates:crates/pod-egress/src/carry.rs`'s up task): the stand-in closes the stream as
   `gorillaConn` does, and the test failed (no answer to the salt); put back, it passes.
 - `scripts/interop-outline.sh` with `.github/workflows/outline-interop.yml` and its 8 ids in
   `scripts/interop-baseline.txt` (the harness `outline`, floor 8): outline-ss-server v1.9.2's own
@@ -5703,7 +5707,7 @@ moved code then runs there.
 
 ## Done
 
-2026-11-06. `crates/podssh-ws/src/via/mod.rs`'s `refused`: a CONNECT that carried credentials and got
+2026-11-06. `PodUtils/podcrates:crates/pod-egress/src/via/mod.rs`'s `refused`: a CONNECT that carried credentials and got
 a status that is neither 2xx nor 407 says "a proxy with probe resistance answers so where its
 credentials do not match: check the credentials file"; with no credentials sent, the proxy's own
 words alone. Unit test `a_page_for_a_connect_with_credentials_names_probe_resistance`: `cargo test
@@ -6309,7 +6313,7 @@ draft's wire still moves.
   CONNECT with `:protocol = connect-tcp` on HTTP/2 and HTTP/3; the payload in capsules DATA and
   FINAL_DATA; the token `connect-tcp-12` for the interop of this version. masque-go's fork speaks
   HTTP/3 alone and cites draft 09; erlang_masque carries raw bytes with no capsules.
-- `crates/podssh-ws/src/via/mod.rs:8` says "HTTP/2's CONNECT (RFC 9113, section 8.5)".
+- `PodUtils/podcrates:crates/pod-egress/src/via/mod.rs` says "HTTP/2's CONNECT (RFC 9113, section 8.5)".
 
 ## Approach
 
@@ -6762,7 +6766,7 @@ taken over.
 - `docs/decisions.md:41` says "Q75: the public Wisp servers that are made for it, as fallbacks",
   and `docs/decisions.md:37` says "A domain that looks taken over (a school's, a church's, a
   shop's, or a name made to look like one) is never used and never published".
-- `crates/podssh-ws/src/forwarder/builtin.rs:7` says "After them, and never first, by the
+- `PodUtils/podcrates:crates/pod-egress/src/forwarder/builtin.rs` says "After them, and never first, by the
   operator's ruling Q65: the demo", and
   `crates/podssh-cli/src/forwarder/fallback.rs:4` says "stderr with each one's name; the Wisp
   demo server last, never first, by".
@@ -6783,7 +6787,7 @@ taken over.
    a web proxy, and never a host that the sweep flagged (Q79). Each fact and its source go into
    `docs/carriers.md`.
 2. Each server that passes: a short live run (Q75) from GitHub Actions and this host, GitHub's
-   version line through it, then a word of `crates/podssh-ws/src/forwarder/builtin.rs` after
+   version line through it, then a word of `PodUtils/podcrates:crates/pod-egress/src/forwarder/builtin.rs` after
    `wisp`, with its note, in the order that the research gives.
 3. The fallback tries them after the demo server, each with its name on stderr, as now.
 4. Where no server passes: the entry is done with the research, and the fallback keeps the demo
@@ -6810,6 +6814,8 @@ server put before the demo server, and the test of the order fails.
 
 ## Correction
 
+The test target `live_forwarder` of `podssh-ws` moved to `pod-egress` of PodUtils/podcrates when podssh took the crate, with `forwarder-live.yml`: `cargo test -p pod-egress --all-features --test live_forwarder -- --ignored` there runs it, with its name.
+
 2026-11-05. The code of this entry (the forwarders and the Wisp road (`podssh-ws`'s `forwarder/` and
 `wisp/`)) goes to `pod-egress` of PodUtils/podcrates (T-684; the waves are in Q101 of
 `TODO/PROGRESS.md`, and the module map is `PodUtils/podcrates:docs/design.md`). Rule Q3
@@ -6818,7 +6824,7 @@ fixes only, and once podssh takes the crate the work is done in PodUtils/podcrat
 takes by the next tag; a test of the moved code then runs there.
 
 2026-11-09. The list of public Wisp servers belongs to `pod-services` of PodUtils/podcrates, not to
-`crates/podssh-ws/src/forwarder/builtin.rs`: step 2's "a word of `builtin.rs` after `wisp`" is
+`PodUtils/podcrates:crates/pod-egress/src/forwarder/builtin.rs`: step 2's "a word of `builtin.rs` after `wisp`" is
 wrong since T-684 (podssh holds no host of another party; `BUILTIN` is read from the kind
 `forwarder`, which `v0.7.0` fills with four services, the last `wisp-forwarder`). The servers are a
 new kind, `wisp-public`, with the facts `word`, `template` and `note` and a `[rank]`, one service
@@ -12306,10 +12312,10 @@ through an HTTP CONNECT proxy.
   its file crates/podssh-ws/src/turn/mod.rs, and its docs/poc.md: "proxy logs 2 CONNECTs").
   `AGENTS.md:333` says "Make one outbound connection", with five exceptions, none for this road.
 - podssh-ws holds the parts of TURN's long-term credential in pure Rust: `hmac`
-  (`crates/podssh-ws/Cargo.toml:34`), and `md5` and `sha1` (`crates/podssh-ws/Cargo.toml:51-52`);
+  (`crates/podssh-ws/Cargo.toml:37`), and `md5` and `sha1` (`crates/podssh-ws/Cargo.toml:54-55`);
   and a resolver order of its own (`PodUtils/podssh:crates/podssh-ws/src/resolve.rs:2` says "resolver works. In
   order"), as a Connect names an address, not a name.
-- No code of podssh names TURN: `crates/podssh-ws/src/forwarder/template.rs:65` says "a
+- No code of podssh names TURN: `PodUtils/podcrates:crates/pod-egress/src/forwarder/template.rs` says "a
   forwarder's template is a ws:// or wss:// URL".
 
 ## Approach
@@ -12708,7 +12714,7 @@ cargo test -p podssh-relay --features piping --test piping_live -- --ignored
 ```
 
 The rates of both forms through `ppng.io`, three runs each, written with their date; the demo
-server's runs in `.github/workflows/forwarder-live.yml`, by hand, written the same way.
+server's runs in `forwarder-live.yml` (now of PodUtils/podcrates), by hand, written the same way.
 
 ## Correction
 

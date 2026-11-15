@@ -14,7 +14,7 @@ use tokio::io::DuplexStream;
 
 use crate::client::ConnectError;
 use crate::dial::ProxyChoice;
-use crate::forwarder::{carry, Form, Note};
+use crate::forwarder::{carry, Form};
 use crate::tls::Trust;
 use crate::url::WsUrl;
 
@@ -53,7 +53,7 @@ pub async fn open(url: &WsUrl, trust: &Trust, proxy: &ProxyChoice, timeout: Dura
     let session = session.naming(PEER);
     session.set_receive_cap(RECEIVE_CAP);
     // A text message is no part of the stream: Outline's server sends none.
-    let note: Note = std::sync::Arc::new(|_: &str| {});
+    let note = crate::forwarder::silent();
     let (carried, _first) = carry::spawn(session, Form::Query, crate::forwarder::AtEnd::AfterPeer, note, PEER);
     // The copying tasks run on when the handle goes; the stream's end is
     // theirs, and the Shadowsocks stream above it reads it.

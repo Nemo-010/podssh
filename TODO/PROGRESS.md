@@ -39,16 +39,17 @@ Read on 2026-11-15.
    take of `v0.42.0`, which answered each. cfb's asks, T-708 to T-731 (#195), wait behind podssh's own work order, M10
    included (the owner's ruling "Priority").
 7. **The move to PodUtils/podcrates** (T-684, Q101, Rule Q3). podssh pins each podcrates crate at
-   `v0.50.0` (COORD-104, PodUtils/podcrates#164; podssh's answer is COORD-076). Taken, so worked on in
+   `v0.51.0` (COORD-105, PodUtils/podcrates#172; podssh's answer is COORD-077). Taken, so worked on in
    PodUtils/podcrates: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`,
    `pod-proxy`, `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`
    and `pod-relay` (2026-11-12), `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue), and
    step 1 of COORD-071 (#248), `pod-transit`, `pod-acme`, `pod-piping`, `pod-opentunnel` and `pod-derp`
-   (2026-11-15, `v0.50.0`); podssh keeps glue over them (`resolve.rs` of `podssh-ws`; `code/`, `session/`,
+   (2026-11-15, `v0.50.0`), and part 1 of step 2, `pod-egress` (2026-11-15, `v0.51.0`); podssh keeps glue over
+   them (`resolve.rs`, and `via.rs`, `forwarder.rs`, `wstunnel.rs`, `wisp.rs`, `meek.rs`, `webtunnel.rs`, `pt.rs`
+   and `cloudflare.rs` of `podssh-ws`; `code/`, `session/`,
    `src/e2e/`, `transit/mod.rs` and the relay client's modules over `context.rs` of `podssh-relay`;
-   `acme/mod.rs` of `podssh-cli`). **Frozen from 2026-11-15** (step 2, at podssh's `2ffb7cd7`), for
-   `pod-egress`: `crates/podssh-ws/src/` `via/`, `forwarder/`, `wstunnel/`, `wisp/`, `meek.rs`, `meek/`,
-   `webtunnel.rs`, `pt.rs`, `cloudflare.rs`, `vless/`, `vmess/`, `trojan/`, `shadowsocks/`, `eice/` and `iap/`. Then `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
+   `acme/mod.rs` of `podssh-cli`). **Frozen from 2026-11-15** (step 2, parts 2 and 3, at podssh's `2ffb7cd7`,
+   for `v0.52.0`), for `pod-egress`: `crates/podssh-ws/src/` `vless/`, `vmess/`, `trojan/`, `shadowsocks/`, `eice/` and `iap/`. Then `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
    `pod-relay-serve` last.
 8. **Drafts.** In work: none. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
    T-118's, T-117's, T-114's, T-112's,
@@ -75,10 +76,10 @@ T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 **Hand-off of 2026-11-15 (the session ended at the operator's word).** Pushed and green up to `a99de1d`'s gate; the
 commits after it are pushed with this note. For the next session, in order:
 1. Read the gate of the last push; repair a failure first.
-2. T-684: podcrates `v0.50.0` (step 1: transit, acme, piping, opentunnel, derp) is taken (2026-11-15,
-   COORD-076). Step 2 (pod-egress) stays frozen; take `v0.51.0` at once when it is tagged.
-3. COORD-075 (#253, T-787, blocked): when podcrates fixes `pod-quic`, take the tag and un-ignore
-   `crates/podssh-relay/tests/quic_socket_fails.rs`.
+2. T-684: podcrates `v0.50.0` (step 1) and `v0.51.0` (step 2, part 1: pod-egress's via, forwarders, Wisp,
+   wstunnel, meek, WebTunnel and Cloudflare's Access) are taken (2026-11-15, COORD-076 and COORD-077). Parts 2
+   and 3 (VLESS, VMess, Trojan, Shadowsocks, EICE, IAP) stay frozen; take `v0.52.0` at once when it is tagged.
+3. COORD-075 (#253, T-787): done with `v0.51.0`, `quic_socket_fails.rs` runs and passes.
 4. The netem labs: T-665 and T-625 are done (2026-11-15, runs 43691396393 and 43691399331: `tuned` is the iroh
    road's default; the Wisp road holds the demo server's bound each way). T-786 is done (run 43709370293): the
    resumable layer outlives a cut of 15 s that osewa does not, but comes back about 12.5 s after it; T-789 (P2,
@@ -148,7 +149,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 744 entries: 44 open, 30 partial, 12 blocked, 658 done.
+`TODO/INDEX.md` holds 744 entries: 44 open, 30 partial, 11 blocked, 659 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 

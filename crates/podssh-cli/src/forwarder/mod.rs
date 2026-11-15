@@ -64,13 +64,13 @@ impl Forwarder {
         let words = builtin::words();
         let refused = || format!("a forwarder is a ws://, wss:// or wisp+wss:// URL, or one of the words {words}");
         let b = builtin::lookup(item).ok_or_else(refused)?;
-        Forwarder::named(b)
+        Forwarder::named(&b)
     }
 }
 
 /// The forwarders that the binary names, in the order of the fallback.
 pub fn builtins() -> Vec<Forwarder> {
-    builtin::BUILTIN.iter().filter_map(|b| Forwarder::named(b).ok()).collect()
+    builtin::builtin().iter().filter_map(|b| Forwarder::named(b).ok()).collect()
 }
 
 /// A list of forwarders: templates and words separated by commas, in
@@ -244,7 +244,7 @@ mod tests {
         assert_eq!(own[0].name, "wisp+wss://w.example/wisp/");
         // The help names each word that the binary takes, and Wisp's form.
         let row = crate::flags::SSH_FLAGS.iter().find(|r| r.long == "forwarder").expect("the row");
-        for b in builtin::BUILTIN.iter() {
+        for b in builtin::builtin().iter() {
             assert!(row.help.contains(b.word), "{}: {}", b.word, row.help);
         }
         assert!(row.help.contains("wisp+wss://"), "{}", row.help);

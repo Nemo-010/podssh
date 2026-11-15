@@ -3186,7 +3186,7 @@ URL written into each result, and a download target that is no test target of `A
    rounds in a new random order from a seed that the result keeps; a limit on each run and a
    budget on the whole; one JSON result, and `--ci` for GitHub's step summary.
 2. A workflow by hand only, .github/workflows/relay-measure.yml, from the draft in the report's
-   section 7, with the pins of `.github/workflows/forwarder-live.yml`.
+   section 7, with the pins of `forwarder-live.yml` (now of PodUtils/podcrates).
 3. The stage `dest` in the workflow, with the operator's server of `PODSSH_THROUGHPUT_SSH` and its
    key from the repository's secrets, as the throughput run takes them; an input names it.
 4. `docs/development.md`, "Live tests": the harness, its self-test and the workflow.

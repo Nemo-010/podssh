@@ -7,9 +7,8 @@
 use std::future::Future;
 use std::io::Write;
 use std::pin::Pin;
-use std::sync::Arc;
 
-use podssh_ws::forwarder::{AtEnd, Carried, Dial, Status};
+use podssh_ws::forwarder::{AtEnd, Carried, Status};
 use podssh_ws::{ProxyChoice, Trust};
 
 use super::Forwarder;
@@ -104,14 +103,9 @@ pub async fn open(
     let mut failed: Vec<String> = Vec::new();
     for forwarder in forwarders {
         let timeout = if fallback { super::fallback::EACH_WAIT } else { podssh_relay::open::CONNECT_TIMEOUT };
-        let dial = Dial {
-            trust,
-            proxy: &ProxyChoice::FromEnvironment,
-            timeout,
-            at_end: AtEnd::AfterPeer,
-            // A pipe has no -v; a forwarder's notes are not the target's.
-            note: Arc::new(|_: &str| {}),
-        };
+        // A pipe has no -v; a forwarder's notes are not the target's.
+        let silent = podssh_ws::forwarder::silent();
+        let dial = podssh_ws::forwarder::dial(trust, &ProxyChoice::FromEnvironment, timeout, AtEnd::AfterPeer, silent);
         let opened = match fallback {
             true => super::fallback::bounded(&forwarder.template, host, port, &dial).await,
             false => podssh_ws::forwarder::open(&forwarder.template, host, port, &dial).await,

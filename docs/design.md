@@ -66,7 +66,7 @@ and over a WebSocket sends nothing until the server's end; `--wstunnel`
 sends nothing until the server's end; `--shadowsocks` is TCP's half-close,
 which the server passes on; `--via` is the tunnel's half-close. Each
 carrier of a WebSocket or a Wisp stream of these roads asks one helper
-(`crates/podssh-ws/src/forwarder/end.rs`), and each road names its
+(`pod_egress::end` of PodUtils/podcrates), and each road names its
 `AtEnd`, which has no default, so that a new road cannot take another's
 choice by a copied bool. MEASURED UNVERIFIED: for each road, this side's
 input ends while 1 MiB is on its way to it, and each byte comes, or, where

@@ -37,7 +37,7 @@ pub(super) async fn open(
     let get = request(server, http::Method::GET, &at(server, &id), false)?;
     let (down, closed) = send(&sender, get, true, limit).await?;
     let down = answer(down, limit, "the GET of packet-up").await?;
-    let read = Stream::from_parts(closed, down.into_body());
+    let read = pod_ws::h2_road::duplex(closed, down.into_body());
     post(server, &sender, &id, 0, Bytes::from(first), limit).await?;
     let (ours, theirs) = tokio::io::duplex(PIPE);
     let failed = Failed::default();

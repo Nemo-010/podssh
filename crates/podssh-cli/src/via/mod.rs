@@ -19,7 +19,7 @@ pub mod reach;
 use std::path::Path;
 use std::sync::{Arc, Mutex, PoisonError};
 
-use podssh_ws::via::{Client, Dial, Offer, Via};
+use podssh_ws::via::{Client, Offer, Via};
 use podssh_ws::{ProxyChoice, Trust};
 use zeroize::Zeroizing;
 
@@ -201,12 +201,8 @@ pub fn client(road: &Road) -> Arc<Client> {
     if let Some((_, client)) = clients.iter().find(|(kept, _)| kept == road) {
         return client.clone();
     }
-    let dial = Dial {
-        trust: road.trust.clone(),
-        proxy: ProxyChoice::FromEnvironment,
-        timeout: podssh_relay::open::CONNECT_TIMEOUT,
-        offer: road.offer,
-    };
+    let limit = podssh_relay::open::CONNECT_TIMEOUT;
+    let dial = podssh_ws::via::dial(road.trust.clone(), &ProxyChoice::FromEnvironment, limit, road.offer);
     let client = Arc::new(Client::new(road.via.clone(), dial));
     clients.push((road.clone(), client.clone()));
     client

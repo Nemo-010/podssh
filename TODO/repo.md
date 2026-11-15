@@ -5832,7 +5832,19 @@ passed (271 tests, 0 failed; `interop-acme.sh` 8 of 8 against Pebble; `cargo den
 consumer checks of podcrates: 7 pins at 1.99, 16 test targets). `cargo clippy --workspace --all-targets`:
 clean; `cargo test --workspace --no-fail-fast`: 4046 passed, 0 failed, 87 ignored.
 
-Next: the waves of Q101; step 2 (`pod-egress`) comes in `v0.51.0`.
+2026-11-15, podcrates `v0.51.0` (`7119770`, COORD-105, PodUtils/podcrates#172), step 2 of COORD-071, part 1:
+`pod-egress` from podssh-ws at `2ffb7cd7` (via, the forwarders, Wisp, wstunnel, meek_lite, WebTunnel and Cloudflare's
+Access client), with `adoption/podssh/pod-egress.patch` by `git apply --3way` after the take of `v0.50.0`. No commit of
+`main` after `2ffb7cd7` touched those modules. The conflicts were the manifests alone: main's side with the tag moved
+where the patch's older base lacked the crates of `v0.50.0`, the patch's for `podssh-ws` (it adds `pod-egress` and
+drops `pod-services`, whose one use moved), and four pins that the patch's base did not hold, moved by hand. The
+modules became glue files of 3 to 29 lines (`via.rs`, `forwarder.rs`, `wstunnel.rs`, `wisp.rs`, `meek.rs`,
+`webtunnel.rs`, `pt.rs`, `cloudflare.rs`). The same tag bounds `pod-quic`'s failed reads (COORD-075, #253), so
+T-787's test runs again and passes. Each of the 16 steps of `pod-egress.run` passed (289 tests with T-787's, 0
+failed; the consumer checks of podcrates). `cargo clippy --workspace --all-targets`: clean; `cargo test
+--workspace --no-fail-fast`: 3951 passed, 0 failed, 82 ignored (the moved tests left with their modules).
+
+Next: parts 2 and 3 of step 2 (VLESS, VMess, Trojan, Shadowsocks, EICE, IAP) in `v0.52.0`, then the rest of Q101.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
 
 **Source:** the operator, 2026-11-05: "we use whatever is necessary, including c, zig, modern rust,

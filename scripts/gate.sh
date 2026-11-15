@@ -220,8 +220,8 @@ step_libs() {
     # code (T-684), and the tests of podssh-ws's glue run with the feature.
     tests "podssh-ws with plain ws:// to the loopback: tests (feature plain-ws)" \
         cargo test --locked --no-fail-fast -p podssh-ws --features plain-ws
-    tests "the road of a Cloudflare tunnel against a stand-in (T-264, feature plain-ws)" \
-        cargo test --locked --no-fail-fast -p podssh-ws --features plain-ws --test cloudflare_access
+    # The road of a Cloudflare tunnel against a stand-in (T-264) went to
+    # pod-egress with the code (its T-035), and runs there.
     # The relay role (T-169, T-427): its routes, and its reverse road against
     # raw sockets and against podssh's node and operator on plain ws://, also
     # across a planned stop and the role's return (T-255); its forward road

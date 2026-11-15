@@ -52,7 +52,7 @@ pub async fn passed(say: &mut dyn FnMut(&str)) -> Vec<Forwarder> {
         }
     }
     let mut out = Vec::new();
-    for b in builtin::BUILTIN.iter() {
+    for b in builtin::builtin().iter() {
         let (Some(form), Some((host, port))) = (ws_form(b), host_of(&ws_text(b))) else { continue };
         let heard = podssh_ws::cleartext::probe(&host, port, &ProxyChoice::FromEnvironment, PROBE_WAIT).await;
         say(&format!("{} in cleartext: {}", podssh_ws::dial::authority(&host, port), heard.words()));
@@ -82,7 +82,7 @@ mod tests {
     /// port 80 of its host.
     #[test]
     fn each_built_in_forwarder_has_a_ws_form() {
-        for b in builtin::BUILTIN.iter() {
+        for b in builtin::builtin().iter() {
             let form = ws_form(b).unwrap_or_else(|| panic!("{}", b.word));
             let ws = form.name.starts_with(&format!("{} (ws://", b.word)) || form.name.contains("wisp+ws://");
             assert!(ws, "{}", form.name);
@@ -91,7 +91,7 @@ mod tests {
             assert_eq!(port, 80, "{}", b.word);
             assert!(b.template.contains(&host), "{}", b.word);
         }
-        let line = announce("192.0.2.1:22", &[ws_form(&builtin::BUILTIN[0]).unwrap()]);
+        let line = announce("192.0.2.1:22", &[ws_form(&builtin::builtin()[0]).unwrap()]);
         let said = "podssh sends 192.0.2.1:22 to mudlet (ws://web-proxy.mudlet.org/), with no TLS";
         assert!(line.contains(said), "{line}");
         assert!(line.ends_with("PODSSH_CLEARTEXT=no turns this off"), "{line}");

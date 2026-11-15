@@ -1434,7 +1434,7 @@ that the section names.
 2026-10-12: two parts of the Premise are more precise in cloudflared's source at `bf4f502`. A
 quick tunnel uses QUIC alone unless the user names `--protocol http2`: cloudflared sets `quic`
 for it, and a protocol that the user names has no fallback (`docs/design.md:326-330`). And the
-client in a cage is the road of T-264, `crates/podssh-ws/src/cloudflare.rs`, whose upgrade is
+client in a cage is the road of T-264, `PodUtils/podcrates:crates/pod-egress/src/cloudflare.rs`, whose upgrade is
 cloudflared's; the cited `PodUtils/podssh:crates/podssh-ws/src/client.rs:181-205` is the relay's upgrade, with
 its token header.
 
@@ -1560,7 +1560,7 @@ publishes.
 2026-10-11. `podssh ssh cf://[user@]HOST` and `podssh proxy cf://HOST` reach a service that
 `cloudflared` publishes, over the WebSocket of `cloudflared access tcp`, through `HTTPS_PROXY`,
 with the credentials of Cloudflare Access from the environment
-(`crates/podssh-ws/src/cloudflare.rs`, `crates/podssh-cli/src/ssh/cloudflare.rs`). The manual's
+(`PodUtils/podcrates:crates/pod-egress/src/cloudflare.rs`, `crates/podssh-cli/src/ssh/cloudflare.rs`). The manual's
 VARIABLES and the notes of `ssh`, `docs/cli.md` and `docs/design.md` (section 2) give the road.
 - `cargo test -p podssh-ws --features plain-ws --test cloudflare_access`: 6 passed, on Windows,
   against a stand-in on the loopback for the edge and the origin. The upgrade, with no credential,
@@ -1864,7 +1864,7 @@ a name: it runs no `cloudflared`.
 - Read: podssh's DNS over HTTPS asks for A and AAAA records only
   (`crates/podssh-ws/src/resolve.rs`, line 125 at `927eb24`).
 - Read: the client exists: `cf://HOST` opens cloudflared's WebSocket through `HTTPS_PROXY`
-  (T-264, `crates/podssh-ws/src/cloudflare.rs`).
+  (T-264, `PodUtils/podcrates:crates/pod-egress/src/cloudflare.rs`).
 - Read: a node runs the far end of the resumable layer for each session (T-083, T-153).
 
 ## Approach
@@ -3378,7 +3378,7 @@ tunnel (T-428), for the user's own node. That node is the server of the edge's r
 today answers each one that is not a visitor's WebSocket with 404
 (`crates/podssh-relay/src/quick/serve.rs:8`). The resumable layer runs over any byte stream, so
 the road is one more link under it, and podssh-ws has a POST loop already, for Tor's meek_lite
-(`crates/podssh-ws/src/meek.rs`). VLESS over XHTTP's `packet-up` (T-440) has the same shape
+(`PodUtils/podcrates:crates/pod-egress/src/meek.rs`). VLESS over XHTTP's `packet-up` (T-440) has the same shape
 against a server that the user runs (Xray-core): a second server of this road, which podssh did
 not write.
 
@@ -5661,6 +5661,8 @@ the sentinel dialled for real (no bootstrap); a POST with no `X-Session-Id` (mee
 
 ## Correction
 
+The test targets `meek` and `webtunnel` of `podssh-ws` moved to `pod-egress` of PodUtils/podcrates when podssh took the crate: `cargo test -p pod-egress --all-features --test meek --test webtunnel` there runs them, with their names.
+
 2026-11-01: the Prove named `PODSSH_TEST_TOR_NETWORK` for the CLI's test; the test reads
 `PODSSH_TEST_TOR_BRIDGES`, the file of the bridge's lines that `scripts/tor-net.sh
 start-bridges` writes beside its network's `arti.toml` (Decision, last item). The Prove adds
@@ -6303,7 +6305,7 @@ text frame once its socket opens. The Approach gains the read of the answer (Dec
 2026-10-31: drafted (branch `draft-forwarder`, `04ea77e`); merged into `main` on 2026-11-01, built,
 tested and measured here.
 
-- `podssh_ws::forwarder` (`crates/podssh-ws/src/forwarder/`): `Template` (the two forms, each
+- `podssh_ws::forwarder` (`PodUtils/podcrates:crates/pod-egress/src/forwarder/`): `Template` (the two forms, each
   refusal of Approach 2, the target checked by `check_target` and then percent-encoded, the first
   frame `{"Host":HOST,"Port":PORT}`, the URL shown with no query); `open`, the dial of
   `podssh_ws::url::dial` with no token, the first frame and its answer, and the wait of the query
@@ -6429,8 +6431,8 @@ As the operator's ruling on Q56 allows (2026-10-31, `docs/decisions.md`):
      none carries stays the relay's. `doctor` says whether the fallback is on, with no dial: Q56
      allows trying them when the relay fails, not on each check; `doctor --forwarder WORDS` asks
      them.
-  6. The watch (Approach 3): `.github/workflows/forwarder-live.yml`, each day and by hand, runs
-     `crates/podssh-ws/tests/live_forwarder.rs`: one connection to each, one at a time, and the
+  6. The watch (Approach 3): `forwarder-live.yml` (now of PodUtils/podcrates), each day and by hand, runs
+     `PodUtils/podcrates:crates/pod-egress/tests/live_forwarder.rs`: one connection to each, one at a time, and the
      first line of `github.com:22`, GitHub's version line (Q56: Actions only, short). Its plant
      names a host under `.invalid` for each, and must fail. Lost: a daily run of `podssh doctor
      --forwarder`, which builds the binary and asks the relay too.
@@ -6460,14 +6462,14 @@ of `AGENTS.md:300-324` name the three forwarders now, from GitHub Actions only, 
 2026-10-31: drafted (branch `draft-forwarder`, `f27fbe2`); merged into `main` on 2026-11-01 at
 `5fa6f81`, built and tested here; closed the same day once its live run passed in GitHub Actions.
 
-- The table of the three (`crates/podssh-ws/src/forwarder/builtin.rs`), the words in each list of
+- The table of the three (`PodUtils/podcrates:crates/pod-egress/src/forwarder/builtin.rs`), the words in each list of
   forwarders (`crates/podssh-cli/src/forwarder/mod.rs`), and the fallback
   (`crates/podssh-cli/src/forwarder/fallback.rs`): after each relay host failed, in the relay's
   arm of `crates/podssh-cli/src/ssh/transport.rs` and in `podssh proxy`; `PODSSH_FORWARDER_FALLBACK`
   and `ForwarderFallback`; the line `fallback` of `doctor`.
 - The manual (the words in the help and a note of `ssh`, the variable, the settings, an example),
   `docs/cli.md`, `docs/carriers.md`, the road table of `docs/design.md`, `docs/relay-operator.md`
-  and `docs/STATUS.md`; the watch, `.github/workflows/forwarder-live.yml`.
+  and `docs/STATUS.md`; the watch, `forwarder-live.yml` (now of PodUtils/podcrates).
 - `cargo test -p podssh-cli --test forwarder_cli`: 11 passed (2026-11-01), the draft's of the
   fallback among them (each word in its form; the fallback after each relay host, in order, each
   named; none for `--relay-host` nor when off; 78 for another word; `proxy`'s fallback);
@@ -8508,7 +8510,7 @@ puts the fallback in its `ok` column without a probe.
   policy or of a token, or after a 502 whose target's name fails
   (`PodUtils/podssh:crates/podssh-relay/src/open.rs:71-93`, `PodUtils/podssh:crates/podssh-relay/src/open.rs:147-155`).
 - Read: `doctor`'s line of the fallback is `ok`, with "not asked here"
-  (`crates/podssh-cli/src/doctor/forwarder.rs:30-47`); `doctor` has a mark for what it did not
+  (`crates/podssh-cli/src/doctor/forwarder.rs:28-45`); `doctor` has a mark for what it did not
   measure (`crates/podssh-cli/src/doctor/report.rs:107-109`).
 - Read: the operator's rulings Q56 and Q65 (`docs/decisions.md`) let the binary try the forwarders,
   and the Wisp demo server last, "when each relay host fails", unasked (T-370, T-438); since T-438
@@ -9467,7 +9469,7 @@ banner where a hop holds the body: the form needs a test of the way and a fallba
   reasons: no server of that shape is offered to others, so the template names the target to an
   HTTP server that nobody runs for the use; its session has no form for a hop that holds a body
   (the patch's own "Limits of the POC"); and it takes the scheme `https://`, which
-  `crates/podssh-ws/src/forwarder/template.rs:65` refuses today, so a mistyped `https://` for
+  `PodUtils/podcrates:crates/pod-egress/src/forwarder/template.rs` refuses today, so a mistyped `https://` for
   `wss://` would become another road with no word.
 - **The form first, with a bound of 2 s on its mark.** Lost: the form after the split form, which
   keeps a request for each batch where the hop streams; a probe of the way at each start (T-325's),
@@ -9998,13 +10000,13 @@ new road from getting the rule wrong, and no test per road keeps it.
 
 ## Premise
 
-- Read: `crates/podssh-ws/src/forwarder/mod.rs:48-57`: `Dial` has `close_at_end: bool` and derives no
+- Read: `PodUtils/podcrates:crates/pod-egress/src/forwarder/mod.rs`: `Dial` has `close_at_end: bool` and derives no
   `Default`; each road writes it. Pipe roads write `false` (`crates/podssh-cli/src/forwarder/pipe.rs:111`,
   `crates/podssh-cli/src/trojan/pipe.rs:106`), reach roads write `true`
   (`crates/podssh-cli/src/forwarder/reach.rs:57`).
-- Read: `crates/podssh-ws/src/forwarder/carry.rs:185-188`: with `close_at_end` false, the read task
+- Read: `PodUtils/podcrates:crates/pod-egress/src/carry.rs`: with `close_at_end` false, the read task
   waits for `down_ended_rx` before it sends Close.
-- Read: `crates/podssh-ws/src/wisp/mux.rs:253-258` and `crates/podssh-ws/src/vless/ws.rs:114`
+- Read: `PodUtils/podcrates:crates/pod-egress/src/wisp/mux.rs` and `crates/podssh-ws/src/vless/ws.rs:114`
   derive the same branch again. Wisp has no half-close: a pipe waits for the server's end.
 - Read: a road to podssh's own relay already drains after the client's Close (T-671, done;
   `docs/relay.md`, the paragraph of the half-close), and the layer road has `END` (T-632, done). A
@@ -10021,7 +10023,7 @@ new road from getting the rule wrong, and no test per road keeps it.
    `scripts/capture-close.py --client-close`.
 3. Add one test for each road: the sender's input ends at t=0 while 1 MiB is in flight to the sender,
    and the receiver's copy is byte-complete. Use the stand-in relay role (`podssh relay serve`)
-   and `crates/podssh-ws/tests/forwarder.rs`.
+   and `PodUtils/podcrates:crates/pod-egress/tests/forwarder.rs`.
 4. Last step: add a column to the table of `docs/design.md`, "Select a road", that says for each road
    whether it half-closes or ends the session on the first end. Run `cargo todo remap
    docs/design.md` in the same change.
@@ -10057,7 +10059,7 @@ and pass on the correct code.
 Premise misses some places of the bool, and two roads that have no choice:
 
 1. Three `Dial` types carry the bool, not one: `podssh_ws::forwarder::Dial` (also the road of a Wisp
-   server, `crates/podssh-ws/src/wisp/forward.rs`), `podssh_ws::vless::Dial` (Trojan's too, by a
+   server, `PodUtils/podcrates:crates/pod-egress/src/wisp/forward.rs`), `podssh_ws::vless::Dial` (Trojan's too, by a
    re-export) and `podssh_ws::wstunnel::Dial`; and `Wisp::open` takes it as an argument. Each takes
    `AtEnd`. The roads that write `false` are the four `pipe.rs` of `crates/podssh-cli/src/`
    (`forwarder`, `trojan`, `vless`, `wstunnel`); those that write `true` are their four `reach.rs`
@@ -10086,7 +10088,7 @@ four other callers of the forwarder's carrier (`chisel/mod.rs`, `frp/dial.rs`, `
 `upterm.rs`) name their value too (`Now` where it was `true`, `AfterPeer` where it was `false`), and a
 borrow of the wstunnel test.
 
-- `crates/podssh-ws/src/forwarder/end.rs`: `AtEnd` (no `Default`) and `end_of_input`, which closes at
+- `PodUtils/podcrates:crates/pod-egress/src/end.rs`: `AtEnd` (no `Default`) and `end_of_input`, which closes at
   once or once the peer ended, with no timer. The forwarder's carrier (`forwarder/carry.rs`, also
   wstunnel's), the Wisp stream's sender (`wisp/mux.rs` `up`) and the WebSocket pump of VLESS and
   Trojan (`vless/ws.rs` `spawn`) each call it at the end of their input. On Wisp, `AfterPeer` then
@@ -10301,7 +10303,7 @@ last resort. All numbers are the reporter's, from one host on one day.
 
 ## Premise
 
-- Read: `crates/podssh-ws/src/forwarder/mod.rs:51-61`: `Dial` has `trust`, `proxy`, `timeout`,
+- Read: `PodUtils/podcrates:crates/pod-egress/src/forwarder/mod.rs`: `Dial` has `trust`, `proxy`, `timeout`,
   `close_at_end` and `note`, and no field for a secret as an address. A road by a secret is a
   sibling of the forwarder, not a template entry.
 - Read: `TODO/issues.md` row of #59 (open research): its survey of accountless roads does not name
@@ -10316,7 +10318,7 @@ last resort. All numbers are the reporter's, from one host on one day.
 
 1. When podcrates ships `pod-gsr`, take it at a pinned tag with its `pod-services` data file (T-684
    procedure). Write no second implementation of the protocol.
-2. Add a road module beside `crates/podssh-ws/src/forwarder/` that dials through `pod-gsr`. Read the
+2. Add a road module beside `PodUtils/podcrates:crates/pod-egress/src/forwarder/` that dials through `pod-gsr`. Read the
    secret from a file or the environment, never from argv, a log or a URL.
 3. Add `--gsr`, opt-in, with the road last in the order, after the operator's relay and the
    accountless forwarders.
@@ -10471,7 +10473,7 @@ the service token on `cf://` only, and reads it from variables (the secret in th
 
 - Read: `cf://` reads `PODSSH_CF_ACCESS_CLIENT_ID` and `PODSSH_CF_ACCESS_CLIENT_SECRET` from variables, and a
   user's token from `PODSSH_CF_ACCESS_TOKEN` or a file (`crates/podssh-cli/src/ssh/cloudflare.rs:37-42`,
-  `:112-122`); the headers are `access.headers()` (`crates/podssh-ws/src/cloudflare.rs:74-85`).
+  `:112-122`); the headers are `access.headers()` (`PodUtils/podcrates:crates/pod-egress/src/cloudflare.rs`).
 - Read: the relay client sends `X-Relay-Token` and no other credential header
   (`PodUtils/podssh:crates/podssh-ws/src/client.rs:183-205`, `crates/podssh-ws/src/handshake.rs:3`); `https_request` takes
   headers (`client.rs:343`).
@@ -10574,7 +10576,7 @@ can run. The owner wants the Access TCP client in podssh on each system it serve
 ## Premise
 
 - `crates/podssh-cli/src/ssh/cloudflare.rs:1`-`10`, `:41`-`:42`: a token only, from a variable or file.
-- `crates/podssh-ws/src/cloudflare.rs:2`: the WebSocket client of an Access TCP rule.
+- `PodUtils/podcrates:crates/pod-egress/src/cloudflare.rs`: the WebSocket client of an Access TCP rule.
 - `crates/podssh-cli/src/man/facts.rs:125`: the manual says that `cloudflared` prints the token.
 
 ## Approach

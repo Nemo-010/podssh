@@ -259,7 +259,7 @@ async fn stream_one(
     let (response, mut up) = send(&sender, request, false, limit).await?;
     send_all(&mut up, Bytes::from(first), false).await.map_err(VlessError::Carry)?;
     let response = answer(response, limit, "the POST of stream-one").await?;
-    Ok(Stream::from_parts(up, response.into_body()))
+    Ok(pod_ws::h2_road::duplex(up, response.into_body()))
 }
 
 async fn stream_up(
@@ -276,8 +276,8 @@ async fn stream_up(
     send_all(&mut up, Bytes::from(first), false).await.map_err(VlessError::Carry)?;
     let down = answer(down, limit, "the GET of stream-up").await?;
     let posted = answer(posted, limit, "the POST of stream-up").await?;
-    let read = Stream::from_parts(closed, down.into_body());
-    Ok(Halves { read, write: Stream::from_parts(up, posted.into_body()), failed: Arc::default() })
+    let read = pod_ws::h2_road::duplex(closed, down.into_body());
+    Ok(Halves { read, write: pod_ws::h2_road::duplex(up, posted.into_body()), failed: Arc::default() })
 }
 
 #[cfg(test)]

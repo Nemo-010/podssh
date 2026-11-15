@@ -14,7 +14,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "crates/podssh-ws/src/via/**"
+      - "crates/podssh-ws/src/via.rs"
       - "crates/podssh-cli/src/via/**"
       - "scripts/interop-via.sh"
       - ".github/workflows/via-interop.yml"

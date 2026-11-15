@@ -4,7 +4,7 @@
 //! the relay's forward check identifies the server, never by its banner.
 
 use podssh_ws::dial::{self, ProxyChoice};
-use podssh_ws::via::{Client, Dial};
+use podssh_ws::via::Client;
 
 use super::relay_checks::{forward_host, github_keys, judge_unlisted, published_keys, TIMEOUT};
 use super::Report;
@@ -19,8 +19,8 @@ pub(super) async fn check(report: &mut Report<'_>, road: &Road) {
         Ok(Some(proxy)) => format!(", through the proxy {proxy}"),
         _ => String::new(),
     };
-    let (proxy, trust) = (ProxyChoice::FromEnvironment, road.trust.clone());
-    let client = Client::new(road.via.clone(), Dial { trust, proxy, timeout: TIMEOUT, offer: road.offer });
+    let dial = podssh_ws::via::dial(road.trust.clone(), &ProxyChoice::FromEnvironment, TIMEOUT, road.offer);
+    let client = Client::new(road.via.clone(), dial);
     let started = std::time::Instant::now();
     let opened = match client.open(forward_host(), 22).await {
         Ok(opened) => opened,

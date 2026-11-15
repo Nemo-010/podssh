@@ -6,7 +6,7 @@
 use std::sync::Arc;
 
 use podssh_ssh::Log;
-use podssh_ws::wstunnel::{AtEnd, Dial, Ended, WstunnelError};
+use podssh_ws::wstunnel::{AtEnd, Ended, WstunnelError};
 use podssh_ws::{ConnectError, DialError, ProxyChoice};
 
 use super::Road;
@@ -21,12 +21,8 @@ pub async fn reach(road: &Road, host: &str, port: u16, rounds: u32, log: &Arc<Lo
         return Err(NotReached { lines: vec![line], code: EX_UNAVAILABLE });
     }
     let (target, shown) = (podssh_ws::dial::authority(host, port), road.shown());
-    let dial = Dial {
-        trust: &road.trust,
-        proxy: &ProxyChoice::FromEnvironment,
-        timeout: podssh_relay::open::CONNECT_TIMEOUT,
-        at_end: AtEnd::Now,
-    };
+    let (environment, limit) = (ProxyChoice::FromEnvironment, podssh_relay::open::CONNECT_TIMEOUT);
+    let dial = podssh_ws::wstunnel::dial(&road.trust, &environment, limit, AtEnd::Now);
     let rounds = rounds.max(1);
     let mut code = EX_UNAVAILABLE;
     for round in 1..=rounds {

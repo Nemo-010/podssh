@@ -56,10 +56,9 @@ fn cpu() -> Duration {
     of(usage.ru_utime) + of(usage.ru_stime)
 }
 
-// It fails until podssh takes the tag of PodUtils/podcrates whose pod-quic
-// bounds the failed reads (T-787, COORD-075): the socket is pod-quic's.
+// The socket is pod-quic's, which ends a way after 256 failed reads in a
+// row (`pod_quic::bounded`, podcrates v0.51.0; T-787, COORD-075).
 #[test]
-#[ignore = "fails until pod-quic bounds a way's failed reads (T-787, COORD-075)"]
 fn quic_socket_fails_each_read_and_the_endpoint_does_not_spin() {
     // A runtime of our own, shut down in the background at the end: a worker
     // that spins never yields, and a drop that waits for it would hang.

@@ -13,7 +13,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "crates/podssh-ws/src/wstunnel/**"
+      - "crates/podssh-ws/src/wstunnel.rs"
       - "crates/podssh-cli/src/wstunnel/**"
       - "scripts/interop-wstunnel.sh"
       - ".github/workflows/wstunnel-interop.yml"

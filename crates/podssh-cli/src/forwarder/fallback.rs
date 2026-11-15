@@ -132,7 +132,7 @@ pub fn announce_with(target: &str, public: &[super::Forwarder]) -> String {
 
 /// One forwarder's session in the fallback, its dial and its first word
 /// within [`EACH_WAIT`].
-pub async fn bounded(template: &Template, host: &str, port: u16, dial: &Dial<'_>) -> Result<Carried, ForwarderError> {
+pub async fn bounded(template: &Template, host: &str, port: u16, dial: &Dial) -> Result<Carried, ForwarderError> {
     match tokio::time::timeout(EACH_WAIT, podssh_ws::forwarder::open(template, host, port, dial)).await {
         Ok(opened) => opened,
         Err(_) => Err(ForwarderError::Answer(format!("no session within {} s", EACH_WAIT.as_secs()))),

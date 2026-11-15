@@ -160,7 +160,7 @@ pub async fn open(server: &Server, dial: &Dial<'_>) -> Result<Carried, ChiselErr
     // session of the user's may last.
     let session = RelaySession::new(stream, pending, None, WRITE_TIMEOUT).naming(PEER);
     session.set_receive_cap(RECEIVE_CAP);
-    let note: crate::forwarder::Note = std::sync::Arc::new(|_: &str| {});
+    let note = crate::forwarder::silent();
     let (carried, _first) = carry::spawn(session, Form::Query, crate::forwarder::AtEnd::Now, note, PEER);
     Ok(carried)
 }

@@ -2361,7 +2361,7 @@ the self-test's (6 checks).
 **Milestone:** M10
 **Priority:** P3
 **Effort:** S
-**Status:** blocked
+**Status:** done
 
 ## Problem
 
@@ -2389,12 +2389,15 @@ cargo test -p podssh-relay --features quic quic_socket_fails
 
 Planted: the bound of empty reads left out, and the test of the CPU fails.
 
-## Blocker
-
-PodUtils/podcrates (COORD-075): `pod-quic`'s socket must bound a way's failed reads.
-
 ## Correction
 
 2026-11-15 (main session). The defect is real. noq 1.4.0's receive loop (`endpoint.rs`, `poll_socket`) answers ECONNRESET and EMSGSIZE with `continue`, before its work limiter. `pod-quic`'s `DatagramSocket::poll_recv` passes each error of the way through. So a way that fails each read so pins a worker for ever, holding the endpoint's lock, and even a drop of the endpoint hangs. `crates/podssh-relay/tests/quic_socket_fails.rs` (`--features quic`): 19,971,985 failed reads and 2.998 s of CPU in 3 s. It is `#[ignore]` with its reason until podssh takes the tag with the fix; then it runs, and its plant is the bound left out. The fix is podcrates': in `pod-quic`, count failed reads in a row in `DatagramSocket` (and a wrapper of the system socket of `on_socket`), and past a bound (osewa: 256) give an error that noq does not skip, so the driver ends and the caller redials. iroh's own socket is iroh's.
 
+## Done
 
+2026-11-15, with the take of podcrates `v0.51.0` (COORD-105, PodUtils/podcrates#172): `pod-quic`'s socket ends a way
+after 256 failed reads in a row (`pod_quic::bounded`). `crates/podssh-relay/tests/quic_socket_fails.rs` is no longer
+ignored: `cargo test -p podssh-relay --features quic --test quic_socket_fails` 1 passed in 3.20 s, the endpoint over a
+way that fails each read with ECONNRESET under its bound of CPU. The planted defect (the bound left out) is the code of
+`pod-quic` now, so it is podcrates' to plant (Rule Q3); this test is the check in podssh that fails without the bound,
+as it did on `v0.50.0` (the Correction above).

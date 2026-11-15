@@ -280,7 +280,7 @@ The candidates, ranked:
    research picks them, each with its source, before any joins the
    fallback.
 
-   Built by T-438 from the document alone (`crates/podssh-ws/src/wisp/`):
+   Built by T-438 from the document alone (`pod_egress::wisp` of PodUtils/podcrates):
    the word `wisp`, the last of the fallback, and `--forwarder
    wisp+wss://HOST/PATH/` for a server that the user runs. Read on
    2026-11-02 in the servers' sources, for the tests: wisp-server-python

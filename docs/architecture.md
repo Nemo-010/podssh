@@ -53,7 +53,7 @@ russh <-> tunnel <-> TLS to the second proxy (ALPN h2, http/1.1) <-> CONNECT HOS
                       `- TCP to it, or to HTTPS_PROXY then CONNECT by its name
 ```
 
-  `podssh-ws` (`crates/podssh-ws/src/via/`) dials the second proxy as it
+  `podssh-ws` (`crates/podssh-ws/src/via.rs`, over `pod-egress` of PodUtils/podcrates) dials the second proxy as it
   dials the relay, through the host's own proxy when one is set, checks its
   certificate for its name with the same trust store, and offers `h2` then
   `http/1.1`. On HTTP/2 the tunnel is a stream of a CONNECT of RFC 9113,
@@ -99,13 +99,13 @@ russh <-> pipe <-> WebSocket GET /PREFIX/events, Sec-WebSocket-Protocol: v1, aut
                     `- TCP and TLS as to the relay, through HTTPS_PROXY when one is set
 ```
 
-  `podssh-ws` (`crates/podssh-ws/src/wstunnel/`) writes the upgrade as
+  `podssh-ws` (`crates/podssh-ws/src/wstunnel.rs`, over `pod-egress` of PodUtils/podcrates) writes the upgrade as
   wstunnel's client does: the path prefix and an `Authorization` of a
   private file, and a JWT whose claims name the target, signed with
   wstunnel's old public key so that servers of 9.1 to 11 read it. The 101
   must name the subprotocol `v1`; a 400 is said in the words of the version
   that sent it. The session is the forwarders' carry
-  (`crates/podssh-ws/src/forwarder/carry.rs`), its frames masked with a
+  (`pod_egress::carry` of PodUtils/podcrates), its frames masked with a
   key of zero, as wstunnel's server reads a payload without its mask by
   default.
 

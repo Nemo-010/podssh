@@ -128,8 +128,7 @@ impl NetStreamProvider<SocketAddr> for ProxiedTcp {
     async fn connect(&self, addr: &SocketAddr, _: &TcpConnectOptions) -> IoResult<ProxiedStream> {
         // A transport's sentinel is a key, never dialled.
         if let Some(kind) = Kind::by_addr(addr) {
-            let (proxy, trust) = (self.proxy.clone(), self.trust.clone());
-            let reach = podssh_ws::pt::Reach { proxy, trust, wait: TRANSPORT_WAIT };
+            let reach = podssh_ws::pt::reach(&self.proxy, self.trust.clone(), TRANSPORT_WAIT);
             let pipe = crate::transport::spawn(kind, reach, self.said.clone());
             return Ok(ProxiedStream { inner: Inner::Pipe(pipe.compat()) });
         }

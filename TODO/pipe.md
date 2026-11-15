@@ -2057,9 +2057,9 @@ Read at `2042200`:
 - `PodUtils/podssh:crates/podssh-ws/src/server.rs:52-107` checks in a fixed order; the version comes before the key:
   `PodUtils/podssh:crates/podssh-ws/src/server.rs:91` says "this server speaks version 13 of RFC 6455", and a request with
   no key is refused at `:96`.
-- podssh's WebTunnel client sends no key and no version (`crates/podssh-ws/src/webtunnel.rs:1-6`), and
+- podssh's WebTunnel client sends no key and no version (`PodUtils/podcrates:crates/pod-egress/src/webtunnel.rs`), and
   takes a `101` with the two headers and no `Sec-WebSocket-Accept`
-  (`crates/podssh-ws/src/webtunnel.rs:138-150`).
+  (`PodUtils/podcrates:crates/pod-egress/src/webtunnel.rs`).
 - `crates/podssh-cli/src/pipe/ws_listen.rs:114` answers with the framed session; `tcp-listen:` already
   carries raw bytes (`crates/podssh-cli/src/pipe/serve.rs:52`).
 - The relay role's roads call the same check, and their contract is framed:
@@ -2137,7 +2137,7 @@ sh scripts/plant-each.sh --here t645-version-before-key t645-raw-unasked
 
 A keyless head is the raw form; a key of 5 bytes is `400`; an `Origin` is `403` with and without a key;
 `check_upgrade` still refuses a keyless head; through `pipe ws-listen:PORT tcp:...  --raw-upgrade`, a
-request as `crates/podssh-ws/src/webtunnel.rs` writes it gets a `101` with no accept, and bytes of each
+request as `PodUtils/podcrates:crates/pod-egress/src/webtunnel.rs` writes it gets a `101` with no accept, and bytes of each
 value cross both ways unmasked; with no flag it is refused; `--raw-upgrade` with no `ws-listen:` exits
 64. Planted: the version checked before the key, and the keyless test gets `426`; the raw form taken
 with no flag, and the test of the request with no flag gets `101`.

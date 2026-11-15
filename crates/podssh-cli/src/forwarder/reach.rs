@@ -7,7 +7,7 @@
 use std::sync::Arc;
 
 use podssh_ssh::Log;
-use podssh_ws::forwarder::{AtEnd, Dial, Ended, ForwarderError, Note};
+use podssh_ws::forwarder::{AtEnd, Ended, ForwarderError, Note};
 use podssh_ws::{ConnectError, DialError, ProxyChoice, Trust};
 
 use super::Forwarder;
@@ -50,13 +50,8 @@ pub async fn carry(
     for forwarder in forwarders {
         log.verbose(&format!("connecting to {target} through the forwarder {}", forwarder.name));
         let timeout = if fallback { super::fallback::EACH_WAIT } else { podssh_relay::open::CONNECT_TIMEOUT };
-        let dial = Dial {
-            trust,
-            proxy: &ProxyChoice::FromEnvironment,
-            timeout,
-            at_end: AtEnd::Now,
-            note: noted(log, &forwarder.name),
-        };
+        let note = noted(log, &forwarder.name);
+        let dial = podssh_ws::forwarder::dial(trust, &ProxyChoice::FromEnvironment, timeout, AtEnd::Now, note);
         let opened = match fallback {
             true => super::fallback::bounded(&forwarder.template, host, port, &dial).await,
             false => podssh_ws::forwarder::open(&forwarder.template, host, port, &dial).await,
@@ -102,7 +97,7 @@ pub async fn carry(
 /// The note of a forwarder's text frames: a line with -v.
 pub fn noted(log: &Arc<Log>, name: &str) -> Note {
     let (log, name) = (log.clone(), name.to_string());
-    Arc::new(move |text: &str| log.verbose(&format!("the forwarder {name} says: {text}")))
+    podssh_ws::forwarder::note(move |text: &str| log.verbose(&format!("the forwarder {name} says: {text}")))
 }
 
 /// The line of a session that the forwarder ended, or `None` for an
