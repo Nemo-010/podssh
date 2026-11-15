@@ -270,8 +270,7 @@ async fn serve(ready: Ready, err: &mut dyn Write) -> i32 {
     if let Some(why) = &unasked {
         let _ = writeln!(
             err,
-            "podssh node: {label}: {why}; so the node serves the OpenTunnel road unasked, through {service}, by the \
-             operator's ruling Q76 ({}=no turns it off)",
+            "podssh node: {label}: {why}; so the node serves the OpenTunnel road unasked, through {service} ({}=no turns it off)",
             opentunnel::ENV
         );
     }

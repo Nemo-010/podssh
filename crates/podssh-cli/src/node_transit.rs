@@ -106,11 +106,7 @@ pub(crate) fn road(label: &str, pair: &Pair, stored: bool, trust: &Trust, url: W
             return None;
         }
     };
-    say(format!(
-        "and through the transit relay {}, by the operator's ruling Q65 ({}=no turns it off)",
-        url.shown(),
-        transit::ENV
-    ));
+    say(format!("and through the transit relay {} ({}=no turns it off)", url.shown(), transit::ENV));
     let keys = keys_now(label, pair, stored);
     let trust = trust_for(&url, trust, crate::pairs::trust(None));
     let config = transit::config(url, &trust, &ProxyChoice::FromEnvironment, say);

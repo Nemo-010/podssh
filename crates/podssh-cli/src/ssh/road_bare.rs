@@ -68,7 +68,7 @@ pub(crate) fn far(name: &str) -> Result<WsUrl, String> {
 pub(crate) fn line(node: &WsUrl, far: &WsUrl) -> String {
     format!(
         "the Bare hop, the last fallback: the Bare node {}, a third party that nobody vouches for, carries this \
-         session to {} (the operator's ruling Q78); it sees that name, the times and the sizes, and the end-to-end \
+         session to {}; it sees that name, the times and the sizes, and the end-to-end \
          channel keeps the bytes private; {ENV}=no or {LAST_RESORT}=no turns it off",
         node.shown(),
         far.shown()

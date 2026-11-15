@@ -30,7 +30,7 @@ pub(crate) struct Road {
 pub(crate) fn beside(pair: Option<&Pair>, say: Say) -> Option<Road> {
     let pair = pair?;
     let (relay, public) = crate::tox::relay_for(&pair.name)?;
-    let why = if public { "the last fallback of the operator's ruling Q78" } else { "the relay that you named" };
+    let why = if public { "the last fallback" } else { "the relay that you named" };
     say(format!("and through the Tox relay {}, {why} ({}=no turns it off)", relay.at, crate::tox::ENV));
     if public {
         say(crate::tox::third_party_line(relay.at).replace("carries this session", "carries the sessions of this road"));

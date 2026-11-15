@@ -26,7 +26,7 @@ pub(super) const NODE: &str = "With --localtunnel, the node serves TARGET over t
      --plain, --no-e2e, --exit, a udp: TARGET, or another road's flag (64). The road is served alone: a pair of \
      NAME is not served beside it, and a line says so. A node that would serve the OpenTunnel road, the Pinggy \
      road, the Serveo road, the ssh-j road or the localhost.run road unasked serves this one, before the bore road, \
-     when none of them reached a service, or when each is off or has no server, by the operator's ruling Q78, and its lines say so and \
+     when none of them reached a service, or when each is off or has no server, and its lines say so and \
      name the third party, which nobody vouches for. PODSSH_LOCALTUNNEL=no turns the road off, and so does \
      PODSSH_LAST_RESORT=no, the switch of each last fallback.";
 
@@ -57,7 +57,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of the localtunnel road");
         assert_eq!(ssh[at - 1], super::super::notes_ssh_http::SSH);
-        for text in ["nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no", "port 443 alone", "its key gives", "(78)"] {
+        for text in ["nobody vouches for", "PODSSH_LAST_RESORT=no", "port 443 alone", "its key gives", "(78)"] {
             assert!(super::NODE.contains(text), "{text}");
         }
         for text in ["--node-key", "pins of NAME", "before the bore road", "Bypass-Tunnel-Reminder", "--no-e2e"] {

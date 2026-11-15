@@ -24,8 +24,7 @@ pub(super) const NODE: &str = "With --localhost-run, the node serves TARGET over
      --localtunnel, --bore, --iroh, --derp, --quick-tunnel or --frp (64). A tunnel that ends is opened again, with a wait that doubles from 1 \
      s to 60 s, and the sessions that the layer keeps go on over the next. The road is served alone: a pair of \
      NAME is not served beside it, and a line says so. A node that would serve the ssh-j road unasked serves \
-     this one, before the localtunnel and bore roads, when it reached no service, or when it is turned off, by the operator's ruling \
-     Q78, and its lines say so and name the third party, which nobody vouches for. PODSSH_LOCALHOST_RUN=no \
+     this one, before the localtunnel and bore roads, when it reached no service, or when it is turned off, and its lines say so and name the third party, which nobody vouches for. PODSSH_LOCALHOST_RUN=no \
      turns the road off, and so does PODSSH_LAST_RESORT=no, the switch of each last fallback. With \
      --sandhole, the node serves the same road at Sandhole's public server (demo.sandhole.com.br where podssh's \
      list of services names it, or the server of PODSSH_SANDHOLE): its leg is SSH on port 443, then 22, as the \
@@ -75,7 +74,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of the localhost.run road");
         assert_eq!(ssh[at - 1], super::super::notes_sshj::SSH);
-        for text in ["nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no", "nokey", "port 80", "--relay", "(78)"] {
+        for text in ["nobody vouches for", "PODSSH_LAST_RESORT=no", "nokey", "port 80", "--relay", "(78)"] {
             assert!(super::NODE.contains(text), "{text}");
         }
         for text in ["--tunnel-url", "WebSocket at /", "last, once each road before it failed", "record", "--no-e2e"] {

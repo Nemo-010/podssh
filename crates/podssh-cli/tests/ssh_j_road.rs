@@ -302,7 +302,7 @@ fn with_the_pair_s_road_down_the_race_gives_the_session_to_ssh_j_by_the_name_of_
     lab.pair_down();
     let (_node, said) = lab.node("node.key", &["--ssh-j"], &[]);
     let lines: Vec<String> = said.lines.try_iter().collect();
-    assert!(lines.iter().any(|l| l.contains("nobody vouches for") && l.contains("Q78")), "{lines:#?}");
+    assert!(lines.iter().any(|l| l.contains("nobody vouches for")), "{lines:#?}");
     assert!(lines.iter().any(|l| l.contains("host key") && l.contains("unpinned")), "{lines:#?}");
     assert!(lines.iter().any(|l| l.contains("over the ssh-j road alone")), "{lines:#?}");
     assert!(said.name.0.starts_with("podssh-") && said.name.1.starts_with('n'), "{:?}", said.name);

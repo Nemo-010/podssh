@@ -21,7 +21,7 @@ pub(super) const NODE: &str = "With --ssh-j, the node serves TARGET over the ssh
      and a client that reaches the stranger is refused by the end-to-end channel. The road is served alone: a \
      pair of NAME is not served beside it, and a line says so. A node that would serve the OpenTunnel road, \
      the Pinggy road or the Serveo road unasked serves this one, before the last roads that follow it, when none of them reached a \
-     service, or when each is turned off, by the operator's ruling Q78, and its lines say so and name the \
+     service, or when each is turned off, and its lines say so and name the \
      third party, which nobody vouches for. PODSSH_SSH_J=no turns the road off, and so does \
      PODSSH_LAST_RESORT=no, the switch of each last fallback.";
 
@@ -52,7 +52,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of the ssh-j road");
         assert_eq!(ssh[at - 1], super::super::notes_serveo::SSH);
-        for text in ["nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no", "port 22", "its key gives", "(78)"] {
+        for text in ["nobody vouches for", "PODSSH_LAST_RESORT=no", "port 22", "its key gives", "(78)"] {
             assert!(super::NODE.contains(text), "{text}");
         }
         for text in ["--node-key", "pins of NAME", "last, before the roads", "PODSSH_FORWARDER_FALLBACK=no", "--no-e2e"]

@@ -26,7 +26,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
       aws configure export-credentials writes in its process format, or a shared credentials file, whose \
       profile is AWS_PROFILE's, else default. podssh signs a new URL with it for each tunnel, good for 60 s, as \
       aws-cli signs one; the URL carries the key's id, the signature and a temporary key's token, the one \
-      URL of podssh that holds a credential (the operator's ruling Q51), and podssh never prints it.",
+      URL of podssh that holds a credential, and podssh never prints it.",
     ),
     (
         &["AWS_SHARED_CREDENTIALS_FILE", "AWS_PROFILE"],

@@ -7,7 +7,7 @@
 /// The note of `podssh node`, after Yggdrasil's road's.
 pub(super) const NODE: &str = "In a build with the feature hyperdht, a node of the pair's road with the \
      resumable layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP TARGET also waits for \
-     the pair's operators in HyperDHT where UDP passes, by the operator's rulings Q77 and Q82, after \
+     the pair's operators in HyperDHT where UDP passes, after \
      Yggdrasil's road: it joins the DHT through the bootstrap nodes that podssh's list of services names \
      (none while it names none), or those of PODSSH_HYPERDHT (HOST:PORT[,HOST:PORT...], a DHT of your own), \
      under a key that the pair's name and connect token make, and announces a topic of that key, so its \
@@ -19,8 +19,8 @@ pub(super) const NODE: &str = "In a build with the feature hyperdht, a node of t
 
 /// The note of `podssh ssh`, after Yggdrasil's road's.
 pub(super) const SSH: &str = "In a build with the feature hyperdht, node://NAME also races HyperDHT's road \
-     of its pair (T-736), where UDP passes, only once each road before it failed, after Yggdrasil's road and \
-     before Syncthing's relay road, by the operator's rulings Q77 and Q82: this end joins HyperDHT with a fresh key, \
+     of its pair, where UDP passes, only once each road before it failed, after Yggdrasil's road and \
+     before Syncthing's relay road: this end joins HyperDHT with a fresh key, \
      once a run, through the bootstrap of podssh's list of services or of PODSSH_HYPERDHT, looks up the topic \
      of the node's key, which both ends make of the pair's connect token, again each 5 s, and connects by \
      that key. It waits 45 s at most; where no bootstrap node answers within 15 s, UDP does not pass, and the \
@@ -42,9 +42,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of HyperDHT's road");
         assert_eq!(ssh[at - 1], super::super::notes_ygg::SSH);
-        for text in
-            ["Q77", "Q82", "PODSSH_LAST_RESORT=no", "PODSSH_HYPERDHT=no", "feature hyperdht", "UDP does not pass"]
-        {
+        for text in ["PODSSH_LAST_RESORT=no", "PODSSH_HYPERDHT=no", "feature hyperdht", "UDP does not pass"] {
             assert!(super::NODE.contains(text) && super::SSH.contains(text), "{text}");
         }
         assert!(super::SSH.contains("--no-e2e") && super::NODE.contains("topic"));

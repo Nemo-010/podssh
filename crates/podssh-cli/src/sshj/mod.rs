@@ -166,7 +166,7 @@ pub fn unnamed_words() -> String {
 pub fn third_party_line(service: &Service) -> String {
     format!(
         "the ssh-j road, a last fallback: {service}, a third party that nobody vouches for, carries this session \
-         over SSH on port {} (the operator's ruling Q78); it ends that SSH and sees the times and the sizes, and \
+         over SSH on port {}; it ends that SSH and sees the times and the sizes, and \
          the end-to-end channel keeps the bytes private; {ENV}=no or {}=no turns it off",
         service.port,
         podssh_relay::pinggy::LAST_RESORT
@@ -207,7 +207,7 @@ mod tests {
     #[test]
     fn the_line_of_the_third_party_names_it_both_switches_and_what_it_sees() {
         let line = third_party_line(&stand_in());
-        for word in ["ssh-j.stand-in.test", "nobody vouches for", "Q78", "PODSSH_SSH_J=no", "PODSSH_LAST_RESORT=no"] {
+        for word in ["ssh-j.stand-in.test", "nobody vouches for", "PODSSH_SSH_J=no", "PODSSH_LAST_RESORT=no"] {
             assert!(line.contains(word), "{word}: {line}");
         }
         assert!(line.contains("port 22") && line.contains("end-to-end channel"), "{line}");

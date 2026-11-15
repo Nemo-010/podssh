@@ -112,8 +112,8 @@ pub fn built(ids: &[String], name: &str, token: &str, say: Say) -> Result<Built,
 pub fn board_line(board: &str) -> String {
     format!(
         "the file-host road, the last of the last fallbacks: its notes (each piece's host and URL, sealed under \
-         the pair's key) go through {board}, a public MQTT broker that nobody vouches for (the operator's ruling \
-         Q78), which sees their topics, sizes and times; {ENV}=no or {LAST_RESORT}=no turns it off"
+         the pair's key) go through {board}, a public MQTT broker that nobody vouches for, which sees their topics, \
+         sizes and times; {ENV}=no or {LAST_RESORT}=no turns it off"
     )
 }
 

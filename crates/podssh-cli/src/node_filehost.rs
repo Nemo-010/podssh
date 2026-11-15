@@ -35,8 +35,7 @@ pub(crate) fn beside(pair: Option<&Pair>, say: Say) -> Option<Road> {
     match crate::filehost_road::built(&ids, &pair.name, pair.connect_token(), lines) {
         Ok(built) => {
             say(format!(
-                "and through the public file hosts {}, with notes at {}, the last of the last fallbacks of the \
-                 operator's ruling Q78; slow, for output and files ({}=no turns it off)",
+                "and through the public file hosts {}, with notes at {}, the last of the last fallbacks of slow, for output and files ({}=no turns it off)",
                 built.hosts.join(", "),
                 built.board,
                 crate::filehost_road::ENV

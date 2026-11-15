@@ -16,7 +16,7 @@ pub const NET: &[&str] = &[
      Each end's: ls, one line for each member on stdout (its name, roles, fingerprint and tickets, apart by tabs); \
      show, the document's bytes as signed, or with --signature its signature; take FILE, a document from its owner, \
      as FILE alone or as FILE and FILE.sig, as ssh-keygen -Y sign writes them.",
-    "podssh net invite NAME, on the owner's host, adds a new device by a short code (T-616), as podssh relay pair \
+    "podssh net invite NAME, on the owner's host, adds a new device by a short code, as podssh relay pair \
      gives a pair by one: the code, such as 7-crossover-clockwork-adroitness, shows on this run's terminal alone, \
      beside the owner's fingerprint, never on stdout, in a log or in argv, and a run with no terminal is refused \
      (64). The owner's key is found, and its passphrase asked, before the code is made. On the device, podssh net \

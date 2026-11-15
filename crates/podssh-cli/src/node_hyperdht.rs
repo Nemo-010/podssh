@@ -31,7 +31,7 @@ pub(crate) struct Road {
 pub(crate) fn beside(pair: Option<&Pair>, say: Say) -> Option<Road> {
     let pair = pair?;
     let (bootstrap, public) = crate::hyperdht::bootstrap()?;
-    let why = if public { "where UDP passes, by the operator's rulings Q77 and Q82" } else { "the DHT that you named" };
+    let why = if public { "where UDP passes" } else { "the DHT that you named" };
     say(format!("and through HyperDHT, {why} ({}=no turns it off)", crate::hyperdht::ENV));
     if public {
         say(crate::hyperdht::third_party_line().replace("carries this session", "carries the sessions of this road"));

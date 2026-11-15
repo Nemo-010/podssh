@@ -45,7 +45,7 @@ pub(super) const DOCTOR: &str = "In a build with the feature gsr, the section gs
 /// The variable of the road.
 pub(super) const VARIABLES: &[(&[&str], &str)] = &[(
     &["PODSSH_GSR_SECRET_FILE"],
-    "The file of the GSRN road's shared secret (T-707), as --gsr-secret-file, which wins: podssh node --gsr \
+    "The file of the GSRN road's shared secret, as --gsr-secret-file, which wins: podssh node --gsr \
       serves the road with it, podssh ssh node://NAME races the road last with it, and podssh doctor asks \
       the relay at its shard (see FILES). Unset or empty: no secret. A build with the feature gsr; another \
       build passes it over.",

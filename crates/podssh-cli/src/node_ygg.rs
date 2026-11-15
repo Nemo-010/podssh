@@ -30,7 +30,7 @@ pub(crate) struct Road {
 pub(crate) fn beside(pair: Option<&Pair>, say: Say) -> Option<Road> {
     let pair = pair?;
     let (peer, public) = crate::yggdrasil::peer_for(&pair.name)?;
-    let why = if public { "the last fallback of the operator's ruling Q78" } else { "the peer that you named" };
+    let why = if public { "the last fallback" } else { "the peer that you named" };
     say(format!(
         "and through Yggdrasil's network by the peer {peer}, {why} ({}=no turns it off)",
         crate::yggdrasil::ENV

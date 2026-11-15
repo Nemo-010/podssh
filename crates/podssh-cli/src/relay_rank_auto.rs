@@ -148,7 +148,7 @@ pub(crate) fn doctor_line(relays: &RelayList) -> String {
 /// Whether a session ranks in its background, as `by` asks, in words.
 fn background_words(by: Option<&str>, kept: Option<&Rank>, now: i64) -> String {
     let Some(by) = by else {
-        return "no rank in a session's background (RelayRank auto asks for one, Q89)".into();
+        return "no rank in a session's background (RelayRank auto asks for one)".into();
     };
     let made = kept.map(|k| k.background_ms).filter(|ms| *ms > 0 && *ms <= now);
     let partial = kept.is_some_and(|k| k.background() && k.partial);

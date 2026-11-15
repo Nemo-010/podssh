@@ -325,7 +325,7 @@ fn with_the_pair_s_road_down_the_race_gives_the_session_to_pinggy_and_a_kept_nam
     let (_node, lines, name, address) = lab.node("node.key", &["--pinggy"], &[]);
     assert!(name.ends_with(&format!(".{DOMAIN}")), "{name}");
     let said: Vec<String> = lines.try_iter().collect();
-    assert!(said.iter().any(|l| l.contains("nobody vouches for") && l.contains("Q78")), "{said:#?}");
+    assert!(said.iter().any(|l| l.contains("nobody vouches for")), "{said:#?}");
     assert!(said.iter().any(|l| l.contains("host key") && l.contains("unpinned")), "{said:#?}");
     assert!(said.iter().any(|l| l.contains("host key") && l.contains("over raw SSH")), "{said:#?}");
     assert_eq!(lab.stand_in.users(), vec!["tls".to_string()], "the keyword of a TLS tunnel");

@@ -180,6 +180,6 @@ mod tests {
     #[test]
     fn the_third_party_line_names_who_sees_what() {
         let line = third_party_line("198.51.100.1:443".parse().unwrap());
-        assert!(line.contains("ZeroTier Inc.") && line.contains("Q78") && line.contains("end-to-end"));
+        assert!(line.contains("ZeroTier Inc.") && line.contains("end-to-end"));
     }
 }

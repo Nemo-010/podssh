@@ -21,7 +21,7 @@ fn the_node_s_alias_is_its_key_s_and_a_client_with_the_key_jumps_to_it_last() {
     assert_eq!(alias, alias_of(&fingerprint, 0), "the first alias of the node's key: {said:#?}");
     assert_eq!(lab.stand_in.forwards(), vec![(alias.clone(), 22)], "as ssh -R ALIAS:22:localhost:22 asks");
     assert_eq!(lab.stand_in.users(), vec!["anonymous".to_string()], "no local user's name goes to Serveo");
-    assert!(said.iter().any(|l| l.contains("nobody vouches for") && l.contains("Q78")), "{said:#?}");
+    assert!(said.iter().any(|l| l.contains("nobody vouches for")), "{said:#?}");
     assert!(said.iter().any(|l| l.contains("raw SSH on port 443")), "443 first: {said:#?}");
     assert!(said.iter().any(|l| l.contains("host key") && l.contains("unpinned")), "{said:#?}");
 

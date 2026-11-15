@@ -2,8 +2,7 @@
 //! for `podssh ssh`, `podssh proxy` and `podssh doctor`, and its file.
 
 pub const SSH: &str = "--turn turns:HOST[:PORT] reaches the first hop through a TURN server that you run \
-     (coturn, as a server of calls or chat often has one on 443), in place of the relay, by the operator's \
-     rulings Q93 and Q95: a TCP allocation of RFC 6062. podssh opens TLS to HOST (port 443 when none is named), \
+     (coturn, as a server of calls or chat often has one on 443), in place of the relay: a TCP allocation of RFC 6062. podssh opens TLS to HOST (port 443 when none is named), \
      through HTTPS_PROXY when one is set, checked with podssh's trust (--ca-file); asks an allocation for TCP \
      with the credential that the server's 401 asks for; sends Connect with the target's address, which \
      podssh resolves in its own order of resolvers; then opens a second connection to the same server, binds \

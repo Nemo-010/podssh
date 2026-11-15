@@ -201,7 +201,7 @@ pub(crate) async fn serve(
         let _ = writeln!(
             err,
             "podssh node: {label}: the WebSocket upgrade to {} was refused on the way ({why}); so the node serves the \
-             Piping Server road alone, unasked, by the operator's ruling Q65 ({ENV}=no turns it off)",
+             Piping Server road alone, unasked ({ENV}=no turns it off)",
             pair.relay.host
         );
     }

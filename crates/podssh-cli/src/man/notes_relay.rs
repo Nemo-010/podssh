@@ -28,7 +28,7 @@ pub const RELAY: &[&str] = &[
      --relay-host are refused with it (64): the operator's file is never touched, and its end is asked \
      of the relay once the file's has passed.",
     "podssh relay halt NAME keeps the operators of the pair stored under NAME out for a while, at podssh \
-     relay serve, by the pair's stop token (T-647): each of its sessions ends once, with 1011 the pair's \
+     relay serve, by the pair's stop token: each of its sessions ends once, with 1011 the pair's \
      owner halted it, and each operator's upgrade then hears 503 with the words of --reason TEXT (one \
      line of 200 bytes at most) and no Retry-After, until podssh relay resume NAME. That refusal spends \
      no connect token of --once and no token of one leg. The node keeps its socket, and so the pair's \
@@ -50,7 +50,7 @@ pub const RELAY: &[&str] = &[
      state is one object: schema (1), podssh, label, online, sessions, expires (RFC 3339), seconds_left \
      and halted, with halt_reason where the pair's owner halted it with words (podssh relay halt), for a \
      check.",
-    "podssh relay pair NAME --code gives the operator's part by a short code in place of a file (T-086): the \
+    "podssh relay pair NAME --code gives the operator's part by a short code in place of a file: the \
      pair stored under NAME while it has 10 minutes left, else the next pair, made first, and the node's key \
      (node-NAME.key, made when it is missing). The code, such as 7-crossover-clockwork-adroitness, shows on \
      this run's terminal alone: on stderr when it is a terminal, else on the process's terminal, and with \
@@ -113,8 +113,8 @@ pub const RELAY: &[&str] = &[
      the egress is a digest of the proxy's host and port, or direct, and the rank holds 24 h for it. \
      --cached prints the rank kept, its age and whether it holds here, and --forget removes it; neither \
      connects. Exit 0 when a host opened, 69 when none did or PODSSH_OFFLINE is set, 64 for a bad flag. \
-     podssh probes no host that the user did not ask it to, unless RelayRank auto asks (Q89, below).",
-    "The default list of relay hosts takes the rank (T-607): while a rank of podssh relay rank holds for this \
+     podssh probes no host that the user did not ask it to, unless RelayRank auto asks (below).",
+    "The default list of relay hosts takes the rank: while a rank of podssh relay rank holds for this \
      egress, the default list is the default host and the best three other hosts of the pool, in the rank's \
      order, and a run tries the default host at its place among them; the record of failures still moves a \
      host that failed lately to the end. Each run also keeps the time to open of each host that opened in \
@@ -123,8 +123,8 @@ pub const RELAY: &[&str] = &[
      PODSSH_RELAY_RANK=no, or RelayRank no in the settings file, gives the relay's order of the pool, as \
      before; podssh status says which order a run takes (relay_order), and podssh doctor's line rank and \
      podssh relay info name it with the list.",
-    "A rank in a session's background (T-608) comes only when the user asks for it, with RelayRank auto in \
-     the settings file or PODSSH_RELAY_RANK=auto, never by default (Q89). Then, when no rank holds for this \
+    "A rank in a session's background comes only when the user asks for it, with RelayRank auto in \
+     the settings file or PODSSH_RELAY_RANK=auto, never by default. Then, when no rank holds for this \
      egress, a session of podssh ssh that the default list carries probes the default host and the hosts \
      of its pool, 8 at most in a day, in its own process, one at a time: the first after the session ran \
      60 s, then one each 10 s at most, none while a race of relay hosts runs, none with PODSSH_OFFLINE, \
@@ -196,7 +196,7 @@ pub const RELAY: &[&str] = &[
      families keeps its IPv4 addresses; the loopback is the relay's own; through HTTPS_PROXY the \
      proxy decides. /relays.json says what the relay knows, as egress.ipv6: true, false, or null.",
     "Beside the contract it serves /v1/layer/HOST/PORT, the forward road in the resumable layer, for a \
-     target that speaks no layer, a standard sshd among them (T-173): each WebSocket is one link, the \
+     target that speaks no layer, a standard sshd among them: each WebSocket is one link, the \
      relay dials the target once, after the layer's handshake of a new session, and keeps it while the \
      client's link is lost, until a resume on a new link to this relay carries the session on, or 10 \
      minutes pass and the target is shut. The token, the upgrade and the policy are checked as on \
@@ -243,7 +243,7 @@ pub const RELAY: &[&str] = &[
      whose Host is not the name that its TLS asked for each get 403, which names the key's \
      fingerprint for the owner's list. podssh caches the token as any other.",
     "FILE of --mint keys:FILE may be an https:// URL, for a relay whose image has no writable volume \
-     (T-646): the list is fetched through the host's proxy with the trust of --ca-file, 1 MiB at most, \
+    : the list is fetched through the host's proxy with the trust of --ca-file, 1 MiB at most, \
      within 20 seconds and three redirects to https:// alone, once before the relay takes a connection, \
      which stops the start (78) when it fails, then again each --list-ttl SECONDS (300). A fetch that \
      fails leaves the copy to age, and a line on stderr says so; a copy older than its TTL and \
@@ -270,7 +270,7 @@ pub const RELAY: &[&str] = &[
      gets 429 with its own count and share (this key holds N pairs, past its share of M while others \
      wait), which names no other key. A pair keeps the fingerprint of its key, also in --pairs FILE, so \
      that the share holds across a restart; a pair that is stopped or expires gives its place back.",
-    "With --mint keys:FILE or net, the relay counts what each key carried (T-636). A token names no key and \
+    "With --mint keys:FILE or net, the relay counts what each key carried. A token names no key and \
      ends at a restart, so at each mint for a key the relay keeps the token's SHA-256 with the key's \
      fingerprint, in memory until the token ends, 64 live tokens a key at most. Each session of the forward \
      road (/connect/, each link of /v1/layer/, a session of the HTTP road) counts its payload each way and \
@@ -304,7 +304,7 @@ pub const RELAY: &[&str] = &[
      after 5 minutes, then twice as long each time up to 6 hours, and the certificate of before stays. \
      When no certificate is kept and the first order fails, the role stops with the CA's reason (69). \
      SIGHUP reads the file kept again.",
-    "podssh relay serve is a mailbox of the pairing by code too, at /v1/mailbox (T-086): magic-wormhole's \
+    "podssh relay serve is a mailbox of the pairing by code too, at /v1/mailbox: magic-wormhole's \
      mailbox protocol for podssh's application alone, so that the two ends of podssh relay pair --code and \
      podssh relay join meet at your own relay with --pair-mailbox wss://HOST/v1/mailbox, and a client of \
      magic-wormhole's own library with podssh's application id meets them there. It keeps its nameplates \
@@ -318,7 +318,7 @@ pub const RELAY: &[&str] = &[
      4096 addresses at most, and forgets the one heard from least lately first. /health, the documents \
      and the sockets of both roads are not braked, and the first refusal of an address is a line on \
      stdout.",
-    "The relay's listener takes the cleartext road beside TLS (T-326), for a client whose proxy tunnels CONNECT \
+    "The relay's listener takes the cleartext road beside TLS, for a client whose proxy tunnels CONNECT \
      but cuts TLS that it does not know: a connection whose first byte begins no TLS handshake is served with no \
      TLS, and only with what a session needs with a token of one session, as each hop reads it: GET /health; \
      POST /v1/mint?once=1, for whom --mint names and under the same brake, which answers a token that lives 5 \
@@ -326,7 +326,7 @@ pub const RELAY: &[&str] = &[
      spends, whatever its end, so that a second use is refused. A token of 72 h, the mint of one, the reverse \
      road, the documents and the probes are refused there (403), and go over TLS. --cleartext no serves TLS \
      alone. Over TLS, POST /v1/mint?once=1 mints the same token of one session.",
-    "--sshd ADDR:PORT shares the relay's port with an sshd of yours (T-644), for a host that lets one port in: a \
+    "--sshd ADDR:PORT shares the relay's port with an sshd of yours, for a host that lets one port in: a \
      connection of the listener whose first four bytes are SSH-, the start of an SSH client's version line, goes \
      to the sshd at ADDR:PORT, which reads each of its bytes as they came, and each byte of the sshd goes back; a \
      record of TLS goes to TLS, and another start to the cleartext road, as before. So the port publishes a shell \
@@ -345,7 +345,7 @@ pub const RELAY: &[&str] = &[
     // A name published to a pair's node by its ClientHello (T-649).
     super::notes_publish::RELAY,
     // DERP for the node keys of a file (T-106).
-    "--derp-keys FILE serves DERP at /derp (T-106), over a WebSocket of the subprotocol derp, as Tailscale's \
+    "--derp-keys FILE serves DERP at /derp, over a WebSocket of the subprotocol derp, as Tailscale's \
      derper serves it to the keys that it verifies: a node of podssh ts in its relay mode, pinned to this \
      relay by the flag of podssh ts that names a DERP server, takes it in the place of the operator's Tailscale relay, and two nodes whose keys FILE lists meet here. \
      FILE holds one node key a line, nodekey:HEX (# starts a comment); it is read at the start, where a line \
@@ -355,7 +355,7 @@ pub const RELAY: &[&str] = &[
      and /derp/latency-check answer an empty 200. The packets are WireGuard's, sealed end to end: the relay \
      sees keys, sizes and times. Each login and each end is a line on stdout, with the key's first 8 hex \
      digits.",
-    "The relay's TLS offers h2 before http/1.1 (T-321, RFC 8441): a client that chooses it gets SETTINGS that \
+    "The relay's TLS offers h2 before http/1.1 (RFC 8441): a client that chooses it gets SETTINGS that \
      offer extended CONNECT and 16 streams at once, each with a window of 1 MiB in one of 16 MiB for the \
      connection, so that the sessions of a client's process are streams of one connection. A CONNECT whose \
      :protocol is websocket is the upgrade of its path, with its token and its checks, answered 200 where the \
@@ -363,7 +363,7 @@ pub const RELAY: &[&str] = &[
      there too; another request, such as the HTTP road's, a probe's or a pair's, is asked for again over \
      HTTP/1.1 (HTTP_1_1_REQUIRED, which a client of HTTP/2 follows at once). A connection with no stream for 2 \
      minutes ends. --http2 no offers http/1.1 alone, as before; the first line says which.",
-    "--quic yes serves QUIC too (T-667), on UDP at the address and port of --listen, which the role binds with \
+    "--quic yes serves QUIC too, on UDP at the address and port of --listen, which the role binds with \
      its listener, before it gives up its capabilities; PODSSH_LISTEN=no refuses it with the listener, and a \
      port of UDP that another process holds stops the start (69). Its TLS is 1.3, with the certificate that the \
      listener presents at that moment, and offers the ALPN podssh-relay/1 alone, so that no client of HTTP/3 \

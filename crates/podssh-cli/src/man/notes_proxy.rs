@@ -19,9 +19,9 @@ pub const PROXY: &[&str] = &[
      process that its /relays.json names as forward.host, of the same deployment: the relay keeps its \
      connection to the target while this host's link is lost, and a new link resumes the session where \
      it was, so that an OpenSSH session outlives a drop of this host's network, for as long as the relay \
-     keeps it, 10 minutes by default (T-173). Each loss and resume is a line on stderr. The end of \
+     keeps it, 10 minutes by default. Each loss and resume is a line on stderr. The end of \
      stdin is the end of the target's input there (the layer's END, a half-close of the relay's \
-     connection to the target, T-632), so a target that reads to the end of its input still answers, \
+     connection to the target), so a target that reads to the end of its input still answers, \
      and the target's end ends the session; with a relay that takes no END, the end of stdin stops \
      sending and keeps receiving until the target closes, as on the contract's road. OpenSSH's \
      SIGHUP at its exit ends the session at the relay at once. A host that offers none, or that has no room for \

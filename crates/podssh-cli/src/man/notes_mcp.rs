@@ -18,7 +18,7 @@ pub const MCP: &[&str] = &[
      none. Name each host, or the fewest patterns that hold them; !PATTERN excludes, and a pattern with \
      USER@ needs a destination that names that user. The host is matched as the call names it, before the \
      HostName of your configuration.",
-    "For an agent that watches and must not change (T-731): --read-only offers no tool that changes a host, \
+    "For an agent that watches and must not change: --read-only offers no tool that changes a host, \
      no job_start, job_stop, cp_put or session_ tool, and refuses a call of one by name; ssh_exec is then \
      offered only with --allow-command. --allow-command PATTERN, repeated, names what ssh_exec may run: a \
      pattern is words, the program as typed and * for one word of any text, and a command matches when its \

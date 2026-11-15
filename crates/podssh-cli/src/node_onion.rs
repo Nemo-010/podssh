@@ -43,7 +43,7 @@ pub(crate) fn beside(label: &str, pair: Option<&Pair>, say: Say) -> Option<Road>
         return None;
     }
     say(format!(
-        "and as an onion service of the Tor network, the last fallback of the operator's ruling Q78 ({}=no turns \
+        "and as an onion service of the Tor network, the last fallback ({}=no turns \
          it off)",
         crate::onion::ENV
     ));

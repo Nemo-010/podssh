@@ -50,7 +50,7 @@ pub const EACH: &[&str] = &[
      status, signal, end, failure, bytes and relay as podssh ssh --result-file gives them, error (the \
      words of its failure), duration_ms and files. Each host's facts are its own session's, also when \
      hosts fail at once. With --interactive, --json and --result-file are refused (64).",
-    "podssh each --interactive HOSTS (T-185) opens a shell with no pty on each host, 64 hosts at most, and \
+    "podssh each --interactive HOSTS opens a shell with no pty on each host, 64 hosts at most, and \
      each line typed goes to the hosts of the selection, at first each host; the output of each comes as \
      HOST: LINE. The terminal keeps its normal mode, so that its own line discipline edits the line. A line \
      that starts with : is for podssh: :all, :none, :only HOST... (braces and @GROUP as in HOSTS, and USER@ \

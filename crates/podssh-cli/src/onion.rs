@@ -165,7 +165,7 @@ mod tests {
     #[test]
     fn the_line_names_the_tor_network_and_the_switch() {
         let line = third_party_line(None);
-        assert!(line.contains("Tor network") && line.contains("Q78") && line.contains("PODSSH_ONION=no"), "{line}");
+        assert!(line.contains("Tor network") && line.contains("PODSSH_ONION=no"), "{line}");
         assert!(third_party_line(Some("/n/arti.toml")).contains("Tor network of /n/arti.toml"));
         assert!(kept_file("lab").starts_with("onion-") && kept_file("lab").ends_with(".name"));
     }

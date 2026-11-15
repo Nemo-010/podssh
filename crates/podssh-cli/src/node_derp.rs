@@ -351,7 +351,7 @@ async fn serve(ready: Ready, err: &mut dyn Write) -> i32 {
         let _ = writeln!(
             err,
             "podssh node: {label}: {why}; so the node serves the DERP road unasked, through Tailscale's tailcat fleet \
-             then its main fleet, or the servers of {}, by the operator's rulings Q50 and Q74 ({FALLBACK_ENV}=no \
+             then its main fleet, or the servers of {} ({FALLBACK_ENV}=no \
              turns it off)",
             servers::ENV
         );

@@ -7,7 +7,7 @@
 /// The note of `podssh node`, after the onion road's.
 pub(super) const NODE: &str = "A node of the pair's road with the resumable layer and the end-to-end channel \
      (no --plain, no --no-e2e) and a TCP TARGET also waits for the pair's operators at smee.io's server, the \
-     last fallback of the operator's ruling Q78 after the onion road, for a proxy that refuses the WebSocket \
+     last fallback after the onion road, for a proxy that refuses the WebSocket \
      upgrade: the server of podssh's list of services (none while it names none), or the one of PODSSH_SMEE \
      (https://HOST[:PORT][/PREFIX], smee.io's server of your own), over HTTPS by name on 443 through \
      HTTPS_PROXY, with no account and no upgrade. It reads its door, a channel whose name comes from the \
@@ -19,9 +19,8 @@ pub(super) const NODE: &str = "A node of the pair's road with the resumable laye
      bytes. PODSSH_SMEE=no or PODSSH_LAST_RESORT=no (for the listed server) turns the road off.";
 
 /// The note of `podssh ssh`, after the onion road's.
-pub(super) const SSH: &str = "node://NAME also races the smee.io road of its pair (T-741), only once each \
-     road before it failed, after the onion road and before the Serveo road, the last fallback of the \
-     operator's ruling Q78: a stream of server-sent events of its way down at smee.io's server on 443 (the \
+pub(super) const SSH: &str = "node://NAME also races the smee.io road of its pair, only once each \
+     road before it failed, after the onion road and before the Serveo road, the last fallback: a stream of server-sent events of its way down at smee.io's server on 443 (the \
      listed one, or the one of PODSSH_SMEE), a hello at the node's door posted again each 3 s until the node's mark \
      comes, 20 s at most, then a POST for each frame up, each one after the answer to the one before. A \
      stream that gives no event within 15 s, as through a proxy that holds an answer until its end, ends the \
@@ -43,8 +42,8 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of the smee.io road");
         assert_eq!(ssh[at - 1], super::super::notes_onion::SSH);
-        for text in ["Q78", "PODSSH_LAST_RESORT=no", "PODSSH_SMEE=no", "443", "T-741"] {
-            assert!(super::NODE.contains(text) || text == "T-741", "{text}");
+        for text in ["PODSSH_LAST_RESORT=no", "PODSSH_SMEE=no", "443"] {
+            assert!(super::NODE.contains(text), "{text}");
             assert!(super::SSH.contains(text), "{text}");
         }
         assert!(super::SSH.contains("--no-e2e") && super::NODE.contains("two connections"));

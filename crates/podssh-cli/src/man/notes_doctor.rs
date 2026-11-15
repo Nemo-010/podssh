@@ -29,8 +29,7 @@ pub(super) const DOCTOR_BURST: &str = "The section burst, after the relay's chec
      concurrency limit, where a handshake fails alone too. Through a proxy, it measures the proxy's limit. In \
      --json, its numbers are k, burst_ok, control_ok and each round's.";
 
-pub(super) const DOCTOR_TIER: &str =
-    "--tier (T-706) checks this host alone, with the lines of its section, and ends with one \
+pub(super) const DOCTOR_TIER: &str = "--tier checks this host alone, with the lines of its section, and ends with one \
      verdict of its capabilities in the section tier: identity (a user name, from the database or a variable, and the \
      capability to bind a port below 1024, read from the sets of /proc/self/status, which podssh reads and never \
      changes), exec (the probe of the line exec: a copy of podssh ran from a directory, or none did), terminal (the \
@@ -61,7 +60,7 @@ pub(super) const DOCTOR_DIAGNOSIS: &str = "The line TLS reference makes TLS with
      tls-reset or tls-dropped), detail and evidence, the names that show it.";
 
 pub(super) const DOCTOR_NAT: &str = "The line nat, in the section egress, says whether the NAT in front of this \
-     host keeps one mapping for a local port whatever the destination (T-641): one UDP socket of port 0 asks two \
+     host keeps one mapping for a local port whatever the destination: one UDP socket of port 0 asks two \
      STUN servers in turn for the address that each saw, a Binding Request of RFC 8489 with 3 tries of 1 s, an \
      answer taken only from the address asked and with the request's id. The servers by default: Cloudflare's \
      stun.cloudflare.com:3478, which its Realtime TURN documentation names, then Google's stun.l.google.com:19302, \
@@ -74,7 +73,7 @@ pub(super) const DOCTOR_NAT: &str = "The line nat, in the section egress, says w
      sends nothing.";
 
 pub(super) const DOCTOR_IPV6: &str = "The line ipv6, in the section relay, says whether an IPv6 target can be \
-     reached (T-253). Through the first relay host that answered, by what its /relays.json says of its host's way \
+     reached. Through the first relay host that answered, by what its /relays.json says of its host's way \
      out: podssh relay serve says yes, none (and refuses an IPv6 target before the upgrade) or that it cannot tell, \
      and how it knows; the default relay says nothing of it, and the line gives its egress when last measured, on \
      2026-11-03: none, as each IPv6 target upgraded and then closed with 1011. Direct, by this host's own probes, \
@@ -82,7 +81,7 @@ pub(super) const DOCTOR_IPV6: &str = "The line ipv6, in the section relay, says 
      this host's table of IPv6 routes where Linux gives one. The line is ok, a fact; ???? when no relay host \
      answered or its /relays.json cannot be read.";
 
-pub(super) const DOCTOR_EXIT: &str = "--exit NAME checks the exit NAME of your net (T-458), among the roads \
+pub(super) const DOCTOR_EXIT: &str = "--exit NAME checks the exit NAME of your net, among the roads \
      that the run names, with --quick too, as podssh proxy --exit NAME reaches it: exit net, what the net held \
      says, NAME a member with the role exit and the rule of its policy that lets this client (--client-key FILE, \
      else client.key in the cache) reach exit:NAME, ???? where this host holds no net; exit pair, the pair kept \
@@ -93,7 +92,7 @@ pub(super) const DOCTOR_EXIT: &str = "--exit NAME checks the exit NAME of your n
 
 pub(super) const DOCTOR_CLEARTEXT: &str = "The line cleartext, in the section relay, says what a request with no \
      TLS meets on the way to the first relay host that answered (else the first host), at its port and at port 80 \
-     beside 443, as the cleartext road would meet it (T-326, GitHub #56): the CONNECT that the proxy takes, then GET \
+     beside 443, as the cleartext road would meet it (GitHub #56): the CONNECT that the proxy takes, then GET \
      /health with no token and no target, and what came back, named: a reset or a close with no answer (a hop that \
      expects TLS cuts cleartext), a record of TLS (the far end speaks TLS alone there), the edge's refusal (a 400 \
      that says that a request of plain HTTP was sent to its HTTPS port), a refusal by policy (403), a redirect, \
@@ -103,7 +102,7 @@ pub(super) const DOCTOR_CLEARTEXT: &str = "The line cleartext, in the section re
      443 and 80, and says whether a ws:// form of it can pass.";
 
 pub(super) const DOCTOR_HTTP2: &str = "The line http2, in the section relay, after cleartext, says what the \
-     same host offers the WebSocket over HTTP/2 (T-321, RFC 8441), with nothing sent but HTTP/2's preface, its \
+     same host offers the WebSocket over HTTP/2 (RFC 8441), with nothing sent but HTTP/2's preface, its \
      SETTINGS and a PING: the protocol that its TLS chose when podssh offered h2 then http/1.1, and on h2 whether \
      its SETTINGS offer extended CONNECT, with its streams at once; then whether the sessions of a run share one \
      connection to it, by PODSSH_H2 (podssh relay serve offers it; the default relay's edge chooses h2 and offers \
@@ -157,7 +156,7 @@ pub(super) const RELAY_PROBES: &str = "The relay also serves the probes of podss
 pub(super) fn http_road_file() -> (Vec<String>, String) {
     use crate::http_road_path::{FILE, MAX_AGE, MOST};
     let text = format!(
-        "What podssh doctor --stream measured of the path to each server over TLS (T-319), in the cache: by \
+        "What podssh doctor --stream measured of the path to each server over TLS, in the cache: by \
          HOST:PORT, the first body that did not pass, when a quiet answer ended, and when it was measured, as \
          JSON with mode 0600, at most {MOST} servers, the oldest going first. The HTTP road to that host sizes \
          its batches and its waits by it for {days} days after the measurement, and podssh ssh -v says so; with \

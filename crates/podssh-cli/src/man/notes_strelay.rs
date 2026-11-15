@@ -7,7 +7,7 @@
 /// The note of `podssh node`, after HyperDHT's road's.
 pub(super) const NODE: &str = "In a build with the feature strelay, a node of the pair's road with the \
      resumable layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP TARGET also waits for \
-     the pair's operators on a relay of Syncthing's pool, the last fallback of the operator's ruling Q78 \
+     the pair's operators on a relay of Syncthing's pool, the last fallback \
      after HyperDHT's road: the relay on 443 that the SHA-256 of the pair's name picks among those that \
      podssh's list of services names (none while it names none), or the relay of PODSSH_SYNCTHING_RELAY \
      (a relay:// URL in the pool's form, with the relay's device ID: Syncthing's strelaysrv of your own), by \
@@ -22,8 +22,8 @@ pub(super) const NODE: &str = "In a build with the feature strelay, a node of th
 
 /// The note of `podssh ssh`, after HyperDHT's road's.
 pub(super) const SSH: &str = "In a build with the feature strelay, node://NAME also races Syncthing's \
-     relay road of its pair (T-571), only once each road before it failed, after HyperDHT's road and before \
-     the onion road, the last fallback of the operator's ruling Q78: a request with a fresh certificate to \
+     relay road of its pair, only once each road before it failed, after HyperDHT's road and before \
+     the onion road, the last fallback: a request with a fresh certificate to \
      the pair's relay (the one on 443 that the SHA-256 of its name picks among the pool's relays of \
      podssh's list of services, or the relay of PODSSH_SYNCTHING_RELAY) for the node's device ID, which both \
      ends make of the pair's connect token, then the session's own TCP connection to the relay. It waits \
@@ -45,7 +45,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of Syncthing's relay road");
         assert_eq!(ssh[at - 1], super::super::notes_hyperdht::SSH);
-        for text in ["Q78", "PODSSH_LAST_RESORT=no", "PODSSH_SYNCTHING_RELAY=no", "feature strelay", "SHA-256", "443"] {
+        for text in ["PODSSH_LAST_RESORT=no", "PODSSH_SYNCTHING_RELAY=no", "feature strelay", "SHA-256", "443"] {
             assert!(super::NODE.contains(text) && super::SSH.contains(text), "{text}");
         }
         assert!(super::SSH.contains("--no-e2e") && super::NODE.contains("device ID"));

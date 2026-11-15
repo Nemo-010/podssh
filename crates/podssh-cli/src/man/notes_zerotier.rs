@@ -6,7 +6,7 @@
 /// The note of `podssh node`, after croc's relay road's.
 pub(super) const NODE: &str = "In a build with the feature zerotier, a node of the pair's road with the \
      resumable layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP TARGET also waits for \
-     the pair's operators on ZeroTier, the last fallback of the operator's ruling Q78 after croc's relay: \
+     the pair's operators on ZeroTier, the last fallback after croc's relay: \
      ZeroTierOne's own core, linked into podssh, joins an ad-hoc network of the pair's own (no controller, \
      no account) through ZeroTier Inc.'s roots and its TCP relay, which podssh's list of services names, or \
      the relay of PODSSH_ZEROTIER (IP:PORT, ZeroTierOne's tcp-proxy of your own), by one TCP connection \
@@ -21,8 +21,8 @@ pub(super) const NODE: &str = "In a build with the feature zerotier, a node of t
 
 /// The note of `podssh ssh`, after croc's relay road's.
 pub(super) const SSH: &str = "In a build with the feature zerotier, node://NAME also races ZeroTier's road \
-     of its pair (T-733), only once each road before it failed, after croc's relay road and the Pinggy road \
-     and before Tox's relay road, a last fallback of the operator's ruling Q78: a member of the pair's own \
+     of its pair, only once each road before it failed, after croc's relay road and the Pinggy road \
+     and before Tox's relay road, a last fallback: a member of the pair's own \
      ad-hoc network, with the client's own ZeroTier identity (made at its first run and kept in the cache, \
      a private file), through ZeroTier Inc.'s roots and TCP relay (or those of PODSSH_ZEROTIER and \
      PODSSH_ZEROTIER_PLANET), to the node's address, which both ends make of the pair's connect token. It \
@@ -46,7 +46,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of ZeroTier's road");
         assert_eq!(ssh[at - 1], super::super::notes_croc::SSH);
-        for text in ["Q78", "PODSSH_LAST_RESORT=no", "PODSSH_ZEROTIER=no", "PODSSH_ZEROTIER_PLANET", "zerotier"] {
+        for text in ["PODSSH_LAST_RESORT=no", "PODSSH_ZEROTIER=no", "PODSSH_ZEROTIER_PLANET", "zerotier"] {
             assert!(super::NODE.contains(text) && super::SSH.contains(text), "{text}");
         }
         assert!(super::SSH.contains("--no-e2e") && super::NODE.contains("ZeroTier Inc."));

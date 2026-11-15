@@ -7,7 +7,7 @@
 /// The note of `podssh node`, after Syncthing's relay road's.
 pub(super) const NODE: &str = "In a build with the feature tor, a node of the pair's road with the resumable \
      layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP TARGET also waits for the pair's \
-     operators as an onion service of the Tor network, the last fallback of the operator's ruling Q78 after \
+     operators as an onion service of the Tor network, the last fallback after \
      Syncthing's relay road: Arti bootstraps in podssh's process through the Tor road (HTTPS_PROXY, \
      PODSSH_TOR_PORTS, PODSSH_TOR_BRIDGES and PODSSH_TOR_NETWORK hold), in a directory of the cache of the \
      node's own, where Arti keeps the service's key, so its address stays from one start to the next. Every \
@@ -20,8 +20,8 @@ pub(super) const NODE: &str = "In a build with the feature tor, a node of the pa
 
 /// The note of `podssh ssh`, after Syncthing's relay road's.
 pub(super) const SSH: &str = "In a build with the feature tor, node://NAME also races the onion road of its \
-     pair (T-578), only once each road before it failed, after Syncthing's relay road and before the Serveo \
-     road, the last fallback of the operator's ruling Q78: this end bootstraps Arti through the Tor road, once \
+     pair, only once each road before it failed, after Syncthing's relay road and before the Serveo \
+     road, the last fallback: this end bootstraps Arti through the Tor road, once \
      a run, puts the pair's key of restricted discovery in its keystore, and opens a stream to the node's \
      onion service, at the address of PODSSH_ONION (the node's line says it), else the one of the node's \
      record of pkarr where the net names the node's key, read again at each link, else the one kept under \
@@ -43,9 +43,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of the onion road");
         assert_eq!(ssh[at - 1], super::super::notes_strelay::SSH);
-        for text in
-            ["Q78", "PODSSH_LAST_RESORT=no", "PODSSH_ONION=no", "feature tor", "Tor network", "restricted discovery"]
-        {
+        for text in ["PODSSH_LAST_RESORT=no", "PODSSH_ONION=no", "feature tor", "Tor network", "restricted discovery"] {
             assert!(super::NODE.contains(text) && super::SSH.contains(text), "{text}");
         }
         assert!(super::SSH.contains("--no-e2e") && super::NODE.contains("listens on nothing"));

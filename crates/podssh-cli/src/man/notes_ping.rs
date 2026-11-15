@@ -19,7 +19,7 @@ pub const PING: &[&str] = &[
      assumption about the host, so they run only for a destination. A program that the host lacks \
      ends the run with its status, never with a hang: each step and the whole run have a limit.",
     "With node://NAME, or the name alone of a member of the net with the role node, podssh ping measures the \
-     roads that podssh ssh races to that node (T-435), as tailscale ping names the path that answered: in the \
+     roads that podssh ssh races to that node, as tailscale ping names the path that answered: in the \
      order of the race and with its delays, each road that starts runs on to the far end's first bytes, and a \
      line for each says its time and when it started into the race, why it failed, or that it did not start, as \
      a fallback starts only when each road before it failed; the last line names the road that answered first, \
@@ -31,7 +31,7 @@ pub const PING: &[&str] = &[
      empty, destination, null, and exit. The road that answered, or the race that found none, is what podssh \
      status --net says of the node. With --under-load or --connect-runs, a node is measured as a host is, \
      through the road that podssh ssh takes to it, and logged in to.",
-    "What a user feels (T-660). --under-load measures the echo of keys typed as a user types them, 40 keys \
+    "What a user feels. --under-load measures the echo of keys typed as a user types them, 40 keys \
      150 ms apart, each sent at its time whether or not the one before came back, through cat: first idle, \
      then beside head -c 62914560 /dev/zero, a download of 60 MiB on a second channel of the same \
      connection, once it ran for 3 s, so that the path's queue is full when the first key goes. The \

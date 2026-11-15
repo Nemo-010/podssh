@@ -26,7 +26,7 @@ pub(super) const MORE: &[&str] = &[
     "Where a first relay host offers it in its /relays.json (podssh relay serve does), read at each run \
      with PODSSH_RELAY_LAYER=yes, kept for a day when it is unset (see ENVIRONMENT), podssh ssh \
      carries the session to a standard sshd in the resumable layer at the relay \
-     (T-173): the relay keeps its connection to the server while this host's link is lost, and a new link \
+    : the relay keeps its connection to the server while this host's link is lost, and a new link \
      to the same relay, or to the process that its /relays.json names as forward.host, resumes the \
      session where it was, for as long as the relay keeps it, 10 minutes by default; one line tells of \
      each loss and each resume, and SSH's keepalives are off unless ServerAliveInterval is given, as the \

@@ -6,7 +6,7 @@
 /// The note of `podssh node`, after the transit relay's.
 pub(super) const NODE: &str = "A node of the pair's road with the resumable layer and the end-to-end channel \
      (no --plain, no --no-e2e) and a TCP TARGET also waits for the pair's operators at croc's public relays, \
-     a last fallback of the operator's ruling Q78: croc-web's WebSocket bridge at the address that podssh's \
+     a last fallback: croc-web's WebSocket bridge at the address that podssh's \
      list of services names (wss://getcroc.com/ws, while the list names it; none in this release), or the \
      bridge of PODSSH_CROC (wss://HOST/ws, croc-web of your own before croc relay), through HTTPS_PROXY. The \
      bridge pipes the WebSocket to one of croc's relays, which the pair's secret picks, and the node passes \
@@ -23,9 +23,9 @@ pub(super) const NODE: &str = "A node of the pair's road with the resumable laye
      see the room, the sizes and the times; the channel keeps the bytes from them.";
 
 /// The note of `podssh ssh`, after the transit relay's.
-pub(super) const SSH: &str = "node://NAME also races croc's relay road of its pair (T-694), after the \
+pub(super) const SSH: &str = "node://NAME also races croc's relay road of its pair, after the \
      transit relay's, and only once each road before it failed: the rooms of the pair at croc's relay \
-     behind croc-web's bridge, where the node waits, a last fallback of the operator's ruling Q78, before \
+     behind croc-web's bridge, where the node waits, a last fallback, before \
      the Pinggy, Serveo and ssh-j roads. The \
      client tries the pair's 4 rooms in order: a room that two members hold sends it to the next, and so \
      does one with no one in it, after 3 s; a client of the same pair that it meets starts the rooms again, \
@@ -50,10 +50,10 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of croc's relay road");
         assert!(ssh[at - 1].starts_with("node://NAME also races the transit road"), "{}", ssh[at - 1]);
-        for text in ["nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no", "PODSSH_CROC=no", "3 h", "SIEC"] {
+        for text in ["nobody vouches for", "PODSSH_LAST_RESORT=no", "PODSSH_CROC=no", "3 h", "SIEC"] {
             assert!(super::NODE.contains(text), "{text}");
         }
-        for text in ["nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no", "--no-e2e", "rate limited"] {
+        for text in ["nobody vouches for", "PODSSH_LAST_RESORT=no", "--no-e2e", "rate limited"] {
             assert!(super::SSH.contains(text), "{text}");
         }
     }

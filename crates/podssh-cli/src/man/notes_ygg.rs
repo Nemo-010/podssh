@@ -7,7 +7,7 @@
 /// The note of `podssh node`, after the Tox road's.
 pub(super) const NODE: &str = "In a build with the feature yggdrasil, a node of the pair's road with the \
      resumable layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP TARGET also waits for \
-     the pair's operators in Yggdrasil's network, the last fallback of the operator's ruling Q78 after the \
+     the pair's operators in Yggdrasil's network, the last fallback after the \
      Tox road: one WebSocket (ygg-ws) through HTTPS_PROXY to the public wss:// peer that the SHA-256 of the \
      pair's name picks among those that podssh's list of services names (none while it names none), or to \
      the peer of PODSSH_YGGDRASIL (a wss:// or ws:// URL, yggdrasil-go of your own with that Listen), its \
@@ -22,8 +22,8 @@ pub(super) const NODE: &str = "In a build with the feature yggdrasil, a node of 
 
 /// The note of `podssh ssh`, after the Tox road's.
 pub(super) const SSH: &str = "In a build with the feature yggdrasil, node://NAME also races Yggdrasil's \
-     road of its pair (T-735), only once each road before it failed, after the Tox road and before the Serveo \
-     road, the last fallback of the operator's ruling Q78: this end joins Yggdrasil's network with a fresh key \
+     road of its pair, only once each road before it failed, after the Tox road and before the Serveo \
+     road, the last fallback: this end joins Yggdrasil's network with a fresh key \
      through the pair's peer (the one that the SHA-256 of its name picks among the public wss:// peers of \
      podssh's list of services, or the peer of PODSSH_YGGDRASIL), once a run, and says hello to the node's \
      key, which both ends make of the pair's connect token, with a proof of the token, again each 1 s, until \
@@ -48,7 +48,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of Yggdrasil's road");
         assert_eq!(ssh[at - 1], super::super::notes_tox::SSH);
-        for text in ["Q78", "PODSSH_LAST_RESORT=no", "PODSSH_YGGDRASIL=no", "feature yggdrasil", "SHA-256", "wss://"] {
+        for text in ["PODSSH_LAST_RESORT=no", "PODSSH_YGGDRASIL=no", "feature yggdrasil", "SHA-256", "wss://"] {
             assert!(super::NODE.contains(text) && super::SSH.contains(text), "{text}");
         }
         assert!(super::SSH.contains("--no-e2e") && super::NODE.contains("router of the network"));

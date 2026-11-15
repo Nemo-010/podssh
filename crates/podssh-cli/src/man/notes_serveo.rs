@@ -21,15 +21,14 @@ pub(super) const NODE: &str = "With --serveo, the node serves TARGET over the Se
      the net held here when the node's key is one; never --plain, --no-e2e, --exit, a udp: TARGET, or \
      --opentunnel, --pinggy, --ssh-j, --iroh or --derp (64). With the pair NAME, or --pair-file, the node serves the \
      pair's road beside it, with one keeper of sessions. A node that would serve the Pinggy road unasked \
-     serves this one unasked after the Pinggy road reached no server, or in its place where PODSSH_PINGGY=no, \
-     by the operator's ruling Q78, before the ssh-j road and the roads after it, and its lines say so and name the \
+     serves this one unasked after the Pinggy road reached no server, or in its place where PODSSH_PINGGY=no, before the ssh-j road and the roads after it, and its lines say so and name the \
      third party. \
      PODSSH_SERVEO=no turns the road off, and so does PODSSH_LAST_RESORT=no, the switch of each last \
      fallback.";
 
 /// The note of the Serveo road of `podssh ssh node://NAME`.
 pub(super) const SSH: &str = "node://NAME races the Serveo road too, once each road before it failed and \
-     before the ssh-j road and the roads after it, a last fallback of the operator's ruling Q78, where the road has a server (podssh's list of \
+     before the ssh-j road and the roads after it, a last fallback, where the road has a server (podssh's list of \
      services, or PODSSH_SERVEO) and a key of the node is known: --node-key, else the key that the net names for \
      NAME, else the pins of NAME, which a first session over another road writes. Each link is raw SSH to the \
      server on port 443, then 22, through HTTPS_PROXY, then a direct-tcpip channel to the node's alias, as ssh \
@@ -53,7 +52,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of the Serveo road");
         assert_eq!(ssh[at - 1], super::super::notes_pinggy::SSH);
-        for text in ["nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no", "derived from the node's key", "series"] {
+        for text in ["nobody vouches for", "PODSSH_LAST_RESORT=no", "derived from the node's key", "series"] {
             assert!(super::NODE.contains(text), "{text}");
         }
         for text in ["--node-key", "pins of NAME", "stranger that holds the alias is refused", "before the ssh-j road"]

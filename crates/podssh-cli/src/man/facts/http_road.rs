@@ -15,7 +15,7 @@ pub(super) fn blocks() -> Vec<Block> {
          proxy's, or a 426 of a relay that got the request with its Upgrade taken off), podssh ssh, each command \
          that reaches a server as it does, and podssh proxy carry the session over requests of HTTP/1.1 to that \
          host, which podssh relay serve serves, with the same token, the same targets and the same limits as the \
-         WebSocket road. The split form comes first, on two connections, which the operator's ruling Q44 allows on \
+         WebSocket road. The split form comes first, on two connections on \
          this road alone: the bytes up in numbered batches of {batch} KiB at most, one POST after another, and the \
          bytes down from their offset in a request that waits up to {wait} s; the role holds {window} batches and \
          {down} MiB down that the client has not acknowledged, and an answer down ends a moment after nothing more \

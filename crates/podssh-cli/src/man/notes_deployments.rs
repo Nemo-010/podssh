@@ -3,7 +3,7 @@
 
 /// The list, its keys, its check and the role's side of it.
 pub(super) const RELAY: &str = "A relay host outside the default's domain (ssh.relay.ajam.dev) comes from \
-     a signed list of deployments alone (T-346). /relays.json may carry one as its field signed: the document's \
+     a signed list of deployments alone. /relays.json may carry one as its field signed: the document's \
      exact text (its form podssh-relays 1, a serial, issued, not_after, and its deployments, each a name and up \
      to 8 hosts), the Ed25519 key that signed it, and that key's signature of podssh-relays/1, a zero byte and \
      the text. podssh uses it only when the key is one that it trusts: one compiled in, a key of \

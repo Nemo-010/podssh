@@ -29,7 +29,7 @@ pub(super) const NODE: &[&str] = &[
      start of the session: a lost link then ends the session. On the default relay, which closes the \
      node's whole socket with 1003 for a frame of a session whose operator's link it lost (podssh relay \
      serve drops such a frame), one operator's lost link can end each --plain session of the node, where \
-     the layer resumes each of its sessions; the node connects again at once after such a close (T-421). \
+     the layer resumes each of its sessions; the node connects again at once after such a close. \
      The node's first line names its mode.",
     "A roost: with --sshd, the node serves a standard sshd, TARGET, or 127.0.0.1:22 when no TARGET is \
      given. A normal server gets the resumable layer, and with --iroh the iroh road, this way: the roost \
@@ -192,13 +192,11 @@ pub(super) const NODE: &[&str] = &[
      with no --iroh, in a build with the iroh road, it does too, at n0's server unless its variable names \
      another or off (see iroh record in THE RELAY).",
     "A node with no pair stored under NAME (or one that expired), no --iroh and no --plain, and a door \
-     (an allowlist, or a key that the net held here names), serves the DERP road unasked, by the operator's \
-     ruling Q50, and its first line says so; PODSSH_DERP=no turns that off, and the node refuses as before \
+     (an allowlist, or a key that the net held here names), serves the DERP road unasked, and its first line says so; PODSSH_DERP=no turns that off, and the node refuses as before \
      (78). With neither door, it refuses as before too, as no client could come in.",
     "A node of the pair's road with the resumable layer and the end-to-end channel (no --plain, no \
-     --no-e2e) and a TCP TARGET also waits for the pair's operators at a magic-wormhole transit relay \
-     (T-436), Least Authority's wss://relay.mw.leastauthority.com, which needs no account, by the \
-     operator's ruling Q65, or the relay of PODSSH_TRANSIT; PODSSH_TRANSIT=no turns it off. The token by \
+     --no-e2e) and a TCP TARGET also waits for the pair's operators at a magic-wormhole transit relay, \
+     Least Authority's wss://relay.mw.leastauthority.com, which needs no account, or the relay of PODSSH_TRANSIT; PODSSH_TRANSIT=no turns it off. The token by \
      which the relay pairs the two ends, and a proof of the pair that each end gives the other, come from \
      the pair's connect token, so a side that knows the token alone, as the relay does, is refused before \
      the resumable layer. The node keeps one connection waiting there, opens the next at each meeting, \
@@ -218,7 +216,7 @@ pub(super) const NODE: &[&str] = &[
      through https://ppng.io, which needs no account, then https://piping.onrender.com where ppng.io fails, \
      or the server of PODSSH_PIPING alone. Once TARGET answered, the \
      node asks the relay for its socket with no token; where something on the way refuses the upgrade, \
-     the node says so and serves the Piping Server road alone, unasked, by the operator's ruling Q65, \
+     the node says so and serves the Piping Server road alone, unasked, \
      until the pair expires (77). It waits there with a GET at a door whose path comes from the pair's \
      secret; a client of the pair posts a hello there, and each end then sends its way of the link as a \
      POST and reads the other's as a GET, over HTTP/2 on one connection where the server offers it, else \
@@ -266,7 +264,7 @@ pub(super) const NODE: &[&str] = &[
      reaches the name on port 443. The name is public, so the node needs a door: --allow FILE, and only \
      an operator whose key is a line of FILE reaches TARGET, through the end-to-end channel above the \
      resumable layer; or, with no --allow, a key of the node's that the net held here names, and only \
-     the net's members come in (T-550), its first line saying so. With neither, it is refused (64). The node keeps two connections to the edge, each to its own region first, so that one stays \
+     the net's members come in, its first line saying so. With neither, it is refused (64). The node keeps two connections to the edge, each to its own region first, so that one stays \
      while the other is made again. On the edge's GOAWAY its visitors go on for up \
      to 90 s while a new connection, at once, takes the new ones. A \
      connection to the edge that is lost is made again, with the same name; at Ctrl-C the node \
@@ -423,7 +421,7 @@ pub(super) const NODE_OPENTUNNEL: &str = "With --opentunnel, the node serves TAR
      road needs the end-to-end channel and a door: --allow, or the members of the net held here when the node's \
      key is one; never --plain, --no-e2e, --exit or a udp: TARGET (64). With the pair NAME, or --pair-file, the \
      node serves the pair's road beside it, with one keeper of sessions. A node with no pair, a door, and the \
-     DERP road turned off (PODSSH_DERP=no) serves the road unasked, by the operator's ruling Q76, and its first \
+     DERP road turned off (PODSSH_DERP=no) serves the road unasked, and its first \
      line says so; PODSSH_OPENTUNNEL=no turns the road off. In a build with the iroh road, the node puts its \
      name in its record of pkarr (opentunnel=), signed by its key, once its tunnel is ready, at n0's server \
      unless its variable names another or off (see iroh record in THE RELAY). The service's refusals are \
@@ -437,7 +435,7 @@ pub(super) const SSH_OPENTUNNEL: &str = "node://NAME with --opentunnel-name HOST
      (SSL_CERT_FILE, else the system's stores), with no WebSocket upgrade, so a proxy that refuses the upgrade \
      passes it, and so does one that ends TLS itself, whose CA the host trusts. The name is kept under NAME in the \
      cache (opentunnel-NAME.name), and a later run that gives none dials it only once each road before it \
-     failed, the fallback of the operator's ruling Q76, which PODSSH_OPENTUNNEL=no turns off. With neither, a \
+     failed, the fallback, which PODSSH_OPENTUNNEL=no turns off. With neither, a \
      member of the net whose key the net names races the name of the node's record of pkarr, among the roads \
      of its record (not kept: it is asked again). The end-to-end \
      channel checks the node's key by the pins of NAME, or --node-key, so --no-e2e leaves the road out (64 \

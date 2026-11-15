@@ -29,7 +29,7 @@ pub(crate) struct Road {
 /// line, with the third party's words when the relay is `pod-services`'.
 pub(crate) fn beside(pair: Option<&Pair>, say: Say) -> Option<Road> {
     let (pair, (relay, public)) = (pair?, crate::zerotier::relay()?);
-    let why = if public { "the last fallback of the operator's ruling Q78" } else { "the relay that you named" };
+    let why = if public { "the last fallback" } else { "the relay that you named" };
     say(format!("and through ZeroTier's TCP relay {relay}, {why} ({}=no turns it off)", crate::zerotier::ENV));
     if public {
         say(crate::zerotier::third_party_line(relay).replace("carry this session", "carry the sessions of this road"));

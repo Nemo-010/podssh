@@ -28,7 +28,7 @@ pub(super) const NODE: &str = "With --pinggy, the node serves TARGET over the Pi
      a udp: TARGET, or --opentunnel, --iroh or --derp (64). With the pair NAME, or --pair-file, the node serves \
      the pair's road beside it, with one keeper of sessions. A node with no pair, a door, the DERP road turned \
      off (PODSSH_DERP=no), and the OpenTunnel road turned off (PODSSH_OPENTUNNEL=no) or with no service \
-     reached, serves the road unasked, the last, by the operator's ruling Q78, and its lines say so and name the \
+     reached, serves the road unasked, the last, and its lines say so and name the \
      third party. PODSSH_PINGGY=no turns the road off, and so does PODSSH_LAST_RESORT=no, the switch of each \
      last fallback.";
 
@@ -43,7 +43,7 @@ pub(super) const SSH: &str = "node://NAME with --pinggy-name HOST#PIN races the 
      leaves the road out (64 with --pinggy-name). The address is kept under NAME in the cache \
      (pinggy-NAME.name). A run that gives none dials the address of the node's record of pkarr, where the net \
      names NAME by its key and the record is asked (the node puts each tunnel's there), else the one kept, last, \
-     once each road before it failed, the last fallback of the operator's ruling Q78; the record is signed by \
+     once each road before it failed, the last fallback; the record is signed by \
      the node's key, so its pin is the node's word, and -v says where the address came from. Before it, a line says that Pinggy, a third party that nobody \
      vouches for, carries the session, and that SSH and the end-to-end channel keep its bytes. A free tunnel's \
      name changes each hour, and its pin does not: the record names the new one, else give the new name that \
@@ -63,7 +63,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of the Pinggy road");
         assert!(ssh[at - 1].starts_with("node://NAME with --opentunnel-name"), "{}", ssh[at - 1]);
-        for text in ["nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no", "60 minutes", "raw SSH", "pin"] {
+        for text in ["nobody vouches for", "PODSSH_LAST_RESORT=no", "60 minutes", "raw SSH", "pin"] {
             assert!(super::NODE.contains(text), "{text}");
         }
         assert!(super::NODE.contains("record of pkarr"), "the node's record names its address");

@@ -81,8 +81,7 @@ fn trust_for(bridge: &Bridge, pair: &Trust, host: Trust) -> Trust {
 /// The node of the road for the pair `pair`, through `bridge`, and the line
 /// that says so, with the third party's words when the bridge is public.
 pub(crate) fn road(label: &str, pair: &Pair, stored: bool, trust: &Trust, bridge: Bridge, say: Say) -> far::Node {
-    let why =
-        if bridge.public { "the last fallback of the operator's ruling Q78" } else { "the bridge that you named" };
+    let why = if bridge.public { "the last fallback" } else { "the bridge that you named" };
     say(format!("and through croc's relay behind {}, {why} ({}=no turns it off)", bridge.url.shown(), croc::ENV));
     if bridge.public {
         say(croc::third_party_line(&bridge.url.shown())

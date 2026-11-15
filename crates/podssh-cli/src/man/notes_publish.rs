@@ -2,7 +2,7 @@
 //! `relay` and `node`, apart from the others for the length of their files.
 
 /// The relay's side: `relay serve --publish`.
-pub(super) const RELAY: &str = "--publish publishes a TLS site of a node by its name (T-649), for an owner with \
+pub(super) const RELAY: &str = "--publish publishes a TLS site of a node by its name, for an owner with \
      one port: each takes a DNS name and the name of a pair of this relay joined by =, such as \
      site.example.org=p-0123..., the name that the pair's file holds, and is repeatable. Before its own TLS, the \
      relay peeks at a connection's ClientHello, within 10 s and its one record of 16 KiB at most, and takes none of \
@@ -22,7 +22,7 @@ pub(super) const RELAY: &str = "--publish publishes a TLS site of a node by its 
 
 /// The node's side: `node --publish-tls TARGET`.
 pub(super) const NODE: &str = "With --publish-tls TARGET, the pair's sessions are a site that podssh relay serve \
-     publishes by its name (T-649; see its notes): the relay sends each TLS connection whose ClientHello names it \
+     publishes by its name (see its notes): the relay sends each TLS connection whose ClientHello names it \
      here, before any handshake and with each byte untouched. Each session is one connection to TARGET, a TLS \
      service of this host whose own certificate answers, carried as it came, with no resumable layer and no \
      end-to-end channel, as a visitor speaks neither; a connection that ends is a visitor that left, and no \

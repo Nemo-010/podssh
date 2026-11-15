@@ -30,7 +30,7 @@ pub(crate) struct Road {
 pub(crate) fn beside(pair: Option<&Pair>, say: Say) -> Option<Road> {
     let pair = pair?;
     let (relay, public) = crate::strelay::relay_for(&pair.name)?;
-    let why = if public { "the last fallback of the operator's ruling Q78" } else { "the relay that you named" };
+    let why = if public { "the last fallback" } else { "the relay that you named" };
     say(format!("and through Syncthing's relay {}, {why} ({}=no turns it off)", relay.at, crate::strelay::ENV));
     if public {
         say(crate::strelay::third_party_line(relay.at)

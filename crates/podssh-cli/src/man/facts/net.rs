@@ -6,22 +6,22 @@
 pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_NET"],
-        "The net's document of podssh net (T-429): the absolute path of its file, in place of net.doc in the \
+        "The net's document of podssh net: the absolute path of its file, in place of net.doc in the \
           cache's directory. no: the net is off, so that no member's name, no node's door and no document of the \
           end-to-end channel comes from it, and podssh net refuses (78). Unset, empty or yes: net.doc in the \
           cache; another word, such as a relative path, is a configuration error (78), and the net is off.",
     ),
     (
         &["PODSSH_PAIR_MAILBOX"],
-        "The mailboxes of podssh relay pair --code and podssh relay join (T-086), and of podssh net invite and \
-          podssh net join (T-616), as --pair-mailbox, which wins: ws:// or wss:// URLs by commas, in order, such as \
+        "The mailboxes of podssh relay pair --code and podssh relay join, and of podssh net invite and \
+          podssh net join, as --pair-mailbox, which wins: ws:// or wss:// URLs by commas, in order, such as \
           podssh relay serve's wss://HOST/v1/mailbox. Unset, empty or yes: magic-wormhole's public mailbox, then \
           Least Authority's; no: no code, which then refuses (78) with the way left, the operator's file or podssh \
           net add and take; a URL that cannot be read is a configuration error (78), which does not echo it.",
     ),
     (
         &["PODSSH_MQTT"],
-        "The public MQTT brokers of the pairing by code (T-737), after each mailbox: where no mailbox answers, \
+        "The public MQTT brokers of the pairing by code, after each mailbox: where no mailbox answers, \
           the two ends meet at the code's topic of a broker of podssh's list of services (shiftr.io's public \
           instance, over a WebSocket on 443), and a line first says that a third party that nobody vouches for \
           carries the messages, which the pairing's proof keeps secret. no, or PODSSH_LAST_RESORT=no: no broker; \
@@ -29,7 +29,7 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_PAIR_NTFY"],
-        "The public ntfy servers of the pairing by code (T-496), the first place after the mailboxes: the two \
+        "The public ntfy servers of the pairing by code, the first place after the mailboxes: the two \
           ends post the code's messages, each 4,095 bytes at most, to a topic that the code's nameplate gives, \
           and poll it, after a line that says that a third party that nobody vouches for carries them. ntfy.sh \
           allows 250 messages a day for each address, and a pairing posts seven. An https:// URL: that server \
@@ -37,13 +37,13 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_PAIR_NOSTR"],
-        "The public Nostr relays of the pairing by code (T-545), after the ntfy servers: the code's messages go \
+        "The public Nostr relays of the pairing by code, after the ntfy servers: the code's messages go \
           as ephemeral events tagged from its nameplate, over a WebSocket on 443, after the third party's line. \
           no, or PODSSH_LAST_RESORT=no: none; unset, empty or another word: the relays of podssh's list of services.",
     ),
     (
         &["PODSSH_PAIR_TRACKER"],
-        "The public WebTorrent trackers of the pairing by code (T-695), after the Nostr relays: the code's \
+        "The public WebTorrent trackers of the pairing by code, after the Nostr relays: the code's \
           messages go as offers and answers between the peers of a hash of its nameplate, after the third \
           party's line. Both trackers of podssh's list of services are in a filter list of piracy (hagezi's \
           anti.piracy), so a network that applies it refuses them; the facts filter-list, filter-list-part and \
@@ -56,25 +56,25 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
           they are those of podssh's own stderr (a program that inherited the variable has another), each error \
           line also goes to the journal's socket beside that stream as one entry, at its priority (3, and 2 for a \
           fatal one), so that journalctl -p warning shows a refusal and why a node ended; each line stays on \
-          stderr, at the stream's info, as before. The SSH client's lines go too (T-674): an error at 3, and a \
+          stderr, at the stream's info, as before. The SSH client's lines go too: an error at 3, and a \
           warning at 4 (a forward that the server refused, a channel that it opened unasked, a setting that may \
           cut the session), which shows at INFO as in OpenSSH, so -q and -o LogLevel=ERROR hide it; a log in a \
           file (-E) sends nothing. The socket binds nothing, and a send that fails is dropped, never an exit \
-          code. No flag turns it on or off (T-640).",
+          code. No flag turns it on or off.",
     ),
     (
         &["PODSSH_HANDOVER"],
-        "Set by podssh alone, never by hand: between the two binaries of a node's upgrade in place (T-668, see \
+        "Set by podssh alone, never by hand: between the two binaries of a node's upgrade in place (see \
           the notes of podssh node), it names the descriptor of the memory that holds the node's sessions and what \
-          its roads keep of the run (a key for the run only, a quick tunnel's name, T-679), and the node's pid, \
+          its roads keep of the run (a key for the run only, a quick tunnel's name), and the node's pid, \
           so that only that process reads it, never a program that the node starts. probe makes podssh \
           --version add the line podssh-handover and the version of the sessions that this binary takes, \
-          which a node reads before it hands its sessions to a binary. On Windows (T-678) it names the inherited \
+          which a node reads before it hands its sessions to a binary. On Windows it names the inherited \
           pipe that carries them and a nonce, and the child removes it once read.",
     ),
     (
         &["PODSSH_HANDOVER_ROOT"],
-        "Set by podssh alone, never by hand, on Windows (T-678): in a node's next binary, the pid of the node's \
+        "Set by podssh alone, never by hand, on Windows: in a node's next binary, the pid of the node's \
           first binary, which waits for the ones after it and whose pid the run's record names; the event of an \
           upgrade and the mark beside the record use it.",
     ),

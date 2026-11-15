@@ -402,7 +402,7 @@ fn a_funnel_whose_quick_tunnel_the_proxy_refuses_takes_opentunnel_unasked() {
     let lines = said(&lines);
     let unasked = lines.iter().find(|l| l.contains("unasked")).unwrap_or_else(|| panic!("{lines:#?}"));
     assert!(unasked.contains("the quick tunnel could not carry the funnel"), "{unasked}");
-    assert!(unasked.contains("Q76") && unasked.contains("PODSSH_OPENTUNNEL=no"), "{unasked}");
+    assert!(unasked.contains("PODSSH_OPENTUNNEL=no"), "{unasked}");
     assert!(lines.iter().any(|l| l.contains(TLS_LINE)), "{lines:#?}");
     drop(lab.runtime);
 }

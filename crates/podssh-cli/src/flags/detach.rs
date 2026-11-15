@@ -17,7 +17,7 @@ pub const SSH_DETACH: FlagRow = row(
 
 /// `ssh`: the supervisor of a detached run.
 pub const SSH_RESTART: FlagRow = row(None, "restart", None, FlagKind::Supported,
-    "with -f or --detach: a small process in the background starts the run again whenever it ends, but after 64, 77 or 78 or a stop of that process; it never gives up (T-390)", None);
+    "with -f or --detach: a small process in the background starts the run again whenever it ends, but after 64, 77 or 78 or a stop of that process; it never gives up", None);
 
 /// `ssh`, `pipe` and `node`: the name of a detached run.
 pub const DETACH_NAME: FlagRow = row(None, "detach-name", Some("NAME"), FlagKind::Supported,

@@ -14,7 +14,7 @@ pub const PUBLIC: &str =
      on the reverse road, Tailscale's DERP servers for tailcat, then Tailscale's main DERP fleet, which \
      serves Tailscale's own clients and let podssh in when it was tried (PODSSH_DERP_MAIN=no keeps to \
      tailcat's), Least Authority's transit relay, ppng.io then piping.onrender.com, and n0's server of \
-     pkarr (see podssh node); last, by the operator's ruling Q78, croc's public relays behind croc-web's \
+     pkarr (see podssh node); last, croc's public relays behind croc-web's \
      bridge, Pinggy's free TLS tunnels, then Serveo's private aliases, then ssh-j.com's names, then \
      localhost.run's tunnels, then localtunnel's names, then bore.pub's TCP ports, each where \
      podssh's list of services names its server, whose lines say so \
@@ -26,8 +26,7 @@ pub const PUBLIC: &str =
      web proxy's list and no public proxy node of an aggregator's list, as none names an operator who \
      answers for it. A server that you name (--derp-server, --forwarder, --shadowsocks, \
      --vless, --via, --wstunnel) is yours to trust. podssh never uses, and never names, a domain that \
-     looks taken over: a school's, a church's or a shop's, or a name made to look like one (the \
-     operator's ruling Q79).";
+     looks taken over: a school's, a church's or a shop's, or a name made to look like one.";
 
 #[cfg(test)]
 mod tests {

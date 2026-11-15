@@ -22,8 +22,7 @@ pub(super) const NODE: &str = "With --bore, the node serves TARGET over the bore
      layer keeps go on over the next; a client that reaches a stranger at a port is refused by the end-to-end \
      channel. The road is served alone: a pair of NAME is not served beside it, and a line says so. A node that \
      would serve the OpenTunnel road, the Pinggy road, the Serveo road, the ssh-j road, the localhost.run road \
-     or the localtunnel road unasked serves this one, the last of all, when none of them reached a service, or when each is turned off, by the operator's \
-     ruling Q78, and its lines say so and name the third party, which nobody vouches for. PODSSH_BORE=no turns \
+     or the localtunnel road unasked serves this one, the last of all, when none of them reached a service, or when each is turned off, and its lines say so and name the third party, which nobody vouches for. PODSSH_BORE=no turns \
      the road off, and so does PODSSH_LAST_RESORT=no, the switch of each last fallback.";
 
 /// The note of `podssh ssh node://NAME` on the bore road.
@@ -54,7 +53,7 @@ mod tests {
         let ssh = for_verb("ssh");
         let at = ssh.iter().position(|n| *n == super::SSH).expect("ssh's note of the bore road");
         assert_eq!(ssh[at - 1], super::super::notes_localtunnel::SSH);
-        for text in ["nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no", "7835", "raw TCP", "its key gives", "(78)"] {
+        for text in ["nobody vouches for", "PODSSH_LAST_RESORT=no", "7835", "raw TCP", "its key gives", "(78)"] {
             assert!(super::NODE.contains(text), "{text}");
         }
         for text in ["--node-key", "pins of NAME", "last of all", "PODSSH_FORWARDER_FALLBACK=no", "--no-e2e", "443"] {

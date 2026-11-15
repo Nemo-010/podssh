@@ -19,7 +19,7 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_FILEHOSTS"],
-        "The file hosts' road of a pair (T-738), the last of the last fallbacks of the operator's ruling Q78, in \
+        "The file hosts' road of a pair, the last of the last fallbacks, in \
       a build with the feature filehost (none of a release yet): each small write of a link of the resumable \
       layer a sealed note at the public MQTT broker of PODSSH_MQTT, and each larger piece one sealed upload to \
       a public file host of podssh's list of services, its URL a sealed note there, one request at a time (see \
@@ -31,7 +31,7 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_SRV_US"],
-        "The srv.us road (T-566), a last fallback of the operator's ruling Q78: the localhost.run road's shape \
+        "The srv.us road, a last fallback: the localhost.run road's shape \
           at srv.us, SSH on port 22 as nomatch, logged in with the node's own key, and the forward of port 1, of \
           podssh node --srv-us and podssh ssh node://NAME, where srv.us derives the tunnel's name from that key, \
           so a client that holds the node's whole key derives it too and races the road last, with no record; a \
@@ -43,7 +43,7 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_TUNNL_GG"],
-        "The tunnl.gg road (T-567), a last fallback of the operator's ruling Q78: the localhost.run road's shape \
+        "The tunnl.gg road, a last fallback: the localhost.run road's shape \
           at tunnl.gg, SSH on port 22 with no key, the forward of port 80 and the command output=json, of podssh \
           node --tunnl-gg and podssh ssh node://NAME --tunnel-url https://HOST of a name under its tunnels' zone, \
           which a node with no other road serves unasked after the srv.us road; its name is random, so a client \

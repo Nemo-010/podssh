@@ -2,7 +2,7 @@
 //! ssh`, `podssh proxy` and `podssh doctor`, and its file in FILES.
 
 pub const SSH: &str = "--hysteria FILE reaches the first hop through Hysteria 2 servers that you run \
-     (apernet/hysteria), in place of the relay, where UDP passes, by the operator's ruling Q82: a server of \
+     (apernet/hysteria), in place of the relay, where UDP passes: a server of \
      QUIC that takes a credential in one HTTP/3 request, dials the target named on a stream of its own, and \
      to one who has no credential is a web server. FILE must be yours and closed to others (chmod 600), as a \
      pair file is: each line is a share link as Hysteria's clients give it, hysteria2://AUTH@HOST[:PORT]/ or \

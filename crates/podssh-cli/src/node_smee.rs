@@ -26,7 +26,7 @@ pub(crate) struct Road {
 pub(crate) fn beside(pair: Option<&Pair>, trust: &podssh_ws::Trust, say: Say) -> Option<Road> {
     let pair = pair?;
     let (server, public) = crate::smee_road::server()?;
-    let why = if public { "the last fallback of the operator's ruling Q78" } else { "the server that you named" };
+    let why = if public { "the last fallback" } else { "the server that you named" };
     say(format!("and through smee.io's server {server}, {why} ({}=no turns it off)", crate::smee_road::ENV));
     if public {
         let line = crate::smee_road::third_party_line(&server);

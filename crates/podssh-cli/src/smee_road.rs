@@ -73,7 +73,7 @@ pub fn server() -> Option<(Server, bool)> {
 pub fn third_party_line(server: &Server) -> String {
     format!(
         "the smee.io road, the last fallback: {server}, a third party that nobody vouches for, carries this \
-         session as events of its channels (the operator's ruling Q78); anyone who knows a channel's name sees \
+         session as events of its channels; anyone who knows a channel's name sees \
          the times and the sizes, and SSH and the end-to-end channel keep the bytes private; {ENV}=no or \
          {LAST_RESORT}=no turns it off"
     )

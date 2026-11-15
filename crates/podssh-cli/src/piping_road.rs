@@ -117,7 +117,7 @@ mod tests {
         }
         assert_eq!(want_from(Some("Yes")).unwrap(), Want::Asked(server::public()));
         assert_eq!(server::public()[0], Server::default(), "ppng.io first");
-        assert!(server::public().len() >= 2, "a second public server after it (T-497)");
+        assert!(server::public().len() >= 2, "a second public server after it");
         // A server that the user names is kept alone, a public one too.
         let own = want_from(Some("https://pipe.example:8443/p")).unwrap();
         assert_eq!(own, Want::Asked(vec![Server::parse("https://pipe.example:8443/p").unwrap()]));

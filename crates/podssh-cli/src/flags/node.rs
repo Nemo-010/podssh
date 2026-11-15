@@ -42,7 +42,7 @@ pub const PIPE_NO_RESUME: FlagRow = row(None, "no-resume", None, FlagKind::Suppo
 /// `--exit NAME` of `ssh`, `cp`, `scp` and `sftp` (T-431); over a carrier
 /// too (T-614).
 pub const EXIT: FlagRow = row(None, "exit", Some("NAME"), FlagKind::Supported,
-    "start the road at NAME, a node of your net that lends its egress (podssh node --exit): it dials the destination, or the first hop of -J, from its own host, on each road between the two, or with --carrier ADDR on that stream alone; the host key is the destination's; NAME auto: the exit whose route of the net holds the first hop's address (T-432)", None);
+    "start the road at NAME, a node of your net that lends its egress (podssh node --exit): it dials the destination, or the first hop of -J, from its own host, on each road between the two, or with --carrier ADDR on that stream alone; the host key is the destination's; NAME auto: the exit whose route of the net holds the first hop's address", None);
 /// `--exit NAME` of `proxy`.
 pub const PROXY_EXIT: FlagRow = row(None, "exit", Some("NAME"), FlagKind::Supported,
     "carry the pipe from NAME, a node of your net that lends its egress (podssh node --exit), in place of the relay: it dials HOST PORT from its own host; with --carrier ADDR, NAME is the node at the other end of that stream; NAME auto: the exit whose route of the net holds HOST, an address", None);
@@ -178,9 +178,9 @@ pub const NODE_FLAGS: &[FlagRow] = &[
     row(None, "iroh-ephemeral", None, FlagKind::Supported,
         "the same as --ephemeral-key, by its earlier name; with --iroh, the ticket lasts as long as the run", None),
     row(None, "detach", None, FlagKind::Supported,
-        "go to the background once the node is online, as podssh itself (T-380); for a node that must outlive a logout, --install", None),
+        "go to the background once the node is online, as podssh itself; for a node that must outlive a logout, --install", None),
     row(None, "restart", None, FlagKind::Supported,
-        "with --detach: a small process in the background starts the run again whenever it ends, but after 64, 77 or 78 or a stop of that process; it never gives up (T-390)", None),
+        "with --detach: a small process in the background starts the run again whenever it ends, but after 64, 77 or 78 or a stop of that process; it never gives up", None),
     super::detach::DETACH_NAME,
     row(None, "install", None, FlagKind::Supported,
         "make this node a service of this user, which starts it again whenever it ends, as a probe finds one: a user unit of systemd, else a LaunchAgent, else a line of the crontab at boot and one each 5 minutes; on Windows a task at logon; no privilege is asked for, and no token is written into it", None),

@@ -91,8 +91,7 @@ pub(crate) async fn serve(
     if let Some(why) = &unasked {
         let _ = writeln!(
             err,
-            "podssh funnel: {why}; so the funnel takes the OpenTunnel road unasked, through {service}, by the \
-             operator's ruling Q76 ({}=no turns it off)",
+            "podssh funnel: {why}; so the funnel takes the OpenTunnel road unasked, through {service} ({}=no turns it off)",
             opentunnel::ENV
         );
     }

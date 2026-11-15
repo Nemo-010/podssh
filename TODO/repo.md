@@ -6546,7 +6546,7 @@ with `BOX_PTRACE=refused`; the gate's box job requires 22 properties (`.github/w
 **Milestone:** M10
 **Priority:** P1
 **Effort:** M
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -6580,6 +6580,20 @@ The planted drift (a variable read with no fact) fails the new test.
 ## Correction
 
 2026-11-15. `pod-manual` part 1 is in podcrates `v0.54.0`, which podssh took: the entry is open.
+
+## Done
+
+Partial, 2026-11-15. The measure: each string of `podssh man --json` (4,559) against `pod_manual::rules::faults` of
+podcrates `v0.54.0`, by a program of the session's own: 263 sentences over 25 words and 125 work ids, no fault of a
+character. Step one, the work ids: each entry id (`T-NNN`) and each ruling id (`QNN`) leaves the strings that a user
+reads, in the manual (`crates/podssh-cli/src/man/`), the help of the flags (`crates/podssh-cli/src/flags/`) and the
+lines of the roads (for example `the last fallback of the operator's ruling Q78` is `the last fallback`), never in a
+comment, by a scanner of the string literals of Rust; the tests that looked for an id in a line look for the line's
+other words. After it: 0 work ids, 259 long sentences. `cargo test -p podssh-cli --lib` 1168 passed, and the roads'
+tests that changed (`pinggy_road`, `ssh_tunnel_http`, `funnel_opentunnel`, `ssh_j_road`, `opentunnel_road`,
+`serveo_road`) passed; clippy and rustfmt clean. Next: the long sentences, then the model on `pod-manual` and its
+checks in the tests (`check::texts`, `check::variables`, `check::exit_codes`, `check::flags`, `check::generated`).
+
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
 

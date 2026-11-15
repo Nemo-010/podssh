@@ -316,7 +316,7 @@ fn with_the_pair_s_road_down_the_race_gives_the_session_to_the_tunnel_s_websocke
     lab.let_in();
     lab.pair_down();
     let (_node, lines, _) = lab.node("node.key", &["--localhost-run"], &[]);
-    assert!(lines.iter().any(|l| l.contains("nobody vouches for") && l.contains("Q78")), "{lines:#?}");
+    assert!(lines.iter().any(|l| l.contains("nobody vouches for")), "{lines:#?}");
     assert!(lines.iter().any(|l| l.contains("host key") && l.contains("unpinned")), "{lines:#?}");
     assert!(lines.iter().any(|l| l.contains("over the localhost.run road alone")), "{lines:#?}");
     let name = name_of(lines.last().unwrap());

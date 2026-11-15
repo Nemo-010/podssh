@@ -43,7 +43,7 @@ pub const HONOURED: &[Keyword] = &[
     kw("EscapeChar", "CHAR|^X|none", "the same as -e", "~"),
     kw("ExitOnForwardFailure", "yes|no", "yes: a forward of -R that the server refuses ends the run with 255", "yes"),
     kw("ForkAfterAuthentication", "yes|no", "yes is -f: the run goes to the background once its request went, with a \
-        command or -N (T-380)", "yes"),
+        command or -N", "yes"),
     kw("ForwardAgent", "yes|no|PATH|$NAME", "yes is -A: while the session lasts, the server may use the agent that \
         podssh logs in with; PATH, or the variable NAME, names another agent (default no)", "yes"),
     kw("ForwardX11", "yes|no", "yes is -X: the server may open X11 channels to DISPLAY (default no)", "yes"),

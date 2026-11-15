@@ -122,7 +122,7 @@ pub fn exit_codes() -> Vec<(Code, String)> {
              refuses UDP for a udp: TARGET. podssh each --interactive: the emergency stop cannot be armed. \
              podssh session start and serve: PODSSH_LISTEN is no, or no directory takes the session's \
              socket. podssh serve: no authorized key, or a key file or the host key that cannot be used, or no \
-             shell that runs (T-222).",
+             shell that runs.",
         ),
         row(
             podssh_ssh::EXIT_FAILURE,
@@ -250,7 +250,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec![podssh_relay::pair::part::file_name("NAME").unwrap_or_default()],
-            "The operator's part of a pair that podssh relay join NAME took by a code (T-086), in the cache: the \
+            "The operator's part of a pair that podssh relay join NAME took by a code, in the cache: the \
              relay, the pair's name, its connect token and its expiry, as JSON with mode 0600, replaced by the \
              next join under NAME. podssh operator, podssh ssh node:// and podssh relay status find it by NAME \
              where no pair is stored under it."
@@ -261,7 +261,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
                 podssh_relay::identity::file::node_file("NAME"),
                 podssh_relay::identity::file::CLIENT_FILE.to_string(),
             ],
-            "The keys of the ends of a road between two podssh ends (T-087), in the cache, the same on each \
+            "The keys of the ends of a road between two podssh ends, in the cache, the same on each \
              road: a node's under its NAME, and this user's as a client; --key and --client-key name other \
              files. Each holds the secret key in hex, has mode 0600, and is made when it is missing. podssh \
              refuses one that is a symbolic link, another user's, or that others can read, and never \
@@ -271,7 +271,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec![podssh_relay::pool::kept::FILE.to_string(), podssh_relay::pool::signed::ROLE_KEY_FILE.to_string()],
-            "The signed lists of relay deployments (T-346), in the cache: the newest list of each trusted key, its \
+            "The signed lists of relay deployments, in the cache: the newest list of each trusted key, its \
              exact text and its signature, as JSON with mode 0600, checked again at each read, so that a run keeps \
              the other deployments when the default's domain is gone; and the key with which podssh relay serve \
              --deployment signs its list, in hex with mode 0600, made when it is missing, unless --list-key names \
@@ -280,7 +280,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec!["grants-NAME/".to_string()],
-            "The grants used once that the node NAME let in (T-226), in the cache: a private directory with a \
+            "The grants used once that the node NAME let in, in the cache: a private directory with a \
              file of mode 0600 for each grant, made create-new and synced before the session comes in, named by \
              the end of the grant's window and the digest of what its issuer signed, and removed once that end \
              passed. A grant whose file is there is refused; a directory that cannot take a file refuses each \
@@ -290,7 +290,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         (
             vec![crate::net::reached::FILE.to_string()],
             format!(
-                "The road that last reached each node from this host (T-435), in the cache: by the node's label, the \
+                "The road that last reached each node from this host, in the cache: by the node's label, the \
                  road that answered first, its time and when, and why the last race that found no road ended so, as \
                  JSON with mode 0600, at most {} nodes, the oldest going first. Each race of podssh ssh, of the \
                  copies and of podssh ping to node://NAME writes it, and podssh status --net reads it. It holds no \
@@ -309,7 +309,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec![format!("{}/HOST-DIGEST/", crate::acme::store::DIR)],
-            "The state of podssh relay serve --acme NAME (T-447), in the cache, mode 0700, for each CA: HOST is the \
+            "The state of podssh relay serve --acme NAME, in the cache, mode 0700, for each CA: HOST is the \
              host of its directory, and DIGEST 8 hex digits of the SHA-256 of its URL. account.key, the account's \
              P-256 key, made once and never replaced; NAME.pem, the certificate's own P-256 key and its chain in one \
              file, replaced whole by a rename at each renewal, so that the key of one certificate is never read with \
@@ -319,7 +319,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec!["detached/".to_string()],
-            "The runs that --detach and -f sent into the background (T-380, T-392), in the cache, mode 0700: \
+            "The runs that --detach and -f sent into the background, in the cache, mode 0700: \
              VERB-PID.log, mode 0600, which takes the run's stdout and stderr once it is ready; past 1 MiB it is \
              renamed VERB-PID.log.1, which takes the lines written until the run writes the new one, so none is \
              lost. NAME.lock, which the run of the name NAME (or its supervisor \
@@ -327,13 +327,13 @@ pub fn files() -> Vec<(Vec<String>, String)> {
              holds: a second start of the name refuses while either is held, and podssh detached reads them. \
              NAME.json, the run's record: its pid, the pid of a supervisor's run, its words, its log and its \
              start. NAME.alive, whose time each run of --restart sets each 10 s, and which its supervisor reads \
-             (T-394). Each start of --detach or -f removes each of them older than 30 days whose run runs no \
-             more: no lock of its name is held, and the process of a log's PID is gone (T-397)."
+            . Each start of --detach or -f removes each of them older than 30 days whose run runs no \
+             more: no lock of its name is held, and the process of a log's PID is gone."
                 .to_string(),
         ),
         (
             vec!["node-NAME.env".to_string(), "ssh-NAME.env".to_string(), "node-NAME.env.lock".to_string()],
-            "The service of podssh node NAME --install, or of podssh ssh --install NAME (T-121, T-393), in the \
+            "The service of podssh node NAME --install, or of podssh ssh --install NAME, in the \
              cache: the private file of the variables that it reads (the file of --env-file), with no token; \
              FILE.lock beside it, which its run holds with its pid in it, so that a second start of the service \
              ends at once; and a LaunchAgent's log, node-NAME.log, made with mode 0600 before launchd opens it. \
@@ -343,7 +343,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec!["node-NAME.shares".to_string(), "node-NAME.shares.lock".to_string()],
-            "The shares of podssh node NAME (T-433), in the cache beside its key, or the file of podssh node --shares \
+            "The shares of podssh node NAME, in the cache beside its key, or the file of podssh node --shares \
              FILE: one name=HOST:PORT on each line, which the node reads again for each session, and which podssh \
              share changes under the lock of FILE.lock beside it, the file replaced whole. Mode 0600; the node \
              refuses one that others may change, as it names what the node dials."
@@ -371,7 +371,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec![crate::net::store::FILE.to_string()],
-            "The net's document (podssh net, T-429), in the cache, or the file of PODSSH_NET: one line of JSON, \
+            "The net's document (podssh net), in the cache, or the file of PODSSH_NET: one line of JSON, \
              then the owner's signature as ssh-keygen -Y sign writes it, replaced whole by each document taken. \
              A file of the user that others cannot change; a node of the net reads it again for each session."
                 .to_string(),

@@ -414,7 +414,7 @@ fn a_node_with_no_pair_and_the_derp_road_off_serves_the_road_unasked_and_keeps_i
         }
     }
     let said = seen.iter().find(|l| l.contains("unasked")).unwrap_or_else(|| panic!("{seen:#?}"));
-    assert!(said.contains("Q76") && said.contains("PODSSH_OPENTUNNEL=no"), "{said}");
+    assert!(said.contains("PODSSH_OPENTUNNEL=no"), "{said}");
     assert!(seen.iter().any(|l| l.contains(&format!("name {name}"))), "the same name: {seen:#?}");
     assert!(seen.iter().any(|l| l.contains("the tunnel kept in")), "{seen:#?}");
     assert_eq!(lab.stand_in.created.load(Ordering::SeqCst), 1, "no second tunnel");
