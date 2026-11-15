@@ -137,7 +137,7 @@ Dependabot's #119, #120, #122 and #123 of 2026-11-02 (Python 3.15 for the box's 
 image's digest, sha2 0.11.1 and simple-dns 0.13) are T-597. Dependabot's #149 and #150 of 2026-11-06
 (taiki-e/install-action 2.90.0 and aes 0.9.4) are T-691. Dependabot's #197 to #202 of 2026-11-12
 (trufflehog, the actions group, the minor and patch group, Arti's tor-rtcompat and tor-error 0.48,
-and num-bigint 0.5) are T-754.
+and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 
 | Issue | Subject | State | Entries |
 | --- | --- | --- | --- |
