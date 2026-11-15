@@ -4266,7 +4266,7 @@ repair: the guard moved from `tries` into `layer_alive::apply`, as rustfmt took 
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** partial
+**Status:** blocked
 
 ## Problem
 
@@ -4298,9 +4298,25 @@ osewa does not, but it loses about 12 s where a link that redials at once would 
 `feel-netem.yml` with `shapes=outage` and `roads=role`, from Actions: the first byte within 2 s of the return in
 each round, and T-781's tunnels of HTTP still make progress (`last-roads-live.yml`).
 
-## Done
+## Blocker
 
-Partial, 2026-11-15. Step 1's tool: `feel_outage.py` runs the role's road with `-v`, and writes each line of the
+PodUtils/podcrates (COORD-078, #262): pod-relay's open of a new link of the resumable layer must not take the pooled
+HTTP/2 connection that carries the link it replaces.
+
+## Correction
+
+2026-11-15. The Premise's cause is wrong. The stamped `-v` of `feel-netem.yml` run 43710388009 (#259) showed the first
+spare open 11.0 and 13.1 s into the cut, not after the doubled wait of T-579, and close each time as "the link spoke
+again", 0.5 and 12.9 s after the return. Reproduced here with the same cell in a private network namespace, the cut
+an iptables DROP of the role's TCP port: the spare passes `open_on`, the gate and the mint's turn at once (prints in a
+copy of pod-relay `v0.51.0`), and no new TCP socket is made for it (`ss`, `strace`). The spare takes its WebSocket over
+HTTP/2 from the process's pool (`h2_road::connect`, `ctx.h2_pool()`), on the very connection that carries the silent
+link, so it waits for that connection's retransmission. With `PODSSH_H2=no` the same cut came back 0.40 and 0.19 s
+after the return, the spare answering 0.30 and 0.11 s after it; with `PODSSH_H2` unset, 12.7 and 12.6 s. The Approach
+becomes: podcrates gives a new link of the layer a connection of its own (COORD-078); podssh takes the tag and runs
+the cell again.
+
+Step 1's tool, the same day: `feel_outage.py` runs the role's road with `-v`, and writes each line of the
 child's stderr after the seconds since the round's start, with "feel: the cut begins" and "feel: the link is back" on
 the same clock (`Stamped`). Here, with a stand-in cut that does nothing: the layer's lines ("opened resumable session",
 its heartbeat) and the two marks, stamped, in `role.outage.err`; `--self-test` passed. UNVERIFIED: the run from

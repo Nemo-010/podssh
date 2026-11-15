@@ -325,6 +325,7 @@ and num-bigint 0.5) are T-754.
 | #259 | `[gh action] requested`: T-789's outage cell of the role's road with `-v` | closed 2026-11-15: run 43710388009 read | T-789 |
 | #260 | COORD-077: podssh took podcrates v0.51.0 at 3f6a9fe (to podcrates) | open 2026-11-15: waits for podcrates to record the take of `v0.51.0` | T-684, T-787 |
 | #261 | `[gh action] requested`: the gate on `main` after the take of v0.51.0 | open 2026-11-15: waits for the owner's agent | T-684 |
+| #262 | COORD-078: pod-relay: a spare link of the resumable layer rides the pooled HTTP/2 connection of the silent link it replaces (to podcrates) | open 2026-11-15: asks pod-relay for a connection of its own for a new link | T-789 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,

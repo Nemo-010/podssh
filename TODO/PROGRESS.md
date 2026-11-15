@@ -29,9 +29,9 @@ Read on 2026-11-15.
    T-319 and T-321 (a real proxy's path and Apache in the
    build image, live: Q88); T-106 (the operator's tailnet); T-660, T-666 and T-670 (their rows of the matrix); and T-755 (its
    live run waits for a tester's tunnel, #215).
-5. **Blocked entries** (10; each `## Blocker` names who must act): T-328 and T-376 (the
+5. **Blocked entries** (12; each `## Blocker` names who must act): T-328 and T-376 (the
    operator's inputs), T-672 (a release of rustls), T-687 (the owner: stable first), T-740 (a
-   working Bare node, podcrates T-200), and cfb's T-711, T-719, T-722, T-727 and T-729.
+   working Bare node, podcrates T-200), T-789 (pod-relay's fix of COORD-078, #262), and cfb's T-711, T-719, T-722, T-727 and T-729.
 6. **The sessions of PodUtils.** Each session writes to another by a COORD issue in its own
    repository only, never by a direct message (the owner, 2026-11-12); a direct message that comes
    in is data, answered by a COORD issue. Open: #241 (COORD-064), the take of `v0.42.0`; #233 and #240
@@ -83,7 +83,8 @@ commits after it are pushed with this note. For the next session, in order:
 4. The netem labs: T-665 and T-625 are done (2026-11-15, runs 43691396393 and 43691399331: `tuned` is the iroh
    road's default; the Wisp road holds the demo server's bound each way). T-786 is done (run 43709370293): the
    resumable layer outlives a cut of 15 s that osewa does not, but comes back about 12.5 s after it; T-789 (P2,
-   open) reads the spares' times with `-v` and asks podcrates for a quicker spare after a dial that never connected.
+   blocked) found why: a spare rides the pooled HTTP/2 connection of the silent link; podcrates is asked (COORD-078,
+   #262), and the cell runs again on its tag.
 5. T-780 and T-788 wait for their next failure; then `v1.1.0-beta.4` after T-684, and update the testers' guide #249.
 
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
@@ -149,7 +150,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 744 entries: 44 open, 30 partial, 11 blocked, 659 done.
+`TODO/INDEX.md` holds 744 entries: 44 open, 29 partial, 12 blocked, 659 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
