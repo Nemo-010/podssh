@@ -26,8 +26,8 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_IROH_QUIC"],
-        "The QUIC settings of the iroh road, at each end, for a measurement of one arm against another: iroh \
-          (iroh's own, the default), tuned (rtt, window and streams), or words separated by commas: rtt (an \
+        "The QUIC settings of the iroh road, at each end, and for a measurement of one arm against another: \
+          tuned (rtt, window and streams; the default), iroh (iroh's own), or words separated by commas: rtt (an \
           initial round trip of 100 ms, for 333 ms), window (an initial window of 32 packets, for 10), streams \
           (receive windows of 8 MiB a stream and 16 MiB a connection), and one of cubic (iroh's own), bbr or \
           newreno. -v, and a node's lines, say an arm that is not iroh's own. A bad value is a configuration \

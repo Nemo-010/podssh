@@ -7,7 +7,7 @@ HTTP and of HTTP/2 to the relay.
 
 # T-162: The iroh road behind the cargo feature `iroh`
 
-**Source:** ROADMAP M6 (the iroh road); `docs/design.md:1196-1469`;
+**Source:** ROADMAP M6 (the iroh road); `docs/design.md:1196-1470`;
 `docs/decisions.md` (2026-10-08: iroh is a road that the user must select);
 GitHub #18 (Nemo-010, 2026-10-08: the iroh-ssh, zuko, GPU-Share and quic-ssh
 reports).
@@ -31,7 +31,7 @@ to 245 crates. In the target sandbox it runs only with no UDP transport (or a
 UDP bind after a probe), podssh's proxy in `proxy_url(...)`, the `Minimal`
 preset with no pkarr or DNS, peers dialled by ticket, and a home relay whose
 `/ping` passes the proxy. The operator accepted netlink sockets and extra
-connections for this road (`docs/design.md:1458-1461`). The sandbox refuses UDP
+connections for this road (`docs/design.md:1459-1462`). The sandbox refuses UDP
 (`docs/target-environment.md:23`). Measured on `3ee70dc`: `--iroh` is an
 unknown flag (exit 64), and `Cargo.lock` has no iroh crate.
 
@@ -142,7 +142,7 @@ that uses iroh's own proxy selection fails with `ALL_PROXY` set.
 # T-163: iroh tickets and node keys
 
 **Source:** ROADMAP M6 (dialled by ticket); `docs/design.md:1225` and
-`docs/design.md:1426-1427`; GitHub #18 (Nemo-010, 2026-10-08: zuko's ticket
+`docs/design.md:1427-1428`; GitHub #18 (Nemo-010, 2026-10-08: zuko's ticket
 handoff; iroh-ssh's persistent and ephemeral keys).
 **Category:** feature
 **Milestone:** M6
@@ -159,7 +159,7 @@ no form for a ticket, no place for the keys, and no rule for who may connect.
 
 Read: with the `Minimal` preset nothing is discovered, so a ticket gives the
 key and the relay URL (`docs/design.md:1225`). The key is the identity, and
-access is by an allowlist of keys or a relay token (`docs/design.md:1426-1427`).
+access is by an allowlist of keys or a relay token (`docs/design.md:1427-1428`).
 Read in the reports, not verified here: iroh-ssh warns when a server's key is
 ephemeral (`rustonbsd/iroh-ssh:src/ssh.rs`); zuko hands over a ticket out of
 band (`adonm/zuko:docs/protocol.md`). Read: `podssh ts` keeps its node key in
@@ -349,7 +349,7 @@ limit of iroh to each connection.
 Read: for a podssh node, the iroh road is first and the reverse road with the
 resumable layer is second, raced (`docs/design.md:48-53`). The first real
 sandbox can block what iroh needs, so the fallback is necessary
-(`docs/design.md:1463-1469`). The user must select iroh (`docs/decisions.md`,
+(`docs/design.md:1464-1470`). The user must select iroh (`docs/decisions.md`,
 2026-10-08). Each road has one attempt for each host, with a time limit
 (`docs/design.md:76-83`). The relay opener tries one host at a time
 (`PodUtils/podssh:crates/podssh-relay/src/open.rs:212-298`), and no code races two roads.
@@ -489,9 +489,9 @@ forward road has one default relay name in library code
 (`PodUtils/podssh:crates/podssh-relay/src/relay.rs:12-13`) and a seed pool
 (`PodUtils/podssh:crates/podssh-relay/src/pool.rs:25-34`); the same shape fits the iroh
 relays. n0's free relays are for development, with a rate limit that is not
-published (`docs/design.md:1443-1445`). At least three projects run the iroh
+published (`docs/design.md:1444-1446`). At least three projects run the iroh
 relay protocol on Workers and Durable Objects (read, not verified:
-`docs/design.md:1449-1451`). The URLs of n0's relays for iroh 1.x must be read
+`docs/design.md:1450-1452`). The URLs of n0's relays for iroh 1.x must be read
 in iroh's source at the pinned version.
 
 ## Approach
@@ -624,7 +624,7 @@ other build.
 # T-166: A roost: a podssh next to a standard sshd
 
 **Source:** `docs/design.md:52` (a standard sshd behind a podssh `roost`) and
-`docs/design.md:727-730`; the `roost` of pigeons (`docs/design.md:1453-1456`);
+`docs/design.md:727-730`; the `roost` of pigeons (`docs/design.md:1454-1457`);
 GitHub #18 (Nemo-010, 2026-10-08: iroh-ssh reaches sshd by node id, and
 refuses early when no sshd answers).
 **Category:** feature
@@ -2559,7 +2559,7 @@ The test target `mptcp` of `podssh-ws` moved to `pod-proxy` of PodUtils/podcrate
 # T-173: Resumption in the relay for a standard sshd
 
 **Source:** ROADMAP M8 (not now; look at it again after M6);
-`docs/design.md:731-748` (layer 3) and `docs/design.md:1585-1588` (question 1 of
+`docs/design.md:731-748` (layer 3) and `docs/design.md:1586-1589` (question 1 of
 section 8).
 **Category:** feature
 **Milestone:** M10
@@ -2582,7 +2582,7 @@ a resume token in the `101` response, and offset framing as a protocol
 version that the client selects. It is a project of the relay's operator, and
 it costs Durable Object time for the whole session (`docs/design.md:744-748`).
 The recommendation is "not now; look at it again after M6"
-(`docs/design.md:1585-1588`). The relay is in another repository.
+(`docs/design.md:1586-1589`). The relay is in another repository.
 
 ## Approach
 
@@ -9566,7 +9566,7 @@ the path and the mark from `pod-relay`, one source for both ends. The manual's i
 **Milestone:** M10
 **Priority:** P3
 **Effort:** S
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -9679,7 +9679,20 @@ ISP's queues, middleboxes or NAT.
 
 2026-11-15, the lab's first run (`iroh-ab.yml`, run 43670344623, `lab=far`) failed in its shaping step: `tc filter add dev lo parent 1: protocol ipv6 prio 1 u32 match ip6 protocol 17 0xff match ip6 dport 53 0xffff flowid 1:2` gave "We have an error talking to the kernel" (exit 2). Next: in `feel_netem.shape_udp`, the IPv6 filters on a prio of their own (u32 refuses two protocols at one prio of one parent), or IPv4 alone with the ends bound to IPv4; then run the A/B again.
 
-2026-11-15 (next session): `shape_udp` of `scripts/feel_netem.py` puts IPv4's filters at prio 1 and 2 and IPv6's at prio 3 and 4, so no prio holds two protocols. This host's kernel has neither netem nor the prio qdisc ("Specified qdisc kind is unknown"), so the fix is proved in Actions alone. UNVERIFIED: `iroh-ab.yml` with `lab=far` again (asked by `[gh action] requested`).
+2026-11-15 (next session): `shape_udp` of `scripts/feel_netem.py` puts IPv4's filters at prio 1 and 2 and IPv6's at prio 3 and 4, so no prio holds two protocols. This host's kernel has neither netem nor the prio qdisc ("Specified qdisc kind is unknown"), so the fix is proved in Actions alone.
+
+2026-11-15, done. The lab's A/B (`iroh-ab.yml` run 43691396393 at `714db79`, `lab=far`: UDP on the loopback shaped
+to 60 ms each way and 50 Mbit/s, the shape's filters at prio 1 to 4 accepted; asked by #256), 5 rounds of 4 MiB, each
+on the direct path: `iroh` down 1.72, 1.79, 1.88 MiB/s (min, p50, max), up 0.86, 0.88, 0.88; `tuned` down 1.89, 2.00,
+2.12, up 0.93, 0.95, 0.97. Each round of `tuned` beat each round of iroh's own, both ways (+12 % down and +8 % up at
+p50), so `DEFAULT` of `crates/podssh-iroh/src/tuning.rs` is `tuned` (Approach 2); `PODSSH_IROH_QUIC=iroh` keeps
+iroh's own. The run measured the arm whole, not each word apart: which of `rtt`, `window` and `streams` gives the
+gain is not known, and the lab shows no real ISP's queues, middleboxes or NAT. Checks: `cargo test -p podssh-iroh
+--lib` 36 passed (`the_default_arm_is_tuned_and_iroh_names_iroh_s_own`); `cargo test -p podssh-cli --features
+iroh-test --test iroh_road` 4 passed, 1 ignored; `cargo test -p podssh-cli --lib man::` 61 passed (the manual says
+the default); `python3 -I scripts/iroh-ab.py --self-test` ok; clippy and rustfmt clean; `sh scripts/plant-each.sh
+--here t665-quic-unset`: caught. The optional run on the operator's real path (Q38) stays possible if its secrets
+are set.
 
 # T-666: Bulk off the interactive stream: a copy beside a terminal on its own QUIC stream of the same iroh connection
 

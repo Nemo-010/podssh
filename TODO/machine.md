@@ -2323,6 +2323,13 @@ Partial, 2026-11-15 (main session).
 
 2026-11-15, the first run (`feel-netem.yml`, run 43670350662, `shapes=outage`, podssh of the gate's artifact of `a99de1d`, osewa v0.1.5): each cut held. OpenSSH: first byte 533.8 ms and caught up 612.4 ms after the return in round 1, 11,815.2 and 11,903.1 ms in round 2; podssh `--direct`: 11,884.1 and 11,982.4 ms, then 11,920.3 and 12,011.6 ms (TCP's backed-off retransmission timer). osewa-quic and osewa-ws failed: 6 bytes (READY) and no END within 180 s of the return, both rounds; whether osewa exec stops at the cut or the cell's `osewa exec feel -- sh -c` is wrong is not known yet. Next: read the cells' `.outage.err` in the run's artifact; then compare with podssh's resumable layer, which the netem matrix cannot run (a node).
 
+2026-11-15 (next session), the cells' `.outage.err` of run 43670350662, printed by the owner's agent (#256): OpenSSH's
+and podssh `--direct`'s are empty; osewa-quic's and osewa-ws's each hold, once for each round, "osewa exec: osewa:
+connection closed: no pong in 10s". So osewa ends its session during a cut longer than 10 s, on both carriers, and
+the cell's command is right: of the four, only the two over plain TCP outlived the cut of 15 s, each about 12 s after
+the return (TCP's backed-off retransmission). Next: podssh's resumable layer in the same cell, which needs a node
+behind the shaped link (the netem matrix runs none): a cell of its own, the cut on the node's leg alone.
+
 # T-787: A QUIC socket whose reads keep failing must not spin a core
 
 **Source:** the re-reading of osewa on 2026-11-15 (osewa v0.1.5, `24058a3`).

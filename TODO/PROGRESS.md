@@ -27,8 +27,7 @@ Read on 2026-11-15.
    waiting for its run in the build image (T-251): T-107, T-108, T-109, T-110, T-112, T-114 and
    T-222; the migration, T-684; the release of M10, T-446; T-738 (podcrates' entry 528, COORD-053);
    T-319 and T-321 (a real proxy's path and Apache in the
-   build image, live: Q88); T-106 (the operator's tailnet); T-625 and T-665 (the throughput host's
-   secrets, "Operator actions"); T-660, T-666 and T-670 (their rows of the matrix); and T-755 (its
+   build image, live: Q88); T-106 (the operator's tailnet); T-660, T-666 and T-670 (their rows of the matrix); and T-755 (its
    live run waits for a tester's tunnel, #215).
 5. **Blocked entries** (10; each `## Blocker` names who must act): T-328 and T-376 (the
    operator's inputs), T-672 (a release of rustls), T-687 (the owner: stable first), T-740 (a
@@ -80,9 +79,9 @@ commits after it are pushed with this note. For the next session, in order:
    COORD-076). Step 2 (pod-egress) stays frozen; take `v0.51.0` at once when it is tagged.
 3. COORD-075 (#253, T-787, blocked): when podcrates fixes `pod-quic`, take the tag and un-ignore
    `crates/podssh-relay/tests/quic_socket_fails.rs`.
-4. The netem labs (T-665, T-625, T-786), each partial with its next step in its entry: T-665's IPv6 tc filter
-   refused (run 43670344623); T-625's lab rates are above wisp-python's flag (run 43670347317); T-786's osewa
-   cells got no END (run 43670350662).
+4. The netem labs: T-665 and T-625 are done (2026-11-15, runs 43691396393 and 43691399331: `tuned` is the iroh
+   road's default; the Wisp road holds the demo server's bound each way). T-786 is partial: osewa's cells got no
+   END in run 43670350662, as osewa closed each session at the cut ("no pong in 10s"); its entry names the step.
 5. T-780 and T-788 wait for their next failure; then `v1.1.0-beta.4` after T-684, and update the testers' guide #249.
 
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
@@ -112,7 +111,7 @@ item whenever it appears.
    `v0.42.0` names their services; T-575, T-532 and T-622 (done); ntfy and the trackers as
    meeting points are done on podcrates `v0.47.0`, and Nostr's (done, on `v0.49.0`); T-777 (done, 2026-11-14). Each with its Prove, one entry at a time.
 8. **What waits on others, not tonight:** T-113's real sandbox (the operator's agents run
-   `sh scripts/m5-in-sandbox.sh`), T-625 and T-665 (the throughput host's secrets), T-106
+   `sh scripts/m5-in-sandbox.sh`), T-106
    (the operator's tailnet), T-755 (a tester's tunnel), T-319 and T-321's live runs and the build
    image (Q88), T-660, T-666 and T-670's runs of the matrix.
 9. **No beta tonight** (the operator, 2026-11-11): the next beta waits until podssh is nearly
@@ -148,7 +147,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 743 entries: 44 open, 32 partial, 12 blocked, 655 done.
+`TODO/INDEX.md` holds 743 entries: 44 open, 30 partial, 12 blocked, 657 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
@@ -166,7 +165,7 @@ operator interrupts it.
    and T-222, the remap their `## Done` lists and the run in the build image (the release check); T-738,
    podcrates' entry 528 (COORD-053); T-319 and T-321, a real
    proxy's path, Apache in the build image and the live runs (Q88); T-106, the operator's tailnet;
-   T-625 and T-665, the throughput host's secrets; T-660, T-666 and T-670, their runs of the matrix;
+   T-660, T-666 and T-670, their runs of the matrix;
    T-755, a tester's tunnel; T-684, each next tag; T-446, the end of the migration.
 3. The migration's takes (T-684), as the podcrates session hands each crate over (Rule Q3 of
    `docs/decisions.md`: from the import, podssh changes that code for fixes only; after podssh takes
@@ -185,7 +184,7 @@ operator interrupts it.
    M10. Between entries: the `none` entries, the highest priority first, but for the testers'.
    Dependabot's #123 waits for an iroh-dns that takes simple-dns 0.13.
 5. The entries that the studies of osewa filed (Q99, `docs/research/osewa.md`) go ahead of the
-   rest of M10, in this order: T-660, T-670, T-665 and T-666 (each waits for a run that its
+   rest of M10, in this order: T-660, T-670 and T-666 (each waits for a run that its
    `## Done` names), their follow-up and what the netem run found (done); then the open
    entries of GitHub #127 to #148 by their priority, beside M10 (Q85, Q100).
 6. podssh's own order by priority beside M10's order below. The GSRN road is done (2026-11-15,
@@ -239,7 +238,7 @@ parts are named so that the open ones read in their place):
    done, serv00's done); and the roads over UDP (done: MASQUE over HTTP/3, Hysteria 2's and TUIC's). These are features of a tester's
    report and of the sweep, done after the defects (Q85). Then what the archive of forward
    carriers (`docs/research/forward-carriers.md`) filed: the rates of `ppng.io`'s road and of the
-   Wisp demo server through podssh (T-625), TURN with RFC 6062 for a server that the user runs
+   Wisp demo server through podssh (done), TURN with RFC 6062 for a server that the user runs
    (done), the research of smee.io, of three hosted tunnels and of I2P, Nym and cjdns (done; it
    filed smee.io as a last fallback, done, hostc's, done, and Sandhole's public server as a host
    of the localhost.run road's module, done), and the HTTP road's one-POST form (done).
@@ -534,8 +533,8 @@ before `v1.0.0`.
 
 One blocks entries, none a session:
 
-- **The secrets of the throughput host** (2026-11-12): no longer needed (2026-11-15, the operator's ruling): T-625,
-  T-665 and T-463 measure in a netem lab on Actions. Setting `PODSSH_THROUGHPUT_SSH` and `PODSSH_THROUGHPUT_KEY`
+- **The secrets of the throughput host** (2026-11-12): no longer needed (2026-11-15, the operator's ruling): T-625
+  and T-665 measured in a netem lab on Actions (done), and T-463 measures there too. Setting `PODSSH_THROUGHPUT_SSH` and `PODSSH_THROUGHPUT_KEY`
   adds an optional run on the real path of Q38.
 
 - At any time: require the status `all` of the workflow `build` for `main`, if the operator wants a

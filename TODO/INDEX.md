@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**743 entries: 44 open, 32 partial, 12 blocked, 655 done.**
+**743 entries: 44 open, 30 partial, 12 blocked, 657 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 3 | 4 | 3 | 75 | 85 |
 | P2 | 7 | 20 | 2 | 279 | 308 |
-| P3 | 34 | 8 | 7 | 300 | 349 |
-| **All** | 44 | 32 | 12 | 655 | 743 |
+| P3 | 34 | 6 | 7 | 302 | 349 |
+| **All** | 44 | 30 | 12 | 657 | 743 |
 
 ## Entries
 
@@ -664,7 +664,7 @@ repository and CI).
 | [T-622](roads.md) | P3 | M | M10 | feature | done | The HTTP road's one-POST form: one request carries both ways, where the way streams a body |
 | [T-623](mesh.md) | P3 | S | M10 | research | done | smee.io, a POST in and server-sent events out, as a carrier where a proxy refuses the upgrade: the research |
 | [T-624](mesh.md) | P3 | S | M10 | research | done | hostc, Tunnelmole and Sandhole's public server as last fallbacks of the reverse road: the research |
-| [T-625](mesh.md) | P3 | S | M10 | measurement | partial | The rates of the Piping Server road through `ppng.io` and of the Wisp demo server, measured through podssh |
+| [T-625](mesh.md) | P3 | S | M10 | measurement | done | The rates of the Piping Server road through `ppng.io` and of the Wisp demo server, measured through podssh |
 | [T-626](mesh.md) | P3 | S | M10 | research | done | I2P, Nym and cjdns: whether an overlay of peer addresses carries a podssh pair: the research |
 | [T-627](robustness.md) | P1 | S | M10 | defect | partial | The relay role's test of a resume by the next token of one leg timed out once in the relay crate's suite |
 | [T-628](mesh.md) | P1 | S | M10 | defect | done | The relay role's refusal of a target names the address that its name resolved to, so a holder of a token maps the role's network |
@@ -695,7 +695,7 @@ repository and CI).
 | [T-662](ssh.md) | P2 | S | M10 | feature | done | SSH windows that grow to the path where nobody types, to a cap of each road |
 | [T-663](resume.md) | P2 | S | M10 | feature | done | Liveness in round trips: a spare link after the larger of three round trips and 1 s, and a check when the host wakes |
 | [T-664](ssh.md) | P3 | M | M10 | feature | done | A faster cold connect: TLS tickets kept across runs, a key's signature sent with no query first, and fewer waits before the first command |
-| [T-665](roads.md) | P3 | S | M10 | measurement | partial | QUIC on the iroh road, tuned and measured on a wide-area path |
+| [T-665](roads.md) | P3 | S | M10 | measurement | done | QUIC on the iroh road, tuned and measured on a wide-area path |
 | [T-666](roads.md) | P3 | M | M10 | feature | partial | Bulk off the interactive stream: a copy beside a terminal on its own QUIC stream of the same iroh connection |
 | [T-667](mesh.md) | P3 | L | M10 | feature | done | QUIC on UDP 443 to podssh's relay role, raced with its TCP roads where a probe found that UDP passes |
 | [T-668](reverse.md) | P3 | L | M10 | feature | done | A node that keeps its sessions across its own upgrade: the new binary takes the sockets and the layer's state |

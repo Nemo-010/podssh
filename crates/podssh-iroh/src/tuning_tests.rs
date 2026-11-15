@@ -17,8 +17,11 @@ fn first_window(tuning: Tuning) -> u64 {
 }
 
 #[test]
-fn the_default_arm_is_iroh_s_own_until_the_a_b_run() {
-    for value in [None, Some(""), Some("  "), Some("iroh"), Some("IROH")] {
+fn the_default_arm_is_tuned_and_iroh_names_iroh_s_own() {
+    for value in [None, Some(""), Some("  ")] {
+        assert_eq!(Tuning::from_value(value), Ok(Tuning::TUNED), "{value:?}");
+    }
+    for value in [Some("iroh"), Some("IROH")] {
         assert_eq!(Tuning::from_value(value), Ok(Tuning::IROH), "{value:?}");
     }
     assert_eq!(Tuning::IROH.to_string(), "iroh's own settings");

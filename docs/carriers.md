@@ -232,7 +232,13 @@ The candidates, ranked:
    `wss://wisp.mercurywork.shop/` "is available primarily for demo and
    testing purposes", runs wisp-server-python with a "500kB/s bandwidth
    limit per IP", and resolves names through 1.1.1.3, a resolver that
-   blocks malware and adult names [N2]. wisp-server-python refuses
+   blocks malware and adult names [N2]. Through podssh, against
+   wisp-python 0.11.0 with that bound (`--bandwidth 500 --window 1`) behind a
+   netem link of 60 ms each way and 50 Mbit/s (2026-11-15, `wisp-rate.yml`
+   run 43691399331, T-625): open and login 1.0 to 1.3 s; 4 MiB down at 0.495
+   to 0.530 MiB/s and up at 0.496 to 0.508 MiB/s, three runs: the bound,
+   each way. wisp-python bounds a mean over a fixed window, 60 s unless
+   asked, so a session after a quiet start can burst above it once. wisp-server-python refuses
    loopback and private addresses and filters no port by default [N3], so
    port 22 passes unless the deployment adds a rule (Inferred); whether it
    does was not read. The host is behind Cloudflare, with no category

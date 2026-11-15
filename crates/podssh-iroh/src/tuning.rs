@@ -48,8 +48,10 @@ pub const PACKET: u64 = 1200;
 pub const STREAM_WINDOW: u64 = 8 << 20;
 pub const CONNECTION_WINDOW: u64 = 16 << 20;
 
-/// The arm until the A/B run shows what helps (T-665): iroh's own.
-pub const DEFAULT: &str = "iroh";
+/// The arm when none is named: `tuned`, which beat iroh's own in each
+/// round of the A/B run on a shaped link of 60 ms and 50 Mbit/s each way
+/// (T-665), down and up alike.
+pub const DEFAULT: &str = "tuned";
 
 /// The congestion controller.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -261,4 +261,4 @@
 253 issue open
 254 issue closed
 255 issue closed
-256 issue open
+256 issue closed

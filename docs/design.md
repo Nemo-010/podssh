@@ -1380,16 +1380,17 @@ QUIC's floor, which osewa takes for Tailscale's 1280, then MTU discovery.
 iroh's UDP sockets ask for 7 MiB of buffer each way by `SO_RCVBUF` and
 `SO_SNDBUF` (netwatch 0.19.3), never the `FORCE` forms; the kernel grants up to
 its `rmem_max` and `wmem_max`, which an A/B run keeps. `PODSSH_IROH_QUIC`
-chooses the arm at each end (`podssh-iroh`'s `tuning.rs`): `iroh`, the
-default; `tuned`, osewa's where iroh lets podssh set them (a first round trip
+chooses the arm at each end (`podssh-iroh`'s `tuning.rs`): `iroh`, iroh's
+own; `tuned`, the default, osewa's where iroh lets podssh set them (a first round trip
 of 100 ms, a first window of 32 packets, receive windows of 8 MiB a stream,
 above the resumable layer's 4 MiB in flight, and 16 MiB a connection); or its
 words, `rtt`, `window`, `streams`, and one of `cubic`, `bbr` and `newreno`. A
 bad value is refused (78), and a value that iroh's types cannot hold keeps
 iroh's own and says so. `scripts/iroh-ab.py` measures the arms by T-157's
 method on a direct path between GitHub Actions and the operator's server of
-`PODSSH_THROUGHPUT_SSH` (`.github/workflows/iroh-ab.yml`, by hand); the default
-changes only with what that run shows (T-665).
+`PODSSH_THROUGHPUT_SSH` (`.github/workflows/iroh-ab.yml`, by hand), or in its
+netem lab (`lab=far`). The lab's run of 2026-11-15 chose `tuned` as the default:
+each of its rounds beat each of iroh's own, down and up (T-665).
 
 **Drafted (T-666, 2026-11-04):** the sessions of one process to one node share
 one connection. A second SSH connection of a process to a node that the iroh
