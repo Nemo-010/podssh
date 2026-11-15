@@ -22,5 +22,5 @@ pub const MCP_FLAGS: &[FlagRow] = &[
     row(None, "direct", None, FlagKind::Supported,
         "each session over TCP with no relay, as podssh ssh --direct", None),
     row(None, "client-config", Some("CLIENT"), FlagKind::Supported,
-        "print the entry that CLIENT (claude-desktop, cursor, vscode or gemini) reads to start this server with the other flags typed, checked as a run checks them, with this binary's absolute path and each path made absolute; it starts no server and writes no file", None),
+        "print the entry that CLIENT (claude-desktop, cursor, vscode or gemini) reads to start this server with the other flags typed; it is checked as a run checks them, with this binary's absolute path and each path made absolute; it starts no server and writes no file", None),
 ];

@@ -46,7 +46,7 @@ pub(super) const DOCTOR: &str = "In a build with the feature gsr, the section gs
 pub(super) const VARIABLES: &[(&[&str], &str)] = &[(
     &["PODSSH_GSR_SECRET_FILE"],
     "The file of the GSRN road's shared secret, as --gsr-secret-file, which wins: podssh node --gsr \
-      serves the road with it, podssh ssh node://NAME races the road last with it, and podssh doctor asks \
+      serves the road with it; podssh ssh node://NAME races the road last with it; and podssh doctor asks \
       the relay at its shard (see FILES). Unset or empty: no secret. A build with the feature gsr; another \
       build passes it over.",
 )];
@@ -58,8 +58,8 @@ pub(super) fn file() -> (Vec<String>, String) {
         "The shared secret of the GSRN road: its first line, without the line end, as gs-netcat -k reads a \
          key file; any later line must be blank. At most 32 bytes, the relay's limit. podssh reads it only \
          as a regular file of yours that others cannot read (on Windows, as its access list says); else, and \
-         for a file with no secret, more than one, or a control character, the run is refused (78), in words \
-         that never hold the secret. It never goes to argv, a line or the relay: the relay sees the address \
+         for a file with no secret, more than one, or a control character, the run is refused (78). Its words \
+         never hold the secret. It never goes to argv, a line or the relay: the relay sees the address \
          and the shard that it gives. podssh never writes it."
             .to_string(),
     )

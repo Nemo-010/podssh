@@ -165,8 +165,8 @@ pub fn file() -> (Vec<String>, String) {
     (
         vec![podssh_ssh::server::host_key::FILE.to_string()],
         "The host key of podssh serve, in the cache, when no --host-key names one: an OpenSSH private key \
-         (Ed25519) that the first start makes, mode 0600 (on Windows, the access list of the cache), and \
-         that each later start reads; podssh never writes over it. Remove it to make a new host key, which \
+         (Ed25519) that the first start makes, mode 0600 (on Windows, the access list of the cache); \
+         each later start reads it; podssh never writes over it. Remove it to make a new host key, which \
          each client then sees as a changed one."
             .to_string(),
     )

@@ -7,13 +7,13 @@
 pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_IAP_TOKEN_FILE"],
-        "The file of the token of an iap:// destination, which must be private (chmod 600): a token that \
-      gcloud auth print-access-token printed, read again for each link of the session, so that a token \
-      written there later serves a new link; or the JSON key of a service account (gcloud iam \
-      service-accounts keys create), whose token podssh asks Google's token endpoint, oauth2.googleapis.com, \
-      for, with a JWT that it signs (RS256), and renews before its end; or the credentials of gcloud auth \
-      application-default login. The token goes in the upgrade's Authorization header alone; podssh never \
-      prints it. A file that cannot be read, or holds no token, is a configuration error (78).",
+        "The file of the token of an iap:// destination, which must be private (chmod 600): a token that gcloud auth \
+      print-access-token printed, read again for each link of the session; this way, a token written there later serves \
+      a new link; or the JSON key of a service account (gcloud iam service-accounts keys create). For it podssh asks \
+      Google's token endpoint, oauth2.googleapis.com, for a token, with a JWT that it signs (RS256), and renews the \
+      token before its end; or the credentials of gcloud auth application-default login. The token goes in the \
+      upgrade's Authorization header alone; podssh never prints it. A file that cannot be read, or holds no token, is \
+      a configuration error (78).",
     ),
     (
         &["GOOGLE_APPLICATION_CREDENTIALS"],
@@ -25,21 +25,21 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
         "The file of the credential of AWS for an eice:// destination, which must be private: the JSON that \
       aws configure export-credentials writes in its process format, or a shared credentials file, whose \
       profile is AWS_PROFILE's, else default. podssh signs a new URL with it for each tunnel, good for 60 s, as \
-      aws-cli signs one; the URL carries the key's id, the signature and a temporary key's token, the one \
+      aws-cli signs one; the URL carries the key's id, the signature and a temporary key's token; it is the one \
       URL of podssh that holds a credential, and podssh never prints it.",
     ),
     (
         &["AWS_SHARED_CREDENTIALS_FILE", "AWS_PROFILE"],
         "AWS's own variables: the shared credentials file, read for eice:// when PODSSH_EICE_CREDENTIALS_FILE \
-      is not set (else ~/.aws/credentials, when it is there), and the profile of either file (default when \
+      is not set (else ~/.aws/credentials, when it is there); and the profile of either file (default when \
       it is not set).",
     ),
     (
         &["PODSSH_WARP_ACCEPT_TERMS"],
         "yes accepts Cloudflare's Terms (https://www.cloudflare.com/application/terms/), which a device of \
       WARP needs: with it, the first warp:// destination registers one device with Cloudflare's API, \
-      api.cloudflareclient.com, else api.devices.cloudflare.com (PODSSH_WARP_API first), through the proxy, \
-      and keeps its record in the cache (see FILES); later runs \
+      api.cloudflareclient.com, else api.devices.cloudflare.com (PODSSH_WARP_API first), through the proxy; \
+      it keeps its record in the cache (see FILES); later runs \
       read the record and register nothing. Unset, no or empty, a run with no record refuses (78) and names \
       it. Another word is a configuration error (78). A build with the feature warp.",
     ),
@@ -53,12 +53,12 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
         &["PODSSH_WARP_ENDPOINT"],
         "WARP's endpoint of HTTP/2 as ADDRESS:PORT, in place of 162.159.198.2:443; the device's pinned key \
       stays its own. The run tries it alone, not the endpoints of the device's record (the one that last \
-      opened, 162.159.198.2:443, then the peers that WARP's API gave), and the record keeps those as they \
+      opened, 162.159.198.2:443, then the peers that WARP's API gave). The record keeps those as they \
       were. Another value is a configuration error (78).",
     ),
     (
         &["PODSSH_WARP_API"],
-        "Another route to WARP's API, as https://HOST[:PORT] (a path of / at most, no user or query), tried \
+        "Another route to WARP's API, as https://HOST[:PORT] (a path of / at most, no user or query). It is tried \
       before api.cloudflareclient.com and api.devices.cloudflare.com, for the registration and for each read of \
       the device's record again: a compatible API, or a name that this host can reach. A route that is not \
       reached gives way to the next; an answer, a refusal too, is the API's. The device's record keeps the \
@@ -75,7 +75,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_WARP_H3"],
         "When WARP's road goes over HTTP/3, connect-ip with each IP packet in a QUIC datagram on UDP port \
-      443, where a probe of UDP (one QUIC packet, answered within 300 ms) found that UDP passes: auto, the \
+      443; where a probe of UDP (one QUIC packet, answered within 300 ms) found that UDP passes: auto, the \
       default, after the road over HTTP/2 failed to reach the endpoint (not after a refused device); first, \
       before it; no, never. UDP goes through no proxy. Another word is a configuration error (78). A build \
       with the feature warp.",
@@ -83,8 +83,8 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_WARP_SERVER", "PODSSH_WARP_SERVER_PIN"],
         "A server of connect-ip over HTTP/3 (RFC 9484) that the user runs, as https://HOST[:PORT][/PATH], in \
-      place of WARP's endpoint: a warp:// destination then needs no device, the server assigns the address \
-      inside, and its certificate is checked by the roots of the trust, or pinned by PODSSH_WARP_SERVER_PIN, \
+      place of WARP's endpoint: a warp:// destination then needs no device, and the server assigns the address \
+      inside. Its certificate is checked by the roots of the trust, or pinned by PODSSH_WARP_SERVER_PIN, \
       the SHA-256 of its DER in 64 hex digits (colons allowed). The probe of UDP waits 1.5 s. Another value \
       is a configuration error (78). A build with the feature warp.",
     ),
@@ -97,17 +97,17 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_TOR_BRIDGES"],
-        "The file of the bridges of a tor:// destination, a bridge line a line as Tor gives them out, with or \
-      without the word Bridge of a torrc; # begins a comment. Arti's first hops are then these bridges alone, \
-      and PODSSH_TOR_PORTS does not hold. A line is a plain bridge, ADDRESS:PORT FINGERPRINT, or one of \
-      meek_lite or webtunnel, which podssh speaks itself, in this process, through the proxy: meek_lite sends \
-      Tor's bytes in POSTs to its url=, TLS to its front= with the front's name and Host the URL's host; \
-      WebTunnel upgrades at its url=, then carries raw bytes. Each TLS is checked with podssh's trust \
-      (--ca-file, SSL_CERT_FILE, CaFile, else the system's), and WebTunnel's cert= after that check, never in \
-      its place. Arti asks each line for the bridge's fingerprint, so a line with none is refused, the \
-      meek_lite line of Tor Browser among them; so is another transport (obfs4, snowflake), which would be \
-      another program. A line that does not read, or a file that cannot be read, holds no bridge or is longer \
-      than 64 KiB, is a configuration error (78). A build with the feature tor.",
+        "The file of the bridges of a tor:// destination, a bridge line a line as Tor gives them out; with or without \
+      the word Bridge of a torrc; # begins a comment. Arti's first hops are then these bridges alone, and \
+      PODSSH_TOR_PORTS does not hold. A line is a plain bridge, ADDRESS:PORT FINGERPRINT, or one of meek_lite or \
+      webtunnel, which podssh speaks itself, in this process, through the proxy: meek_lite sends Tor's bytes in POSTs \
+      to its url=, TLS to its front= with the front's name and Host the URL's host; WebTunnel upgrades at its url=, \
+      then carries raw bytes. Each TLS is checked with podssh's trust (--ca-file, SSL_CERT_FILE, CaFile, else the \
+      system's), and WebTunnel's cert= after that check, never in its place. Arti asks each line for the bridge's \
+      fingerprint, so a line with none is refused, the meek_lite line of Tor Browser among them; so is another \
+      transport (obfs4, snowflake), which would be another program. These are a configuration error (78): a line that \
+      does not read, or a file that cannot be read, holds no bridge or is longer than 64 KiB. A build with the feature \
+      tor.",
     ),
     (
         &["PODSSH_TOR_NETWORK"],

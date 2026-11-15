@@ -108,7 +108,7 @@ pub fn chisel_file() -> (Vec<String>, String) {
     (
         vec!["the file of --chisel-auth-file".to_string()],
         "What the chisel server of --chisel takes and shows: auth USER:PASSWORD, the user and password of chisel's \
-         auth option (the password may hold colons), and fingerprint BASE64, the SHA-256 of the server's key in \
+         auth option (the password may hold colons); and fingerprint BASE64, the SHA-256 of the server's key in \
          base64, 44 characters, as chisel server prints it; each once, either or both. # starts a comment. podssh \
          reads it only as a regular file of yours that others cannot read (on Windows, as its access list says), as a \
          pair file; else, and for a line that cannot be read, the run is refused (78), by the line's number and never \

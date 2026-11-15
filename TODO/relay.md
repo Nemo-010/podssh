@@ -284,7 +284,7 @@ nothing, and a host that does not start TLS, each cost the 20 s limit before the
 4. Print one note for each moved host: "trying HOST last: it failed N s ago (REASON)".
 5. Ignore a record with a time in the future (a clock that moved).
 6. `doctor` and `status` (T-051) show the records. State the window in THE RELAY section of the
-   manual (`crates/podssh-cli/src/man/facts.rs:330-343`) and in `docs/relay.md:107-152`.
+   manual (`crates/podssh-cli/src/man/facts.rs:331-344`) and in `docs/relay.md:107-152`.
 7. This is retry policy across runs. T-220 shortens the wait inside one run; the two work
    together.
 
@@ -796,7 +796,7 @@ listener" (lines 86-88 at `22c3b88`), and the ruling on Q10 allows more than one
 7. Add the flag to `SSH_FLAGS`, `PROXY_FLAGS` and `DOCTOR_FLAGS`
    (`crates/podssh-cli/src/flags.rs:116-292`, 323-343) and to `ONCE`
    (`crates/podssh-cli/src/ssh/args.rs:206-255`); the variable to VARIABLES and the modes to THE
-   RELAY (`crates/podssh-cli/src/man/facts.rs:46-272`, 170-183); both to `docs/relay.md:107-152`.
+   RELAY (`crates/podssh-cli/src/man/facts.rs:46-273`, 170-183); both to `docs/relay.md:107-152`.
 8. T-059 orders the hosts across runs; this entry shortens the wait in one run. GitHub #25 asks
    for a circuit breaker: retry policy, not overlap.
 
@@ -918,8 +918,8 @@ the module comment repeats it (`crates/podssh-relay/src/cache.rs`, lines 4-8 at 
 5. `doctor` names the directory in use and the variable that chose it; `status` (T-051) shows
    it; the settings file of T-048 can set it. The session log (T-056) and the failure records
    (T-059) use the same chain.
-6. Change in the same commit: VARIABLES and FILES (`crates/podssh-cli/src/man/facts.rs:212-226`,
-   `crates/podssh-cli/src/man/data.rs:172-180`), the test of lines 365-377 at `22c3b88`, the comment
+6. Change in the same commit: VARIABLES and FILES (`crates/podssh-cli/src/man/facts.rs:213-227`,
+   `crates/podssh-cli/src/man/data.rs:169-177`), the test of lines 365-377 at `22c3b88`, the comment
    of `cache.rs`, and the `doctor`
    notes (`crates/podssh-cli/src/man/notes.rs:257-348`).
 

@@ -28,7 +28,7 @@ pub const RELAY_FLAGS: &[FlagRow] = &[
         "join: this operator's key file, whose key goes to the node's host (default: client.key in the cache)", None),
     // The stored pair renewed, on podssh's relay role (T-592).
     row(None, "renew", None, FlagKind::Supported,
-        "pair: renew the pair stored under NAME at its relay, 72 h from now, its tokens the same, so that each operator's file holds; podssh relay serve renews, and a relay that renews none is said so (69), with the next pair in the last 24 h as the way", None),
+        "pair: renew the pair stored under NAME at its relay, 72 h from now, its tokens the same, so that each operator's file holds; podssh relay serve renews; a relay that renews none is said so (69), with the next pair in the last 24 h as the way", None),
     // The owner's halt of a pair, on podssh's relay role (T-647).
     row(None, "reason", Some("TEXT"), FlagKind::Supported,
         "halt: the words that each operator of the halted pair hears in the relay's refusal, and that relay status shows: one line of 200 bytes at most", None),
@@ -62,7 +62,7 @@ pub const RELAY_FLAGS: &[FlagRow] = &[
     row(None, "port-file", Some("FILE"), FlagKind::Supported,
         "serve: write the port that it listens on to FILE, for --listen ADDR:0", None),
     row(None, "mint", Some("WHO"), FlagKind::Supported,
-        "serve: who may mint a token at /v1/mint and make a pair at /v1/pair: anyone; keys:FILE, the keys of FILE (the format of podssh node --allow), each by its signature of the relay's challenge, FILE a file read again for each request or an https:// URL whose list is fetched again each --list-ttl; net, the members of the net that this host holds, by the same signature, as its policy lets them reach relay:*; net,keys:FILE, both; or nobody (the default: 503, and tokens are given another way)", None),
+        "serve: who may mint a token at /v1/mint and make a pair at /v1/pair: anyone; keys:FILE, the keys of FILE (the format of podssh node --allow), each by its signature of the relay's challenge; FILE is a file read again for each request, or an https:// URL whose list is fetched again each --list-ttl; net, the members of the net that this host holds, by the same signature, as its policy lets them reach relay:*; net,keys:FILE, both; or nobody (the default: 503, and tokens are given another way)", None),
     row(None, "allow-private", None, FlagKind::Supported,
         "serve: dial private, loopback and other non-public addresses too (by default only public targets, as the default relay)", None),
     // The private targets of a list, between the two (T-635).
@@ -85,12 +85,12 @@ pub const RELAY_FLAGS: &[FlagRow] = &[
     row(None, "max-connections", Some("N"), FlagKind::Supported,
         "serve: keep at most N connections open in all, 0 for no cap (the default); published as max_connections", None),
     row(None, "pairs", Some("FILE"), FlagKind::Supported,
-        "serve: keep the pairs of the reverse road in FILE, of mode 0600, so that they outlive a restart (the digests of their tokens, never a token)", None),
+        "serve: keep the pairs of the reverse road in FILE, of mode 0600; this way, they outlive a restart (the digests of their tokens, never a token)", None),
     // What each key carried, and its budget for a day (T-636).
     row(None, "quota", Some("MIB"), FlagKind::Supported,
-        "serve --mint keys:FILE or net: each key's budget for a day (UTC), in MiB, both ways together, from 1 to 16777216: each session of the forward road is charged to its token's key at its end, and once the key spent it, a session gets 403 before its target is dialed, until the next day", None),
+        "serve --mint keys:FILE or net: each key's budget for a day (UTC), in MiB, both ways together, from 1 to 16777216: each session of the forward road is charged to its token's key at its end; once the key spent it, a session gets 403 before its target is dialed, until the next day", None),
     row(None, "usage", Some("FILE"), FlagKind::Supported,
-        "serve --mint keys:FILE or net: keep each key's totals of the day and the day before in FILE, of mode 0600, written each 2 s while a count moved, so that they outlive a restart; SIGHUP says them on stderr", None),
+        "serve --mint keys:FILE or net: keep each key's totals of the day and the day before in FILE, of mode 0600; it is written each 2 s while a count moved, so that they outlive a restart; SIGHUP says them on stderr", None),
     // A list of keys at a URL, and its copy's life (T-646).
     row(None, "list-ttl", Some("SECONDS"), FlagKind::Supported,
         "serve --mint keys:https://URL: fetch the list again each SECONDS, 1 to 86400 (default 300), through the host's proxy with the trust of --ca-file; a fetch that fails leaves the copy to age", None),
@@ -101,16 +101,16 @@ pub const RELAY_FLAGS: &[FlagRow] = &[
         "serve: yes (the default) or no: on the listener, a request whose first byte begins no TLS handshake gets the cleartext road, for a client whose proxy cuts TLS: /health, a token of one session (POST /v1/mint?once=1, as --mint says) and /connect/ with it, which its upgrade spends; each other request there is refused (403)", None),
     // An SSH client of the listener, to the owner's sshd (T-644).
     row(None, "sshd", Some("ADDR:PORT"), FlagKind::Supported,
-        "serve: send each connection of the listener whose first four bytes are SSH-, an SSH client's version line, to the sshd at ADDR:PORT (an address, not a name), its bytes untouched, so that one port serves the relay and a shell: a shell for each client that reaches the port, behind that sshd's own authentication; each other start goes to TLS or the cleartext road, as before", None),
+        "serve: send each connection of the listener whose first four bytes are SSH- (an SSH client's version line) to the sshd at ADDR:PORT; ADDR is an address, not a name; its bytes go untouched, so that one port serves the relay and a shell: a shell for each client that reaches the port, behind that sshd's own authentication; each other start goes to TLS or the cleartext road, as before", None),
     // A name published to a pair's node, by its ClientHello (T-649).
     row(None, "publish", Some("NAME=PAIR"), FlagKind::Supported,
-        "serve: send each TLS connection whose ClientHello names NAME, a DNS name, to the node of PAIR, a pair of this relay (its name p-..., which the pair's file holds), before any handshake and with its bytes untouched, so that the node's own TLS answers it with its own certificate (podssh node --publish-tls); repeatable; the relay reads the name, never the bytes; a CA's validation of NAME (acme-tls/1) goes to the node too; NAME is never the name of --acme", None),
+        "serve: send each TLS connection whose ClientHello names NAME, a DNS name, to the node of PAIR; PAIR is a pair of this relay (its name p-..., which the pair's file holds); the connection goes before any handshake, with its bytes untouched; this way, the node's own TLS answers it with its own certificate (podssh node --publish-tls); repeatable; the relay reads the name, never the bytes; a CA's validation of NAME (acme-tls/1) goes to the node too; NAME is never the name of --acme", None),
     // DERP over a WebSocket for the node keys of a file (T-106).
     row(None, "derp-keys", Some("FILE"), FlagKind::Supported,
-        "serve: serve DERP at /derp, over a WebSocket of the subprotocol derp, as Tailscale's derper does, for the node keys in FILE, one a line (nodekey:HEX, as the status of tailscale and of podssh's ts_echo example write them; # starts a comment), read again at each login; a node key that is not in it is closed with 1008 not authorized, as the operator's relay closes it; so that podssh ts --ts-mode relay --ts-relay HOST:PORT pins this relay. The packets are WireGuard's, sealed end to end: the relay sees keys, sizes and times", None),
+        "serve: serve DERP at /derp, over a WebSocket of the subprotocol derp, as Tailscale's derper does; for the node keys in FILE, one a line (nodekey:HEX, as the status of tailscale and of podssh's ts_echo example write them; # starts a comment), read again at each login; a node key that is not in it is closed with 1008 not authorized, as the operator's relay closes it; this way, podssh ts --ts-mode relay --ts-relay HOST:PORT pins this relay. The packets are WireGuard's, sealed end to end: the relay sees keys, sizes and times", None),
     // The signed list of deployments of /relays.json (T-346).
     row(None, "deployment", Some("NAME=HOSTS"), FlagKind::Supported,
-        "serve: a deployment that /relays.json names in its signed list, NAME=HOST[:PORT][,HOST[:PORT]...], repeatable, in order; a client that trusts the list's key (PODSSH_RELAY_KEYS, RelayKeys, a member of its net with the role relay) tries those hosts after its default list, each with a token of its own", None),
+        "serve: a deployment that /relays.json names in its signed list, NAME=HOST[:PORT][,HOST[:PORT]...], repeatable, in order; a client that trusts the list's key (PODSSH_RELAY_KEYS, RelayKeys, a member of its net with the role relay) tries those hosts after its default list; each with a token of its own", None),
     row(None, "list-key", Some("FILE"), FlagKind::Supported,
         "serve --deployment: the Ed25519 key that signs the list, in a private file, made when it is missing (default: relay-list.key in the cache); the first line names its fingerprint", None),
     // The resumable sessions of the forward road (T-173).
@@ -119,13 +119,13 @@ pub const RELAY_FLAGS: &[FlagRow] = &[
     row(None, "resume-budget", Some("MIB"), FlagKind::Supported,
         "serve: the replay buffers of the sessions of /v1/layer/ in all, in MiB, 4 for each session: from 4 to 16384 (default 256, 64 sessions), or 0 for none, which offers no such road; a new session past it is refused in its handshake, and podssh's client takes /connect/ instead", None),
     row(None, "resume-host", Some("HOST[:PORT]"), FlagKind::Supported,
-        "serve: the name of this process alone, which its certificate holds, where several processes serve one name: /relays.json names it as forward.host, and podssh's client sends each link of a session of /v1/layer/ to it, so that each resume reaches the process that holds the session (a host of the name's deployment)", None),
+        "serve: the name of this process alone, which its certificate holds, where several processes serve one name: /relays.json names it as forward.host; podssh's client sends each link of a session of /v1/layer/ to it; this way, each resume reaches the process that holds the session (a host of the name's deployment)", None),
     // HTTP/2 with extended CONNECT on the listener (T-321).
     row(None, "http2", Some("WORD"), FlagKind::Supported,
-        "serve: yes (the default) or no: offer h2 by ALPN before http/1.1, with extended CONNECT (RFC 8441), so that the sessions of a client's process are streams of one connection, each upgrade a CONNECT answered 200; /health, /relays.json, /trace, /llms-full.txt and the mint answer there too, and each other request is asked for again over HTTP/1.1; no offers http/1.1 alone, as before", None),
+        "serve: yes (the default) or no: offer h2 by ALPN before http/1.1, with extended CONNECT (RFC 8441); this way, the sessions of a client's process are streams of one connection, each upgrade a CONNECT answered 200; /health, /relays.json, /trace, /llms-full.txt and the mint answer there too, and each other request is asked for again over HTTP/1.1; no offers http/1.1 alone, as before", None),
     // QUIC on the listener's port of UDP (T-667).
     row(None, "quic", Some("WORD"), FlagKind::Supported,
-        "serve: yes or no (the default): serve QUIC too, on UDP at the address and port of --listen, a second socket that you ask for, with TLS 1.3, the listener's certificate and the ALPN podssh-relay/1, each stream one connection of HTTP/1.1 to the same routes; /relays.json offers it as forward.quic, and podssh's client races it before TCP (PODSSH_QUIC)", None),
+        "serve: yes or no (the default): serve QUIC too, on UDP at the address and port of --listen, a second socket that you ask for; with TLS 1.3, the listener's certificate and the ALPN podssh-relay/1; each stream one connection of HTTP/1.1 to the same routes; /relays.json offers it as forward.quic, and podssh's client races it before TCP (PODSSH_QUIC)", None),
 ];
 
 /// **`proxy`.** It is **not an SSH client** (`podssh man proxy`), so not an alias of `ssh`,
@@ -182,7 +182,7 @@ pub const DOCTOR_FLAGS: &[FlagRow] = &[
     row(None, "json", None, FlagKind::Supported,
         "write the report as one JSON object on stdout, when every check has run", None),
     row(None, "full", None, FlagKind::Supported,
-        "also log in to github.com through the relay with a key made for the check, which GitHub refuses, and, with no \
+        "also log in to github.com through the relay with a key made for the check, which GitHub refuses; and, with no \
          proxy set, make a QUIC handshake with the quick tunnel's edge; with --quick, which wins, the handshake and the stream \
          probes do not run", None),
     row(None, "hop", Some("[USER@]HOST[:PORT]"), FlagKind::Supported,
@@ -195,7 +195,7 @@ pub const DOCTOR_FLAGS: &[FlagRow] = &[
          github.com: the QUIC handshake and the stream probes", None),
     // What this host allows, as one verdict (T-706).
     row(None, "tier", None, FlagKind::Supported,
-        "check this host alone and give one verdict of its capabilities: identity (a user name, the capability to bind a low port), exec (a directory that runs a program), terminal (a pty), state (a directory that keeps files) and resolver (how names resolve), each ok, closed or ????, and for each closed one the features that it closes; reads the capability sets and drops nothing; connects nowhere but for one lookup of the relay's name", None),
+        "check this host alone and give one verdict of its capabilities: identity (a user name, the capability to bind a low port); exec (a directory that runs a program); terminal (a pty); state (a directory that keeps files); and resolver (how names resolve); each ok, closed or ????; and for each closed one the features that it closes; reads the capability sets and drops nothing; connects nowhere but for one lookup of the relay's name", None),
     row(None, "jobs", Some("N"), FlagKind::Supported,
         "run at most N sections at once, 1 to 64, in the order of the report (default: each at once; also DoctorJobs \
          of the settings file); --jobs 1 runs one after another", None),
@@ -204,9 +204,9 @@ pub const DOCTOR_FLAGS: &[FlagRow] = &[
         "check this host and what the path to URL does to a stream, alone: whether a response and a request's body \
          pass as they come, the largest body that passes, and how long a quiet stream lives; URL is \
          https://HOST[:PORT][/PATH] or http://..., a server of podssh relay serve, the quick tunnel of podssh node \
-         --relay, or go-httpbin, its probes under PATH (default /v1/probe)", None),
+         --relay, or go-httpbin; its probes under PATH (default /v1/probe)", None),
     row(None, "stream-idle", Some("SECONDS"), FlagKind::Supported,
-        "how long the probe of a quiet stream holds it, 1 to 600 (default 130), with --stream, or with --full, which \
+        "how long the probe of a quiet stream holds it, 1 to 600 (default 130), with --stream; or with --full, which \
          probes a stream at the relay that you named, or a quiet socket at the default relay", None),
     super::forwarder::DOCTOR_FORWARDER,
     super::shadowsocks::DOCTOR_SHADOWSOCKS,
@@ -222,7 +222,7 @@ pub const DOCTOR_FLAGS: &[FlagRow] = &[
     // The exit of the net, and one session from it (T-458).
     row(None, "exit", Some("NAME"), FlagKind::Supported,
         "also check the exit NAME of your net: what the net held says of it and of this client, the pair kept under \
-         NAME, and one session from it to --exit-target, with the node's verdict and whose a refusal is; NAME auto: \
+         NAME; and one session from it to --exit-target, with the node's verdict and whose a refusal is; NAME auto: \
          the exit whose route of the net holds --exit-target's address", None),
     row(None, "exit-target", Some("HOST:PORT"), FlagKind::Supported,
         "the target of the session from --exit NAME (default github.com:22, identified by its published host key)", None),

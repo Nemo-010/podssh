@@ -157,9 +157,9 @@ pub(super) fn http_road_file() -> (Vec<String>, String) {
     use crate::http_road_path::{FILE, MAX_AGE, MOST};
     let text = format!(
         "What podssh doctor --stream measured of the path to each server over TLS, in the cache: by \
-         HOST:PORT, the first body that did not pass, when a quiet answer ended, and when it was measured, as \
+         HOST:PORT, the first body that did not pass, when a quiet answer ended, and when it was measured. It is \
          JSON with mode 0600, at most {MOST} servers, the oldest going first. The HTTP road to that host sizes \
-         its batches and its waits by it for {days} days after the measurement, and podssh ssh -v says so; with \
+         its batches and its waits by it for {days} days after the measurement; podssh ssh -v says so; with \
          none, the road's own sizes. It holds no secret; a record that does not read is none.",
         days = MAX_AGE.as_secs() / 86_400,
     );

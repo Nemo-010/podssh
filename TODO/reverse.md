@@ -70,7 +70,7 @@ pair (`crates/podssh-relay/src/cache.rs` lines 126-153 and 221-240 at `9811e0d`)
 8. Use the control host only (`tcp.ssh.relay.ajam.dev`, or one host that the user names). No failover
    to pool hosts until a measurement shows that they serve `/v1/*`.
 9. In the same commit: `docs/relay.md` (lines 192-214 at `3632dcb`), `docs/reverse.md` (lines 46-53 at
-   `3632dcb`), and the FILES section of the manual (`crates/podssh-cli/src/man/facts.rs:294`).
+   `3632dcb`), and the FILES section of the manual (`crates/podssh-cli/src/man/facts.rs:295`).
 
 ## Decision
 
@@ -773,7 +773,7 @@ So a local TCP TARGET exists only where the host allows it; `podssh serve` (M5) 
    `crates/podssh-cli/src/doctor/relay_checks.rs:53-107` (zuko's doctor checks its ticket and state).
 6. Remove `node` and `relay` from `VERB_OWNER`, and add them to `DISPATCHED`
    (`crates/podssh-cli/tests/flag_table.rs:110-146`). New variables go in `VARIABLES`
-   (`crates/podssh-cli/src/man/facts.rs:46`), files in FILES (`:294` there), examples in
+   (`crates/podssh-cli/src/man/facts.rs:46`), files in FILES (`:295` there), examples in
    `crates/podssh-cli/src/man/examples.rs:8-309`; update `docs/cli.md`, `docs/reverse.md` and
    `docs/STATUS.md` (lines 48-50 at `af0a163`).
 7. Pitfalls: `podssh man relay` shows the command; the topic THE RELAY has its own key since

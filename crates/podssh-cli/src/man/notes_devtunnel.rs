@@ -42,7 +42,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_DEVTUNNEL_ACCESS_FILE"],
         "The file of a tunnel's access token of Dev Tunnels (devtunnel token TUNNEL --scopes connect prints \
-      one), for a tunnel that its owner shares with you: one line, the token alone, # a comment; a private \
+      one). It is for a tunnel that its owner shares with you: one line, the token alone, # a comment; a private \
       file as the token file is (see FILES). With PODSSH_DEVTUNNEL_TOKEN_FILE also set, the road is refused \
       (78). A build with the feature devtunnel.",
     ),

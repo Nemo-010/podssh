@@ -22,7 +22,7 @@ pub const SSH_UNINSTALL: FlagRow = row(
     None,
 );
 pub const SSH_ENV_FILE: FlagRow = row(None, "env-file", Some("FILE"), FlagKind::Supported,
-    "read the variables of FILE, a private file of NAME=VALUE lines, before anything else, and hold FILE.lock while it runs, so that a second start ends at once: the file that --install writes", None);
+    "read the variables of FILE, a private file of NAME=VALUE lines, before anything else; hold FILE.lock while it runs, so that a second start ends at once: the file that --install writes", None);
 
 /// A client's own resume deadline (T-306), of `ssh` and `operator`.
 pub const OWN_DEADLINE: FlagRow = row(None, "resume-deadline", Some("TIME"), FlagKind::Supported,
@@ -42,7 +42,7 @@ pub const PIPE_NO_RESUME: FlagRow = row(None, "no-resume", None, FlagKind::Suppo
 /// `--exit NAME` of `ssh`, `cp`, `scp` and `sftp` (T-431); over a carrier
 /// too (T-614).
 pub const EXIT: FlagRow = row(None, "exit", Some("NAME"), FlagKind::Supported,
-    "start the road at NAME, a node of your net that lends its egress (podssh node --exit): it dials the destination, or the first hop of -J, from its own host, on each road between the two, or with --carrier ADDR on that stream alone; the host key is the destination's; NAME auto: the exit whose route of the net holds the first hop's address", None);
+    "start the road at NAME, a node of your net that lends its egress (podssh node --exit): it dials the destination, or the first hop of -J, from its own host; on each road between the two, or with --carrier ADDR on that stream alone; the host key is the destination's; NAME auto: the exit whose route of the net holds the first hop's address", None);
 /// `--exit NAME` of `proxy`.
 pub const PROXY_EXIT: FlagRow = row(None, "exit", Some("NAME"), FlagKind::Supported,
     "carry the pipe from NAME, a node of your net that lends its egress (podssh node --exit), in place of the relay: it dials HOST PORT from its own host; with --carrier ADDR, NAME is the node at the other end of that stream; NAME auto: the exit whose route of the net holds HOST, an address", None);
@@ -105,7 +105,7 @@ pub const EXIT_FLAGS: &[FlagRow] = &[
         "trust only the CA certificates in FILE for the relay (default: env SSL_CERT_FILE, else system and built-in roots)", None),
     // The exit at the other end of a stream that exists already (T-596).
     row(None, "carrier", Some("ADDR"), FlagKind::Supported,
-        "the exit is the node at the other end of ADDR, a stream that exists already, with no relay and no pair (podssh node NAME --exit --carrier): stdio (or -), as the exec channel of a platform's own SSH gives it, fd:N (Unix), or exec:CMD, a program started with no shell; each connection is a session of the one stream; a stream of stdio or fd:N ends the proxy when its node leaves; stdin may not be a terminal", None),
+        "the exit is the node at the other end of ADDR, a stream that exists already; with no relay and no pair (podssh node NAME --exit --carrier): stdio (or -), as the exec channel of a platform's own SSH gives it, fd:N (Unix), or exec:CMD, a program started with no shell; each connection is a session of the one stream; a stream of stdio or fd:N ends the proxy when its node leaves; stdin may not be a terminal", None),
     row(Some('q'), "quiet", None, FlagKind::Supported,
         "no line for each connection; errors still go to stderr", None),
 ];
@@ -125,9 +125,9 @@ pub const NODE_FLAGS: &[FlagRow] = &[
         "keep a session whose link is lost for TIME, on each road, and tell its operator so: 90s, 30m, 8h or 3d, from 1 minute to 72 h (default 10m)", None),
     // Sessions that the pair's relay role readies ahead (T-650).
     row(None, "spares", Some("N"), FlagKind::Supported,
-        "ask the pair's relay to keep up to N sessions, 0 to 16, open and readied ahead for this node's operators, so that a run of short connections waits for no open and ready; each is a session at rest here, drawn again each 15 to 20 s, and with --plain --no-e2e a connection to TARGET; podssh relay serve keeps them, a relay of the contract none (default 0, none)", None),
+        "ask the pair's relay to keep up to N sessions, 0 to 16, open and readied ahead for this node's operators; this way, a run of short connections waits for no open and ready; each is a session at rest here, drawn again each 15 to 20 s, and with --plain --no-e2e a connection to TARGET; podssh relay serve keeps them, a relay of the contract none (default 0, none)", None),
     row(None, "sshd", None, FlagKind::Supported,
-        "a roost: each TARGET (default 127.0.0.1:22) is a standard sshd that runs already, which must send its SSH version line, after any lines of a greeting, at the start and on each session's connection; podssh brings no sshd (podssh doctor's line sshd says whether this host has one)", None),
+        "a roost: each TARGET (default 127.0.0.1:22) is a standard sshd that runs already; it must send its SSH version line, after any lines of a greeting, at the start and on each session's connection; podssh brings no sshd (podssh doctor's line sshd says whether this host has one)", None),
     row(None, "temporary", Some("KEY"), FlagKind::Supported,
         "the far end that podssh ssh --upgrade starts on its server: a roost in front of the session's sshd, with a pair and a key that no file keeps, for the client key KEY alone; one line on stdout gives the offer; it ends with its last session, or after 10 minutes with none", None),
     row(None, "key", Some("FILE"), FlagKind::Supported,
@@ -139,12 +139,12 @@ pub const NODE_FLAGS: &[FlagRow] = &[
     row(None, "no-e2e", None, FlagKind::Supported,
         "carry each session's bytes with no end-to-end channel, to operators that run none either; the relay then sees them", None),
     row(None, "exit", None, FlagKind::Supported,
-        "lend this host's egress to the members of its net: a session may name a target of its own, which the node resolves, then dials at a public address alone, or in a range of --routes; needs a net that gives this node the role exit; TARGET is then optional", None),
+        "lend this host's egress to the members of its net: a session may name a target of its own, which the node resolves; the node then dials it at a public address alone, or in a range of --routes; needs a net that gives this node the role exit; TARGET is then optional", None),
     row(None, "routes", Some("RANGES"), FlagKind::Supported,
-        "with --exit: the private ranges that the exit dials too, ADDR/BITS or one address, separated by commas, each for the members that the net's policy lets reach the address; a loopback address or one of this host's own is dialled only when a range names it alone (ADDR, or ADDR/32 and ADDR/128); with --relay: the private ranges that the relay role dials too, as podssh relay serve --routes; a prefix that sets bits past it is refused", None),
+        "with --exit: the private ranges that the exit dials too, ADDR/BITS or one address, separated by commas; each for the members that the net's policy lets reach the address; a loopback address or one of this host's own is dialled only when a range names it alone (ADDR, or ADDR/32 and ADDR/128); with --relay: the private ranges that the relay role dials too, as podssh relay serve --routes; a prefix that sets bits past it is refused", None),
     // A stream that exists already as the node's one road (T-595).
     row(None, "carrier", Some("ADDR"), FlagKind::Supported,
-        "serve TARGET over ADDR, a stream that exists already, with no relay and no pair: stdio (or -), as the exec channel of a platform's own SSH gives it, fd:N (Unix), or exec:CMD, a program started with no shell; the other end runs podssh operator --carrier, or proxy, ssh, cp, scp or sftp --carrier to node://NAME, or for --exit, podssh exit NAME --listen ADDR:PORT --carrier, or ssh, proxy or pipe with --exit NAME --carrier; stdin may not be a terminal", None),
+        "serve TARGET over ADDR, a stream that exists already, with no relay and no pair: stdio (or -), as the exec channel of a platform's own SSH gives it, fd:N (Unix), or exec:CMD, a program started with no shell; the other end runs podssh operator --carrier, or proxy, ssh, cp, scp or sftp --carrier to node://NAME; or for --exit, podssh exit NAME --listen ADDR:PORT --carrier, or ssh, proxy or pipe with --exit NAME --carrier; stdin may not be a terminal", None),
     row(None, "iroh", None, FlagKind::Supported,
         "serve TARGET over the iroh road, with no pair: a client dials the ticket that the node prints; a build with the feature iroh", None),
     super::derp::NODE_DERP, super::opentunnel::NODE_OPENTUNNEL, super::opentunnel::NODE_PINGGY, super::frp::NODE_FRP,
@@ -159,16 +159,16 @@ pub const NODE_FLAGS: &[FlagRow] = &[
     super::opentunnel::NODE_BORE,
     super::gsr::NODE_GSR, super::gsr::NODE_GSR_SECRET_FILE,
     row(None, "quick-tunnel", None, FlagKind::Supported,
-        "serve TARGET at https://NAME.trycloudflare.com, a quick tunnel of Cloudflare's that podssh makes itself, with no pair and no account; the name, new each run, is the line on stdout; needs --allow, or a key that the net held here names, and TCP port 7844 of Cloudflare's edge, directly or through a proxy that allows it", None),
+        "serve TARGET at https://NAME.trycloudflare.com, a quick tunnel of Cloudflare's that podssh makes itself, with no pair and no account; the name, new each run, is the line on stdout; needs --allow, or a key that the net held here names; and TCP port 7844 of Cloudflare's edge, directly or through a proxy that allows it", None),
     row(None, "warp", None, FlagKind::Supported,
         "with --quick-tunnel: reach the edge's TCP port 7844 inside WARP's tunnel first, over HTTP/2 to Cloudflare on port 443; without it, WARP's tunnel is tried after QUIC and TCP fail; a build with the feature warp", None),
     // The relay role behind the quick tunnel, with no listener (T-428).
     row(None, "relay", None, FlagKind::Supported,
         "with --quick-tunnel or --localhost-run: serve the relay's forward and reverse roads too, those of podssh relay serve, at the tunnel's name, with no listener; a client names https://NAME.trycloudflare.com, or the name of localhost.run's tunnel, as its relay host; with no TARGET, the relay alone", None),
     row(None, "mint", Some("WHO"), FlagKind::Supported,
-        "with --relay: who may mint a token and make a pair: keys:FILE, the keys of FILE, a file or an https:// URL whose list is fetched again each 5 minutes with the trust of --ca-file, each by its signature of the relay's challenge; net, the members of this node's net, as its policy lets them reach relay:NAME (this node) or relay:*; net,keys:FILE, both; anyone; or nobody (default: the keys of --allow)", None),
+        "with --relay: who may mint a token and make a pair: keys:FILE, the keys of FILE, a file or an https:// URL whose list is fetched again each 5 minutes with the trust of --ca-file; each key by its signature of the relay's challenge; net, the members of this node's net, as its policy lets them reach relay:NAME (this node) or relay:*; net,keys:FILE, both; anyone; or nobody (default: the keys of --allow)", None),
     row(None, "pairs", Some("FILE"), FlagKind::Supported,
-        "with --relay: keep the pairs of its reverse road in FILE, of mode 0600, so that they outlive a restart (the digests of their tokens, never a token)", None),
+        "with --relay: keep the pairs of its reverse road in FILE, of mode 0600; this way, they outlive a restart (the digests of their tokens, never a token)", None),
     row(None, "allow-private", None, FlagKind::Supported,
         "with --relay: dial private, loopback and other non-public addresses too (by default only public targets, as the default relay)", None),
     row(None, "iroh-key", Some("FILE"), FlagKind::Supported,
@@ -187,7 +187,7 @@ pub const NODE_FLAGS: &[FlagRow] = &[
     row(None, "uninstall", None, FlagKind::Supported,
         "remove the service that --install made for NAME, its file of variables and its lock, and nothing else", None),
     row(None, "env-file", Some("FILE"), FlagKind::Supported,
-        "read the node's variables from FILE, a private file of NAME=VALUE lines, before anything else, and hold FILE.lock while it runs, so that a second start ends at once: the file that --install writes beside the pair", None),
+        "read the node's variables from FILE, a private file of NAME=VALUE lines, before anything else; hold FILE.lock while it runs, so that a second start ends at once: the file that --install writes beside the pair", None),
     row(None, "iroh-relay", Some("URLS"), FlagKind::Supported,
         "with --iroh: the relays, https://HOST[:PORT][,...]; the first that answers is the home relay (default: env PODSSH_IROH_RELAY, else n0's)", None),
     super::derp::NODE_DERP_SERVER,
@@ -202,9 +202,9 @@ pub const NODE_FLAGS: &[FlagRow] = &[
         "ask at this terminal of each operator key that the door or a grant lets in: y or n within 100 s, no answer a no; a yes lets the key in while one of its sessions is open and 120 s after its last, a no stands 15 s; stdin and stderr must be a terminal (else 78)", None),
     // A site that podssh's relay role publishes by its name (T-649).
     row(None, "publish-tls", Some("TARGET"), FlagKind::Supported,
-        "serve the pair's sessions as a site that podssh relay serve --publish NAME=PAIR sends here by the name in each ClientHello, before any handshake: each session is one connection to TARGET, a TLS service of this host that answers with its own certificate, the bytes as they came, with no resumable layer and no end-to-end channel; the relay reads the name, never the bytes; with --acme NAME, TARGET serves in cleartext and the node ends TLS itself; the first line names the pair for --publish", None),
+        "serve the pair's sessions as a site that podssh relay serve --publish NAME=PAIR sends here by the name in each ClientHello, before any handshake: each session is one connection to TARGET, a TLS service of this host that answers with its own certificate; the bytes as they came, with no resumable layer and no end-to-end channel; the relay reads the name, never the bytes; with --acme NAME, TARGET serves in cleartext and the node ends TLS itself; the first line names the pair for --publish", None),
     row(None, "acme", Some("NAME"), FlagKind::Supported,
-        "with --publish-tls: end each session's TLS at this node with a certificate for NAME, the published name, from an ACME CA (Let's Encrypt by default), proven by TLS-ALPN-01, whose validation the relay that publishes NAME sends here too; asked once the node is online, kept in the cache and renewed while the node runs", None),
+        "with --publish-tls: end each session's TLS at this node with a certificate for NAME, the published name, from an ACME CA (Let's Encrypt by default); it is proven by TLS-ALPN-01, whose validation the relay that publishes NAME sends here too; asked once the node is online, kept in the cache and renewed while the node runs", None),
     row(None, "acme-directory", Some("URL"), FlagKind::Supported,
         "with --acme: the directory of another ACME CA, reached with the trust of --ca-file", None),
 ];

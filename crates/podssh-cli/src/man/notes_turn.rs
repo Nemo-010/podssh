@@ -35,8 +35,8 @@ pub fn file() -> (Vec<String>, String) {
     (
         vec!["the file of --turn-auth-file".to_string()],
         "The credential of the TURN server of --turn: one line, USER:PASSWORD, split at its first colon (the \
-         password may hold colons), or auth-secret SECRET, the static-auth-secret of a coturn of use-auth-secret, \
-         from which podssh makes a user and a password of a day, as coturn's REST API makes them. # starts a \
+         password may hold colons); or auth-secret SECRET, the static-auth-secret of a coturn of use-auth-secret. \
+         From it podssh makes a user and a password of a day, as coturn's REST API makes them. # starts a \
          comment. podssh reads it only as a regular file of yours that others cannot read (on Windows, as its \
          access list says), as a pair file; else, and for a line that cannot be read, the run is refused (78), \
          by the line's number and never its text. podssh never writes it."

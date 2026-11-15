@@ -6604,6 +6604,14 @@ tests that changed (`pinggy_road`, `ssh_tunnel_http`, `funnel_opentunnel`, `ssh_
 `serveo_road`) passed; clippy and rustfmt clean. Next: the long sentences, then the model on `pod-manual` and its
 checks in the tests (`check::texts`, `check::variables`, `check::exit_codes`, `check::flags`, `check::generated`).
 
+Step two, 2026-11-15, the long sentences (a draft of the session's own, `draft-t790`, merged): each sentence of the
+help of the flags and of the manual's notes and facts that ran past 25 words is split where its clauses part, at a
+`;`, in 30 files of `crates/podssh-cli/src/flags/` and `crates/podssh-cli/src/man/`; a piece that began "so that"
+reads "this way". The same measure on podcrates `v0.56.0`: 4,559 strings, 0 long sentences, 0 work ids, 0 faults of a
+character. `cargo clippy -p podssh-cli --all-targets` clean, rustfmt clean, `cargo test -p podssh-cli` 2320 passed and
+0 failed, and `sh scripts/interop-man.sh target/debug/podssh` (groff and mandoc of this host) 7 checks ok. Next: the
+model on `pod-manual` and its checks, as above.
+
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
 

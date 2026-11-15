@@ -81,7 +81,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["SSH_CONNECTION"],
         "Set by sshd in a session: podssh node --temporary, which podssh ssh --upgrade starts there, stands \
-      in front of the server's address and port that it names, tried on the loopback first.",
+      in front of the server's address and port that it names; it is tried on the loopback first.",
     ),
     (
         &["PODSSH_SESSION_LOG"],
@@ -91,14 +91,14 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_ERROR_PROGRAM"],
-        "A program that gets a report when podssh itself fails, run as SSH_ASKPASS is: by its name, with no \
-      shell and no argument. Its stdin is one JSON object: schema (1), podssh, os, arch, verb, exit, messages \
-      (the last 64 lines of podssh's own messages, 16 KiB at most) and relay (host, close code and reason, \
-      or null). A report never holds a token, a proxy URL or its password, a key, the environment, the \
-      command line or a byte of a session. An exit 0, the status of a remote command or of a child that \
-      podssh passes on, and a stop by SIGINT or SIGTERM start no program. Its stdout and stderr go to \
-      stderr; after 30 s podssh stops it. Its status is ignored, and the exit code stays the run's. podssh \
-      calls no AI service and no address for the report: the program decides.",
+        "A program that gets a report when podssh itself fails, run as SSH_ASKPASS is: by its name, with no shell and \
+      no argument. Its stdin is one JSON object: schema (1), podssh, os, arch, verb, exit, messages (the last 64 lines \
+      of podssh's own messages, 16 KiB at most); and relay (host, close code and reason, or null). A report never \
+      holds a token, a proxy URL or its password, a key, the environment, the command line or a byte of a session. \
+      These start no program: an exit 0, the status of a remote command or of a child that podssh passes on, and a \
+      stop by SIGINT or SIGTERM. Its stdout and stderr go to stderr; after 30 s podssh stops it. Its status is \
+      ignored, and the exit code stays the run's. podssh calls no AI service and no address for the report: the \
+      program decides.",
     ),
     (
         &["PODSSH_SETTINGS"],
@@ -129,7 +129,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_REPLAY_BUFFER"],
         "With a node that offers the resumable layer, the bytes that podssh keeps in each direction until \
-      the node acknowledges them, so that a new link can send them again: a whole number of bytes, from \
+      the node acknowledges them. They are kept so that a new link can send them again: a whole number of bytes, from \
       4194304 (the default) to 16777216. When they are kept in full, podssh sends nothing more until an \
       acknowledgement comes. Another value is ignored.",
     ),
@@ -137,8 +137,8 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
         &["PODSSH_PROGRESS"],
         "line or off: the progress line of podssh cp, mv, scp, sftp and run on stderr, on or off whatever \
       stderr is. With neither, the line shows when stderr is a terminal and -q is not given; where it is \
-      no terminal, podssh cp, mv and run write a plain line each 10 s once the run has passed 10 s, which \
-      off silences too; --jsonl gives progress objects instead.",
+      no terminal, podssh cp, mv and run write a plain line each 10 s once the run has passed 10 s; off \
+      silences that too; --jsonl gives progress objects instead.",
     ),
     (
         &["PODSSH_ZMODEM"],
@@ -149,9 +149,10 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_SPARE_LINKS"],
         "no: with a node that offers the resumable layer, podssh opens no spare link beside a link that \
-      went silent, and finds such a link dead after 30 s only (see podssh ssh). Else a spare link opens \
-      once the node has not answered for three round trips of the link (1 s at least, 3 s at most), one \
-      each 10 s at most, but on the iroh road, whose QUIC carries a session across a new address by itself.",
+      went silent; it finds such a link dead after 30 s only (see podssh ssh). Else a spare link opens \
+      once the node has not answered for three round trips of the link: 1 s at least, 3 s at most. One \
+      opens each 10 s at most. This is not so on the iroh road, whose QUIC carries a session across a new \
+      address by itself.",
     ),
     (
         &["PODSSH_TITLE_STACK"],
@@ -162,7 +163,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["XTERM_VERSION", "VTE_VERSION"],
         "Set by xterm and by VTE: podssh ssh shows the notice of a silent node in the window's title of \
-      such a terminal, saved first on its stack of titles, but inside tmux or screen.",
+      such a terminal, but inside tmux or screen. The title is saved first on its stack of titles.",
     ),
     (
         &["PODSSH_SESSION_BUDGET"],
@@ -178,7 +179,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (&["SSL_CERT_FILE"], "Trust only the CA certificates in this file, as --ca-file. The flag wins."),
     (
         &["PODSSH_TS_TEST_CA_FILE"],
-        "For tests only: a PEM file of CA certificates that the node of podssh ts adds to its roots, so that \
+        "For tests only: a PEM file of CA certificates that the node of podssh ts adds to its roots. With it, \
       a test's control server of its own CA is reached with TLS checked. podssh ts says when it is set. \
       Its checks before the start trust podssh's own roots, which take a podssh-ca.pem beside the binary.",
     ),
@@ -191,7 +192,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
         &["SSH_ASKPASS", "SSH_ASKPASS_REQUIRE", "DISPLAY", "WAYLAND_DISPLAY"],
         "A program that asks for passwords and passphrases, chosen as OpenSSH chooses: \
       SSH_ASKPASS_REQUIRE=force always uses it; prefer uses it when DISPLAY or WAYLAND_DISPLAY is set; \
-      never does not use it. When SSH_ASKPASS_REQUIRE is not set, podssh asks on the terminal, and uses \
+      never does not use it. When SSH_ASKPASS_REQUIRE is not set, podssh asks on the terminal. It uses \
       the program only when there is no terminal and DISPLAY or WAYLAND_DISPLAY is set.",
     ),
     (&["XAUTHORITY"], "The authority file of the X server of DISPLAY, whose cookie -Y forwards (else ~/.Xauthority)."),
@@ -205,7 +206,7 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
       the effective uid's entry in the user database (/etc/passwd, read as a file; on macOS the system's \
       directory), and root for uid 0 with no entry; -v says where the name came from. On a host with no \
       name, a destination with no user is refused (64), with what was read and the ways to give one: \
-      user@host, -l, PODSSH_USER, USER or User in ssh_config. The same name is %u, Match localuser, the \
+      user@host, -l, PODSSH_USER, USER or User in ssh_config. The same name is %u and Match localuser. It is also the \
       nick of podssh chat when neither --nick nor PODSSH_NICK gives one, and the default comment of \
       podssh keygen.",
     ),
@@ -233,15 +234,15 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_SYSTEMD", "DBUS_SESSION_BUS_ADDRESS"],
         "On Linux, whether a run in the background asks the user's systemd for a scope of its own once it \
-      is ready, so that a logout does not end it: no asks nothing; yes asks outside a login session's \
+      is ready. With the scope, a logout does not end it: no asks nothing; yes asks outside a login session's \
       scope too; unset asks only from a login session's scope. It asks on the user's bus that \
       DBUS_SESSION_BUS_ADDRESS names (unix:path= only), else on XDG_RUNTIME_DIR/bus, else on systemd's \
       own socket there.",
     ),
     (
         &["PODSSH_DETACH_NAME", "PODSSH_DETACH_SUPERVISOR"],
-        "podssh's own, for a run in the background (see podssh detached): its name, which --detach-name gives, \
-      and in each run that a supervisor of --restart starts, the supervisor's pid, so that the run holds its \
+        "podssh's own, for a run in the background (see podssh detached): its name, which --detach-name gives. \
+      In each run that a supervisor of --restart starts, also the supervisor's pid, so that the run holds its \
       own lock beside the name's. Set by podssh, and removed from a run that --detach starts; a user has no \
       need to set them.",
     ),
@@ -252,8 +253,8 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_MPTCP"],
-        "yes: with --direct and no proxy, ask Linux for Multipath TCP, which can carry a connection on \
-      after one of two networks of this host goes, where the server speaks it too. Where the kernel \
+        "yes: with --direct and no proxy, ask Linux for Multipath TCP. Where the server \
+      speaks it too, it can carry a connection on after one of two networks of this host goes. Where the kernel \
       offers none, a proxy carries the connection or the server does not speak it, the connection is \
       plain TCP; -v says which. no, or unset, asks for nothing; another value is refused before the \
       connection, as a configuration error (78; podssh ssh exits 255).",

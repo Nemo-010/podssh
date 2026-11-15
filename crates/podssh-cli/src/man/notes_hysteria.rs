@@ -41,11 +41,11 @@ pub const DOCTOR: &str = "With --hysteria FILE, the section hysteria gives a lin
 pub fn file() -> (Vec<String>, String) {
     (
         vec!["the file of --hysteria".to_string()],
-        "The Hysteria 2 servers of --hysteria: a hysteria2:// or hy2:// share link on each line (see podssh \
-         ssh); # starts a comment. Each link holds the server's credential, and Salamander's password where it \
-         names one, so podssh reads it only as a regular file of yours that others cannot read (on Windows, as \
-         its access list says), as a pair file; else, and for a line that cannot be read, the run is refused \
-         (78), by the line's number, never its text. podssh never writes it."
+        "The Hysteria 2 servers of --hysteria: a hysteria2:// or hy2:// share link on each line (see podssh ssh); # \
+         starts a comment. Each link holds the server's credential, and Salamander's password where it names one. So \
+         podssh reads it as it reads a pair file: only as a regular file of yours that others cannot read (on Windows, \
+         as its access list says); else, and for a line that cannot be read, the run is refused (78), by the line's \
+         number, never its text. podssh never writes it."
             .to_string(),
     )
 }

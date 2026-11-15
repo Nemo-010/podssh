@@ -49,7 +49,7 @@ pub const PIPE_FLAGS: &[FlagRow] = &[
         "http-listen: each client gives a USER:PASSWORD of FILE, a private file, one a line, in Proxy-Authorization; needed off loopback", None),
     // A page of a directory for a visit to ws-listen: (T-639).
     row(None, "cover", Some("DIR"), FlagKind::Supported,
-        "ws-listen: a GET or HEAD that asks for no upgrade gets a file of DIR, index.html for / and a directory, 1 MiB at most, else 404", None),
+        "ws-listen: a GET or HEAD that asks for no upgrade gets a file of DIR, index.html for / and a directory; 1 MiB at most, else 404", None),
     // An upgrade with no key, as WebTunnel's client sends it (T-645).
     row(None, "raw-upgrade", None, FlagKind::Supported,
         "ws-listen: an upgrade with no Sec-WebSocket-Key gets 101 with no accept, then raw bytes both ways: no frames, close code or idle bound", None),

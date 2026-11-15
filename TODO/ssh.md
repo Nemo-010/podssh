@@ -3748,7 +3748,7 @@ name to give. OpenSSH on the same host connects.
   (`crates/podssh-cli/src/ssh/jump.rs:238-239`). Each verb of the report resolves its destination
   there, so one change serves all eleven.
 - Read: the manual says that podssh never reads the user database
-  (`crates/podssh-cli/src/man/facts.rs:202-205`); the reason is in
+  (`crates/podssh-cli/src/man/facts.rs:203-206`); the reason is in
   `docs/target-environment.md:37-44`: on hosts with no passwd entry, OpenSSH's tools exit 255 ("No
   user exists for uid 0"), so podssh takes the name from the environment. The rule is no row of
   `docs/decisions.md`; T-222 (on hold) says the same of the shell of `podssh serve`.

@@ -100,7 +100,7 @@ pub const TURN: FlagRow = row(
     Some("turns:HOST[:PORT]"),
     FlagKind::Supported,
     "reach the first hop through a TURN server that you run (coturn), in place of the relay: a TCP allocation \
-     of RFC 6062, its control connection and a second connection to the same server that carries the bytes, \
+     of RFC 6062; its control connection and a second connection to the same server that carries the bytes; \
      each through HTTPS_PROXY when one is set (port 443 when none is named); turn: has no TLS and goes to this \
      host alone; also env PODSSH_TURN",
     None,

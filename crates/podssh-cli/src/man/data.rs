@@ -69,7 +69,7 @@ pub fn exit_codes() -> Vec<(Code, String)> {
         row(
             crate::exit_codes::EXIT_NOT_IMPLEMENTED,
             "The command is not implemented yet, or podssh failed inside. podssh node and operator: the \
-             relay closed the node or the session for a fault (1003, 1008 or 1009), or the end-to-end \
+             relay closed the node or the session for a fault (1003, 1008 or 1009); or the end-to-end \
              channel failed (a peer with no channel, a message that failed its check). podssh cp and mv: the \
              digests of a copy differ, or the session broke; the destination was not changed. podssh mv: \
              the copy is verified and its source could not be removed; the data is in both places. podssh \
@@ -99,42 +99,39 @@ pub fn exit_codes() -> Vec<(Code, String)> {
             "podssh proxy: the relay or the proxy refused (a token, a blocked address, a proxy's 403 or 407). \
              podssh node, operator and relay: the relay refused the pair, or the pair expired; for relay \
              trace, the token. podssh operator and pipe node:: the node's key is not the one pinned in known-nodes or named by \
-             --node-key, or the node's allowlist refused this client's key, or the node its grant. podssh cp \
+             --node-key; or the node's allowlist refused this client's key, or the node its grant. podssh cp \
              and mv: the server refused the login, or podssh did not accept its host key. podssh chat: the same of the pair \
              and of the keys, or the peer declined the file of --file. podssh session start: this host refuses \
              the bind of the session's socket. podssh net policy check: the policy does not let FROM reach TO.",
         ),
         row(
             sysexits::EX_CONFIG,
-            "A setting of the environment cannot be used: PODSSH_RELAY or PODSSH_RELAY_ADDR (podssh ssh, \
-             cp, proxy and doctor). For podssh proxy also a proxy URL that is not http://, or a \
-             PODSSH_RELAY_TOKEN that is not a token. The same value as a flag is a usage error (64). \
-             A line that podssh cannot use in the settings file (see FILES) or in an ssh_config file (-F, \
-             ~/.ssh/config, the system's, or one that Include reads), with its file and line named, and such \
-             a file that cannot be read or that others can change; the same keyword with -o on the command \
-             line is a usage error (64). \
-             podssh node, operator, relay and chat: no pair is stored under the label, the pair cannot be \
-             read or stored, or a node cannot connect as it is set up; podssh node and operator: the relay \
-             speaks a dialect of the reverse road that this podssh does not read, or does not read its own \
-             (its hello, or 426), and the line names the side to update. podssh edit: VISUAL, EDITOR and PATH \
-             give no editor, the editor does not start, or PODSSH_CACHE_DIR is none. podssh node --sshd: a \
-             TARGET that sends lines and no version line of SSH 2, which is another service. podssh node: this host \
-             refuses UDP for a udp: TARGET. podssh each --interactive: the emergency stop cannot be armed. \
-             podssh session start and serve: PODSSH_LISTEN is no, or no directory takes the session's \
-             socket. podssh serve: no authorized key, or a key file or the host key that cannot be used, or no \
-             shell that runs.",
+            "A setting of the environment cannot be used: PODSSH_RELAY or PODSSH_RELAY_ADDR (podssh ssh, cp, proxy and \
+             doctor). For podssh proxy also a proxy URL that is not http://, or a PODSSH_RELAY_TOKEN that is not a \
+             token. The same value as a flag is a usage error (64). A line that podssh cannot use, with its file and \
+             line named: in the settings file (see FILES), or in an ssh_config file (-F, ~/.ssh/config, the system's, \
+             or one that Include reads). Also such a file that cannot be read or that others can change; the same \
+             keyword with -o on the command line is a usage error (64). podssh node, operator, relay and chat: no pair \
+             is stored under the label, the pair cannot be read or stored, or a node cannot connect as it is set up; \
+             podssh node and operator: the relay speaks a dialect of the reverse road that this podssh does not read, \
+             or does not read its own (its hello, or 426); the line names the side to update. podssh edit: VISUAL, \
+             EDITOR and PATH give no editor, the editor does not start, or PODSSH_CACHE_DIR is none. podssh node \
+             --sshd: a TARGET that sends lines and no version line of SSH 2, which is another service. podssh node: \
+             this host refuses UDP for a udp: TARGET. podssh each --interactive: the emergency stop cannot be armed. \
+             podssh session start and serve: PODSSH_LISTEN is no, or no directory takes the session's socket. podssh \
+             serve: no authorized key, or a key file or the host key that cannot be used, or no shell that runs.",
         ),
         row(
             podssh_ssh::EXIT_FAILURE,
-            "podssh ssh: the connection, the host key, a node's key or the authentication failed, the \
-             server refused a session or ended the connection before one opened (the line says which), the \
-             session ended with no exit status (also when stdout closed and none came within 5 s), the \
+            "podssh ssh: the connection, the host key, a node's key or the authentication failed; or the \
+             server refused a session or ended the connection before one opened (the line says which); or the \
+             session ended with no exit status (also when stdout closed and none came within 5 s); or the \
              connection was lost after the exit status and before the end of the output, which may be cut \
-             (the line says the status), or the server ended a run of -N. OpenSSH uses the same code, but \
+             (the line says the status); or the server ended a run of -N. OpenSSH uses the same code, but \
              for a cut, where it gives the status. podssh ping: the destination could \
              not be reached or logged in to, or a measure broke. podssh each: a host could not be reached \
              or logged in to, or its session ended with no exit status. podssh health: the host could not \
-             be reached or logged in to, it has no sh, or its answer had none of the lines of the script \
+             be reached or logged in to, or it has no sh; or its answer had none of the lines of the script \
              (with --preflight, the login alone). \
              podssh containers: the host could not be reached or logged in to, or its list did not end \
              within 60 s. podssh session start: the connection or the login failed. podssh job: the host \
@@ -174,9 +171,9 @@ pub fn files() -> Vec<(Vec<String>, String)> {
          %TEMP%, else the one Windows gives), else .podssh in the working directory"
     } else {
         "$PODSSH_CACHE_DIR, else $XDG_CACHE_HOME/podssh (else ~/.cache/podssh; when it is in another \
-         user's tree, the .cache/podssh of the home of your uid's entry in /etc/passwd), else \
-         $XDG_RUNTIME_DIR/podssh, else podssh-UID in $TMPDIR (else $TMP, $TEMP, and only then /tmp and \
-         /dev/shm), else ./.podssh"
+         user's tree, the .cache/podssh of the home of your uid's entry in /etc/passwd); else \
+         $XDG_RUNTIME_DIR/podssh; else podssh-UID in $TMPDIR (else $TMP, $TEMP, and only then /tmp and \
+         /dev/shm); else ./.podssh"
     };
     let mut rows = vec![
         (
@@ -194,15 +191,15 @@ pub fn files() -> Vec<(Vec<String>, String)> {
             vec!["~/.ssh/config".to_string()],
             "The user's ssh_config, read by podssh ssh, cp, mv, scp and sftp unless -F or PODSSH_SSH_CONFIG \
              names another file, or none. A missing file is no error. A file that another user than you or \
-             root owns (on Windows, than you, SYSTEM or the Administrators), or that others can change (on \
-             Windows, as its access list says), is refused, and so is each file that an Include reads. Match \
-             is read as OpenSSH 10.3p1 reads it, but Match exec and Match localnetwork, which are refused by \
+             root owns (on Windows, than you, SYSTEM or the Administrators) is refused. So is a file that others \
+             can change (on Windows, as its access list says), and so is each file that an Include reads. Match \
+             is read as OpenSSH 10.3p1 reads it, but for Match exec and Match localnetwork. These are refused by \
              name, with the file and the line, where they would decide, and run nothing. Each hop of \
-             -J reads the blocks of its own name, as OpenSSH's jump host does, and logs in as its user@, its \
+             -J reads the blocks of its own name, as OpenSSH's jump host does; it logs in as its user@, its \
              User, else the local user. The first ProxyCommand holds, as in OpenSSH: none, or podssh proxy %h \
-             %p, on the command line or in an earlier block, goes past a later block's command, so -o \
-             ProxyCommand=none goes past a Host * that names a jump host for OpenSSH and keeps the file's \
-             other settings, and a later ProxyJump is not read, as OpenSSH does not read it then; a \
+             %p, on the command line or in an earlier block, goes past a later block's command. So -o \
+             ProxyCommand=none goes past a Host * that names a jump host for OpenSSH, and keeps the file's \
+             other settings. A later ProxyJump is not read, as OpenSSH does not read it then; a \
              command with no value before it is refused with its file and line (exit 78)."
                 .to_string(),
         ),
@@ -216,16 +213,16 @@ pub fn files() -> Vec<(Vec<String>, String)> {
             vec![cache.to_string()],
             format!(
                 "The cache: the first of these directories that podssh can use. It holds one relay token for \
-                 each relay deployment, with the host that minted it ({} for the default relay), the \
-                 relay's list of hosts ({}), and the last addresses that carried a session to each relay host \
+                 each relay deployment, with the host that minted it ({} for the default relay). It holds the \
+                 relay's list of hosts ({}). It holds the last addresses that carried a session to each relay host \
                  ({}), which a run whose resolver fails asks before DNS over HTTPS. It holds the key exchange \
-                 group that each TLS server took ({}), which the next run offers first, and, for each host \
-                 that took a key, by a hash of its host key and the user, that key's fingerprint ({}): the \
-                 next login sends that key's signature in its first request, with no query before it, when \
-                 the key is a file that opens with no question and is not RSA or a security key's. Neither \
+                 group that each TLS server took ({}), which the next run offers first. For each host \
+                 that took a key, it holds that key's fingerprint by a hash of its host key and the user ({}): the \
+                 next login sends that key's signature in its first request, with no query before it. It does so \
+                 when the key is a file that opens with no question and is not RSA or a security key's. Neither \
                  holds a secret. It holds each pair of the \
                  reverse road under its label ({}), \
-                 as podssh relay pair writes it, and, until a copy that broke is done, its side file \
+                 as podssh relay pair writes it. Until a copy that broke is done, it holds its side file \
                  (podssh-cp-*.resume: the offset, the temporary file's name and the source's state, never a \
                  byte of the file). While podssh edit runs, a directory edit-RANDOM of mode 0700 holds the \
                  copy of the far file; it goes after the edit, and stays, named, after a failure when the copy \
@@ -236,7 +233,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
                  to the home (else up to /), is yours or root's. One in another user's tree, as when root runs \
                  with the HOME of another account, is passed over: podssh writes nothing more there, and \
                  makes no directory there, so a missing .cache stays its owner's to make. It still reads a \
-                 key, the pins, a pair or a token that an earlier run kept there, after your own places, and \
+                 key, the pins, a pair or a token that an earlier run kept there, after your own places; it \
                  says once of a key where to move it; it moves nothing. podssh status and podssh doctor name \
                  each place passed over, and why. Above the cache's own directory, podssh makes a missing \
                  one only in a directory of yours or of root.",
@@ -271,27 +268,27 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec![podssh_relay::pool::kept::FILE.to_string(), podssh_relay::pool::signed::ROLE_KEY_FILE.to_string()],
-            "The signed lists of relay deployments, in the cache: the newest list of each trusted key, its \
-             exact text and its signature, as JSON with mode 0600, checked again at each read, so that a run keeps \
-             the other deployments when the default's domain is gone; and the key with which podssh relay serve \
-             --deployment signs its list, in hex with mode 0600, made when it is missing, unless --list-key names \
-             another file."
+            "The signed lists of relay deployments, in the cache: the newest list of each trusted key, its exact text \
+             and its signature, as JSON with mode 0600. It is checked again at each read, so that a run keeps the \
+             other deployments when the default's domain is gone; and the key with which podssh relay serve \
+             --deployment signs its list, in hex with mode 0600. The key is made when it is missing, unless --list-key \
+             names another file."
                 .to_string(),
         ),
         (
             vec!["grants-NAME/".to_string()],
-            "The grants used once that the node NAME let in, in the cache: a private directory with a \
-             file of mode 0600 for each grant, made create-new and synced before the session comes in, named by \
-             the end of the grant's window and the digest of what its issuer signed, and removed once that end \
-             passed. A grant whose file is there is refused; a directory that cannot take a file refuses each \
-             grant. It holds no secret: a serial and an issuer's fingerprint."
+            "The grants used once that the node NAME let in, in the cache: a private directory with a file of mode \
+             0600 for each grant. Each file is made create-new and synced before the session comes in. It is named by \
+             the end of the grant's window and the digest of what its issuer signed, and removed once that end passed. \
+             A grant whose file is there is refused; a directory that cannot take a file refuses each grant. It holds \
+             no secret: a serial and an issuer's fingerprint."
                 .to_string(),
         ),
         (
             vec![crate::net::reached::FILE.to_string()],
             format!(
                 "The road that last reached each node from this host, in the cache: by the node's label, the \
-                 road that answered first, its time and when, and why the last race that found no road ended so, as \
+                 road that answered first, its time and when, and why the last race that found no road ended so. It is \
                  JSON with mode 0600, at most {} nodes, the oldest going first. Each race of podssh ssh, of the \
                  copies and of podssh ping to node://NAME writes it, and podssh status --net reads it. It holds no \
                  secret; a record that does not read is none.",
@@ -301,20 +298,20 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         (
             vec![crate::ssh::cloud::warp::DEVICE_FILE.to_string(), crate::ssh::cloud::warp::DOOR_FILE.to_string()],
             "WARP's road (warp://, in a build with the feature warp), in the cache: the device, pod-warp's identity \
-             file of mode 0600, JSON with its record of WARP's API, its certificate and its P-256 key, written once \
-             as it registers and again when WARP's API gives the front door a new key; and the door that opened and \
-             the API's base that answered last, which a run tries first. A record that cannot be read is a \
+             file of mode 0600, JSON with its record of WARP's API, its certificate and its P-256 key. It is written \
+             once as it registers, and again when WARP's API gives the front door a new key; and the door that opened \
+             and the API's base that answered last, which a run tries first. A record that cannot be read is a \
              configuration error (78), never a new registration: remove it to register again."
                 .to_string(),
         ),
         (
             vec![format!("{}/HOST-DIGEST/", crate::acme::store::DIR)],
-            "The state of podssh relay serve --acme NAME, in the cache, mode 0700, for each CA: HOST is the \
-             host of its directory, and DIGEST 8 hex digits of the SHA-256 of its URL. account.key, the account's \
-             P-256 key, made once and never replaced; NAME.pem, the certificate's own P-256 key and its chain in one \
-             file, replaced whole by a rename at each renewal, so that the key of one certificate is never read with \
-             the chain of another. Each has mode 0600; podssh refuses one that is a symbolic link, another user's, or \
-             that others can read."
+            "The state of podssh relay serve --acme NAME, in the cache, mode 0700, for each CA: HOST is the host of \
+             its directory, and DIGEST 8 hex digits of the SHA-256 of its URL. account.key, the account's P-256 key, \
+             made once and never replaced; NAME.pem, the certificate's own P-256 key and its chain in one file. It is \
+             replaced whole by a rename at each renewal, so that the key of one certificate is never read with the \
+             chain of another. Each has mode 0600; podssh refuses one that is a symbolic link, another user's, or that \
+             others can read."
                 .to_string(),
         ),
         (
@@ -323,7 +320,7 @@ pub fn files() -> Vec<(Vec<String>, String)> {
              VERB-PID.log, mode 0600, which takes the run's stdout and stderr once it is ready; past 1 MiB it is \
              renamed VERB-PID.log.1, which takes the lines written until the run writes the new one, so none is \
              lost. NAME.lock, which the run of the name NAME (or its supervisor \
-             of --restart) holds for its life, with its pid in it, and NAME.run.lock, which a supervisor's run \
+             of --restart) holds for its life, with its pid in it. NAME.run.lock, which a supervisor's run \
              holds: a second start of the name refuses while either is held, and podssh detached reads them. \
              NAME.json, the run's record: its pid, the pid of a supervisor's run, its words, its log and its \
              start. NAME.alive, whose time each run of --restart sets each 10 s, and which its supervisor reads \
@@ -344,15 +341,15 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         (
             vec!["node-NAME.shares".to_string(), "node-NAME.shares.lock".to_string()],
             "The shares of podssh node NAME, in the cache beside its key, or the file of podssh node --shares \
-             FILE: one name=HOST:PORT on each line, which the node reads again for each session, and which podssh \
-             share changes under the lock of FILE.lock beside it, the file replaced whole. Mode 0600; the node \
+             FILE: one name=HOST:PORT on each line, which the node reads again for each session. podssh \
+             share changes it under the lock of FILE.lock beside it, the file replaced whole. Mode 0600; the node \
              refuses one that others may change, as it names what the node dials."
                 .to_string(),
         ),
         (
             vec![format!("{}/", crate::ssh::cloud::tor::DIR_NAME)],
             "The Tor road's directory (tor://, in a build with the feature tor), in the cache, mode 0700: \
-             Arti's state (its guards, which Tor asks a client to keep) in state/, and its copy of Tor's \
+             Arti's state (its guards, which Tor asks a client to keep) in state/. Its copy of Tor's \
              directory in cache/, which a later run reads to start sooner. Arti checks that no other user \
              can write them; where a sandbox's mounts fail that check on a directory above, podssh made \
              these private itself and tries once more without it. The same pair for another network of \
@@ -378,9 +375,9 @@ pub fn files() -> Vec<(Vec<String>, String)> {
         ),
         (
             vec!["the file of --shadowsocks".to_string()],
-            "The Shadowsocks servers of --shadowsocks: ss:// lines, subscription lines and access keys (see \
-             podssh ssh). Its keys hold passwords, so podssh reads it only as a regular file of yours that others \
-             cannot read (on Windows, as its access list says), as a pair file; else, and for a line that cannot be \
+            "The Shadowsocks servers of --shadowsocks: ss:// lines, subscription lines and access keys (see podssh \
+             ssh). Its keys hold passwords. So podssh reads it as it reads a pair file: only as a regular file of \
+             yours that others cannot read (on Windows, as its access list says); else, and for a line that cannot be \
              read, the run is refused (78). podssh never writes it."
                 .to_string(),
         ),
@@ -396,8 +393,8 @@ pub fn files() -> Vec<(Vec<String>, String)> {
             ["the file of --vless", "the file of --trojan", "the file of --tuic"].map(String::from).to_vec(),
             "The VLESS servers of --vless, the Trojan servers of --trojan, or the TUIC servers of --tuic: a \
              vless://, trojan:// or tuic:// share link on each line (see podssh ssh); # starts a comment. Each link \
-             holds its user's ID or password, so podssh reads it only as a regular file of yours that others cannot \
-             read (on Windows, as its access list says), as a pair file; else, and for a line that \
+             holds its user's ID or password. So podssh reads it as it reads a pair file: only as a regular file of \
+             yours that others cannot read (on Windows, as its access list says); else, and for a line that \
              cannot be read, the run is refused (78), by the line's number, never its text. podssh never writes \
              it."
             .to_string(),
@@ -440,24 +437,24 @@ pub fn files() -> Vec<(Vec<String>, String)> {
                 vec!["$XDG_CONFIG_HOME/podssh/settings".to_string(), crate::settings::BESIDE_BINARY.to_string()]
             },
             "podssh's own settings: RelayHost, RelayAddr (each line adds), RelayFailover, CaFile, SessionLog, \
-             Forwarder, ForwarderFallback, DoctorJobs (the sections of podssh doctor at once), RelayKeys (the \
-             keys of a signed list of relay deployments; each line adds) and ECH (as PODSSH_ECH), as Keyword value \
-             lines, below the flags and the variables. The file of PODSSH_SETTINGS, else the first of these \
-             that exists (~/.config/podssh/settings with no XDG_CONFIG_HOME; the second beside the podssh \
-             binary); never one of the working directory. A symbolic link, a file of another user than you or \
-             root, one that others can change, and a bad line are refused (78) by each command that reaches the \
-             relay. podssh never writes it, and no keyword holds a token. After a line [groups], each line is \
-             NAME HOSTS: a group of hosts, parted by commas or blanks (by commas alone on the command line), which \
-             podssh each takes as @NAME. After a line [snippets], each line is NAME COMMAND: a command that podssh \
-             ssh --snippet NAME and podssh each run, with its placeholders (see podssh ssh). A COMMAND in double \
-             quotes, with none inside, loses them, and a # in it is no comment."
+             Forwarder, ForwarderFallback; DoctorJobs (the sections of podssh doctor at once), RelayKeys (the keys of \
+             a signed list of relay deployments; each line adds) and ECH (as PODSSH_ECH), as Keyword value lines, \
+             below the flags and the variables. The file of PODSSH_SETTINGS, else the first of these that exists \
+             (~/.config/podssh/settings with no XDG_CONFIG_HOME; the second beside the podssh binary); never one of \
+             the working directory. A symbolic link, a file of another user than you or root, one that others can \
+             change, and a bad line are refused (78). Each command that reaches the relay refuses them. podssh never \
+             writes it, and no keyword holds a token. After a line [groups], each line is NAME HOSTS: a group of \
+             hosts, parted by commas or blanks (by commas alone on the command line), which podssh each takes as \
+             @NAME. After a line [snippets], each line is NAME COMMAND: a command that podssh ssh --snippet NAME and \
+             podssh each run, with its placeholders (see podssh ssh). A COMMAND in double quotes, with none inside, \
+             loses them, and a # in it is no comment."
                 .to_string(),
         ),
         (
             vec![crate::session_log::FILE.to_string(), crate::session_log::OLD_FILE.to_string()],
             "The log of the sessions of this host, in the cache, when PODSSH_SESSION_LOG or SessionLog asks for \
-             it: a JSON line for each run of podssh ssh and podssh proxy that named a destination, at its end, \
-             with its start, duration, verb, host, port, relay host or road, end, exit code, bytes and the \
+             it: a JSON line for each run of podssh ssh and podssh proxy that named a destination, at its end. \
+             The line holds its start, duration, verb, host, port, relay host or road, end, exit code, bytes and the \
              relay's close code; never a command, an environment value, a token or a password. Mode 0600, \
              opened to append with no symbolic link followed, a line in one write; at 1 MiB it becomes the \
              second name, and a new file starts. podssh status shows the last line."
@@ -468,8 +465,8 @@ pub fn files() -> Vec<(Vec<String>, String)> {
             "The socket of each session of podssh session, in the cache: the directory sessions has mode 0700, \
              and each socket mode 0600 (on Windows, the access list of the cache); it goes when its session's \
              podssh ends. A socket that nobody serves is replaced by the next start of its name. Beside a \
-             socket's file, NAME.sock.lock, which its podssh holds for its life, so that a second one of the \
-             name is refused (69) and never removes the first one's socket."
+             socket's file, NAME.sock.lock, which its podssh holds for its life. So a second one of the \
+             name is refused (69), and it never removes the first one's socket."
                 .to_string(),
         ),
         (
@@ -483,12 +480,12 @@ pub fn files() -> Vec<(Vec<String>, String)> {
                 "podssh.prev.exe".to_string(),
                 "podssh.exe.old".to_string(),
             ],
-            "In the directory of the podssh binary, while podssh update runs: the new binary, written beside \
-             the old one with its mode and run once with --version, then renamed over it, or removed when a \
-             step fails. The binary before the last update stays as podssh.prev (podssh.prev.exe on Windows, \
-             where the running binary is renamed to it), which a move over it or update --rollback puts back; on \
-             Windows, when that name is taken by a running one, the running binary is renamed to \
-             podssh.exe.old instead, which the next run of podssh removes."
+            "In the directory of the podssh binary, while podssh update runs: the new binary, written beside the old \
+             one with its mode and run once with --version. Then it is renamed over the old one, or removed when a \
+             step fails. The binary before the last update stays as podssh.prev (podssh.prev.exe on Windows, where the \
+             running binary is renamed to it); a move over it or update --rollback puts it back; on Windows, when that \
+             name is taken by a running one, the running binary is renamed to podssh.exe.old instead. The next run of \
+             podssh removes it."
                 .to_string(),
         ),
     ];

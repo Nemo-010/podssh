@@ -53,7 +53,7 @@ pub const OPERATOR_CONNECT_TIMEOUT: FlagRow = row(None, "ConnectTimeout", Some("
     "the bound on the time to the session's open, 1 to 86400: the relay's answer, the node's ready, and the handshakes of the layer and of the channel, each within its own limit too; past it one line names the step that waited, and the exit is 69; never the bytes after the open", None);
 /// `--ConnectTimeout` of `proxy` (T-589).
 pub const PROXY_CONNECT_TIMEOUT: FlagRow = row(None, "ConnectTimeout", Some("SECONDS"), FlagKind::Supported,
-    "the bound on the time to the session's open, 1 to 86400: the relay's answer (each host's dial, TLS, the upgrade, its dial of HOST), or that of the road in its place, or the steps of node://NAME as operator has them; past it one line names the step that waited, and the exit is 69; never the bytes after the open", None);
+    "the bound on the time to the session's open, 1 to 86400: the relay's answer (each host's dial, TLS, the upgrade, its dial of HOST), or that of the road in its place; or the steps of node://NAME as operator has them; past it one line names the step that waited, and the exit is 69; never the bytes after the open", None);
 /// `--ConnectTimeout` of `pipe` (T-589).
 pub const PIPE_CONNECT_TIMEOUT: FlagRow = row(None, "ConnectTimeout", Some("SECONDS"), FlagKind::Supported,
     "node: and relay:: the bound on the time to the session's open, as operator and proxy take it, with no listening side; ssh:: each hop's ConnectTimeout too, and with no node: or relay: side the hops' alone", None);
@@ -61,7 +61,7 @@ pub const PIPE_CONNECT_TIMEOUT: FlagRow = row(None, "ConnectTimeout", Some("SECO
 /// `--timeout` of `operator` and `proxy` (T-613): another name of their
 /// `--ConnectTimeout`, a bound on the open alone, so never required.
 pub const TIMEOUT: FlagRow = optional(row(None, "timeout", Some("DURATION"), FlagKind::Supported,
-    "another name of --ConnectTimeout, as a duration (30s, 2m, 1h) rounded up to whole seconds, a day at most, which bounds the session's open and never its bytes; --ConnectTimeout wins when both are given; never required (default: env PODSSH_TIMEOUT)", None));
+    "another name of --ConnectTimeout, as a duration (30s, 2m, 1h) rounded up to whole seconds, a day at most; it bounds the session's open and never its bytes; --ConnectTimeout wins when both are given; never required (default: env PODSSH_TIMEOUT)", None));
 /// `--timeout` of `pipe` (T-613).
 pub const PIPE_TIMEOUT: FlagRow = optional(row(None, "timeout", Some("DURATION"), FlagKind::Supported,
     "node:, relay: and ssh:: another name of --ConnectTimeout, as a duration (30s, 2m, 1h) rounded up to whole seconds, a day at most; --ConnectTimeout wins when both are given; never required (default: env PODSSH_TIMEOUT, for a node: or relay: side of a pipe that does not listen)", None));

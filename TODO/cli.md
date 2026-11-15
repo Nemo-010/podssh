@@ -602,7 +602,7 @@ variable matters when `cp`, `mv` and `relay` exist. `ssh` and `proxy` have no
 3. A malformed value names its source: `--timeout` (exit 64), or
    `PODSSH_TIMEOUT` (exit 78, see Decision). The variable never bounds `ssh`
    or `proxy`.
-4. Same commit: a row in `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-272`),
+4. Same commit: a row in `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-273`),
    which `each_variable_in_the_source_is_documented` requires
    (`crates/podssh-cli/src/man/facts/tests.rs:71-84`); "default: env
    PODSSH_TIMEOUT" in the help of each `--timeout` row, as `--relay-host` says
@@ -1177,7 +1177,7 @@ Read: podssh matches hashed lines with HMAC-SHA1
 with their numbers (`scan`, `crates/podssh-ssh/src/known_hosts.rs:149-179`), and
 appends without a rewrite (`crates/podssh-ssh/src/known_hosts.rs`, lines 323-372 at `f6b7676`).
 The default files are the ones of `podssh ssh`
-(`crates/podssh-cli/src/man/data.rs:183`).
+(`crates/podssh-cli/src/man/data.rs:180`).
 
 ## Approach
 

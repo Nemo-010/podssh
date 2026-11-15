@@ -206,7 +206,7 @@ No glob code exists in podssh. `known_hosts::wildcard`
    stands, and `Match final all` applies after the last line and fills only unset values, as
    measured. Each other `Match` stays refused by name until T-045.
 6. Check each included file as T-043 checks the user file: its owner and its mode.
-7. Change `docs/cli.md:6537-6658`, FILES (`crates/podssh-cli/src/man/data.rs:165-499`) and the
+7. Change `docs/cli.md:6537-6658`, FILES (`crates/podssh-cli/src/man/data.rs:162-496`) and the
    `ssh` notes in the same commit.
 
 ## Prove
@@ -702,7 +702,7 @@ configuration directory first; the operator corrected it on 2026-10-08 (`docs/de
 5. No keyword for a token: a token in a file is a stored credential (question Q5, T-034).
 6. podssh never writes the file: csshw creates one, but podssh changes nothing unasked.
 7. `doctor` and `status` (T-051) name the file in use. Change in the same commit: VARIABLES and
-   FILES (`crates/podssh-cli/src/man/facts.rs:46-272`, 98-142), `docs/relay.md:107-241` and
+   FILES (`crates/podssh-cli/src/man/facts.rs:46-273`, 98-142), `docs/relay.md:107-241` and
    `docs/cli.md`. The cache directory is the work of T-243.
 
 ## Decision

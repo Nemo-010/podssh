@@ -17,13 +17,13 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
         "The DERP servers of the DERP road in place of Tailscale's fleets, as --derp-server: \
           HOST[:PORT], separated by commas, in order; the port is 443 when none is named. The flag wins; a bad \
           value is a configuration error (78). podssh node --derp calls the first whose /derp/probe answers \
-          home, and podssh ssh tries the rest after a ticket's server when the list holds that server.",
+          home; podssh ssh tries the rest after a ticket's server when the list holds that server.",
     ),
     (
         &["PODSSH_DERP_MAIN"],
         "no: the DERP road keeps to Tailscale's four servers for tailcat. Unset, empty or yes: Tailscale's main \
-          DERP fleet follows them, one server of each region first, in the order of the regions, then the \
-          others (its servers are pod-services' list, read on its date); a node \
+          DERP fleet follows them: one server of each region first, in the order of the regions, then the \
+          others; its servers are pod-services' list, read on its date; a node \
           calls the first that answers home, and a client tries them after a ticket's server of either fleet. \
           Another word is a configuration error (78). With PODSSH_DERP_SERVER or --derp-server it says nothing.",
     ),
@@ -37,9 +37,9 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_TRANSIT"],
         "The transit road of a pair, which podssh takes unasked: a \
-          magic-wormhole transit relay, Least Authority's wss://relay.mw.leastauthority.com by default, where a \
+          magic-wormhole transit relay, Least Authority's wss://relay.mw.leastauthority.com by default. There a \
           node of the resumable layer and the end-to-end channel waits for the pair's operators beside the pair's \
-          road, and where podssh ssh node://NAME meets it when each other road failed. Its token and the proof of \
+          road. podssh ssh node://NAME meets it there when each other road failed. Its token and the proof of \
           the pair come from the pair's connect token; the relay sees ciphertext. no: no transit road; a ws:// or \
           wss:// URL: that relay in place of Least Authority's; unset, empty or yes: the default; another word \
           is a configuration error (78), which does not echo the value.",
@@ -47,9 +47,9 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_CROC"],
         "croc's relay road of a pair, the last fallback: croc's public \
-          relays behind croc-web's WebSocket bridge, the one that podssh's list of services names, where a node \
-          of the resumable layer and the end-to-end channel waits in a room of the pair beside the pair's road, \
-          and where podssh ssh node://NAME meets it when each other road failed. Its rooms and the proof of the \
+          relays behind croc-web's WebSocket bridge, the one that podssh's list of services names. There a node \
+          of the resumable layer and the end-to-end channel waits in a room of the pair beside the pair's road. \
+          podssh ssh node://NAME meets it there when each other road failed. Its rooms and the proof of the \
           pair come from the pair's connect token; the relay sees ciphertext. no: no road; a ws:// or wss:// \
           URL: that bridge (croc-web of your own, its query relay=N&port=P when it names one, else relay 0 and \
           port 9009), which PODSSH_LAST_RESORT does not turn off; unset, empty or yes: the listed bridge, none \
@@ -58,8 +58,8 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_ZEROTIER"],
         "ZeroTier's road of a pair, in a build with the feature zerotier, the last fallback after croc's: an ad-hoc network of the pair's own through ZeroTier Inc.'s roots and \
-          its TCP relay, the one that podssh's list of services names, where a node of the resumable layer and the \
-          end-to-end channel waits beside the pair's road, and where podssh ssh node://NAME reaches it when each \
+          its TCP relay, the one that podssh's list of services names. There a node of the resumable layer and the \
+          end-to-end channel waits beside the pair's road. podssh ssh node://NAME reaches it there when each \
           other road failed. The node's identity and the network come from the pair's connect token; the roots \
           and the relay see ciphertext. no: no road; IP:PORT: that relay (ZeroTierOne's tcp-proxy of your own), \
           which PODSSH_LAST_RESORT does not turn off; unset, empty or yes: the listed relay; another word is a \
@@ -67,21 +67,21 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_TOX"],
-        "Tox's relay road of a pair, in a build with the feature tox, the last fallback after ZeroTier's: a TCP relay of the Tox project's public nodes, the one that the \
-          SHA-256 of the pair's name picks among those that podssh's list of services names, where a node of the \
-          resumable layer and the end-to-end channel waits beside the pair's road under a key of the pair's \
-          connect token, and where podssh ssh node://NAME reaches it when each other road failed; the relay sees \
-          ciphertext. no: no road; IP:PORT=KEY (the relay's key in 64 hex digits): that relay (c-toxcore's \
-          tox-bootstrapd of your own, with its TCP relay), which PODSSH_LAST_RESORT does not turn off; unset, \
-          empty or yes: the listed relays, none while the list names none; another word is a configuration \
-          error (78), which does not echo the value.",
+        "Tox's relay road of a pair, in a build with the feature tox, the last fallback after ZeroTier's: a TCP relay \
+          of the Tox project's public nodes: the one that the SHA-256 of the pair's name picks among those that \
+          podssh's list of services names. There a node of the resumable layer and the end-to-end channel waits beside \
+          the pair's road, under a key of the pair's connect token. podssh ssh node://NAME reaches it there when each \
+          other road failed; the relay sees ciphertext. no: no road; IP:PORT=KEY (the relay's key in 64 hex digits): \
+          that relay (c-toxcore's tox-bootstrapd of your own, with its TCP relay), which PODSSH_LAST_RESORT does not \
+          turn off; unset, empty or yes: the listed relays, none while the list names none; another word is a \
+          configuration error (78), which does not echo the value.",
     ),
     (
         &["PODSSH_YGGDRASIL"],
         "Yggdrasil's road of a pair, in a build with the feature yggdrasil, the last fallback after the Tox road: a public wss:// peer of Yggdrasil's network, the one that the \
-          SHA-256 of the pair's name picks among those that podssh's list of services names, through which a node \
-          of the resumable layer and the end-to-end channel joins the network beside the pair's road under a key \
-          of the pair's connect token, and where podssh ssh node://NAME reaches it by that key when each other \
+          SHA-256 of the pair's name picks among those that podssh's list of services names. Through it a node \
+          of the resumable layer and the end-to-end channel joins the network beside the pair's road. It joins \
+          under a key of the pair's connect token. podssh ssh node://NAME reaches it by that key when each other \
           road failed; the peers see ciphertext, and an end routes for the network while the road is up. no: no \
           road; a wss:// or ws:// URL: that peer (yggdrasil-go of your own, with that Listen), which \
           PODSSH_LAST_RESORT does not turn off; unset, empty or yes: the listed peers, none while the list names \
@@ -90,8 +90,8 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_HYPERDHT"],
         "HyperDHT's road of a pair, in a build with the feature hyperdht, where UDP passes, after Yggdrasil's road: the DHT that the bootstrap nodes of podssh's \
-          list of services reach, where a node of the resumable layer and the end-to-end channel announces a \
-          topic of a key of the pair's connect token beside the pair's road, and where podssh ssh node://NAME \
+          list of services reach. There a node of the resumable layer and the end-to-end channel announces a \
+          topic beside the pair's road; the topic is of a key of the pair's connect token. podssh ssh node://NAME \
           connects to it by that key, a hole punched through both NATs, when each other road failed; the DHT's \
           nodes see the two ends' addresses, and the channel keeps the bytes. no: no road; HOST:PORT[,HOST:PORT...]: \
           the bootstrap of a DHT of your own, which PODSSH_LAST_RESORT does not turn off; unset, empty or yes: the \
@@ -101,9 +101,9 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_SYNCTHING_RELAY"],
         "Syncthing's relay road of a pair, in a build with the feature strelay, the last fallback after HyperDHT's road: a relay of Syncthing's pool on 443, the one that the SHA-256 \
-          of the pair's name picks among those that podssh's list of services names, where a node of the \
-          resumable layer and the end-to-end channel joins beside the pair's road under a certificate of the \
-          pair's connect token, and where podssh ssh node://NAME asks for it when each other road failed; the \
+          of the pair's name picks among those that podssh's list of services names. There a node of the \
+          resumable layer and the end-to-end channel joins beside the pair's road, under a certificate of the \
+          pair's connect token. podssh ssh node://NAME asks for it there when each other road failed; the \
           relay sees ciphertext. no: no road; relay://IP:PORT/?id=DEVICE-ID: that relay (Syncthing's strelaysrv of \
           your own), which PODSSH_LAST_RESORT does not turn off; unset, empty or yes: the listed relays, none while \
           the list names none; another word is a configuration error (78), which does not echo the value.",
@@ -112,8 +112,8 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
         &["PODSSH_SMEE"],
         "The smee.io road of a pair, the last fallback after the onion road, \
           for a proxy that refuses the WebSocket upgrade: channels of smee.io's server, named from the pair's \
-          connect token, where a node of the resumable layer and the end-to-end channel reads its door beside the \
-          pair's road, and where podssh ssh node://NAME posts a hello when each other road failed; each way of a \
+          connect token. There a node of the resumable layer and the end-to-end channel reads its door beside the \
+          pair's road. podssh ssh node://NAME posts a hello there when each other road failed; each way of a \
           link is a POST for each frame and a stream of server-sent events back, and the server sees ciphertext. \
           no: no road; https://HOST[:PORT][/PREFIX]: that server (smee.io's server of your own), which \
           PODSSH_LAST_RESORT does not turn off; unset, empty or yes: the server of podssh's list of services, none \
@@ -122,9 +122,9 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_ONION"],
         "The onion road of a pair, in a build with the feature tor, the last fallback after Syncthing's relay road: an onion service of the Tor network, Arti's in podssh's process \
-          through the Tor road (its proxy, PODSSH_TOR_PORTS, PODSSH_TOR_BRIDGES and PODSSH_TOR_NETWORK hold), where \
-          a node of the resumable layer and the end-to-end channel waits beside the pair's road, and where podssh \
-          ssh node://NAME reaches it when each other road failed. The service's key stays in the node's own \
+          through the Tor road (its proxy, PODSSH_TOR_PORTS, PODSSH_TOR_BRIDGES and PODSSH_TOR_NETWORK hold). There \
+          a node of the resumable layer and the end-to-end channel waits beside the pair's road. podssh \
+          ssh node://NAME reaches it there when each other road failed. The service's key stays in the node's own \
           directory of the cache, so its address stays; its descriptor is of restricted discovery, readable only \
           with a key that both ends make of the pair's connect token. The node's line says its address, which a \
           node of this host keeps under its NAME. no: no road; an onion address (56 letters of base32 and .onion): \
@@ -135,37 +135,37 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_ZEROTIER_PLANET"],
         "A file of a ZeroTier planet (zerotier-one's planet, or one that mkworld made) whose roots ZeroTier's road \
-          joins in the place of ZeroTier Inc.'s, so that no root of a third party carries it. A file that \
+          joins in the place of ZeroTier Inc.'s. Then no root of a third party carries it. A file that \
           cannot be read, or that is empty or over 16 KiB, is a configuration error (78).",
     ),
     (
         &["PODSSH_PIPING"],
-        "The Piping Server road of a pair (podssh node NAME, podssh ssh node://NAME), for a proxy that refuses \
-          the WebSocket upgrade: a POST and a GET of plain HTTPS for each way of a link, on paths that the pair's \
-          secret gives, under the resumable layer and the end-to-end channel. Unset or empty: the fallback that podssh takes, through https://ppng.io, then https://piping.onrender.com where \
-          ppng.io fails (a node waits at the first that answers, and a client that meets no node at one tries \
-          the next): a node serves it alone once a probe at its \
-          start finds the upgrade to the relay refused on the way, and a client tries it once the pair's road \
-          found the same. no: no such road. yes (the same servers), or https://HOST[:PORT][/PREFIX] of a Piping \
-          Server (that server alone): the road as asked, which a node serves beside the pair's road and a client races 250 ms after it; with \
-          --plain, --no-e2e or a udp: TARGET the node refuses it (64). Another word is a configuration error \
+        "The Piping Server road of a pair (podssh node NAME, podssh ssh node://NAME), for a proxy that refuses the \
+          WebSocket upgrade: a POST and a GET of plain HTTPS for each way of a link, on paths that the pair's secret \
+          gives; under the resumable layer and the end-to-end channel. Unset or empty: the fallback that podssh takes, \
+          through https://ppng.io, then https://piping.onrender.com where ppng.io fails (a node waits at the first \
+          that answers; a client that meets no node at one tries the next): a node serves it alone once a probe at its \
+          start finds the upgrade to the relay refused on the way; a client tries it once the pair's road found the \
+          same. no: no such road. yes (the same servers), or https://HOST[:PORT][/PREFIX] of a Piping Server (that \
+          server alone): the road as asked, which a node serves beside the pair's road and a client races 250 ms after \
+          it; with --plain, --no-e2e or a udp: TARGET the node refuses it (64). Another word is a configuration error \
           (78).",
     ),
     (
         &["PODSSH_OPENTUNNEL"],
-        "The OpenTunnel road, which podssh takes unasked for a node with no \
-          other road: a blind TLS tunnel with no account, https://opentunnel.xyz by default, of podssh node \
-          --opentunnel and podssh ssh node://NAME --opentunnel-name, and of podssh funnel --opentunnel, \
-          which a funnel that the quick tunnel cannot carry takes unasked. no: no such road, and the flags are \
-          refused (64); an https://HOST[:PORT] URL: that service in place of OpenTunnel's, whose certificates the trust of \
-          --ca-file checks; unset, empty or yes: the default. Another word is a configuration error (78), which \
-          does not echo the value.",
+        "The OpenTunnel road, which podssh takes unasked for a node with no other road: a blind TLS tunnel with no \
+          account, https://opentunnel.xyz by default. It is the road of podssh node --opentunnel and podssh ssh \
+          node://NAME --opentunnel-name. It is also the road of podssh funnel --opentunnel, which a funnel that the \
+          quick tunnel cannot carry takes unasked. no: no such road, and the flags are refused (64); an \
+          https://HOST[:PORT] URL: that service in place of OpenTunnel's, whose certificates the trust of --ca-file \
+          checks; unset, empty or yes: the default. Another word is a configuration error (78), which does not echo \
+          the value.",
     ),
     (
         &["PODSSH_PINGGY"],
         "The Pinggy road, a last fallback: a TLS tunnel of Pinggy's free \
-          tier with no account, whose node's leg is SSH on port 443, raw, else inside TLS that the host's trust \
-          verifies, and whose client's TLS pins the node's key, of podssh node --pinggy and podssh ssh \
+          tier with no account. Its node's leg is SSH on port 443, raw, else inside TLS that the host's trust \
+          verifies. Its client's TLS pins the node's key. It is the road of podssh node --pinggy and podssh ssh \
           node://NAME --pinggy-name HOST#PIN, which a node with no other road serves unasked. no: no such \
           road, and the flags are refused (64); HOST[:PORT]: that server of Pinggy's protocol in place of \
           Pinggy's, whose host key nobody names; unset, empty or yes: Pinggy's own. Another word is a \
@@ -173,50 +173,49 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_SERVEO"],
-        "The Serveo road, a last fallback: a private alias at Serveo with \
-          no account, derived from the node's key, whose node's leg and client's hop are raw SSH on port 443, \
-          then 22, of podssh node --serveo, which a node with no other road serves unasked after the Pinggy road, \
-          and of podssh ssh node://NAME, which a client with a key of the node races last but for the ssh-j \
-          road. no: no such road, and the flag is refused (64); HOST[:PORT]: that server of Serveo's protocol, whose host key nobody names; \
-          unset, empty or yes: the server that podssh's list of services names, and none where it names none. \
-          Another word is a configuration error (78), which does not echo the value.",
+        "The Serveo road, a last fallback: a private alias at Serveo with no account, derived from the node's key. Its \
+          node's leg and client's hop are raw SSH on port 443, then 22. It is the road of podssh node --serveo, which \
+          a node with no other road serves unasked after the Pinggy road. It is also the road of podssh ssh \
+          node://NAME, which a client with a key of the node races last but for the ssh-j road. no: no such road, and \
+          the flag is refused (64); HOST[:PORT]: that server of Serveo's protocol, whose host key nobody names; unset, \
+          empty or yes: the server that podssh's list of services names, and none where it names none. Another word is \
+          a configuration error (78), which does not echo the value.",
     ),
     (
         &["PODSSH_SSH_J"],
-        "The ssh-j road, the last fallback: ssh-j.com, a public SSH jump and \
-          forwarding server with no account on port 22, of podssh node --ssh-j and podssh ssh node://NAME, where \
-          the node and the client derive the node's name there from its key; a node with no other road serves it \
-          unasked after the Pinggy road and the Serveo road. no: no such road, and --ssh-j is refused (64); \
-          HOST[:PORT]: that server of the same protocol, whose host key nobody names; unset, empty or yes: ssh-j.com where podssh's list \
-          of services names it, else no server, and --ssh-j is a configuration error (78). Another word is a \
-          configuration error (78), which does not echo the value.",
+        "The ssh-j road, the last fallback: ssh-j.com, a public SSH jump and forwarding server with no account on port \
+          22. It is the road of podssh node --ssh-j and podssh ssh node://NAME; the node and the client derive the \
+          node's name there from its key; a node with no other road serves it unasked after the Pinggy road and the \
+          Serveo road. no: no such road, and --ssh-j is refused (64); HOST[:PORT]: that server of the same protocol, \
+          whose host key nobody names; unset, empty or yes: ssh-j.com where podssh's list of services names it, else \
+          no server, and --ssh-j is a configuration error (78). Another word is a configuration error (78), which does \
+          not echo the value.",
     ),
     (
         &["PODSSH_LOCALHOST_RUN"],
-        "The localhost.run road, a last fallback: a tunnel of HTTP made by \
-          ssh -R with no account, SSH on port 22 as nokey with the forward of port 80, of podssh node --localhost-run \
-          and podssh ssh node://NAME --tunnel-url https://HOST, which a node with no other road serves unasked after \
-          the ssh-j road, before the localtunnel road. no: no such road, and the flags are refused (64); \
-          HOST[:PORT]: that server of the same shape, whose host key nobody names; unset, empty or yes: localhost.run where podssh's list of services \
-          names it, else no server, and --localhost-run is a configuration error (78). Another word is a \
-          configuration error (78), which does not echo the value.",
+        "The localhost.run road, a last fallback: a tunnel of HTTP made by ssh -R with no account, SSH on port 22 as \
+          nokey with the forward of port 80. It is the road of podssh node --localhost-run and podssh ssh node://NAME \
+          --tunnel-url https://HOST. A node with no other road serves it unasked after the ssh-j road, before the \
+          localtunnel road. no: no such road, and the flags are refused (64); HOST[:PORT]: that server of the same \
+          shape, whose host key nobody names; unset, empty or yes: localhost.run where podssh's list of services names \
+          it, else no server, and --localhost-run is a configuration error (78). Another word is a configuration error \
+          (78), which does not echo the value.",
     ),
     (
         &["PODSSH_SANDHOLE"],
-        "The Sandhole road, a last fallback: the localhost.run road's shape \
-          at Sandhole's public server, SSH on port 443, then 22, with a key made for the login alone and the forward \
-          of port 80, of podssh node --sandhole and podssh ssh node://NAME --tunnel-url https://HOST of a name under \
-          its tunnels' zone, which a node with no other road serves unasked after the localhost.run road. no: no \
-          such road, and the flags are refused (64); HOST[:PORT]: that server of the same shape, whose host key \
-          nobody names; unset, empty or yes: demo.sandhole.com.br where podssh's list of services names it, else \
-          no server, and --sandhole is a configuration error (78). Another word is a configuration error (78), \
-          which does not echo the value.",
+        "The Sandhole road, a last fallback: the localhost.run road's shape at Sandhole's public server: SSH on port \
+          443, then 22, with a key made for the login alone and the forward of port 80. It is the road of podssh node \
+          --sandhole and podssh ssh node://NAME --tunnel-url https://HOST of a name under its tunnels' zone. A node \
+          with no other road serves it unasked after the localhost.run road. no: no such road, and the flags are \
+          refused (64); HOST[:PORT]: that server of the same shape, whose host key nobody names; unset, empty or yes: \
+          demo.sandhole.com.br where podssh's list of services names it, else no server, and --sandhole is a \
+          configuration error (78). Another word is a configuration error (78), which does not echo the value.",
     ),
     (
         &["PODSSH_BARE"],
         "The Bare hop, the last fallback of all: podssh ssh node://NAME \
           reaches the tunnel's name of the localhost.run or Sandhole road through a Bare v3 node, once each road \
-          before it failed, so that a proxy sees the node's name alone; the node dials the name itself and sees it, \
+          before it failed; this way, a proxy sees the node's name alone; the node dials the name itself and sees it, \
           and the end-to-end channel keeps the bytes. No relay token goes to it. no: no such hop; an https:// URL: \
           that node; unset, empty or yes: the node of the kind bare-node of podssh's list of services, else none. \
           Another word is a configuration error (78), which does not echo the value.",
@@ -226,8 +225,8 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
         "The hostc road, a last fallback, after the Sandhole road and before \
           the localtunnel road: hostc's public server with no account, of podssh node --hostc; the node asks it for \
           a tunnel over HTTPS and keeps one WebSocket to it, both on 443 by name through HTTPS_PROXY; the name is \
-          random, so a client takes it as a tunnel's name of the localhost.run road (podssh ssh node://NAME \
-          --tunnel-url https://HOST, or the node's record), with this variable as its switch. A server that \
+          random; so a client takes it as a tunnel's name of the localhost.run road (podssh ssh node://NAME \
+          --tunnel-url https://HOST, or the node's record); this variable is its switch. A server that \
           answers 426 speaks a newer version of hostc's protocol than this podssh: the road ends, and the next \
           road goes on. no: no such road, and --hostc is refused (64); an https:// URL, or http:// on this \
           host's loopback: that server of hostc's protocol; unset, empty or yes: hostc's where podssh's list of \
@@ -236,79 +235,77 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_LOCALTUNNEL"],
-        "The localtunnel road, a last fallback, before the bore road: \
-          localtunnel's public server with no account, of podssh node --localtunnel and podssh ssh node://NAME, where the node and \
-          the client derive the node's name there from its key; the node needs an egress that reaches the port \
-          that the server names, its client port 443 alone; a node with no other road serves it unasked after \
-          the localhost.run road. no: no such road, and --localtunnel is refused (64); an https:// URL, or http:// on \
-          this host's loopback: that server of localtunnel's protocol, whose tunnels are names under its own; \
-          unset, empty or yes: localtunnel's where podssh's list of services names it, else no server, and \
-          --localtunnel is a configuration error (78). Another word is a configuration error (78), which does \
-          not echo the value.",
-    ),
-    (
-        &["PODSSH_BORE"],
-        "The bore road, the last fallback: bore.pub, a public server of \
-          bore's protocol that gives a TCP port with no account, of podssh node --bore and podssh ssh node://NAME, \
-          where the node and the client derive the node's public ports there from its key; raw TCP to the control \
-          port 7835 and to the port, so a proxy that allows 443 alone leaves the node out, and the client then \
-          reaches the port through the forwarders that the binary names; a node with no other road serves it \
-          unasked after the localtunnel road. no: no such road, and --bore is refused (64); HOST[:PORT]: that server of \
-          bore's protocol, at its control port (7835 where none is named); unset, empty or yes: bore.pub where \
-          podssh's list of services names it, else no server, and --bore is a configuration error (78). Another \
+        "The localtunnel road, a last fallback, before the bore road: localtunnel's public server with no account, of \
+          podssh node --localtunnel and podssh ssh node://NAME; the node and the client derive the node's name there \
+          from its key; the node needs an egress that reaches the port that the server names, its client port 443 \
+          alone; a node with no other road serves it unasked after the localhost.run road. no: no such road, and \
+          --localtunnel is refused (64); an https:// URL, or http:// on this host's loopback: that server of \
+          localtunnel's protocol, whose tunnels are names under its own; unset, empty or yes: localtunnel's where \
+          podssh's list of services names it, else no server, and --localtunnel is a configuration error (78). Another \
           word is a configuration error (78), which does not echo the value.",
     ),
     (
+        &["PODSSH_BORE"],
+        "The bore road, the last fallback: bore.pub, a public server of bore's protocol that gives a TCP port with no \
+          account. It is the road of podssh node --bore and podssh ssh node://NAME; the node and the client derive the \
+          node's public ports there from its key; raw TCP to the control port 7835 and to the port; so a proxy that \
+          allows 443 alone leaves the node out; the client then reaches the port through the forwarders that the \
+          binary names; a node with no other road serves it unasked after the localtunnel road. no: no such road, and \
+          --bore is refused (64); HOST[:PORT]: that server of bore's protocol, at its control port (7835 where none is \
+          named); unset, empty or yes: bore.pub where podssh's list of services names it, else no server, and --bore \
+          is a configuration error (78). Another word is a configuration error (78), which does not echo the value.",
+    ),
+    (
         &["PODSSH_PINGGY_TRACE"],
-        "1: the Pinggy road says each visitor's bytes each way every 5 s while it lives, on the node's stderr, \
-          and each link's on the client's with -v, with a write that waits and since when, so that a run that \
+        "1: the Pinggy road says each visitor's bytes each way every 5 s while it lives, on the node's stderr. \
+          It says each link's on the client's with -v, with a write that waits and since when. So a run that \
           stalls names the side where the bytes stop. The node says each visitor's end, why and its \
           bytes each way, with or without it. Unset or another value: no such lines.",
     ),
     (
         &["PODSSH_FRP"],
-        "The file of the frp road, the user's own frps: a private file with a line each, server \
-          (frp://HOST[:PORT] or wss://HOST[:PORT][/PATH]), token (frps's) and secret (the node's STCP service's), \
-          and name where the service is not the node's NAME; user (frpc's user, which a visitor logs in as), \
-          and for a visitor alone owner (frpc's serverUser) and plain (a real frpc's service of an sshd, which \
-          SSH reaches on the visit itself, with no end-to-end channel). podssh node NAME TARGET serves the road \
-          with it when --frp names no file, and podssh ssh node://NAME races the road once each road before it \
+        "The file of the frp road, the user's own frps: a private file with a line each: server \
+          (frp://HOST[:PORT] or wss://HOST[:PORT][/PATH]), token (frps's) and secret (the node's STCP service's); \
+          and name where the service is not the node's NAME; user (frpc's user, which a visitor logs in as); \
+          and for a visitor alone owner (frpc's serverUser) and plain (a real frpc's service of an sshd; \
+          SSH reaches it on the visit itself, with no end-to-end channel). podssh node NAME TARGET serves the road \
+          with it when --frp names no file. podssh ssh node://NAME races the road once each road before it \
           failed, or takes the plain service alone. Unset or empty: no frp road. A file that does not read is a \
           configuration error (78), which names its line and never its text.",
     ),
     (
         &["PODSSH_RELAY_LAYER"],
-        "yes: podssh proxy and podssh ssh, and each command that logs in as podssh ssh does, read the \
-          /relays.json of the first relay host, and where it offers the resumable layer (forward.layer, which \
-          podssh relay serve gives), carry the session in it to that host alone, or to the process that it names \
-          as forward.host, of its deployment: the relay keeps the connection to the target while this host's \
-          link is lost, for 10 minutes unless it says otherwise, and a new link resumes the session, which a \
-          line on stderr says. A host that offers none, that has no room for a new resumable session, or \
-          whose first link fails for a reason that another host may not share, takes the contract's road, with \
-          one line; so does podssh ssh --no-resume. Unset or empty: the same where the first host offered the \
-          layer within a day, with no line where it is not there: each read of a host's offer is kept in the \
-          cache for a day (relay-offer-HOST-PORT.json), and for a relay host that the user named whose offer \
-          is not kept, its /relays.json is read once, 1 s at most, before the session; the default relay's \
-          offer comes with the refresh of its pool alone. A kept offer whose host answers 404 for the layer is \
-          forgotten, with one line, and the contract's road carries the session. no: the contract's road, \
-          with no request more. Another word is a configuration error (78).",
+        "yes: podssh proxy and podssh ssh, and each command that logs in as podssh ssh does, read the /relays.json of \
+          the first relay host. Where it offers the resumable layer (forward.layer, which podssh relay serve gives), \
+          they carry the session in it to that host alone. Or they carry it to the process that it names as \
+          forward.host, of its deployment: the relay keeps the connection to the target while this host's link is \
+          lost, for 10 minutes unless it says otherwise. A new link resumes the session, which a line on stderr says. \
+          A host that offers none takes the contract's road, with one line. So does a host with no room for a new \
+          resumable session; so does one whose first link fails for a reason that another host may not share; so does \
+          podssh ssh --no-resume. Unset or empty: the same where the first host offered the layer within a day, with \
+          no line where it is not there: each read of a host's offer is kept in the cache for a day \
+          (relay-offer-HOST-PORT.json). For a relay host that the user named whose offer is not kept, its /relays.json \
+          is read once, 1 s at most, before the session; the default relay's offer comes with the refresh of its pool \
+          alone. A kept offer whose host answers 404 for the layer is forgotten, with one line, and the contract's \
+          road carries the session. no: the contract's road, with no request more. Another word is a configuration \
+          error (78).",
     ),
     (
         &["PODSSH_RELAY_RANK"],
         "no (or off, 0): the default relay hosts go in the order of /relays.json, with no rank. Unset or \
-          another word: when a rank of podssh relay rank holds for this egress (24 h), the default list is the \
-          default host and the best three other hosts of the pool in the rank's order, the default host at its \
+          another word: when a rank of podssh relay rank holds for this egress (24 h): the default list is the \
+          default host and the best three other hosts of the pool, in the rank's order; the default host is at its \
           place among them; where none holds, the times of each run's own race, the last 8 of each host, order \
           the pool. A list that the user named keeps its order, and a host that failed lately goes last over \
-          its rank. auto: the same, and a session of podssh ssh on the default list ranks the hosts in its \
-          background when no rank holds for this egress, once a day, 8 hosts, one probe each 10 s at most, \
+          its rank. auto: the same; and a session of podssh ssh on the default list ranks the hosts in its \
+          background when no rank holds for this egress; once a day, 8 hosts, one probe each 10 s at most, \
           each with ?dial=lazy; never unless asked. The settings file's RelayRank yes, no or auto \
           says the same, below the variable: a variable that is set, and not empty, wins.",
     ),
     (
         &["PODSSH_RELAY_KEYS"],
         "More keys to trust for a signed list of relay deployments: KEY[,KEY...], each SHA256:... as \
-          ssh-keygen -l shows an Ed25519 key, or its 64 hex digits, such as the key that podssh relay serve \
+          ssh-keygen -l shows an Ed25519 key, or its 64 hex digits; an example is the key that podssh relay serve \
           --deployment names on its first line. They add to the keys compiled in, the settings file's \
           RelayKeys and the members of your net with the role relay. A list that /relays.json carries, signed by \
           one of them, adds its deployments' hosts after the default list, each with a token of its own; a list \
@@ -318,46 +315,47 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_RELAY_RANK_PACE"],
         "For tests only, and read only by a build with debug assertions, never by a release binary: \
-          DELAY_MS,GAP_MS, the wait of a rank in a session's background after the session opened and \
-          between the starts of two of its probes, in place of 60 s and 10 s, so that a test of the bounds \
+          DELAY_MS,GAP_MS: the wait of a rank in a session's background after the session opened, and \
+          between the starts of two of its probes. They are in place of 60 s and 10 s, so that a test of the bounds \
           runs in seconds.",
     ),
     (
         &["PODSSH_DIRECT"],
-        "no: when each relay host failed, podssh ssh and each command that reaches a server as it does (cp, \
-          each, job, health, containers, ping, pipe ssh:) end with the relay's failure, as with --relay-host, \
-          and do not try the direct road. Unset, empty or yes: with no relay named (no --relay-host, \
-          PODSSH_RELAY or RelayHost), the direct road is tried once, as --direct dials it, of the family of \
-          -4 or -6 when one is given, also after a relay that closed a session to an IPv6 target before any \
-          byte, through HTTPS_PROXY when one is set, and the server's version line must come within 10 s. The \
+        "no: when each relay host failed, podssh ssh ends with the relay's failure, as with --relay-host, and \
+          does not try the direct road. So does each command that reaches a server as it does (cp, each, job, \
+          health, containers, ping, pipe ssh:). Unset, empty or yes: with no relay named (no --relay-host, \
+          PODSSH_RELAY or RelayHost), the direct road is tried once, as --direct dials it. It uses the family of \
+          -4 or -6 when one is given, and goes through HTTPS_PROXY when one is set. It is also tried after a \
+          relay that closed a session to an IPv6 target before any byte. The server's version line must come \
+          within 10 s. The \
           settings file's Direct says the same, below the variable; another word is a configuration error (78).",
     ),
     (
         &["PODSSH_CLEARTEXT"],
-        "no: no cleartext road: when each relay host failed, and the TLS of one failed on the way (its \
-          certificate, a reset or a close in the handshake, or its bound), podssh ssh, each command of its road, \
-          podssh proxy and podssh pipe end with the relay's failure, and the fallback to the forwarders that \
-          podssh names tries no ws:// form of them. Unset, empty or yes: the road is tried last, a host of each \
+        "no: no cleartext road: when each relay host failed, and the TLS of one failed on the way: by its \
+          certificate, a reset or a close in the handshake, or its bound. Then podssh ssh, each command of its road, \
+          podssh proxy and podssh pipe end with the relay's failure. The fallback to the forwarders that \
+          podssh names then tries no ws:// form of them. Unset, empty or yes: the road is tried last, a host of each \
           deployment once, through HTTPS_PROXY as each road dials: a token of one session, minted in cleartext \
           (POST /v1/mint?once=1) and never cached, then the upgrade with it, which each hop can read; no other \
           token goes there. Another word is said in a line, and the road is not tried.",
     ),
     (
         &["PODSSH_HTTP_ROAD"],
-        "The HTTP road (see THE RELAY): when each relay host failed and the \
-          way to one of them refused the WebSocket upgrade, podssh ssh, each command that reaches a server as it \
-          does, and podssh proxy carry the session over plain HTTPS requests to that host, which podssh relay serve \
-          serves. Unset, empty, auto or yes: the one-POST form where the host's /relays.json names it (one \
-          connection, the bytes both ways in one request; a way that holds its body takes the split form within 2 s, \
-          and for the rest of the run), then the split form, then the serial form; split, serial or one: that form \
-          alone; no: no such road. Another word is a configuration error (78), which does not echo the value.",
+        "The HTTP road (see THE RELAY): when each relay host failed and the way to one of them refused the WebSocket \
+          upgrade: podssh ssh, each command that reaches a server as it does, and podssh proxy carry the session over \
+          plain HTTPS requests to that host. podssh relay serve serves these requests. Unset, empty, auto or yes: the \
+          one-POST form where the host's /relays.json names it (one connection, the bytes both ways in one request; a \
+          way that holds its body takes the split form within 2 s, and for the rest of the run); then the split form, \
+          then the serial form; split, serial or one: that form alone; no: no such road. Another word is a \
+          configuration error (78), which does not echo the value.",
     ),
     (
         &["PODSSH_H2"],
         "The WebSocket over HTTP/2's extended CONNECT (see THE RELAY), for podssh ssh, each command that reaches a \
           server as it does, and podssh proxy: the sessions of one run to a relay host as streams of one TLS \
           connection. Unset, empty or auto: offered to a relay host that you named (--relay-host, PODSSH_RELAY or \
-          RelayHost), as podssh relay serve offers it, and to no host of the default relay, whose edge offers no \
+          RelayHost), as podssh relay serve offers it; and to no host of the default relay, whose edge offers no \
           extended CONNECT; yes: offered to each relay host, where one whose HTTP/2 offers none costs one more \
           connection in a run; no: the upgrade of HTTP/1.1 alone, as before. Another word offers it to none, and \
           podssh doctor's line http2 fails with it.",
@@ -367,10 +365,10 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
         "QUIC to podssh relay serve (see THE RELAY), for podssh ssh, each command that reaches a server as it does, \
           and podssh proxy: a session raced over QUIC on UDP first, then over TCP. Unset, empty or auto: to a relay \
           host that you named (--relay-host, PODSSH_RELAY or RelayHost) whose /relays.json offered QUIC \
-          (forward.quic), as its offer of the resumable layer is kept, for a day; yes: to each relay host, at the \
-          port that it offered, else at its own; no: never. In each case only where no proxy is set for the host, \
-          as no HTTP proxy carries UDP, and never with a TLS configuration that a caller of the library gave. \
-          Another word races QUIC to none.",
+          (forward.quic); that offer is kept for a day, as its offer of the resumable layer is; yes: to each relay \
+          host, at the port that it offered, else at its own; no: never. In each case only where no proxy is set for \
+          the host, as no HTTP proxy carries UDP; and never with a TLS configuration that a caller of the library \
+          gave. Another word races QUIC to none.",
     ),
     (
         &["PODSSH_FORWARDER"],
@@ -385,35 +383,38 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
         &["PODSSH_FORWARDER_FALLBACK"],
         "no: when each relay host failed, podssh does not try the forwarders that it names (mudlet, ssheasy, \
       mudix, then the Wisp demo server, wisp); yes, the default, tries them, 10 s at most each, where the relay \
-      was podssh's own choice and no relay host answered about the target (its 502, or its refusal of the \
-      target by policy, ends the run). Over ForwarderFallback of the settings file; another word is a \
+      was podssh's own choice and no relay host answered about the target. Its 502, or its refusal of the \
+      target by policy, ends the run. Over ForwarderFallback of the settings file; another word is a \
       configuration error (78).",
     ),
     (
         &["PODSSH_PROXY_LISTS"],
-        "no: when each relay host, each forwarder and each ws:// form failed, podssh does not ask the public lists \
-      of proxy nodes (VLESS, Trojan and VMess's AEAD form, which anonymous operators run; the lists are the \
-      services of the kind proxy-list of pod-services) for a node to carry the session of podssh ssh (never a pipe of podssh proxy, \
-      whose stream a node could read). yes, the default, tries at most 16 nodes, \
-      12 s each, as the last fallback, where the same conditions as the forwarders' hold; one line names the \
-      lists' hosts and says that the target goes to a third party that nobody vouches for, and the line of the \
-      node that carries names its host. SSH and its host key keep the session's bytes private. A node that is \
-      not on 443 with TLS, that fronts another name than its host, that sits under a school's, a church's or a \
-      government's suffix, or that is at a private address is never tried. PODSSH_LAST_RESORT=no turns this \
-      off with the other last fallbacks. Another word is no.",
+        "no: podssh does not ask the public lists of proxy nodes for a node to carry the session of podssh ssh. That \
+      ask comes when each relay host, each forwarder and each ws:// form failed. The nodes are VLESS, Trojan and \
+      VMess's AEAD form, which anonymous operators run; the lists are the services of the kind proxy-list of \
+      pod-services. It is never asked for a pipe of podssh proxy, whose stream a node could read. yes, the default, \
+      tries at most 16 nodes, 12 s each, as the last fallback, where the same conditions as the forwarders' hold; one \
+      line names the lists' hosts and says that the target goes to a third party that nobody vouches for; the line of \
+      the node that carries names its host. SSH and its host key keep the session's bytes private. These nodes are \
+      never tried: a node that is not on 443 with TLS, or that fronts another name than its host; one that sits under \
+      a school's, a church's or a government's suffix; one that is at a private address. PODSSH_LAST_RESORT=no turns \
+      this off with the other last fallbacks. Another word is no.",
     ),
     (
         &["PODSSH_LAST_RESORT"],
         "no: turns off each last fallback that sends the target to a public service of a third party that nobody \
-      vouches for (the public proxy nodes, PODSSH_PROXY_LISTS; the Pinggy road, PODSSH_PINGGY; the \
-      Serveo road, PODSSH_SERVEO; the ssh-j road, PODSSH_SSH_J; the localhost.run road, \
-      PODSSH_LOCALHOST_RUN; the Sandhole road, PODSSH_SANDHOLE; the srv.us road, PODSSH_SRV_US; the tunnl.gg road, PODSSH_TUNNL_GG; the Bare hop, PODSSH_BARE; the hostc road, PODSSH_HOSTC; the localtunnel road, PODSSH_LOCALTUNNEL; the bore road, \
-      PODSSH_BORE; croc's relay road, PODSSH_CROC; ZeroTier's road, PODSSH_ZEROTIER; Tox's relay road, PODSSH_TOX; Yggdrasil's road, PODSSH_YGGDRASIL; HyperDHT's road, PODSSH_HYPERDHT; Syncthing's relay road, PODSSH_SYNCTHING_RELAY; the onion road, PODSSH_ONION; the smee.io road, PODSSH_SMEE; the file hosts' road, PODSSH_FILEHOSTS; and the roads that join them); yes, the default, leaves each to its own variable. \
-      Another word is no.",
+      vouches for. These are the public proxy nodes, PODSSH_PROXY_LISTS; the Pinggy road, PODSSH_PINGGY; the Serveo \
+      road, PODSSH_SERVEO; the ssh-j road, PODSSH_SSH_J; the localhost.run road, PODSSH_LOCALHOST_RUN; the Sandhole \
+      road, PODSSH_SANDHOLE; the srv.us road, PODSSH_SRV_US; the tunnl.gg road, PODSSH_TUNNL_GG; the Bare hop, \
+      PODSSH_BARE; the hostc road, PODSSH_HOSTC; the localtunnel road, PODSSH_LOCALTUNNEL; the bore road, PODSSH_BORE; \
+      croc's relay road, PODSSH_CROC; ZeroTier's road, PODSSH_ZEROTIER; Tox's relay road, PODSSH_TOX; Yggdrasil's \
+      road, PODSSH_YGGDRASIL; HyperDHT's road, PODSSH_HYPERDHT; Syncthing's relay road, PODSSH_SYNCTHING_RELAY; the \
+      onion road, PODSSH_ONION; the smee.io road, PODSSH_SMEE; the file hosts' road, PODSSH_FILEHOSTS; and the roads \
+      that join them. yes, the default, leaves each to its own variable. Another word is no.",
     ),
     (
         &["PODSSH_VIA"],
-        "The forward proxy over TLS of podssh ssh, of each command that reaches its server as podssh ssh does, \
+        "The forward proxy over TLS of podssh ssh, of each command that reaches its server as podssh ssh does; \
       and of podssh proxy and podssh doctor, as --via: https://[USER@]HOST[:PORT], in place of the relay. The \
       flag wins, and so do --relay-host, --relay-failover, --forwarder and --shadowsocks; beside PODSSH_RELAY or \
       PODSSH_FORWARDER, or with a URL that cannot be read, it is a configuration error (78). An empty value is \
@@ -460,25 +461,24 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
         &["PODSSH_STUN"],
         "The STUN servers of podssh doctor's line nat, in place of stun.cloudflare.com:3478 and \
       stun.l.google.com:19302: HOST[:PORT], 2 to 4 of them separated by commas, the port 3478 when none is \
-      named, asked in turn from one UDP socket until two gave the address that they saw. no: the line asks \
+      named; asked in turn from one UDP socket until two gave the address that they saw. no: the line asks \
       none, and says so as ????. Unset or empty: the two by default. Another value is a configuration error \
       (78), before any probe.",
     ),
     (
         &["PODSSH_ECH"],
-        "Encrypted Client Hello. yes: the name of each host that podssh reaches over TLS by a name goes \
-      sealed inside the hello, where the name's HTTPS record publishes a list (its ech parameter), and the hello \
-      in the clear names the list's public name instead. The record is read before the connection, from the \
-      resolvers of DNS over HTTPS, through HTTPS_PROXY as each road dials, once for each name and its TTL (30 s \
-      at least, 300 s with none); a name with no list, or whose read failed, goes plain and is asked again 30 s \
-      later. A server that refuses the sealed hello with retry configs gets one more hello with them; any other \
-      refusal goes on with a plain hello, which names the host, and the name is left alone for 5 minutes. \
-      strict: as yes, but no plain hello ever goes to a name that was to be sealed; the connection fails, with \
-      why (the cleartext road, which PODSSH_CLEARTEXT=no turns off, still names the host). no, unset or empty: \
-      nothing is sealed and no record is read, the default. Over ECH of the settings file; another word is a \
-      configuration error (78). A proxy is still given the host's name in its CONNECT, and the address stays \
-      visible; never to an address, nor with a TLS configuration that a caller of the library gave. podssh \
-      doctor's line ech says what it did.",
+        "Encrypted Client Hello. yes: the name of each host that podssh reaches over TLS by a name goes sealed inside \
+      the hello. It does so where the name's HTTPS record publishes a list (its ech parameter). The hello in the clear \
+      then names the list's public name instead. The record is read before the connection, from the resolvers of DNS \
+      over HTTPS, through HTTPS_PROXY as each road dials; it is read once for each name and its TTL (30 s at least, \
+      300 s with none); a name with no list, or whose read failed, goes plain and is asked again 30 s later. A server \
+      that refuses the sealed hello with retry configs gets one more hello with them; any other refusal goes on with a \
+      plain hello, which names the host, and the name is left alone for 5 minutes. strict: as yes, but no plain hello \
+      ever goes to a name that was to be sealed; the connection fails, with why (the cleartext road, which \
+      PODSSH_CLEARTEXT=no turns off, still names the host). no, unset or empty: nothing is sealed and no record is \
+      read, the default. Over ECH of the settings file; another word is a configuration error (78). A proxy is still \
+      given the host's name in its CONNECT, and the address stays visible; never to an address, nor with a TLS \
+      configuration that a caller of the library gave. podssh doctor's line ech says what it did.",
     ),
     (
         &["INVOCATION_ID", "WSL_DISTRO_NAME", "TERMUX_VERSION"],

@@ -74,13 +74,13 @@ pub const HONOURED: &[Keyword] = &[
     kw("PreferredAuthentications", "LIST", "publickey, keyboard-interactive and password, in the order to try them", "publickey,password"),
     kw("ProxyJump", "HOSTS|none", "the same as -J", "none"),
     kw("PubkeyAcceptedAlgorithms", "LIST", "the algorithms that podssh signs a login with: a key of another is not \
-        offered, and an RSA key signs with the list's first of RSA when the server's best is not in it", "ssh-ed25519,rsa-sha2-512"),
+        offered; an RSA key signs with the list's first of RSA when the server's best is not in it", "ssh-ed25519,rsa-sha2-512"),
     kw("PubkeyAcceptedKeyTypes", "LIST", "the old name of PubkeyAcceptedAlgorithms", "+ssh-rsa"),
     kw("PubkeyAuthentication", "yes|no", "allow key authentication", "yes"),
     kw("RemoteCommand", "COMMAND", "the command to run when the command line gives none; it takes the % tokens", "uptime"),
     kw("RemoteForward", "LISTEN [TARGET]", "the same as -R: a port or a socket path, then HOST:PORT or a socket here, or none for SOCKS; repeatable", "8080 localhost:80"),
     kw("RequestTTY", "auto|yes|force|no", "yes is -t, force is -tt, no is -T", "force"),
-    kw("RequiredRSASize", "BITS", "the least RSA key: a smaller key of the user is not offered, and a smaller host \
+    kw("RequiredRSASize", "BITS", "the least RSA key: a smaller key of the user is not offered; a smaller host \
         key, or key of the CA of a host certificate, ends the connection with 255; under 1024 it changes nothing \
         (default 1024)", "2048"),
     kw("SendEnv", "NAME...", "send these local variables; the server decides which to accept", "LANG"),

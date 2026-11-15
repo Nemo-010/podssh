@@ -14,7 +14,7 @@ pub const VLESS: FlagRow = row(
     Some("FILE"),
     FlagKind::Supported,
     "reach the first hop through VLESS servers that you run (Xray-core, shoes), in order, in place of the relay: \
-     FILE is private, with a vless:// share link on each line, over a WebSocket (type=ws) or XHTTP on HTTP/2 \
+     FILE is private, with a vless:// share link on each line; over a WebSocket (type=ws) or XHTTP on HTTP/2 \
      (type=xhttp), which passes where a proxy refuses the upgrade",
     None,
 );
@@ -71,7 +71,7 @@ pub const TUIC: FlagRow = row(
     Some("FILE"),
     FlagKind::Supported,
     "reach the first hop through TUIC servers that you run (sing-box, mihomo, Itsusinn's tuic), in order, in \
-     place of the relay, over QUIC where a probe finds that UDP passes: FILE is private, with a tuic:// share link \
+     place of the relay; over QUIC where a probe finds that UDP passes: FILE is private, with a tuic:// share link \
      on each line",
     None,
 );

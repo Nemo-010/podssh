@@ -8,7 +8,7 @@ use super::{row, FlagKind, FlagRow};
 
 /// `--grant FILE` of `operator`.
 pub const OPERATOR_GRANT: FlagRow = row(None, "grant", Some("FILE"), FlagKind::Supported,
-    "a grant used once, an OpenSSH certificate of this operator's key (KEY-cert.pub of ssh-keygen -s, or of podssh node --grant-to), which the end-to-end channel carries to the node, never a relay; it lets in one session, once, of the node or route that it names; a URL is refused", None);
+    "a grant used once, an OpenSSH certificate of this operator's key (KEY-cert.pub of ssh-keygen -s, or of podssh node --grant-to); the end-to-end channel carries it to the node, never a relay; it lets in one session, once, of the node or route that it names; a URL is refused", None);
 /// `--grant FILE` of `proxy node://NAME`, as `operator` takes it.
 pub const PROXY_GRANT: FlagRow = row(
     None,

@@ -12,8 +12,8 @@ pub const FORWARDER: FlagRow = row(
     Some("TEMPLATES"),
     FlagKind::Supported,
     "reach the first hop through other products' WebSocket forwarders, in order, in place of the relay: ws:// or \
-     wss:// URLs with {host} and {port} once each, or neither for a first frame of JSON, or wisp+wss://HOST/PATH/ \
-     for a Wisp server, or the words mudlet, ssheasy, mudix and wisp; also env PODSSH_FORWARDER",
+     wss:// URLs with {host} and {port} once each, or neither for a first frame of JSON; or wisp+wss://HOST/PATH/ \
+     for a Wisp server; or the words mudlet, ssheasy, mudix and wisp; also env PODSSH_FORWARDER",
     None,
 );
 
@@ -24,8 +24,8 @@ pub const PROXY_FORWARDER: FlagRow = row(
     Some("TEMPLATES"),
     FlagKind::Supported,
     "reach the target through other products' WebSocket forwarders, in order, in place of the relay: ws:// or \
-     wss:// URLs with {host} and {port} once each, or neither for a first frame of JSON, or wisp+wss://HOST/PATH/ \
-     for a Wisp server, or the words mudlet, ssheasy, mudix and wisp; also env PODSSH_FORWARDER",
+     wss:// URLs with {host} and {port} once each, or neither for a first frame of JSON; or wisp+wss://HOST/PATH/ \
+     for a Wisp server; or the words mudlet, ssheasy, mudix and wisp; also env PODSSH_FORWARDER",
     None,
 );
 
