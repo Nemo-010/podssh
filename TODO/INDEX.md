@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**746 entries: 44 open, 29 partial, 14 blocked, 659 done.**
+**748 entries: 44 open, 29 partial, 16 blocked, 659 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 3 | 4 | 5 | 75 | 87 |
+| P1 | 3 | 4 | 7 | 75 | 89 |
 | P2 | 7 | 19 | 3 | 280 | 309 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 44 | 29 | 14 | 659 | 746 |
+| **All** | 44 | 29 | 16 | 659 | 748 |
 
 ## Entries
 
@@ -822,3 +822,5 @@ repository and CI).
 | [T-789](resume.md) | P2 | S | M10 | defect | blocked | The resumable layer comes back about 12.5 s after a cut of 15 s ends, where TCP alone can in under 1 s |
 | [T-790](repo.md) | P1 | M | M10 | chore | blocked | The help and the manual from `pod-manual`, mechanically free of drift |
 | [T-791](repo.md) | P1 | M | M10 | chore | blocked | Each release run first in `pod-lab`'s profiles of podssh's host classes |
+| [T-792](repo.md) | P1 | S | M10 | chore | blocked | The state of each GitHub issue written from the record by podcrates' workflow |
+| [T-793](repo.md) | P1 | S | M10 | feature | blocked | One POSIX installer for podssh, hermetic, idempotent and fast, on podcrates' shared core |

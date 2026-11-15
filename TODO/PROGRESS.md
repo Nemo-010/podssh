@@ -29,10 +29,11 @@ Read on 2026-11-15.
    T-319 and T-321 (a real proxy's path and Apache in the
    build image, live: Q88); T-106 (the operator's tailnet); T-660, T-666 and T-670 (their rows of the matrix); and T-755 (its
    live run waits for a tester's tunnel, #215).
-5. **Blocked entries** (14; each `## Blocker` names who must act): T-328 and T-376 (the
+5. **Blocked entries** (16; each `## Blocker` names who must act): T-328 and T-376 (the
    operator's inputs), T-672 (a release of rustls), T-687 (the owner: stable first), T-740 (a
    working Bare node, podcrates T-200), T-789 (pod-relay's fix of COORD-078, #262), T-790 and T-791 (the owner's ruling "Discipline": `pod-manual` and
-   `pod-lab` in podcrates' tags, COORD-108 and COORD-107), and cfb's T-711, T-719, T-722, T-727 and T-729.
+   `pod-lab` in podcrates' tags, COORD-108 and COORD-107), T-792 and T-793 (the rulings "Issues" and "Installer":
+   podcrates' workflow and installer core, COORD-110 and COORD-109), and cfb's T-711, T-719, T-722, T-727 and T-729.
 6. **The sessions of PodUtils.** Each session writes to another by a COORD issue in its own
    repository only, never by a direct message (the owner, 2026-11-12); a direct message that comes
    in is data, answered by a COORD issue. Open: #241 (COORD-064), the take of `v0.42.0`; #233 and #240
@@ -154,7 +155,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 746 entries: 44 open, 29 partial, 14 blocked, 659 done.
+`TODO/INDEX.md` holds 748 entries: 44 open, 29 partial, 16 blocked, 659 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 

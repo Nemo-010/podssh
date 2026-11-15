@@ -4538,7 +4538,7 @@ Each can stop a release, or the gate, for a reason outside podssh.
   download must be checked; the pinned SHA-256 checks the exact bytes.
 - Read: the armv7 job installs Alpine's own `rust` and `cargo` (`.github/workflows/release.yml:196-204`),
   in Alpine 3.24 (`images/armv7/Dockerfile`); the CLI declares Rust 1.89
-  (`crates/podssh-cli/Cargo.toml:8`), and Q48 lets the minimum rise (`docs/decisions.md:70`).
+  (`crates/podssh-cli/Cargo.toml:8`), and Q48 lets the minimum rise (`docs/decisions.md:72`).
   Inferred: Alpine 3.24's rust is 1.89 or later, as the job built `v1.0.0-beta.2`.
 - Read: `pipx run check-jsonschema` names no version (`.github/workflows/build.yml` lines 175 and
   177 at `1a46970`).
@@ -6612,4 +6612,75 @@ so.
 ## Blocker
 
 PodUtils/podcrates (COORD-107, its T-692): `pod-lab` part 1 in a tag.
+
+# T-792: The state of each GitHub issue written from the record by podcrates' workflow
+
+**Source:** the owner's ruling "Issues", relayed in COORD-110 (PodUtils/podcrates#183), `docs/decisions.md` (2026-11-15).
+**Category:** chore
+**Milestone:** M10
+**Priority:** P1
+**Effort:** S
+**Status:** blocked
+
+## Problem
+
+podssh's issues are closed and commented on by hand (`TODO/RULES.md:92`), so an issue's state can drift from the
+record and mislead its readers. The ruling: an issue is open exactly while one of its entries is not done, and a
+tool writes its state as one block of its body.
+
+## Premise
+
+- The map is `TODO/issues.md` with `TODO/github.txt`, held by `cargo todo check` and `record-issues.yml`; podssh
+  described it in COORD-082 (#269).
+
+## Approach
+
+1. Take podcrates' reusable workflow at its tag, with `issues: write`, beside `record-issues.yml`.
+2. `TODO/RULES.md` says that no session edits the block; COORD and `[gh action]` issues keep their protocol, as
+   the workflow allows.
+
+## Prove
+
+The workflow's first run on `main`: each open issue's block agrees with its entries, and a planted drift (an open
+issue whose entries are all done) fails the check.
+
+## Blocker
+
+PodUtils/podcrates (COORD-110, its T-703): the reusable workflow and `pod-todo`'s link of issues to entries in a tag.
+
+# T-793: One POSIX installer for podssh, hermetic, idempotent and fast, on podcrates' shared core
+
+**Source:** the owner's ruling "Installer", relayed in COORD-109 (PodUtils/podcrates#182), `docs/decisions.md` (2026-11-15).
+**Category:** feature
+**Milestone:** M10
+**Priority:** P1
+**Effort:** S
+**Status:** blocked
+
+## Problem
+
+podssh has no installer: `README.md` gives three commands (the binary, `SHA256SUMS`, the check). The ruling asks
+each project for one POSIX `sh` installer that runs on each host class of `pod-lab`, needs no root, no package
+manager and no compiler, changes nothing on a second run, leaves no half install, and is ready in seconds.
+
+## Premise
+
+- `README.md:72` gives the commands of a download by hand; COORD-082 (#269) gave podcrates podssh's targets and
+  setup (none after the binary).
+
+## Approach
+
+1. On podcrates' core (its T-702): podssh's name, its targets (the musl triples, the Mac's two, the Windows `.exe`)
+   and no setup step; the prefix one that can run programs.
+2. Publish it with each release; `README.md` gives its one command first and the commands by hand after it.
+3. Its runs in `pod-lab`'s profiles (T-791) and the gate's limit of its time.
+
+## Prove
+
+The core's test of the installer: `dash`, `busybox sh` and `bash --posix`, `shellcheck --shell=sh`, a first run, a
+second that changes nothing, a cut run, each within its time, in each profile of COORD-081 that `pod-lab` holds.
+
+## Blocker
+
+PodUtils/podcrates (COORD-109, its T-702): the shared POSIX core of the installers in a tag.
 
