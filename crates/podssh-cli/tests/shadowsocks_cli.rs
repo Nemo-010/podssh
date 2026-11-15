@@ -209,7 +209,10 @@ fn the_server_is_reached_through_the_proxy_and_a_proxy_that_carries_nothing_is_n
         assert_eq!(asked.lock().unwrap().clone(), vec![format!("ss.test:{port}")], "{err}");
         if hold {
             assert_eq!(code, Some(255), "{err}");
-            let named = format!("the proxy 127.0.0.1:{proxy} took the CONNECT, and no byte of the Shadowsocks server");
+            // pod-egress names the proxy by its label, scheme and authority,
+            // never its credentials (podcrates v0.52.0).
+            let named =
+                format!("the proxy http://127.0.0.1:{proxy} took the CONNECT, and no byte of the Shadowsocks server");
             assert!(err.contains(&named), "{err}");
         } else {
             assert_eq!(code, Some(0), "{err}");

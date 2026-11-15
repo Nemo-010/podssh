@@ -5852,6 +5852,11 @@ the tag moved and, in `podssh-ws`, the features of both parts on `pod-egress`; f
 hold, moved by hand; and one citation of `TODO/ws.md` (the split's file at podcrates, main's line of
 `docs/STATUS.md`). Each of the 19 steps of the two `.run` files passed (287 tests, 0 failed). `cargo clippy
 --workspace --all-targets`: clean; `cargo test --workspace --no-fail-fast`: 3837 passed, 0 failed, 82 ignored.
+The gate of `94ee6ac` (run 43719624106, #264) failed in its step `ssh`: `tests/shadowsocks_cli.rs`, which needs
+`ssserver` and so ran here as a skip, asserted the old name of the proxy, "the proxy 127.0.0.1:PORT"; pod-egress now
+names it by `Proxy::label` of pod-proxy, "the proxy http://127.0.0.1:PORT", the scheme and the authority and never a
+credential. The test's expectation follows the new form. Run in the build image with Alpine's `shadowsocks-rust`, as the
+gate's step `ssh`: `cargo test -p podssh-cli --test shadowsocks_cli` 9 passed, 0 failed.
 
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.
