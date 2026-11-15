@@ -2275,7 +2275,7 @@ kex), `crates/podssh-ssh/src/kex_first.rs` (the record, `kex-first.txt` of the c
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -2302,6 +2302,24 @@ python3 scripts/feel-matrix.py target/debug/podssh --roads direct --shapes outag
 ```
 
 `feel-netem.yml` with the cell, from Actions. Planted: the cut left out, and the cell's check of the cut fails.
+
+## Done
+
+Partial, 2026-11-15 (main session).
+
+- `scripts/feel_outage.py`: the cell. The far end prints READY, sleeps 2 s, writes 20 MiB and END; at READY the far
+  ends' ports are cut by netem at 100% loss (`feel_netem.Links.install`, split out of `shape`) for 15 s; then the time
+  from the return to the first byte and to END, two rounds, each its own session. A byte that arrives from 1 s into
+  the cut to its end means the cut did not hold, and the cell fails. `feel-matrix.py --links netem --shapes outage`
+  runs it for OpenSSH, podssh's roads (`--direct`) and osewa's two carriers (`osewa exec feel -- sh -c`), the figures
+  in summary.tsv's note and ROAD.outage.json; `--shapes outage` with the proxy's links is refused (exit 2).
+  `feel-netem.yml`'s input `shapes` takes `outage`.
+- `python3 -I scripts/feel_outage.py --self-test`: 6 checks passed, on a local `sh` with a cut that changes nothing: a
+  cut of 1 s before the burst holds, its first byte about a second after the return; one of 4 s that lets the burst
+  through is caught ("the cut did not hold"), the planted defect of the cut left out.
+- A node is not in the cell: with netem, the matrix runs no role or node (a filter by port would also cut the node's
+  own leg to the sshd).
+- UNVERIFIED: the run in `feel-netem.yml` with `shapes=outage`; this host's kernel has no netem.
 
 # T-787: A QUIC socket whose reads keep failing must not spin a core
 

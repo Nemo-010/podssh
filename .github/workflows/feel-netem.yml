@@ -23,7 +23,7 @@ on:
         description: "Or the id of a run of build.yml or release.yml: its artifact podssh-x86_64-unknown-linux-musl, in place of the tag"
         default: ""
       shapes:
-        description: "Links, separated by commas: none, far, cellular, wifi, slow"
+        description: "Links, separated by commas: none, far, cellular, wifi, slow; and outage, a cut of 15 s (T-786)"
         default: "none,far,cellular,wifi,slow"
       roads:
         description: "Roads, separated by commas: openssh, direct, osewa-quic, osewa-ws"

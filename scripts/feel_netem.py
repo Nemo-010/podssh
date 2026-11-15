@@ -154,6 +154,13 @@ class Links:
             return
         args = netem_args(name)
         self.record["shapes"][name]["netem"] = " ".join(args)
+        self.install(args, ports)
+        self.save()
+
+    def install(self, args, ports):
+        """netem with `args` each way for the packets of `ports`, on a
+        loopback with no qdisc of ours: `shape`'s link, or a cut of the
+        outage cell (scripts/feel_outage.py, `loss 100%`)."""
         self.root(["tc", "qdisc", "add", "dev", DEV, "root", "handle", "1:", "prio", "bands", "4",
                    "priomap"] + PRIOMAP)
         self.root(["tc", "qdisc", "add", "dev", DEV, "parent", TOWARD, "handle", "30:", "netem"] + args)
@@ -162,7 +169,6 @@ class Links:
             for field, band in (("dport", TOWARD), ("sport", FROM)):
                 self.root(["tc", "filter", "add", "dev", DEV, "parent", "1:", "protocol", "ip", "prio", "1",
                            "u32", "match", "ip", field, str(port), "0xffff", "flowid", band])
-        self.save()
 
     def shape_udp(self, name):
         """The loopback as profile `name` for each UDP packet but a

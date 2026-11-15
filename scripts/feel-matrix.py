@@ -28,7 +28,9 @@ Usage: feel-matrix.py PODSSH [--links proxy|netem] [--osewa OSEWA]
   --roads   openssh, direct, role, node, iroh, derp, osewa-quic, osewa-ws
             (default: the first six with proxy; openssh, direct and the two
             of osewa with netem)
-  --shapes  none, far, cellular, wifi, slow (default: each)
+  --shapes  none, far, cellular, wifi, slow (default: each); and outage,
+            with netem only and when named: a cut of 15 s during a burst
+            (scripts/feel_outage.py, T-786)
   --runs    the cold connects of each cell (default 5, at most 20)
   --out     the raw files (default .work/feel/STAMP): ROAD.SHAPE.json, its
             .err, ROAD.SHAPE.process.json, and summary.tsv; with netem also
@@ -63,6 +65,7 @@ sys.path.insert(0, str(HERE))
 import feel_netem  # noqa: E402
 import feel_openssh  # noqa: E402
 import feel_osewa  # noqa: E402
+import feel_outage  # noqa: E402
 
 ROADS = ("openssh", "direct", "role", "node", "iroh", "derp", "osewa-quic", "osewa-ws")
 LINKS = ("proxy", "netem")
@@ -70,6 +73,8 @@ LINKS = ("proxy", "netem")
 DEFAULT_ROADS = {"proxy": ("openssh", "direct", "role", "node", "iroh", "derp"),
                  "netem": ("openssh", "direct", "osewa-quic", "osewa-ws")}
 SHAPES = ("none", "far", "cellular", "wifi", "slow")
+# A shape that runs only when named: a cut of 15 s by netem (T-786).
+OUTAGE = "outage"
 CELL_LIMIT = 300
 SETUP_LIMIT = 60
 NOT_HERE = {
@@ -380,10 +385,12 @@ def main():
     args = parser.parse_args()
     roads = [r for r in (args.roads or ",".join(DEFAULT_ROADS[args.links])).split(",") if r]
     shapes = [s for s in args.shapes.split(",") if s]
-    for what, given, known in (("road", roads, ROADS), ("shape", shapes, SHAPES)):
+    for what, given, known in (("road", roads, ROADS), ("shape", shapes, SHAPES + (OUTAGE,))):
         for value in given:
             if value not in known:
                 parser.error(f"no {what} {value}: one of {', '.join(known)}")
+    if OUTAGE in shapes and args.links != "netem":
+        parser.error("--shapes outage: a cut of netem's, with --links netem")
     if not 1 <= args.runs <= 20:
         parser.error("--runs: from 1 to 20")
     podssh = shutil.which(args.podssh) or args.podssh
@@ -422,11 +429,15 @@ def main():
         for shape in shapes:
             proxy, port = (None, None) if links else bench.proxy(shape)
             if links:
-                links.shape(shape, bench.ports())
+                links.shape("none" if shape == OUTAGE else shape, bench.ports())
             for road in roads:
                 note = why_not(road, args.links, osewa)
                 if note:
                     rows.append(row(road, shape, None, None, f"not run: {note}"))
+                elif shape == OUTAGE:
+                    doc = feel_outage.cell(bench, road, links, feel_osewa.CARRIERS.get(road))
+                    failed = failed or doc["exit"] != 0
+                    rows.append(row(road, shape, doc, None, feel_outage.note(doc)))
                 else:
                     if road == "openssh":
                         ran = bench.openssh(shape, port)

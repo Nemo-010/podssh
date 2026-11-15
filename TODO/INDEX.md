@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**743 entries: 47 open, 31 partial, 11 blocked, 654 done.**
+**743 entries: 46 open, 32 partial, 11 blocked, 654 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 3 | 4 | 3 | 75 | 85 |
-| P2 | 8 | 19 | 2 | 279 | 308 |
+| P2 | 7 | 20 | 2 | 279 | 308 |
 | P3 | 36 | 8 | 6 | 299 | 349 |
-| **All** | 47 | 31 | 11 | 654 | 743 |
+| **All** | 46 | 32 | 11 | 654 | 743 |
 
 ## Entries
 
@@ -816,6 +816,6 @@ repository and CI).
 | [T-783](robustness.md) | P1 | S | M10 | defect | done | `pipe exec:` beside `udp:node:` lost a program's last answer when a send to it failed after its exit |
 | [T-784](robustness.md) | P1 | S | M10 | defect | done | On macOS, `pipe_listen`'s stale socket was still served by a child of another test |
 | [T-785](ws.md) | P3 | S | M10 | feature | open | The Dev Tunnels road with a tunnel's access token, or none for an anonymous tunnel |
-| [T-786](machine.md) | P2 | M | M10 | measurement | open | An outage and its catch-up, measured beside osewa and OpenSSH |
+| [T-786](machine.md) | P2 | M | M10 | measurement | partial | An outage and its catch-up, measured beside osewa and OpenSSH |
 | [T-787](machine.md) | P3 | S | M10 | defect | open | A QUIC socket whose reads keep failing must not spin a core |
 | [T-788](robustness.md) | P1 | S | M10 | defect | partial | On macOS, `node_cut`'s strict stand-in sent no 1003 once |
