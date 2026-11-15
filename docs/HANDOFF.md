@@ -22,8 +22,8 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## Each podcrates take
 
-podssh pins every podcrates crate at `tag = "v0.46.0"` (COORD-099, PodUtils/podcrates#159; podssh's answer is
-COORD-069). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
+podssh pins every podcrates crate at `tag = "v0.48.0"` (COORD-102, PodUtils/podcrates#162; podssh's answer is
+COORD-073). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
 
 - Taken: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`,
   `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`, `pod-relay`
@@ -51,6 +51,10 @@ COORD-069). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; 
 - `v0.46.0` (taken 2026-11-14) carries pod-guest's warm start for podvm and pod-link's S3 carrier and split session
   for podnet; `pod-link`'s `Poll::max_connections` meets no literal of podssh: the bump of the tag only. Checked
   with each feature of podssh-relay and the CLI's iroh, tor and gsr, tests included.
+- `v0.47.0` (taken 2026-11-15, COORD-072) carries ntfy, the WebTorrent trackers and the Nostr relays as meeting
+  points of a code: podssh fills ntfy and the trackers (T-496, T-695); the Nostr relays wait for podcrates' fix
+  (its entry 634, COORD-070), which comes in the tag after `v0.48.0` (T-545).
+- `v0.48.0` (taken 2026-11-15) changes `pod-guest` alone: the bump of the tag only.
 
 ## Open COORD issues
 

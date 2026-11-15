@@ -313,6 +313,7 @@ and num-bigint 0.5) are T-754.
 | #247 | COORD-070: pod-relay's run of a code fails over Nostr alone, though pod-wormhole's nostr pairs (to podcrates) | open (2026-11-14: podcrates took it as its entry 634) | T-545 |
 | #248 | COORD-071: fast-track T-684: Q101's waves 3 and 4, the crates that still live in podssh (to podcrates) | open (2026-11-15: podcrates fast-tracked it; the first five modules frozen at `b9c04657`) | T-684 |
 | #249 | Testers' guide: v1.1.0-beta.4 (in preparation) | open (2026-11-15: posted; updated when the beta is tagged) | T-446 |
+| #250 | COORD-072: podssh took podcrates v0.47.0 at 568f9b2 (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.47.0` | T-684 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,
