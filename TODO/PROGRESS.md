@@ -6,14 +6,14 @@ this page keeps no history (git does).
 
 ## State
 
-Read on 2026-11-13.
+Read on 2026-11-15.
 
-1. **The gate.** Green at `09d2e59` (2026-11-13, run 43442847142: Linux, macOS, Windows, the Tor network,
-   the box and the static release binary). The red jobs of the day are repaired: `ssh` at `33b22e5` (T-222's
-   good shell, `32bf8af`) and `box` at `043bc6d` (T-213, `97d6fac`), whose own gate the next push cancelled;
-   the gate of `a5b4204` (run 43459290806) was running when this was read. The record agrees
-   (`cargo todo check`), and `python scripts/check-repo.py` passes. A push cancels the gate of the one
-   before it, so a commit's gate is read before the next push.
+1. **The gate.** Green at `e7cb4b6` (2026-11-15, run 43687960063), which holds the take of podcrates `v0.50.0`
+   (`13c52be`). This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
+   owner's agent by an issue `[gh action] requested` (`docs/HANDOFF.md`, "How to test"), one new issue for each ask,
+   never an amended one (the agent ran #255's first block). The record agrees (`cargo todo check`), and
+   `python scripts/check-repo.py` passes. A push cancels the gate of the one before it, so a commit's gate is
+   read before the next push.
 2. **Releases.** The newest is `v1.1.0-beta.3` (2026-11-05, at `6d30328`); the newest stable is
    `v1.0.1` (2026-11-03, at `6ece1f9`). The next beta waits until podssh is nearly complete
    (the operator, 2026-11-11), under the rules of `AGENTS.md` ("Releases"); `v1.1.0` waits for the end of the migration (T-446, T-684). podssh

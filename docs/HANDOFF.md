@@ -6,13 +6,9 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## The state of `main`
 
-- The gate is green at `09d2e59` (2026-11-13, run 43442847142). The gates of `c08ad94` and
-  `97d6fac` were cancelled by the next push; the gate of `a5b4204` (run 43459290806) was running when
-  this page was read. A push cancels the older gate, so read a commit's gate before the next push.
+- The gate is green at `e7cb4b6` (2026-11-15, run 43687960063, asked by #255): the take of podcrates `v0.50.0`.
 - The record agrees (`cargo todo check`), and `python scripts/check-repo.py` passes.
-- Drafts that wait for their merge (see "Drafts" in `TODO/PROGRESS.md`): T-117's (`10c87a2`) and
-  T-118's (`692cc1a`) on the branch `draft-t117`, T-248's (`5aa7229`) on `draft-t248`. The main
-  session was merging T-117's.
+- No draft waits for its merge ("Drafts" in `TODO/PROGRESS.md`).
 
 ## The sessions of PodUtils
 
@@ -135,4 +131,6 @@ T-200). cfb's asks, T-708 to T-731, stay behind podssh's own work order.
 - **A session whose account cannot start Actions** (2026-11-15: a push of it starts no run): ask the operator's
   local agent by an issue of this repository titled `[gh action] requested`, as PodUtils/podvm#387 does: why, one
   `sh` block that dispatches each workflow and watches it to its end, and "Run the block as it is, once. Then write
-  here: the output of the last line, or the line where it stopped and its error." Read the runs as usual.
+  here: the output of the last line, or the line where it stopped and its error." Read the runs as usual. Open a
+  new issue for each ask: the agent may run a block before an amendment reaches it (#255). Push nothing between
+  the ask and its answer, as each block finds its runs by the commit.
