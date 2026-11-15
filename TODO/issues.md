@@ -326,6 +326,8 @@ and num-bigint 0.5) are T-754.
 | #260 | COORD-077: podssh took podcrates v0.51.0 at 3f6a9fe (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.51.0` | T-684, T-787 |
 | #261 | `[gh action] requested`: the gate on `main` after the take of v0.51.0 | closed 2026-11-15: the gate passed (run 43711731169, `3f6a9fe`) | T-684 |
 | #262 | COORD-078: pod-relay: a spare link of the resumable layer rides the pooled HTTP/2 connection of the silent link it replaces (to podcrates) | open 2026-11-15: asks pod-relay for a connection of its own for a new link | T-789 |
+| #263 | COORD-079: podssh took podcrates v0.52.0 at 94ee6ac (to podcrates) | open 2026-11-15: waits for podcrates to record the take of `v0.52.0` | T-684 |
+| #264 | `[gh action] requested`: the gate on `main` after the take of v0.52.0 | open 2026-11-15: waits for the owner's agent | T-684 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,
