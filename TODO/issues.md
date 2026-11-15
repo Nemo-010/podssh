@@ -316,13 +316,15 @@ and num-bigint 0.5) are T-754.
 | #250 | COORD-072: podssh took podcrates v0.47.0 at 568f9b2 (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.47.0` | T-684 |
 | #251 | COORD-073: podssh took podcrates v0.48.0 at 3e7c5a2 (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.48.0` | T-684 |
 | #252 | COORD-074: podssh took podcrates v0.49.0 at a99de1d (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.49.0` | T-545, T-684 |
-| #253 | COORD-075: pod-quic spins a core on a way whose reads keep failing (to podcrates) | open 2026-11-15: asks pod-quic to bound failed reads | T-787 |
+| #253 | COORD-075: pod-quic spins a core on a way whose reads keep failing (to podcrates) | closed 2026-11-15: podcrates `v0.51.0` bounds them (`pod_quic::bounded`), taken at `3f6a9fe` | T-787 |
 | #254 | COORD-076: podssh took podcrates v0.50.0 at 13c52be (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.50.0` | T-684 |
 | #255 | `[gh action] requested`: the gate on `main` after the take of v0.50.0, and T-665's lab | closed 2026-11-15: the gate passed (run 43687960063, `e7cb4b6`); its first block ran, not the amended one, so the labs are asked again in #256 | T-684, T-665 (Actions start no workflow for this account on 2026-11-15) |
 | #256 | `[gh action] requested`: the netem labs of T-665 and T-625, and T-786's error files | closed 2026-11-15: iroh-ab 43691396393 and wisp-rate 43691399331 passed, T-786's error files read | T-665, T-625, T-786 |
 | #257 | `[gh action] requested`: the gate on `main` after T-665's default | closed 2026-11-15: the gate passed (run 43704942887, `6732178`) | T-665 |
 | #258 | `[gh action] requested`: T-786's outage cell with the role's road | closed 2026-11-15: run 43709370293 read (T-786 done, T-789 filed) | T-786, T-789 |
-| #259 | `[gh action] requested`: T-789's outage cell of the role's road with `-v` | open 2026-11-15: waits for the owner's agent | T-789 |
+| #259 | `[gh action] requested`: T-789's outage cell of the role's road with `-v` | closed 2026-11-15: run 43710388009 read | T-789 |
+| #260 | COORD-077: podssh took podcrates v0.51.0 at 3f6a9fe (to podcrates) | open 2026-11-15: waits for podcrates to record the take of `v0.51.0` | T-684, T-787 |
+| #261 | `[gh action] requested`: the gate on `main` after the take of v0.51.0 | open 2026-11-15: waits for the owner's agent | T-684 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,

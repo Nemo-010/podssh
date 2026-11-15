@@ -258,10 +258,12 @@
 250 issue closed
 251 issue closed
 252 issue closed
-253 issue open
+253 issue closed
 254 issue closed
 255 issue closed
 256 issue closed
 257 issue closed
 258 issue closed
-259 issue open
+259 issue closed
+260 issue open
+261 issue open
