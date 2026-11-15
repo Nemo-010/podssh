@@ -187,14 +187,19 @@ class Links:
         self.root(["tc", "qdisc", "add", "dev", DEV, "root", "handle", "1:", "prio", "bands", "4",
                    "priomap"] + PRIOMAP)
         self.root(["tc", "qdisc", "add", "dev", DEV, "parent", TOWARD, "handle", "30:", "netem"] + args)
-        for proto, nh in (("ip", ["ip", "protocol", "17", "0xff"]), ("ipv6", ["ip6", "protocol", "17", "0xff"])):
+        # Each protocol on prios of its own: the kernel refuses a filter of
+        # a second protocol at a prio that one already holds under a parent
+        # ("We have an error talking to the kernel", iroh-ab run 43670344623).
+        for proto, nh, first in (("ip", ["ip", "protocol", "17", "0xff"], 1),
+                                 ("ipv6", ["ip6", "protocol", "17", "0xff"], 3)):
             # The resolver first, unshaped, then each other UDP packet.
             for field in ("dport", "sport"):
                 where = "ip" if proto == "ip" else "ip6"
-                self.root(["tc", "filter", "add", "dev", DEV, "parent", "1:", "protocol", proto, "prio", "1",
-                           "u32", "match"] + nh + ["match", where, field, "53", "0xffff", "flowid", "1:2"])
-            self.root(["tc", "filter", "add", "dev", DEV, "parent", "1:", "protocol", proto, "prio", "2",
-                       "u32", "match"] + nh + ["flowid", TOWARD])
+                self.root(["tc", "filter", "add", "dev", DEV, "parent", "1:", "protocol", proto, "prio",
+                           str(first), "u32", "match"] + nh + ["match", where, field, "53", "0xffff",
+                           "flowid", "1:2"])
+            self.root(["tc", "filter", "add", "dev", DEV, "parent", "1:", "protocol", proto, "prio",
+                       str(first + 1), "u32", "match"] + nh + ["flowid", TOWARD])
         self.save()
 
     def tally(self, name):

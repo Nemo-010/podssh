@@ -9679,6 +9679,8 @@ ISP's queues, middleboxes or NAT.
 
 2026-11-15, the lab's first run (`iroh-ab.yml`, run 43670344623, `lab=far`) failed in its shaping step: `tc filter add dev lo parent 1: protocol ipv6 prio 1 u32 match ip6 protocol 17 0xff match ip6 dport 53 0xffff flowid 1:2` gave "We have an error talking to the kernel" (exit 2). Next: in `feel_netem.shape_udp`, the IPv6 filters on a prio of their own (u32 refuses two protocols at one prio of one parent), or IPv4 alone with the ends bound to IPv4; then run the A/B again.
 
+2026-11-15 (next session): `shape_udp` of `scripts/feel_netem.py` puts IPv4's filters at prio 1 and 2 and IPv6's at prio 3 and 4, so no prio holds two protocols. This host's kernel has neither netem nor the prio qdisc ("Specified qdisc kind is unknown"), so the fix is proved in Actions alone. UNVERIFIED: `iroh-ab.yml` with `lab=far` again (asked by `[gh action] requested`).
+
 # T-666: Bulk off the interactive stream: a copy beside a terminal on its own QUIC stream of the same iroh connection
 
 **Source:** the study of osewa, 2026-11-04 (Q99; `docs/research/osewa.md`, `docs/research/osewa-code.md`, `docs/research/osewa-paper.md`).

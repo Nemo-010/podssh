@@ -318,6 +318,7 @@ and num-bigint 0.5) are T-754.
 | #252 | COORD-074: podssh took podcrates v0.49.0 at a99de1d (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.49.0` | T-545, T-684 |
 | #253 | COORD-075: pod-quic spins a core on a way whose reads keep failing (to podcrates) | open 2026-11-15: asks pod-quic to bound failed reads | T-787 |
 | #254 | COORD-076: podssh took podcrates v0.50.0 at 13c52be (to podcrates) | open 2026-11-15: waits for podcrates to record the take of `v0.50.0` | T-684 |
+| #255 | `[gh action] requested`: the gate on `main` after the take of v0.50.0, and T-665's lab | open 2026-11-15: waits for the owner's agent | T-684, T-665 (Actions start no workflow for this account on 2026-11-15) |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,
