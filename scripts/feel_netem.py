@@ -164,6 +164,33 @@ class Links:
                            "u32", "match", "ip", field, str(port), "0xffff", "flowid", band])
         self.save()
 
+    def shape_udp(self, name):
+        """The loopback as profile `name` for each UDP packet but a
+        resolver's (port 53), IPv4 and IPv6, on one netem: the iroh road's
+        direct path between two ends of this host (T-665's lab), with ports
+        that iroh picks; its TCP (a node's leg to sshd, the control) passes
+        as before. A packet crosses the loopback once, so each way takes
+        the profile's delay once, as with `shape`."""
+        self.clear()
+        self.record["shapes"][name] = {"udp": True}
+        if name == "none":
+            self.save()
+            return
+        args = netem_args(name)
+        self.record["shapes"][name]["netem"] = " ".join(args)
+        self.root(["tc", "qdisc", "add", "dev", DEV, "root", "handle", "1:", "prio", "bands", "4",
+                   "priomap"] + PRIOMAP)
+        self.root(["tc", "qdisc", "add", "dev", DEV, "parent", TOWARD, "handle", "30:", "netem"] + args)
+        for proto, nh in (("ip", ["ip", "protocol", "17", "0xff"]), ("ipv6", ["ip6", "protocol", "17", "0xff"])):
+            # The resolver first, unshaped, then each other UDP packet.
+            for field in ("dport", "sport"):
+                where = "ip" if proto == "ip" else "ip6"
+                self.root(["tc", "filter", "add", "dev", DEV, "parent", "1:", "protocol", proto, "prio", "1",
+                           "u32", "match"] + nh + ["match", where, field, "53", "0xffff", "flowid", "1:2"])
+            self.root(["tc", "filter", "add", "dev", DEV, "parent", "1:", "protocol", proto, "prio", "2",
+                       "u32", "match"] + nh + ["flowid", TOWARD])
+        self.save()
+
     def tally(self, name):
         """What the qdiscs counted under profile `name` (packets sent,
         dropped, over the limit), into netem.NAME.txt beside the cells."""
@@ -187,3 +214,35 @@ class Links:
         with open(self.out / "netem.json", "w", encoding="utf-8") as f:
             json.dump(self.record, f, indent=1)
             f.write("\n")
+
+
+def main(argv):
+    """`feel_netem.py udp PROFILE OUT`: the loopback set up and shaped for
+    UDP as `shape_udp`, left so for a run that follows (iroh-ab.yml's lab);
+    the workflow's last step puts the loopback back. Exit 0 shaped, 1 the
+    host cannot shape, 2 a wrong word."""
+    if len(argv) != 3 or argv[0] != "udp":
+        print("usage: feel_netem.py udp none|far|cellular|wifi|slow OUT", file=sys.stderr)
+        return 2
+    name, out = argv[1], Path(argv[2])
+    if name != "none" and name not in fake_shape.PROFILES:
+        print(f"feel_netem: no profile {name}", file=sys.stderr)
+        return 2
+    out.mkdir(parents=True, exist_ok=True)
+    links = Links(out)
+    try:
+        links.setup()
+        links.shape_udp(name)
+    except Unavailable as e:
+        print(f"feel_netem: {e}", file=sys.stderr)
+        try:
+            links.restore()
+        except Unavailable:
+            pass  # nothing of ours was set where the tools are missing
+        return 1
+    print(f"feel_netem: UDP on {DEV} as {name}: {links.record['shapes'][name].get('netem', 'unshaped')}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

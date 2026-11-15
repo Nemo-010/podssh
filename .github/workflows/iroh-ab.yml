@@ -1,8 +1,15 @@
 name: iroh A/B
 
 # QUIC's settings on the iroh road, one arm of PODSSH_IROH_QUIC against
-# another (T-665), by T-157's method, on a direct path between this runner
-# and the operator's server of PODSSH_THROUGHPUT_SSH (Q38; Q91, short runs):
+# another (T-665), by T-157's method. By default in the netem lab (the
+# operator's ruling of 2026-11-15): the far end is this runner's own sshd on
+# the loopback, and `tc netem` shapes each UDP packet of the loopback as the
+# input `lab` names (scripts/feel_netem.py udp), so the iroh road's direct
+# path between the two ends of this host crosses that link, and the node's
+# leg to sshd does not; n0's relays only introduce the ends (Q38). A lab has
+# no real ISP's queues, middleboxes or NAT. With `lab` empty, a direct path
+# between this runner and the operator's server of PODSSH_THROUGHPUT_SSH
+# (Q38; Q91, short runs):
 # scripts/iroh-ab.py copies this commit's static podssh there, runs a node of
 # each arm in front of that server's own sshd, logs in to each from here in
 # turn, and removes the nodes and their directory at the end. By hand only.
@@ -17,6 +24,9 @@ on:
       arms:
         description: "Arms of PODSSH_IROH_QUIC separated by ';' (e.g. iroh;tuned;tuned,bbr)"
         default: "iroh;tuned"
+      lab:
+        description: "The lab's link: none, far, cellular, wifi or slow (scripts/fake_shape.py); empty for the operator's real path"
+        default: "far"
       runs:
         description: "Rounds, each arm once a round, 1 to 20"
         default: "5"
@@ -46,18 +56,60 @@ jobs:
       # scrub that keeps a host's name, would make the run worth nothing.
       - name: the harness offline
         run: python3 -I scripts/iroh-ab.py --self-test
-      - name: the secrets
+      - name: the far end
         id: secrets
         env:
+          LAB: ${{ inputs.lab }}
           DEST: ${{ secrets.PODSSH_THROUGHPUT_SSH }}
           DEST_KEY: ${{ secrets.PODSSH_THROUGHPUT_KEY }}
         run: |
-          if [ -n "$DEST" ] && [ -n "$DEST_KEY" ]; then
-            echo "ready=yes" >> "$GITHUB_OUTPUT"
-          else
-            echo "the A/B run needs the secrets PODSSH_THROUGHPUT_SSH and PODSSH_THROUGHPUT_KEY; not both are set"
-            echo "ready=no" >> "$GITHUB_OUTPUT"
+          case "$LAB" in
+            none|far|cellular|wifi|slow) echo "the netem lab, link $LAB"; echo "ready=yes" >> "$GITHUB_OUTPUT"; echo "lab=yes" >> "$GITHUB_OUTPUT" ;;
+            '')
+              if [ -n "$DEST" ] && [ -n "$DEST_KEY" ]; then
+                echo "ready=yes" >> "$GITHUB_OUTPUT"
+              else
+                echo "the real path needs the secrets PODSSH_THROUGHPUT_SSH and PODSSH_THROUGHPUT_KEY; not both are set"
+                echo "ready=no" >> "$GITHUB_OUTPUT"
+              fi ;;
+            *) echo "lab: none, far, cellular, wifi, slow, or empty"; exit 2 ;;
+          esac
+      # The lab's far end: sshd for the runner's user on the loopback, with a
+      # throwaway key, as scripts/feel-matrix.py starts it; netem, which the
+      # runner's kernel may keep in its extra modules; ethtool, for the
+      # loopback's offloads.
+      - name: the lab's sshd and netem
+        if: steps.secrets.outputs.lab == 'yes'
+        timeout-minutes: 10
+        run: |
+          set -eu
+          command -v /usr/sbin/sshd > /dev/null || { sudo apt-get update -q && sudo apt-get install -y -q openssh-server; }
+          command -v ethtool > /dev/null || { sudo apt-get update -q && sudo apt-get install -y -q ethtool; }
+          if ! sudo modprobe sch_netem; then
+            sudo apt-get update -q
+            sudo apt-get install -y -q "linux-modules-extra-$(uname -r)"
+            sudo modprobe sch_netem
           fi
+          lab="$RUNNER_TEMP/lab"
+          mkdir -p "$lab"
+          chmod 700 "$lab"
+          ssh-keygen -q -t ed25519 -N '' -f "$lab/host_key"
+          ssh-keygen -q -t ed25519 -N '' -f "$lab/client_key"
+          cp "$lab/client_key.pub" "$lab/authorized_keys"
+          port=2222
+          printf '%s\n' "ListenAddress 127.0.0.1" "Port $port" "HostKey $lab/host_key" \
+            "AuthorizedKeysFile $lab/authorized_keys" "StrictModes no" "UsePAM no" \
+            "PasswordAuthentication no" "KbdInteractiveAuthentication no" "PidFile $lab/sshd.pid" > "$lab/sshd_config"
+          if /usr/sbin/sshd -t -f "$lab/sshd_config" -o PerSourcePenalties=no 2> /dev/null; then
+            echo "PerSourcePenalties no" >> "$lab/sshd_config"
+          fi
+          /usr/sbin/sshd -f "$lab/sshd_config" -E "$lab/sshd.log"
+          for i in $(seq 1 30); do grep -q "listening on" "$lab/sshd.log" 2> /dev/null && break; sleep 0.5; done
+          grep -q "listening on" "$lab/sshd.log" || { cat "$lab/sshd.log"; exit 1; }
+          echo "LAB_DEST=$(id -un)@127.0.0.1:$port" >> "$GITHUB_ENV"
+          echo "LAB_KEY=$lab/client_key" >> "$GITHUB_ENV"
+          uname -r
+          tc -V
       # The one place that names the build image, pinned to a digest.
       - name: the build image
         if: steps.secrets.outputs.ready == 'yes'
@@ -77,6 +129,13 @@ jobs:
             -e CARGO_BUILD_JOBS=4 -e RUSTFLAGS=-Ctarget-feature=+crt-static -e PODSSH_BUILD_COMMIT \
             "$image" \
             cargo build --locked --release --target x86_64-unknown-linux-musl -p podssh-cli --features iroh
+      # After the build, which shapes nothing: each UDP packet of the
+      # loopback from here to the end of the run.
+      - name: the lab's link
+        if: steps.secrets.outputs.lab == 'yes'
+        env:
+          LAB: ${{ inputs.lab }}
+        run: python3 -I scripts/feel_netem.py udp "$LAB" "$RUNNER_TEMP/netem"
       - name: measure
         if: steps.secrets.outputs.ready == 'yes'
         env:
@@ -94,7 +153,12 @@ jobs:
           # and removed with the runner.
           key="$RUNNER_TEMP/dest-key"
           umask 077
-          printf '%s\n' "$DEST_KEY" > "$key"
+          if [ -n "${LAB_DEST:-}" ]; then
+            DEST="$LAB_DEST"
+            cp "$LAB_KEY" "$key"
+          else
+            printf '%s\n' "$DEST_KEY" > "$key"
+          fi
           B=target/x86_64-unknown-linux-musl/release/podssh
           rc=0
           timeout 3000 python3 -I scripts/iroh-ab.py --podssh "$B" --far-podssh "$B" \
@@ -103,9 +167,19 @@ jobs:
           rm -f "$key"
           echo "iroh-ab exit $rc"
           exit "$rc"
+      - name: the loopback as it was
+        if: always() && steps.secrets.outputs.lab == 'yes'
+        run: |
+          sudo tc -s qdisc show dev lo > "$RUNNER_TEMP/netem/qdisc.txt" 2>&1 || true
+          sudo tc qdisc del dev lo root 2> /dev/null || true
+          sudo ip link set dev lo mtu 65536 || true
+          [ -f "$RUNNER_TEMP/lab/sshd.pid" ] && kill "$(cat "$RUNNER_TEMP/lab/sshd.pid")" 2> /dev/null || true
+          rm -rf "$RUNNER_TEMP/lab"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always() && steps.secrets.outputs.ready == 'yes'
         with:
           name: iroh-ab
-          path: ${{ runner.temp }}/iroh-ab.json
+          path: |
+            ${{ runner.temp }}/iroh-ab.json
+            ${{ runner.temp }}/netem/
           if-no-files-found: warn

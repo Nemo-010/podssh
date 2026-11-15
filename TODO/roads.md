@@ -9673,6 +9673,8 @@ that the entry names; it needs no secret. A run on the operator's real path (Q38
 `PODSSH_THROUGHPUT_SSH` and `PODSSH_THROUGHPUT_KEY` are ever set; the record says that a lab shows no real
 ISP's queues, middleboxes or NAT.
 
+2026-11-15 (main session): the lab is built. `iroh-ab.yml` takes the input `lab` (none, far, cellular, wifi, slow; default far; empty for the operator's real path through the secrets). In the lab the far end is the runner's own sshd on the loopback, with a throwaway key, and `scripts/feel_netem.py udp LINK OUT` shapes each UDP packet of the loopback but a resolver's (IPv4 and IPv6, one netem, so each way takes the link's delay once): the iroh road's direct path between the two ends of the runner crosses the link, and the node's TCP leg to sshd does not. n0's relays only introduce the ends (Q38), in place of a lab relay: podssh has no binary that runs `podssh_iroh::test_relay`, and the relay carries no measured byte once the path is direct (each sample records its path). This host's kernel has no netem (`tc qdisc add dev lo root netem`: "Specified qdisc kind is unknown"), so the shape is first tried in Actions. UNVERIFIED: the lab's A/B run.
+
 # T-666: Bulk off the interactive stream: a copy beside a terminal on its own QUIC stream of the same iroh connection
 
 **Source:** the study of osewa, 2026-11-04 (Q99; `docs/research/osewa.md`, `docs/research/osewa-code.md`, `docs/research/osewa-paper.md`).
