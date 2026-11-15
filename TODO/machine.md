@@ -2330,6 +2330,15 @@ the cell's command is right: of the four, only the two over plain TCP outlived t
 the return (TCP's backed-off retransmission). Next: podssh's resumable layer in the same cell, which needs a node
 behind the shaped link (the netem matrix runs none): a cell of its own, the cut on the node's leg alone.
 
+2026-11-15 (next session): the cell of podssh's resumable layer is the relay role's road, not a node's: `feel_outage.cell`
+cuts the role's port alone for `role` (the client's leg; the role's own leg to the sshd is on the sshd's port, which
+stays up), and `feel-matrix.py` runs `role` with `--links netem` for the outage shape alone (`why_not`, the shape
+given); a node's road stays out, as its leg to the role is on the cut port too. Its plumbing here, with a stand-in cut
+that does nothing (this kernel has no netem): the cut was asked on the role's port alone (not the sshd's), the burst of
+20 MiB crossed the role, and the cell failed as it must, "the cut did not hold: 20971525 bytes arrived during it".
+`python3 -I scripts/feel_outage.py --self-test`: passed. UNVERIFIED: `feel-netem.yml` with `shapes=outage` and
+`roads=openssh,direct,role,osewa-quic,osewa-ws`.
+
 # T-787: A QUIC socket whose reads keep failing must not spin a core
 
 **Source:** the re-reading of osewa on 2026-11-15 (osewa v0.1.5, `24058a3`).

@@ -360,10 +360,14 @@ def row(road, shape, doc, process, note=""):
     return [road, shape] + [shown(v) for v in figures] + [note or far.get("error") or ""]
 
 
-def why_not(road, links, osewa):
-    """Why a road does not run here with this way of shaping, or ''."""
+def why_not(road, links, osewa, shape=None):
+    """Why a road does not run here with this way of shaping, or ''. The
+    role's outage cell cuts the role's port alone, the client's leg, so it
+    runs with netem (T-786); a node's leg goes to that port too."""
     if road in NOT_HERE:
         return NOT_HERE[road]
+    if links == "netem" and road == "role" and shape == OUTAGE:
+        return ""
     if road in NOT_WITH[links]:
         return NOT_WITH[links][road]
     if road == "openssh" and not shutil.which("ssh"):
@@ -416,7 +420,7 @@ def main():
     try:
         bench.keys()
         bench.sshd()
-        ran_here = [r for r in roads if not why_not(r, args.links, osewa)]
+        ran_here = [r for r in roads if any(not why_not(r, args.links, osewa, s) for s in shapes)]
         if {"role", "node"} & set(ran_here):
             bench.certs()
             bench.role()
@@ -431,7 +435,7 @@ def main():
             if links:
                 links.shape("none" if shape == OUTAGE else shape, bench.ports())
             for road in roads:
-                note = why_not(road, args.links, osewa)
+                note = why_not(road, args.links, osewa, shape)
                 if note:
                     rows.append(row(road, shape, None, None, f"not run: {note}"))
                 elif shape == OUTAGE:

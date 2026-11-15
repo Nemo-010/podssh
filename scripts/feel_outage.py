@@ -172,7 +172,13 @@ def cell(bench, road, links, osewa_road):
         flags, dest, _ = bench.road(road)
         argv = [bench.podssh, "ssh"] + flags + bench.common(bench.work / f"known_hosts.{road}") + [dest]
         env = bench.env()
-    doc = measure(road, argv, env, netem_cut(links, bench.ports()), bench.out / f"{road}.outage.err")
+    ports = bench.ports()
+    if road == "role":
+        # The client's leg alone: the role's port, never the sshd's, which
+        # the role's own leg uses; the name of `bench.road` is the loopback.
+        env = bench.env(PODSSH_RELAY_ADDR="relay-a.test=127.0.0.1")
+        ports = [bench.role_port]
+    doc = measure(road, argv, env, netem_cut(links, ports), bench.out / f"{road}.outage.err")
     with open(bench.out / f"{road}.outage.json", "w", encoding="utf-8") as f:
         json.dump(doc, f, indent=1)
         f.write("\n")
