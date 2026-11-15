@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**748 entries: 44 open, 29 partial, 16 blocked, 659 done.**
+**749 entries: 44 open, 29 partial, 16 blocked, 660 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 3 | 4 | 7 | 75 | 89 |
+| P1 | 3 | 4 | 7 | 76 | 90 |
 | P2 | 7 | 19 | 3 | 280 | 309 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 44 | 29 | 16 | 659 | 748 |
+| **All** | 44 | 29 | 16 | 660 | 749 |
 
 ## Entries
 
@@ -824,3 +824,4 @@ repository and CI).
 | [T-791](repo.md) | P1 | M | M10 | chore | blocked | Each release run first in `pod-lab`'s profiles of podssh's host classes |
 | [T-792](repo.md) | P1 | S | M10 | chore | blocked | The state of each GitHub issue written from the record by podcrates' workflow |
 | [T-793](repo.md) | P1 | S | M10 | feature | blocked | One POSIX installer for podssh, hermetic, idempotent and fast, on podcrates' shared core |
+| [T-794](ssh.md) | P1 | S | M10 | defect | done | `cold_connect`'s test of the auth request failed at random on a busy runner |

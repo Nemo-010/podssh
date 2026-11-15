@@ -376,13 +376,16 @@ fn link_late(late: Duration) -> (tokio::io::DuplexStream, tokio::io::DuplexStrea
     (client_end, server_end)
 }
 
-/// The server's bytes come this late in the test of the auth request.
-const FAR: Duration = Duration::from_millis(400);
+/// The server's bytes come this late in the test of the auth request: long
+/// beside the CPU of a login, so that a busy runner's CPU cannot pass for a
+/// wait (the gate's run 43726773977 took 1.44 s at 400 ms, 0.24 s of CPU).
+const FAR: Duration = Duration::from_millis(800);
 
-#[tokio::test]
-async fn the_auth_request_follows_the_service_request_with_no_wait() {
+/// How long a login over `link_late(late)` takes, from the dial to the end of
+/// the authentication.
+async fn login_over(late: Duration) -> Duration {
     let host = PrivateKey::random(&mut rand::rng(), Algorithm::Ed25519).expect("a host key");
-    let (client_end, server_end) = link_late(FAR);
+    let (client_end, server_end) = link_late(late);
     let (config, handler) = (config(&host), Holds::default());
     tokio::spawn(async move {
         if let Ok(session) = server::run_stream(config, server_end, handler).await {
@@ -397,12 +400,22 @@ async fn the_auth_request_follows_the_service_request_with_no_wait() {
         .expect("logged in");
     let took = start.elapsed();
     disconnect_all(&handles).await;
+    took
+}
+
+#[tokio::test]
+async fn the_auth_request_follows_the_service_request_with_no_wait() {
+    // The same login with no delay first: its time is the CPU of a login on
+    // this host, which the count of waits leaves out.
+    let cpu = login_over(Duration::ZERO).await;
+    let took = login_over(FAR).await;
+    let waited = took.saturating_sub(cpu);
     // The banner with the key exchange's offer, its reply, then the service's
     // answer with the auth's: three waits; a client that waits for the
     // service's answer before its auth request waits a fourth.
     assert!(
-        took > FAR * 2 && took < FAR * 7 / 2,
-        "the login took {took:?}, {:.1} answers late",
-        took.as_secs_f64() / FAR.as_secs_f64()
+        waited > FAR * 2 && waited < FAR * 7 / 2,
+        "the login took {took:?}, {cpu:?} of it with no delay: {:.1} answers late",
+        waited.as_secs_f64() / FAR.as_secs_f64()
     );
 }

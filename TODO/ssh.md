@@ -5411,3 +5411,46 @@ The test of six changes at once passes, and fails planted. The interop ids meet 
   of 56 harnesses meet the baseline.
 - `cargo test -p podssh-ssh --test cold_connect` 8 times: 3 passed each time; `--lib accepted`: 8
   passed. Clippy and rustfmt clean.
+
+# T-794: `cold_connect`'s test of the auth request failed at random on a busy runner
+
+**Source:** the gate of `cfc3ae3` (run 43726773977, step `ssh`, #266), 2026-11-15.
+**Category:** defect
+**Milestone:** M10
+**Priority:** P1
+**Effort:** S
+**Status:** done
+
+## Problem
+
+`the_auth_request_follows_the_service_request_with_no_wait` failed once in the gate: "the login took 1.443329657s,
+3.6 answers late", against a bound of 3.5. The rerun of the same run passed, and 20 runs in 20 passed on this host.
+
+## Premise
+
+- The test measured the whole login over a link 400 ms late each way and asked for fewer than 3.5 delays (1.4 s): three
+  waits are 1.2 s, so 0.2 s was left for the CPU of a login in a debug build, which a runner busy with the step's other
+  tests passed (0.24 s).
+
+## Approach
+
+1. Count the waits, not the CPU: the same login with no delay first, its time subtracted.
+2. A delay of 800 ms, so that 3.5 delays leave 0.4 s on each side of the three waits.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-ssh --test cold_connect
+```
+
+20 runs in a row, and runs with each core busy; planted, the wait for the service's answer back in russh, it fails.
+
+## Done
+
+2026-11-15. `crates/podssh-ssh/tests/cold_connect.rs`: `login_over(late)`, the login with no delay first and its time
+subtracted, and `FAR` of 800 ms. `cargo test -p podssh-ssh --test cold_connect`: 20 runs in 20 passed (4 tests each);
+5 runs in 5 passed with four busy loops on the host's 4 cores. Planted, the patch 0007's hunk undone in
+`vendor/russh/src/client/encrypted.rs` (the client waits for the service's answer again): "the login took 3.23689951s,
+35.994077ms of it with no delay: 4.0 answers late", failed; reverted. rustfmt clean.
+

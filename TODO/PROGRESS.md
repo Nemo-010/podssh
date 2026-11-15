@@ -8,8 +8,8 @@ this page keeps no history (git does).
 
 Read on 2026-11-15.
 
-1. **The gate.** Green at `3f6a9fe` (2026-11-15, run 43711731169, #261): the take of podcrates `v0.51.0`, after
-   those of `v0.50.0` (`e7cb4b6`) and T-665's default (`6732178`). This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
+1. **The gate.** Green at `cfc3ae3` (2026-11-15, run 43726773977 on its rerun, #266): the takes of podcrates
+   `v0.51.0` and `v0.52.0`; its first attempt failed `cold_connect` at random, repaired by T-794. This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
    owner's agent by an issue `[gh action] requested` (`docs/HANDOFF.md`, "How to test"), one new issue for each ask,
    never an amended one (the agent ran #255's first block). The record agrees (`cargo todo check`), and
    `python scripts/check-repo.py` passes. A push cancels the gate of the one before it, so a commit's gate is
@@ -89,8 +89,7 @@ commits after it are pushed with this note. For the next session, in order:
    blocked) found why: a spare rides the pooled HTTP/2 connection of the silent link; podcrates is asked (COORD-078,
    #262), and the cell runs again on its tag.
 5. T-780 and T-788 wait for their next failure; then `v1.1.0-beta.4` after T-684 and after its run in `pod-lab`'s
-   profiles (T-791, the owner's ruling "Discipline"), and update the testers' guide #249. The gate is red at `cfc3ae3`
-   in `cold_connect` at random (#266): read its lines, repair, and run it 20 times before other work.
+   profiles (T-791, the owner's ruling "Discipline"), and update the testers' guide #249.
 
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
 Actions; "offline" needs none. A test that fails at random, or a red gate, goes before the next
@@ -155,7 +154,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 748 entries: 44 open, 29 partial, 16 blocked, 659 done.
+`TODO/INDEX.md` holds 749 entries: 44 open, 29 partial, 16 blocked, 660 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 

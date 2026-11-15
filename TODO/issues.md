@@ -329,7 +329,7 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #263 | COORD-079: podssh took podcrates v0.52.0 at 94ee6ac (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.52.0` | T-684 |
 | #264 | `[gh action] requested`: the gate on `main` after the take of v0.52.0 | closed 2026-11-15: run 43719624106 red in `ssh` (the Shadowsocks CLI test's old proxy wording), repaired; asked again in #265 | T-684 |
 | #265 | `[gh action] requested`: the gate after the repair of the Shadowsocks CLI test | closed 2026-11-15: run 43726773977 red in `ssh`, `cold_connect` at random; asked again in #266 | T-684 |
-| #266 | `[gh action] requested`: the lines of `cold_connect`'s failure in run 43726773977, and a rerun | open 2026-11-15: waits for the owner's agent | T-684 |
+| #266 | `[gh action] requested`: the lines of `cold_connect`'s failure in run 43726773977, and a rerun | closed 2026-11-15: the rerun passed; the lines read from the job's log, T-794 repaired the test | T-684, T-794 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |
