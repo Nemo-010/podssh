@@ -13,9 +13,12 @@ run that the owner's agent started is seen at once and not waited for.
 The reads go through forge.web.pkgforge.dev/github, a keyless read-only
 mirror of GitHub's REST API (https://forge.web.pkgforge.dev/llms.txt). Its
 quota is shared by each caller of an address (GitHub's 60 an hour), so it
-polls each SECONDS (default 120), adds a little jitter, and backs off on
-403, 429 and 5xx, after `Retry-After` when the mirror gives one. The first
-poll records what exists and prints nothing for it. Stdlib only.
+polls each SECONDS (default 120), adds a little jitter, and tries a poll
+again twice, soon, on 403, 429 and 5xx (after `Retry-After` when the mirror
+gives one, up to SECONDS), then waits for the next poll: a long backoff would
+keep it silent while a run ends. It says once when no poll has answered for
+QUIET seconds, and again when one does. The first poll records what exists
+and prints nothing for it. Stdlib only.
 """
 import json
 import os
@@ -28,15 +31,18 @@ import urllib.request
 MIRROR = "https://forge.web.pkgforge.dev/github"
 # Transient answers of the mirror or of GitHub behind it.
 TRANSIENT = (403, 429, 500, 502, 503, 504)
-TRIES = 6
-LONGEST = 900
+# The tries of one poll; then the next poll.
+TRIES = 3
+# How long with no answer before the watcher says so.
+QUIET = 600
 
 
-def get(path, n, opener=None):
+def get(path, n, opener=None, longest=120):
     """The JSON of `path`, or None after TRIES transient answers. A query
-    word `n` defeats the mirror's cache, as watch-org.sh does."""
+    word `n` defeats the mirror's cache, as watch-org.sh does; no wait of a
+    try is longer than `longest`."""
     sep = "&" if "?" in path else "?"
-    wait = 20
+    wait = 10
     for _ in range(TRIES):
         url = f"{MIRROR}/{path}{sep}n={n}{random.randint(0, 1 << 30)}"
         req = urllib.request.Request(url, headers={"Accept": "application/json", "User-Agent": "watch-runs"})
@@ -47,11 +53,23 @@ def get(path, n, opener=None):
             if e.code not in TRANSIENT:
                 raise
             after = e.headers.get("Retry-After") if e.headers else None
-            time.sleep(int(after) if after and after.isdigit() else wait + random.uniform(0, 5))
+            asked = int(after) if after and after.isdigit() else wait
+            time.sleep(min(asked, longest) + random.uniform(0, 3))
         except (urllib.error.URLError, TimeoutError, ValueError, OSError):
-            time.sleep(wait + random.uniform(0, 5))
-        wait = min(wait * 2, LONGEST)
+            time.sleep(wait + random.uniform(0, 3))
+        wait = min(wait * 2, longest)
     return None
+
+
+def heard(last_ok, now, quiet_said, answered):
+    """The line of the mirror's health after a poll, if any, and whether the
+    silence is said: once when no poll answered for QUIET seconds, and once
+    when one answers again."""
+    if answered:
+        return ("RUN watcher: the mirror answers again" if quiet_said else None), False
+    if not quiet_said and now - last_ok >= QUIET:
+        return f"RUN watcher: no answer of the mirror for {int(now - last_ok)} s; it goes on trying", True
+    return None, quiet_said
 
 
 def failed_jobs(repo, run, n, fetch=get):
@@ -122,16 +140,15 @@ def main(argv):
     seen = load(state)
     announce = seen is not None
     seen = seen or {}
-    n, down = 0, False
+    n, last_ok, quiet_said = 0, time.time(), False
     while True:
         n += 1
-        doc = get(f"repos/{repo}/actions/runs?per_page=30", n)
-        if doc is None:
-            if not down:
-                print(f"RUN watcher: the mirror did not answer {TRIES} times; it goes on trying", flush=True)
-            down = True
-        else:
-            down = False
+        doc = get(f"repos/{repo}/actions/runs?per_page=30", n, longest=pause)
+        said, quiet_said = heard(last_ok, time.time(), quiet_said, doc is not None)
+        if said:
+            print(said, flush=True)
+        if doc is not None:
+            last_ok = time.time()
             for text in step(repo, seen, doc.get("workflow_runs", []), announce, n):
                 print(text, flush=True)
             save(state, seen)
@@ -172,6 +189,10 @@ def self_test():
         seen[str(i)] = [1, "completed"]
     step("o/r", seen, [], True, 8, fetch)
     check("the state keeps the newest 200 runs", (len(seen), min(map(int, seen))), (200, 60))
+    check("a short silence says nothing", heard(0, QUIET - 1, False, False), (None, False))
+    check("a long silence is said once", heard(0, QUIET, False, False)[1], True)
+    check("and not again", heard(0, QUIET * 3, True, False), (None, True))
+    check("an answer after it is said", heard(0, QUIET * 3, True, True), ("RUN watcher: the mirror answers again", False))
     print("watch-runs self-test:", "passed" if ok else "FAILED")
     return 0 if ok else 1
 
