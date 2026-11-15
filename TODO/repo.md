@@ -6622,7 +6622,7 @@ model on `pod-manual` and its checks, as above.
 **Milestone:** M10
 **Priority:** P1
 **Effort:** M
-**Status:** blocked
+**Status:** partial
 
 ## Problem
 
@@ -6650,10 +6650,22 @@ podlab run proxy-only -- sh scripts/release-short.sh BINARY --net
 Each profile of COORD-081 that `pod-lab` holds runs the lane and passes; a profile that does not hold on the host says
 so.
 
-## Blocker
+## Done
 
-PodUtils/podcrates (COORD-107, its T-692 part 2 and T-701): `pod-lab` part 1 is in `v0.54.0`, but it holds none of podssh's
-network classes (`proxy-only` and the others of COORD-081) yet.
+Partial, 2026-11-16. `pod-lab` of podcrates `v0.56.0` holds podssh's classes (COORD-115): `podlab` was built with
+`cargo install --git https://github.com/PodUtils/podcrates --tag v0.56.0 pod-lab --features cli`, and run as root in
+this cloud container, whose only way out is an HTTP CONNECT proxy on the loopback, with `target/debug/podssh` of
+`8a8e72c`. Commands 1 and 2 of podssh's lane, in each profile that `LANES.md` marks as held here:
+`podlab run PROFILE -- podssh doctor` exited 0 with 63 or 64 ok and 0 FAIL in `listen-denied`, `udp-denied`,
+`no-ptmx`, `no-passwd-entry`, `noexec-home`, `no-proc`, `seccomp-nonewprivs`, `ro-etc-ssl` and `no-tun`; and
+`podlab run PROFILE -- podssh ssh -o BatchMode=yes -T git@github.com` reached GitHub through the live relay in each
+of them ("Permission denied (publickey)", as no key was offered). In `bind-denied` doctor exited 1 with 19 FAIL, each
+a refused connect to the proxy, and `ssh` reached nothing: the profile refuses each TCP connect (Landlock with no TCP
+port), so podssh has no way out there. podcrates is asked to give podssh's row of it command 1 alone, or a lab a port
+for a connect to the host's proxy (COORD-086, #278). Next: commands 3 to 6 (a copy of 200 MiB each way, `serve` with
+`vi`, `less` and Ctrl-C, `pipe`, a session after a kill of its relay link) in the same profiles, then the release
+steps that name the run. The network classes (`proxy-only` and the others of COORD-081) wait for podnet's data in
+`pod-lab` (podcrates T-716).
 
 # T-792: The state of each GitHub issue written from the record by podcrates' workflow
 
