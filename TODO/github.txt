@@ -23,14 +23,14 @@
 15 issue deleted
 16 issue deleted
 17 issue deleted
-18 issue closed
-19 issue closed
-20 issue closed
+18 issue open
+19 issue open
+20 issue open
 21 issue closed
-22 issue closed
+22 issue open
 23 issue closed
-24 issue closed
-25 issue closed
+24 issue open
+25 issue open
 26 issue closed
 27 issue closed
 28 issue deleted
@@ -134,7 +134,7 @@
 126 issue closed
 127 issue closed
 128 issue closed
-129 issue closed
+129 issue open
 130 issue closed
 131 issue closed
 132 issue closed
@@ -171,9 +171,9 @@
 163 issue closed
 164 issue closed
 165 issue closed
-166 issue closed
+166 issue open
 167 issue closed
-168 issue closed
+168 issue open
 169 issue closed
 170 issue closed
 171 issue closed
@@ -267,7 +267,7 @@
 259 issue closed
 260 issue closed
 261 issue closed
-262 issue open
+262 issue closed
 263 issue closed
 264 issue closed
 265 issue closed
@@ -279,3 +279,5 @@
 271 issue closed
 272 issue closed
 273 issue closed
+274 issue open
+275 issue closed

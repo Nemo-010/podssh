@@ -102,9 +102,14 @@ entry that large is two entries.
   when its other entries are done; the comment names the entries that wait.
   Comment only after the work is done (the operator, 2026-10-08). Write in
   `TODO/issues.md` that the issue is closed, with the commit.
-- An issue whose work is done but for entries that are parked, blocked or wait
-  for another milestone may be closed as stale, with a comment that names the
-  entries left; they stay open in the record (the operator, 2026-11-11).
+- An issue is open exactly while one of its entries is not done (the owner's
+  ruling "Issues", 2026-11-15). The record sets the state: a session changes
+  `TODO/issues.md` and `TODO/github.txt`, and `.github/workflows/issue-sync.yml`
+  (podcrates' sync) writes the status block, closes and opens each issue to
+  match. A report, a deferred issue and a tracker name one entry or more; a
+  COORD message and a `[gh action] requested` need none. `cargo todo check`
+  holds it (`issue_rules = "on"` in `TODO/todo.toml`). Never close or open an
+  issue by hand, and never edit its block.
 - `TODO/github.txt` lists each number of the repository, an issue or a pull
   request, with its state (T-360). `cargo todo check` holds `TODO/issues.md`
   to it: each issue has one place in the map (the first cell of a row, or the

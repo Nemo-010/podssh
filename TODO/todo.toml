@@ -2,3 +2,6 @@
 # PodUtils/podcrates). The other facts are the defaults of pod-todo, which
 # are podssh's.
 tool = "podssh-todo"
+
+# The rules of the state of an issue against its entries (the owner's ruling "Issues").
+issue_rules = "on"

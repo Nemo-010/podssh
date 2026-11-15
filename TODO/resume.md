@@ -2284,7 +2284,7 @@ then resumes over a new one. For those 30 s, an interactive session shows nothin
   new one goes on (`docs/design.md:932-934`). The far end lets the newest resume take a session
   (`docs/design.md:1008-1010`).
 - Measured (T-156): a session on the layer and on the iroh road survives a new address of its
-  client (`crates/podssh-cli/tests/m6_exit.rs:270`); the time that the resume took is not in the
+  client (`crates/podssh-cli/tests/m6_exit.rs:272`); the time that the resume took is not in the
   record.
 - Read in Mosh (`docs/design.md:789-803`): its client tries a new source port after 10 s with no
   round trip, and its server follows each newer authentic datagram at once.
@@ -4266,7 +4266,7 @@ repair: the guard moved from `tries` into `layer_alive::apply`, as rustfmt took 
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -4315,12 +4315,14 @@ Step 1's tool, the same day: `feel_outage.py` runs the role's road with `-v`, an
 child's stderr after the seconds since the round's start, with "feel: the cut begins" and "feel: the link is back" on
 the same clock (`Stamped`). Here, with a stand-in cut that does nothing: the layer's lines ("opened resumable session",
 its heartbeat) and the two marks, stamped, in `role.outage.err`; `--self-test` passed. UNVERIFIED: the run from
-Actions (`feel-netem.yml`, `shapes=outage`, `roads=role`) and what its lines show of the spares.
+Actions (`feel-netem.yml`, `shapes=outage`, `roads=role`): read with the Done below.
 
 ## Done
 
-Partial, 2026-11-15. podcrates `v0.53.0` holds COORD-078's fix (`pod-ws`'s numbered HTTP/2 connections: a link that
+2026-11-15. podcrates `v0.53.0` holds COORD-078's fix (`pod-ws`'s numbered HTTP/2 connections: a link that
 replaces another takes only a newer one, and a silent connection leaves the pool), taken with `v0.54.0`. The workspace
-passes on it (3837 tests, T-684). UNVERIFIED: the outage cell of the role's road from Actions (`feel-netem.yml`,
-`shapes=outage`, `roads=role`, `-v`), the first byte within 2 s of the return in each round.
+passes on it (3837 tests, T-684). The outage cell of the role's road from Actions (`feel-netem.yml`, `shapes=outage`,
+`roads=role`, run 43770482263 at `d0ef973`, #275): the first byte 129.7 ms after the return and caught up in 918.4 ms,
+then 178.0 ms and 1,042.6 ms, where it was 12.7 and 12.5 s before. Both rounds are within the target of 2 s. T-781's
+tunnels of HTTP keep their own rule (no spare links through a third party's tunnel), which this fix does not touch.
 

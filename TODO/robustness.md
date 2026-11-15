@@ -2558,6 +2558,19 @@ failure's text held its known host alone: `Road::carry` of `crates/podssh-cli/te
 (`podssh node` has no `-v`; its lines are kept already), so the next failure in the gate says where the session stopped.
 Next: read that failure's lines.
 
+A fifth time, on 2026-11-15, at `d00ca78` (podcrates `v0.54.0`, run 43766309151, job `gate (m6)`):
+`the_layer_survives_a_new_address` did not end within 600 s. The client said "the link said nothing for 1 s, and a
+spare link answered; resuming the session", then "the session resumed after 0.0 s, 688128 bytes sent again", and
+nothing after, as after the stall of `2ffb7cd`: no loss of the new link either, in 600 s, so its heartbeat was
+answered and no session's byte moved. The client's proxy logged its spare from the new address; the node's lines end
+at "came in, by the door"; the other ten tests passed (1,238 s). The two shapes of the layer after a resume each sent
+again about 700 KiB, near the window of a link of the pair's road (`PAIR_WINDOW`, 768 KiB, pod-session's
+`replay.rs`). A reading of `pump/up.rs`, `pump/down.rs`, `pump/outbox.rs` and `link.rs` at `v0.55.0` found no wait
+that holds without an `ACK` due: the up half's `room` is the link's own, the reader never waits for the writer, and a
+resume sets the acknowledged offset to the peer's received one. `through_the_layer` of
+`crates/podssh-cli/tests/m6_exit.rs` now runs `ssh -v` too, so that the next failure gives the layer's spare and retry
+lines.
+
 
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes
 

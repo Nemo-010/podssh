@@ -226,7 +226,9 @@ fn logs(home: &std::path::Path) -> String {
 fn through_the_layer(fault: &[&str], node_fault: &[&str], tag: &str) {
     let Some(stand) = Stand::new(tag, fault, node_fault) else { return };
     let label = stand.node();
-    let mut args = vec!["ssh".to_string()];
+    // `-v`: a run in CI hung after a resume with no line after it (T-780);
+    // the layer's spare links, retries and moves are verbose lines.
+    let mut args = vec!["ssh".to_string(), "-v".into()];
     args.extend(stand.session.common());
     args.extend([format!("node://tester@{label}"), "echo".into()]);
     let child =

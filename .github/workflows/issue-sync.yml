@@ -1,0 +1,32 @@
+name: issue-sync
+
+# The state of each issue from the record (the owner's ruling "Issues",
+# docs/decisions.md): podcrates' sync writes a status block into each issue,
+# closes an issue whose entries are done and opens again one with open work.
+# TODO/issues.md and TODO/github.txt are the map; `cargo todo check` holds
+# them to the entries. Change the record, never the block or the state by
+# hand. A dispatch with dry_run reads what a run would change.
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  issues:
+    permissions:
+      contents: read
+      issues: write
+    uses: PodUtils/podcrates/.github/workflows/issue-sync.yml@93bf133ab8b636505d035dfda5c7a1ce21b27eb4 # v0.56.0
+    with:
+      podcrates_ref: v0.56.0
+      dry_run: ${{ inputs.dry_run || false }}

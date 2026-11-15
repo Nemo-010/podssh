@@ -4994,7 +4994,7 @@ of GitHub #69 to #72 corrected these; nothing finds the next.
    get their entry or a date, or are corrected, in the same change.
 3. A status written beside an id in those documents (`T-NNN, partial`, `(T-NNN, open)`) agrees
    with the index, unless its paragraph reads at a date or at a commit, as the record's readings
-   do (`TODO/RULES.md:148-153`): "T-099, partial" of 2026-10-10 is such a reading
+   do (`TODO/RULES.md:153-158`): "T-099, partial" of 2026-10-10 is such a reading
    (`docs/STATUS.md:903`).
 4. `TODO/RULES.md` says it, beside the rules of citations.
 
@@ -5864,6 +5864,16 @@ that replaces another takes only a newer HTTP/2 connection, and a silent one lea
 `node-*` id of `pod-services`; `v0.54.0` carries `pod-lab` and `pod-manual` part 1 (T-791, T-790). `cargo build`,
 `cargo clippy --workspace --all-targets`: clean; `cargo test --workspace --no-fail-fast`: 3837 passed, 0 failed, 82
 ignored.
+
+2026-11-15, podcrates `v0.55.0` (`e3c3e1d4`, COORD-115, PodUtils/podcrates#194) and `v0.56.0` (`93bf133a`, the same
+issue), taken together as a bump of the tag, no patch for podssh: `v0.55.0` carries the sync of the issues (the owner's
+ruling "Issues") and podssh's classes in `pod-lab` (T-791); `v0.56.0` adds the kind `reference` to `pod-todo` and the
+sync, and changes no other crate. podssh turns the sync on: `issue_rules = "on"` in `TODO/todo.toml`, its map repaired
+(the issues that the ruling opens again, the titles of the requests, #59's entries; PodUtils/podcrates#192), and
+`.github/workflows/issue-sync.yml` calls podcrates' workflow at `v0.56.0`. On `v0.55.0`: `cargo clippy --workspace
+--all-targets` clean, `cargo test --workspace --no-fail-fast` 3837 passed, 0 failed, 82 ignored; on `v0.56.0`, whose
+only change of code is `pod-todo`: clippy clean, `cargo test -p podssh-todo` passed, `cargo todo check` agrees with the
+rules on.
 
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.

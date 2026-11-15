@@ -40,7 +40,7 @@ Read on 2026-11-15.
    take of `v0.42.0`, which answered each. cfb's asks, T-708 to T-731 (#195), wait behind podssh's own work order, M10
    included (the owner's ruling "Priority").
 7. **The move to PodUtils/podcrates** (T-684, Q101, Rule Q3). podssh pins each podcrates crate at
-   `v0.54.0` (COORD-113, PodUtils/podcrates#188; podssh's answer is COORD-084). Taken, so worked on in
+   `v0.56.0` (COORD-115, PodUtils/podcrates#194; podssh's answer is COORD-085). Taken, so worked on in
    PodUtils/podcrates: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`,
    `pod-proxy`, `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`
    and `pod-relay` (2026-11-12), `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue), and
@@ -52,7 +52,7 @@ Read on 2026-11-15.
    `acme/mod.rs` of `podssh-cli`). Nothing is frozen now (2026-11-15). Next, as podcrates names
    them: `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
    `pod-relay-serve` last.
-8. **Drafts.** In work: none. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
+8. **Drafts.** In work: T-790's sentences of the manual at 25 words or fewer (branch `draft-t790`, worktree `.claude/worktrees/t790-sentences`, commits `6a5715b` and `12c2d36`; written, not built). Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
    T-118's, T-117's, T-114's, T-112's,
    T-110's, T-109's, T-108's with T-222, T-107's, T-771's, T-773's, T-738's second and third, T-321's
    CLI test of `podssh each`, T-319's item 2, and the takes of podcrates v0.36.0 to v0.39.0 and
@@ -153,7 +153,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 749 entries: 44 open, 31 partial, 14 blocked, 660 done.
+`TODO/INDEX.md` holds 749 entries: 44 open, 30 partial, 14 blocked, 661 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 

@@ -46,13 +46,13 @@ T-168. A Cloudflare quick tunnel, made by podssh itself: T-170 (the research, do
 (the measurement), T-300 and T-301. QUIC between peers with a relay
 fallback and an allowlist: T-162, T-087. The sandbox limits (no UDP, port 22
 refused, only CONNECT): already a decision (probe, never assume;
-`docs/decisions.md`, 2026-10-05). Closed on 2026-11-11 as stale, with a comment that names the entries done; T-124 stays open in the record.
+`docs/decisions.md`, 2026-10-05). Closed on 2026-11-11 as stale, with a comment that names the entries done, and open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done); T-124 stays open in the record.
 
 **#19, the reverse road and sessions that survive.** A receiving mode: T-079,
 T-083. Resume by byte offset with a limited replay ring: T-151, T-152,
 T-153. Byte replay or screen state: T-152 and T-161. The reconnection policy:
 T-153, T-154. A start over a standard sshd: T-167. A lasting terminal through
-`tmux`: T-178. A clean server life cycle: T-117. Closed on 2026-11-11 as stale, with a comment that names the entries done; T-117 and T-161 stay open in the record.
+`tmux`: T-178. A clean server life cycle: T-117. Closed on 2026-11-11 as stale, with a comment that names the entries done, and open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done); T-117 and T-161 stay open in the record.
 
 **#20, `podssh serve` and the pty in the cage.** The server: T-107, T-108,
 T-109, T-110, T-111, T-112, T-113. A session that outlives the window: T-159.
@@ -60,7 +60,7 @@ Line discipline and copy mode: T-111, T-125 to T-129, T-161. Backpressure:
 T-118. A handshake with version and role: T-151. An install with no
 privileges: T-121; an agent, a credential helper and hardware keys, inside
 podssh: T-034, T-228, T-229. The host key of each hop: T-030.
-A limit on each wait: T-110, T-111, T-112, T-133. Transient scopes: T-122. Closed on 2026-11-11 as stale, with a comment that names the entries done; the entries of `podssh serve` stay open (T-107 to T-113, T-118, T-122, T-159, T-161) in the record.
+A limit on each wait: T-110, T-111, T-112, T-133. Transient scopes: T-122. Closed on 2026-11-11 as stale, with a comment that names the entries done, and open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done); the entries of `podssh serve` stay open (T-107 to T-113, T-118, T-122, T-159, T-161) in the record.
 
 **#21, file copy.** Resume with a side file: T-136. Delta, parallel and the
 copy options: T-141, T-142, T-143, T-144. A fast road with a fallback: T-164.
@@ -75,7 +75,7 @@ settings in effect (`-G`): T-046. `Match`: T-045. `-F` and the port forms of
 copy tools: T-043, T-139. Repeated flags: T-017 (done). Values that start with
 `-`: T-011. A Mosh transport for each host (SSHub's report): no road runs
 `mosh-server` (`docs/decisions.md`); the functions of Mosh: T-171 (the map, done), then T-302,
-T-303, T-304, T-305 and T-306. Closed on 2026-11-11 as stale, with a comment that names the entries done; T-303 and T-304 stay open in the record.
+T-303, T-304, T-305 and T-306. Closed on 2026-11-11 as stale, with a comment that names the entries done, and open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done); T-303 and T-304 stay open in the record.
 
 **#23, output for machines.** JSON on each surface: T-049, T-050, T-051,
 T-054. Latency and throughput, and a short preflight: T-053. The health of
@@ -89,7 +89,7 @@ T-185, T-187. A control surface for agents: T-186; over stdio: T-055.
 Host groups and per-host settings: T-184, T-043. Session recording: T-033.
 Fan-out with an exit rule: T-183. Import and export: T-047, T-292 (PuTTY,
 MobaXterm, Remmina), T-327 (mRemoteNG) and T-328 (FinalShell, Termius; it
-waits for the operator's exports). Closed on 2026-11-11 as stale, with a comment that names the entries done; T-328 stays open, waiting for the operator's exports in the record.
+waits for the operator's exports). Closed on 2026-11-11 as stale, with a comment that names the entries done, and open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done); T-328 stays open, waiting for the operator's exports in the record.
 
 **#25, robustness and releases.** A circuit breaker: T-059; the retry policy:
 T-025. Rate limits and quotas: T-169 (in podssh's own relay role, M10, Q63), T-114 (in `serve`),
@@ -97,7 +97,7 @@ T-145 (a bandwidth limit). Resource limits: T-201. Connection sharing: T-039.
 A scored interop harness: T-199. Fuzzing and a terminal oracle: T-198,
 T-200. An audit log: T-116. Live tests kept out of the default run: already
 so (the live tests are `#[ignore]`; `docs/STATUS.md`, "Measure again").
-Provenance of releases: T-210, T-211. Closed on 2026-11-11 as stale, with a comment that names the entries done; T-114 and T-116 stay open in the record.
+Provenance of releases: T-210, T-211. Closed on 2026-11-11 as stale, with a comment that names the entries done, and open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done); T-114 and T-116 stay open in the record.
 
 **#26, streams that are not SSH.** A binary protocol through `-W` or exec:
 already works (`docs/STATUS.md`: 262144, 262145 and 5,000,000 bytes with
@@ -145,7 +145,7 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #54 | `doctor` measures what the proxy does to a stream | closed | T-324 (the three failures of the upgrade, and samples with their loss; the commit "doctor samples each probe of TCP, and names three failures of the upgrade"); T-325 (buffering, a cap on bodies, an idle limit) is M10's, served by podssh's own relay role (Q63) |
 | #55 | The split road's wire protocol | open (2026-11-13: commented where it stands, T-319 partial: invariant 5 against a real proxy waits for the live runs, Q88) | T-319 (its Approach holds the protocol; the operator allowed its second connection, Q44, and it is M10's since Q63, served by podssh's own relay role) |
 | #56 | A cleartext road on port 443, probed | closed 2026-11-09, T-326 done (`fddabaa3`) | T-326 (the operator allowed it with a token for one session, Q45, and it is M10's since Q63, served by podssh's own relay role) |
-| #59 | The forward road without the operator's relay: ways with no account to reach a `host:port` (research) | closed 2026-11-11, each road of its ranking done | Each road of its ranking, in the paragraph below |
+| #59 | The forward road without the operator's relay: ways with no account to reach a `host:port` (research) | closed 2026-11-11, each road of its ranking done | T-162, T-169, T-347, T-348, T-351, T-352, T-353, T-369, T-370, T-371, T-372, T-373, T-374 (each road of its ranking, in the paragraph below) |
 | #60 | A relay template: a WebSocket forwarder that takes the destination from the URL | closed 2026-11-01, each entry done | T-369 (a forwarder that the user names); T-370 (the public forwarders in the binary, and a fallback to them, by the operator's ruling Q56) |
 | #61 | SSH on port 443 as a hop | closed 2026-11-01, each entry done | T-371 (the hop measured, and a `doctor` line for a hop, b666713), T-372 (a hop or a destination whose SSH is wrapped in TLS, `ssh+tls://`, 60c2414) |
 | #62 | A Shadowsocks road with a refreshable subscription | closed 2026-11-01, each entry done | T-373 (`--shadowsocks FILE`, tested against shadowsocks-rust's `ssserver` and `sslocal`) |
@@ -200,7 +200,7 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #126 | `relay serve`: a policy refusal names the address that a target resolved to | closed 2026-11-04 (`45a3447`), its entry done | T-628 |
 | #127 | `relay serve` keeps each capability of its start after the bind | closed 2026-11-04 (`ce411ac`), its entry done | T-629 (dropped by default after the bind, before the runtime; no flag to keep them) |
 | #128 | The relay role's 4096 pairs have no share for each key | closed 2026-11-04 (`4ae2284`), its entry done | T-630 (a reserve for each key that a busy key may borrow past, not the issue's ceiling) |
-| #129 | `serve --listen`: an absolute deadline from the accept | closed 2026-11-11 as stale; T-631 stays open, parked until T-124 | T-631 (backlog, parked until T-124, whose listener it bounds: no server of `podssh serve` exists yet) |
+| #129 | `serve --listen`: an absolute deadline from the accept | open 2026-11-15 (closed 2026-11-11 as stale; T-631 stays open, parked until T-124; open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done)) | T-631 (backlog, parked until T-124, whose listener it bounds: no server of `podssh serve` exists yet) |
 | #130 | A record of the resumable layer that ends one direction | closed 2026-11-05 (`c3a9b89`, done 2026-11-04), its entry done | T-632 (also the relay role's layer road for a standard sshd, which `proxy` takes unasked by Q96; consent by the layer's own features, not the node's `hello`) |
 | #131 | One rule for an absent member that carries a guarantee, and a helper | closed 2026-11-05 (`0289b6d`), its entry done | T-633 (each reader that exists is right; the rule and the helper are new) |
 | #132 | Refuse a retired `PODSSH_*` variable by name | closed 2026-11-04 (`91669ae`), its entry done | T-634 (the manual's check of variables runs both ways already, which the issue missed) |
@@ -221,23 +221,23 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #147 | `relay serve` routes a published name by its ClientHello, TLS at the node | closed 2026-11-05, its entry done | T-649 (the listener moved to `podssh-relay`; funnel at the edge is T-180) |
 | #148 | A pool of sessions opened ahead for each node | closed 2026-11-05, its entry done | T-650 (only for a node that asks, by its own flag) |
 | #151 | COORD-001: a test of the fallback channel | closed 2026-11-05, its entry partial | T-684 (the first message of the protocol of PodUtils' sessions, a test that the watcher sees it) |
-| #152 | `[gh action] requested`: the gate on `main` | closed 2026-11-06, the gate passed (run 42179347665, `78e78e4`) | T-684 (Actions start no workflow for this account on 2026-11-06; the owner's agent ran it; T-465's probe, T-451's test and T-691's pins in the gate) |
-| #153 | `[gh action] requested`: the gate on `main` after T-434, T-456 and T-180 | closed 2026-11-06, its run red (42203919941, `0fc03e7`) and repaired (`b20fd8fe`, T-692) | T-684 (Actions start no workflow for this account on 2026-11-06; the owner's agent ran it) |
+| #152 | [gh action] requested: the gate on `main` | closed 2026-11-06, the gate passed (run 42179347665, `78e78e4`) | T-684 (Actions start no workflow for this account on 2026-11-06; the owner's agent ran it; T-465's probe, T-451's test and T-691's pins in the gate) |
+| #153 | [gh action] requested: the gate on `main` after T-434, T-456 and T-180 | closed 2026-11-06, its run red (42203919941, `0fc03e7`) and repaired (`b20fd8fe`, T-692) | T-684 (Actions start no workflow for this account on 2026-11-06; the owner's agent ran it) |
 | #154 | COORD-002: podssh took pod-dns and pod-services of v0.4.0 (to podcrates) | closed 2026-11-09, the take is in podcrates' `SOURCES` (`taken 72fb94d1`) | T-684 (the take at `72fb94d1`, written to the podcrates session as the protocol asks) |
-| #155 | `[gh action] requested`: the gate on `main` after the take of v0.4.0 | closed 2026-11-06: its run red (42214300946, `ea5d4117`) and repaired (`5c91c0b1`); its second run asked in #157 | T-684 (the static binary of the take, which the gate's step `release` built and checked) |
+| #155 | [gh action] requested: the gate on `main` after the take of v0.4.0 | closed 2026-11-06: its run red (42214300946, `ea5d4117`) and repaired (`5c91c0b1`); its second run asked in #157 | T-684 (the static binary of the take, which the gate's step `release` built and checked) |
 | #156 | COORD-003: podssh moved each podcrates tag to v0.5.0 (to podcrates) | closed 2026-11-09, superseded by the move to v0.6.0 (#161) | T-684 (the move at `486c001b`, written to the podcrates session) |
-| #157 | `[gh action] requested`: the gate on `main` after v0.5.0 and T-491 to T-498 | closed 2026-11-06: run 42248490766 at `8f21bf9a`, each step but `libs` passed; repaired at `db1e6307` | T-684 (the gate of the takes and of the drafts merged since `ea5d4117`) |
+| #157 | [gh action] requested: the gate on `main` after v0.5.0 and T-491 to T-498 | closed 2026-11-06: run 42248490766 at `8f21bf9a`, each step but `libs` passed; repaired at `db1e6307` | T-684 (the gate of the takes and of the drafts merged since `ea5d4117`) |
 | #158 | COORD-004: a second public Piping Server in pod-services, piping.onrender.com (to podcrates) | closed 2026-11-06, delivered in podcrates v0.6.0 | T-497 (done 2026-11-06) |
 | #159 | COORD-005: Tailscale's main DERP fleet in pod-services, after tailcat's (to podcrates) | closed 2026-11-06, delivered in podcrates v0.6.0 | T-534 (done 2026-11-06) |
-| #160 | `[gh action] requested`: the gate on `main` after `db1e6307` | closed 2026-11-06: the gate passed each job (run 42254589426, `285b0562`) | T-684 (the gate after the takes of v0.4.0 and v0.5.0, and the drafts of the day) |
+| #160 | [gh action] requested: the gate on `main` after `db1e6307` | closed 2026-11-06: the gate passed each job (run 42254589426, `285b0562`) | T-684 (the gate after the takes of v0.4.0 and v0.5.0, and the drafts of the day) |
 | #161 | COORD-006: podssh moved each podcrates tag to v0.6.0 (to podcrates) | closed 2026-11-09, `main` pins v0.6.0 since `28fa1170` | T-684 (the move at `28fa1170`, written to the podcrates session) |
-| #162 | `[gh action] requested`: the gate on `main` at `8c7519c0` | closed 2026-11-09: its run red (42290205000, the job `windows`), repaired by T-696; the gate passed each job at `47e1eba3` (run 42627967826) | T-684 (the gate after the take of v0.6.0, T-497 and T-534), T-696 |
-| #163 | `[gh action] requested`: `PodUtils/podcrates:.github/workflows/live.yml`, the main DERP fleet from GitHub Actions | closed 2026-11-09, the run passed (42290196915, `8c7519c0`) | T-534 (step 1's run from Actions) |
+| #162 | [gh action] requested: the gate on `main` at `8c7519c0` | closed 2026-11-09: its run red (42290205000, the job `windows`), repaired by T-696; the gate passed each job at `47e1eba3` (run 42627967826) | T-684 (the gate after the take of v0.6.0, T-497 and T-534), T-696 |
+| #163 | [gh action] requested: `PodUtils/podcrates:.github/workflows/live.yml`, the main DERP fleet from GitHub Actions | closed 2026-11-09, the run passed (42290196915, `8c7519c0`) | T-534 (step 1's run from Actions) |
 | #164 | The GSRN road: accountless SRP authentication on one TCP connection to port 443 | closed 2026-11-11 as stale; T-707 stays open until the owner takes up `pod-gsr` | T-707 (blocked: the owner deferred `pod-gsr` on 2026-11-09) |
 | #165 | Forwarder roads re-derive the half-close discipline per road | closed 2026-11-09 (`cdb46f81`), its entry done | T-699 |
-| #166 | `doctor`: one verdict of the host's capabilities that names what each restriction closes | closed 2026-11-09, its entry done | T-706 (M5, beside T-248) |
+| #166 | `doctor`: one verdict of the host's capabilities that names what each restriction closes | open 2026-11-15 (closed 2026-11-09, its entry done; open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done)) | T-706 (M5, beside T-248) |
 | #167 | `sftp` prints no near-cap line before a budget stop, and the reverse node discards the close reason | closed | T-700 (sftp), T-701 (the node) |
-| #168 | `serve`: inherit the relay role's capability drop, and bound the accept path before authentication | closed 2026-11-13 as stale: T-698 done (`565accd`), serve calls the drop (T-107); T-631 stays open, parked until T-124 | T-698 (the drop; T-107 depends on it); the bound of the accept path is T-631 (#129) |
+| #168 | `serve`: inherit the relay role's capability drop, and bound the accept path before authentication | open 2026-11-15 (closed 2026-11-13 as stale: T-698 done (`565accd`), serve calls the drop (T-107); T-631 stays open, parked until T-124; open again from 2026-11-15, by the owner's ruling "Issues" (an issue is open while one of its entries is not done)) | T-698 (the drop; T-107 depends on it); the bound of the accept path is T-631 (#129) |
 | #169 | `relay serve`: the contract's limits are fixed constants; only `--keepalive` is configurable | closed 2026-11-09, its entry done | T-704, T-732 (a defect of the byte cap, found by its test) |
 | #170 | `ssh`: the direct road's banner check and the roost's sshd check give opposite verdicts on the same bytes | closed 2026-11-09, its entry done | T-702 |
 | #171 | `ssh`: `--relay-host` and `--relay-failover` are dropped in silence for a node destination | closed 2026-11-09 (`cbb31bc0`), its entry done | T-697 |
@@ -318,21 +318,23 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #252 | COORD-074: podssh took podcrates v0.49.0 at a99de1d (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.49.0` | T-545, T-684 |
 | #253 | COORD-075: pod-quic spins a core on a way whose reads keep failing (to podcrates) | closed 2026-11-15: podcrates `v0.51.0` bounds them (`pod_quic::bounded`), taken at `3f6a9fe` | T-787 |
 | #254 | COORD-076: podssh took podcrates v0.50.0 at 13c52be (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.50.0` | T-684 |
-| #255 | `[gh action] requested`: the gate on `main` after the take of v0.50.0, and T-665's lab | closed 2026-11-15: the gate passed (run 43687960063, `e7cb4b6`); its first block ran, not the amended one, so the labs are asked again in #256 | T-684, T-665 (Actions start no workflow for this account on 2026-11-15) |
-| #256 | `[gh action] requested`: the netem labs of T-665 and T-625, and T-786's error files | closed 2026-11-15: iroh-ab 43691396393 and wisp-rate 43691399331 passed, T-786's error files read | T-665, T-625, T-786 |
-| #257 | `[gh action] requested`: the gate on `main` after T-665's default | closed 2026-11-15: the gate passed (run 43704942887, `6732178`) | T-665 |
-| #258 | `[gh action] requested`: T-786's outage cell with the role's road | closed 2026-11-15: run 43709370293 read (T-786 done, T-789 filed) | T-786, T-789 |
-| #259 | `[gh action] requested`: T-789's outage cell of the role's road with `-v` | closed 2026-11-15: run 43710388009 read | T-789 |
+| #255 | [gh action] requested: the gate on `main` after the take of v0.50.0, and T-665's lab | closed 2026-11-15: the gate passed (run 43687960063, `e7cb4b6`); its first block ran, not the amended one, so the labs are asked again in #256 | T-684, T-665 (Actions start no workflow for this account on 2026-11-15) |
+| #256 | [gh action] requested: the netem labs of T-665 and T-625, and T-786's error files | closed 2026-11-15: iroh-ab 43691396393 and wisp-rate 43691399331 passed, T-786's error files read | T-665, T-625, T-786 |
+| #257 | [gh action] requested: the gate on `main` after T-665's default | closed 2026-11-15: the gate passed (run 43704942887, `6732178`) | T-665 |
+| #258 | [gh action] requested: T-786's outage cell with the role's road | closed 2026-11-15: run 43709370293 read (T-786 done, T-789 filed) | T-786, T-789 |
+| #259 | [gh action] requested: T-789's outage cell of the role's road with `-v` | closed 2026-11-15: run 43710388009 read | T-789 |
 | #260 | COORD-077: podssh took podcrates v0.51.0 at 3f6a9fe (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.51.0` | T-684, T-787 |
-| #261 | `[gh action] requested`: the gate on `main` after the take of v0.51.0 | closed 2026-11-15: the gate passed (run 43711731169, `3f6a9fe`) | T-684 |
-| #262 | COORD-078: pod-relay: a spare link of the resumable layer rides the pooled HTTP/2 connection of the silent link it replaces (to podcrates) | open 2026-11-15: asks pod-relay for a connection of its own for a new link | T-789 |
+| #261 | [gh action] requested: the gate on `main` after the take of v0.51.0 | closed 2026-11-15: the gate passed (run 43711731169, `3f6a9fe`) | T-684 |
+| #262 | COORD-078: pod-relay: a spare link of the resumable layer rides the pooled HTTP/2 connection of the silent link it replaces (to podcrates) | closed 2026-11-15: podcrates `v0.53.0` fixed it; the outage cell (run 43770482263) gave the first byte 0.13 and 0.18 s after the return | T-789 |
 | #263 | COORD-079: podssh took podcrates v0.52.0 at 94ee6ac (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.52.0` | T-684 |
-| #264 | `[gh action] requested`: the gate on `main` after the take of v0.52.0 | closed 2026-11-15: run 43719624106 red in `ssh` (the Shadowsocks CLI test's old proxy wording), repaired; asked again in #265 | T-684 |
-| #265 | `[gh action] requested`: the gate after the repair of the Shadowsocks CLI test | closed 2026-11-15: run 43726773977 red in `ssh`, `cold_connect` at random; asked again in #266 | T-684 |
-| #266 | `[gh action] requested`: the lines of `cold_connect`'s failure in run 43726773977, and a rerun | closed 2026-11-15: the rerun passed; the lines read from the job's log, T-794 repaired the test | T-684, T-794 |
-| #271 | `[gh action] requested`: the gate after T-794 | closed 2026-11-15: run 43737282670 passed `gate (ssh)`, red in `gate (m6)` (T-780) | T-794, T-780 |
-| #272 | `[gh action] requested`: a rerun of the failed jobs of run 43737282670 | closed 2026-11-15: attempt 2 passed | T-780 |
-| #273 | `[gh action] requested`: the gate after m6's iroh client with `-v` | closed 2026-11-15: run 43745453729 passed | T-780 |
+| #264 | [gh action] requested: the gate on `main` after the take of v0.52.0 | closed 2026-11-15: run 43719624106 red in `ssh` (the Shadowsocks CLI test's old proxy wording), repaired; asked again in #265 | T-684 |
+| #265 | [gh action] requested: the gate after the repair of the Shadowsocks CLI test | closed 2026-11-15: run 43726773977 red in `ssh`, `cold_connect` at random; asked again in #266 | T-684 |
+| #266 | [gh action] requested: the lines of `cold_connect`'s failure in run 43726773977, and a rerun | closed 2026-11-15: the rerun passed; the lines read from the job's log, T-794 repaired the test | T-684, T-794 |
+| #271 | [gh action] requested: the gate after T-794 | closed 2026-11-15: run 43737282670 passed `gate (ssh)`, red in `gate (m6)` (T-780) | T-794, T-780 |
+| #272 | [gh action] requested: a rerun of the failed jobs of run 43737282670 | closed 2026-11-15: attempt 2 passed | T-780 |
+| #273 | [gh action] requested: the gate after m6's iroh client with `-v` | closed 2026-11-15: run 43745453729 passed | T-780 |
+| #274 | COORD-084: podssh took podcrates v0.54.0 at d00ca78 (to podcrates) | open 2026-11-15: until podcrates records the take | T-684 |
+| #275 | [gh action] requested | closed 2026-11-15: the gate at `d00ca78` (run 43766309151) red in `gate (m6)` (T-780); the outage cell (run 43770482263) passed T-789 | T-684, T-780, T-789 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |
