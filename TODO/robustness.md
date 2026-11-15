@@ -2685,4 +2685,43 @@ the job `macos` runs it at the next gate.
 
 The gate of `c009f3b` (run 43594009290, 2026-11-14) passed, its job `macos` among them.
 
+# T-788: On macOS, `node_cut`'s strict stand-in sent no 1003 once
+
+**Source:** the gate of `568f9b2` (2026-11-15, run 43657288233, job `macos`).
+**Category:** defect
+**Milestone:** M10
+**Priority:** P1
+**Effort:** S
+**Status:** partial
+
+## Problem
+
+`a_strict_relay_s_1003_costs_the_other_session_no_backoff` of `crates/podssh-cli/tests/node_cut.rs` failed on macOS:
+"the 1003 came", with no line of a 1003 among the node's, though both sessions ended whole. The stand-in sends the
+1003 for a frame of the cut session's link that is in flight when it tells the node of the lost link, a second
+late (`lateclose:1`); where the cut link had drained before that second, no frame is in flight, and no 1003 comes.
+
+## Premise
+
+- `crates/podssh-cli/tests/node_cut.rs:230` says "assert!(!closed.is_empty()": the check of the 1003.
+
+## Approach
+
+1. At the next failure, read the node's lines and the stand-in's log for the frames of the cut link after the cut.
+2. Make the precondition hold: the cut session keeps writing past the cut until the stand-in's close (a source
+   that does not end at the cut), so that a frame is in flight each time; never weaken the check of the 1003.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-cli --test node_cut
+```
+
+The gate's job `macos` passes it ten times in a row, or the cause is named and repaired with a test that makes it.
+
+## Done
+
+Partial, 2026-11-15: not made here: `cargo test -p podssh-cli --test node_cut a_strict_relay` passed three runs in
+three on Linux. It passed each macOS gate before this one. It waits for its next failure.
 

@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**742 entries: 47 open, 31 partial, 12 blocked, 652 done.**
+**743 entries: 47 open, 32 partial, 12 blocked, 652 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 3 | 3 | 3 | 75 | 84 |
+| P1 | 3 | 4 | 3 | 75 | 85 |
 | P2 | 8 | 19 | 2 | 279 | 308 |
 | P3 | 36 | 9 | 7 | 297 | 349 |
-| **All** | 47 | 31 | 12 | 652 | 742 |
+| **All** | 47 | 32 | 12 | 652 | 743 |
 
 ## Entries
 
@@ -818,3 +818,4 @@ repository and CI).
 | [T-785](ws.md) | P3 | S | M10 | feature | open | The Dev Tunnels road with a tunnel's access token, or none for an anonymous tunnel |
 | [T-786](machine.md) | P2 | M | M10 | measurement | open | An outage and its catch-up, measured beside osewa and OpenSSH |
 | [T-787](machine.md) | P3 | S | M10 | defect | open | A QUIC socket whose reads keep failing must not spin a core |
+| [T-788](robustness.md) | P1 | S | M10 | defect | partial | On macOS, `node_cut`'s strict stand-in sent no 1003 once |

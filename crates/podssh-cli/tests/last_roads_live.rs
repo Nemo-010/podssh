@@ -332,3 +332,31 @@ fn a_node_at_srv_us_serves_a_client_that_derives_its_name_from_its_key() {
 fn a_node_behind_tunnl_gg_serves_a_client_at_its_tunnel_s_url() {
     live("PODSSH_TUNNL_GG", "--tunnl-gg", ": tunnel https://", "the tunnl.gg road", Some(tunnel_url));
 }
+
+/// The GSRN road of gsocket (T-707, the operator's ruling Q106: short, a
+/// throwaway secret): the node registers at the relay's address of a
+/// secret of this run, which the client takes from the same private file,
+/// and the client names the node's key. The relay sees TLS with SRP of the
+/// secret alone. A build with the feature `gsr`.
+#[cfg(all(feature = "gsr", unix))]
+#[test]
+#[ignore = "a live run through the GSRN relay: last-roads-live.yml"]
+fn a_node_at_the_gsrn_relay_serves_a_client_that_holds_its_secret() {
+    use std::io::Read as _;
+    let dir = std::env::temp_dir().join(format!("podssh-gsr-live-{}", std::process::id()));
+    podssh_relay::cache::private_dir(&dir).unwrap();
+    cleanup::at_test_end(&dir);
+    // 22 letters and digits from the kernel's random bytes, in a private file.
+    let mut raw = [0u8; 64];
+    std::fs::File::open("/dev/urandom").unwrap().read_exact(&mut raw).unwrap();
+    let alphabet = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let secret: String = raw.iter().take(22).map(|b| alphabet[*b as usize % alphabet.len()] as char).collect();
+    let file = dir.join("secret");
+    let mut out = podssh_relay::cache::create_new_private(&file).unwrap();
+    writeln!(out, "{secret}").unwrap();
+    drop(out);
+    // Both ends read the secret from the variable; this process runs one test.
+    // SAFETY: no other thread of this test binary reads the environment yet.
+    unsafe { std::env::set_var("PODSSH_GSR_SECRET_FILE", &file) };
+    live("PODSSH_GSR", "--gsr", "over the GSRN road alone", "the GSRN road", None);
+}

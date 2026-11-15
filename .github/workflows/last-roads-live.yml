@@ -36,17 +36,22 @@ jobs:
           - a_node_at_its_bore_port_serves_a_client_that_names_its_key
           - a_node_at_srv_us_serves_a_client_that_derives_its_name_from_its_key
           - a_node_behind_tunnl_gg_serves_a_client_at_its_tunnel_s_url
+        # The GSRN road needs its feature, which builds OpenSSL from source
+        # (T-707, Q106).
+        include:
+          - test: a_node_at_the_gsrn_relay_serves_a_client_that_holds_its_secret
+            features: --features gsr
     env:
       CARGO_BUILD_JOBS: "4"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: build the test
-        run: cargo test --locked -p podssh-cli --test last_roads_live --no-run
+        run: cargo test --locked -p podssh-cli ${{ matrix.features }} --test last_roads_live --no-run
       - name: a short run through the road
         # A name that matches no test runs none and exits 0: one must pass.
         run: |
           set -o pipefail
-          timeout 300 cargo test --locked -p podssh-cli --test last_roads_live -- --ignored --exact "${{ matrix.test }}" --nocapture 2>&1 | tee "$RUNNER_TEMP/run.log"
+          timeout 300 cargo test --locked -p podssh-cli ${{ matrix.features }} --test last_roads_live -- --ignored --exact "${{ matrix.test }}" --nocapture 2>&1 | tee "$RUNNER_TEMP/run.log"
           grep -q "test result: ok. 1 passed" "$RUNNER_TEMP/run.log"
       # The check must see a client that names another node's key fail.
       - name: a planted stranger fails it
@@ -54,7 +59,7 @@ jobs:
           PODSSH_LAST_TEST_PLANT: stranger
         run: |
           rc=0
-          timeout 300 cargo test --locked -p podssh-cli --test last_roads_live -- --ignored --exact "${{ matrix.test }}" --nocapture || rc=$?
+          timeout 300 cargo test --locked -p podssh-cli ${{ matrix.features }} --test last_roads_live -- --ignored --exact "${{ matrix.test }}" --nocapture || rc=$?
           if [ "$rc" -eq 0 ]; then
             echo "the check is vacuous: another node's key passed"
             exit 1

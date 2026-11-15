@@ -10409,6 +10409,13 @@ toolchain: the step adds them as `lint` does (`rustup component add rustfmt clip
 
 The gate of `c009f3b` (run 43594009290, 2026-11-14) passed, its step `gsr` among them: OpenSSL from source in the image, clippy with the feature, and the tests of `podssh-gsr` and of the CLI with it.
 
+2026-11-15, Q106 settled (allowed, short). From this cloud session the node's first registration failed: "no
+GSRN road through y.gs.thc.org:443: Connection reset by peer". The session's way out is a proxy that ends each TLS
+connection with its own CA, and GSRN's control is no TLS from its first byte: a proxy that inspects TLS refuses
+the road, which the node says. The live test is now `a_node_at_the_gsrn_relay_serves_a_client_that_holds_its_secret`
+of `crates/podssh-cli/tests/last_roads_live.rs` (the feature `gsr`, a secret of the run in a private file), a job of
+`last-roads-live.yml` with `--features gsr`, from GitHub Actions; it runs after the push.
+
 # T-718: Access service-token headers from files on each WebSocket road
 
 **Source:** PodUtils/podcrates#35, cfb's ask A-C-04 (COORD-014, PodUtils/podcrates#38)
