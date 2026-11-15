@@ -15,6 +15,11 @@ on:
     # Each Thursday at 05:47 UTC, off the hour.
     - cron: "47 5 * * 4"
   workflow_dispatch:
+    inputs:
+      live:
+        description: "the live places of a pairing after a dead mailbox, by commas: ntfy, tracker, nostr (T-496, T-695, T-545); empty: none"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -43,5 +48,10 @@ jobs:
         run: timeout 900 cargo test --locked -p podssh-relay --features pair,code,serve --test pair_code -- --nocapture
       # Each check must be seen to fail on its planted defect, here with
       # magic-wormhole's server beside the role.
+      - name: the live places of the pairing, each alone (short, Q65 and Q77)
+        if: inputs.live != ''
+        env:
+          PODSSH_TEST_MEET_LIVE: ${{ inputs.live }}
+        run: timeout 900 cargo test --locked -p podssh-relay --features pair,code --test pair_meet_live -- --nocapture
       - name: the planted defects fail their tests
         run: timeout 1800 sh scripts/plant-each.sh --here t086-third-side

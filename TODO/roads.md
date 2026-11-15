@@ -4385,7 +4385,7 @@ account (`podssh node NAME --sshd --quick-tunnel`), and reach it from a cage wit
 `podssh ssh cf://NAME`. That host cannot yet be a jump host: `-J cf://HOST` is refused, so the
 targets that it can reach still need the relay. With it, the forward road has a carrier that is not the operator's
 relay, for each user with such a host. Cloudflare documents SSH through a tunnel, and the operator
-allows podssh as a client of Cloudflare (`docs/decisions.md:71`).
+allows podssh as a client of Cloudflare (`docs/decisions.md:75`).
 
 ## Premise
 
@@ -4633,7 +4633,7 @@ adapter under the layer and the tests against derper make it L.
   client's packets when its queue of 32 is full (tailscale/tailscale:cmd/derper/derper.go,
   tailscale/tailscale:derp/derp.go, tailscale/tailscale:derp/derpserver/derpserver.go). Who else
   may use the fleet is not stated, and Tailscale's terms were not read.
-- Read: `noq` 1.4.0, the QUIC of iroh, is in the lock (`Cargo.lock:4099-4100`).
+- Read: `noq` 1.4.0, the QUIC of iroh, is in the lock (`Cargo.lock:4114-4115`).
 
 ## Approach
 
@@ -4989,7 +4989,7 @@ Endpoint puts a credential in its URL.
   Endpoint takes a presigned SigV4 `wss://` URL, valid for 60 s, then raw binary frames; AWS's
   client honours `HTTPS_PROXY`; a connection lasts an hour at most, and 20 run at once.
 - Read: credentials never go in URLs (`docs/architecture.md:326-331`; `docs/design.md:82`), and
-  `docs/decisions.md:87` says "in a header or a 0600 file and never in a URL" of the relay's
+  `docs/decisions.md:91` says "in a header or a 0600 file and never in a URL" of the relay's
   tokens. The presigned URL carries an access key id and a signature in its query.
 - Read: the `cf://` road uses podssh-ws's WebSocket client through the proxy
   (`crates/podssh-cli/src/ssh/cloudflare.rs:256`); an RSA key signs through aws-lc-rs in the
@@ -5765,7 +5765,7 @@ tunnel until a run against the clouds.
 ## Premise
 
 - Read: the operator allowed both roads and asked for stand-ins first, the live run to wait for
-  accounts (`docs/decisions.md:57`).
+  accounts (`docs/decisions.md:61`).
 
 ## Approach
 
@@ -6022,7 +6022,7 @@ does not depend on them.
   "`--direct`, or when a probe shows it works"; the triage of GitHub #69 to #72 named this entry
   there.
 - Read: rule 2 of `AGENTS.md` allows a second connection at once for a race between relay hosts,
-  and for the split HTTP road (`AGENTS.md:332-360`); a race of the forward and the direct road is
+  and for the split HTTP road (`AGENTS.md:333-361`); a race of the forward and the direct road is
   neither.
 - Read: the direct dial goes through `HTTPS_PROXY` when it is set, with the relay's step limit of
   20 s (`crates/podssh-cli/src/ssh/transport.rs:353-367`, `PodUtils/podssh:crates/podssh-relay/src/open.rs:33`),
@@ -6198,7 +6198,7 @@ relay's path and token.
   (`crates/podssh-cli/src/ssh/transport_kind.rs:9-72`).
 - Read: `validate` refuses a query other than the relay's knobs, and `connect` always sends a token
   (`PodUtils/podssh:crates/podssh-ws/src/client.rs:74-113`, now `crates/podssh-ws/src/client.rs:54-83`); a token goes only to the deployment that
-  minted it (`docs/decisions.md:99`).
+  minted it (`docs/decisions.md:103`).
 - Read: a SOCKS5 proxy that the user names in `ALL_PROXY` carries each road already (T-070;
   `PodUtils/podssh:crates/podssh-ws/src/socks5.rs:1-7`): podssh takes a third party's proxy that the user chooses.
 
@@ -6232,7 +6232,7 @@ relay's path and token.
   step.
 - A forwarder of the user's own, #59's road 2 (the same Worker in the user's own Cloudflare
   account), is a template as any other; podssh ships no forwarder, as the relay stays a separate
-  project (`docs/decisions.md:82`; T-169).
+  project (`docs/decisions.md:86`; T-169).
 - The drafting agent's calls (2026-10-31):
   1. The template, the dial and the stream are in `podssh-ws` (`forwarder/`), pure Rust, so a
      live check of a forwarder builds that crate alone (T-370); `podssh-cli` chooses a run's road
@@ -6288,7 +6288,7 @@ are). Planted: the host put in with no check; the test of `&` fails.
 `a3f948d`. A relay is a host and a port at `PodUtils/podssh:crates/podssh-relay/src/relay.rs:107-113`, and its
 forward path is built at `PodUtils/podssh:crates/podssh-relay/src/relay.rs:205-218`; `:83-89` and `:181-194` hold
 the byte budget and the parser of a relay list. A token goes only to the deployment that minted it
-at `docs/decisions.md:101` (T-057), and at Q49's row, `docs/decisions.md:55`; `docs/decisions.md:96`
+at `docs/decisions.md:105` (T-057), and at Q49's row, `docs/decisions.md:59`; `docs/decisions.md:100`
 holds the exit codes. `Transport` in `crates/podssh-cli/src/ssh/resolve.rs` had six kinds, not five
 (the relay, `--direct`, `node://`, `iroh:`, `cf://`, and the clouds' roads of T-351); this entry
 adds the seventh. Two facts of #59 that the Premise did not hold, read in the forwarders' sources:
@@ -6920,7 +6920,7 @@ edge still needs the operator's relay. WARP's tunnel (T-352) carries any port ov
   tunnel's name answered `200`, after a closed port and an address with no route had failed first.
   It carried QUIC through its stack; the edge's HTTP/2 on TCP 7844, over smoltcp's TCP, would reuse
   the client of T-300.
-- Read: the quick tunnel's live tests run in GitHub Actions only (`docs/decisions.md:56`).
+- Read: the quick tunnel's live tests run in GitHub Actions only (`docs/decisions.md:60`).
 
 ## Approach
 
@@ -6992,7 +6992,7 @@ Read at `a3f948d` on 2026-10-31.
   the VPC road carried TLS to 7844 when T-299 measured it by hand through `podssh proxy`. Step 1
   of the Approach therefore reads: after QUIC and the TCP dial failed.
 - The ruling of the quick tunnel's live tests in GitHub Actions alone is Q47's row (and Q43's),
-  `docs/decisions.md:63`; the Premise's `docs/decisions.md:56` names the row of Q50 since rows
+  `docs/decisions.md:67`; the Premise's `docs/decisions.md:60` names the row of Q50 since rows
   came above it.
 - The Prove names its test with no feature; the test needs the stand-in of WARP's edge, a
   feature of podssh-relay (the Decision, item 5).
@@ -9665,6 +9665,13 @@ Partial, 2026-11-04, merged from its draft (`2ad81c5`).
 - Waits for the operator (`TODO/PROGRESS.md`, "Operator actions"): the Actions secrets `PODSSH_THROUGHPUT_SSH`
   and `PODSSH_THROUGHPUT_KEY` of PodUtils/podssh. Then `gh workflow run iroh-ab.yml` runs the A/B, and the entry takes the
   default that it shows.
+
+2026-11-15, the operator's ruling "the wide-area measurements run in a netem lab, a real path optional"
+(`docs/decisions.md`): the A/B of the iroh road's QUIC settings runs on the lab's shaped link between two podssh ends and an iroh relay of the lab (`podssh_iroh::test_relay`), in place of the throughput host's wide-area path. The lab is GitHub Actions' runner with `tc netem` on its loopback, as
+`feel-netem.yml`, with podssh's own iroh relay and sshd behind a shaped link, and profiles of latency, jitter, loss and rate
+that the entry names; it needs no secret. A run on the operator's real path (Q38) stays an optional extra, if
+`PODSSH_THROUGHPUT_SSH` and `PODSSH_THROUGHPUT_KEY` are ever set; the record says that a lab shows no real
+ISP's queues, middleboxes or NAT.
 
 # T-666: Bulk off the interactive stream: a copy beside a terminal on its own QUIC stream of the same iroh connection
 

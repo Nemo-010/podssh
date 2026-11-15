@@ -251,8 +251,17 @@ pub(crate) fn ends_of(
     let mut ends = Ends::new(mailboxes, code::config(&pairs::trust(ca_file), &ProxyChoice::FromEnvironment, say));
     // The public MQTT brokers after each mailbox (T-737); pod-relay says the
     // third party's line before the first of them.
-    let (mqtt, last) = (std::env::var(code::MQTT_ENV).ok(), std::env::var("PODSSH_LAST_RESORT").ok());
-    ends.brokers = code::brokers(mqtt.as_deref(), last.as_deref());
+    let var = |name: &str| std::env::var(name).ok();
+    let last = var("PODSSH_LAST_RESORT");
+    ends.brokers = code::brokers(var(code::MQTT_ENV).as_deref(), last.as_deref());
+    // Then the places of T-496 and T-695, in pod-relay's order: the
+    // mailboxes, ntfy, the trackers, the brokers. No probe of the upgrade
+    // runs before a pairing (rule 2): ntfy then comes after the mailboxes,
+    // as where the upgrade passes. Not yet the Nostr relays (T-545): a run
+    // of a code over them fails where a pairing through them alone passes,
+    // and a taker that joined at a relay would not go on to the places after.
+    ends.ntfy = code::ntfy_servers(var(code::NTFY_ENV).as_deref(), last.as_deref()).map_err(Refusal::config)?;
+    ends.trackers = code::trackers(var(code::TRACKER_ENV).as_deref(), last.as_deref());
     Ok(ends)
 }
 

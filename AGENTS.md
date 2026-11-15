@@ -322,6 +322,7 @@ or outside the repository. Never print the claim URL of railway.new.
 | The services of Q77 and Q78 (T-548) | Any | Short | Q91 |
 | smee.io, hostc, Tunnelmole, Sandhole's public server | Any | Short, once each research entry has read the service's terms (T-623, T-624) | Q94 |
 | The public servers of osewa | Any | Short, where their terms allow | Q99 |
+| The GSRN relay of gsocket (`pod-services`' `hackerschoice-gsr`) | Actions, own host | Short: one session each way and one idle registration of 20 s, a throwaway secret | Q106 |
 
 ## 5. Rules for the code
 

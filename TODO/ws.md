@@ -1988,7 +1988,7 @@ command says what to do. Four of the eight release binaries are for Windows and 
 - Read: `windows-sys` 0.61 is already a dependency of `podssh-relay` on Windows
   (`crates/podssh-relay/Cargo.toml:230-231`), a crate with no C; `rustls-native-certs` 0.8.4,
   `schannel` and `security-framework` are in the lock through other crates
-  (`Cargo.lock:6344-6345`).
+  (`Cargo.lock:6364-6365`).
 - Read: one proxy that re-terminates TLS was measured, with its CA in `SSL_CERT_FILE` and in the
   system's store of Linux (`docs/target-environment.md:61-67`).
 - Inferred: on macOS, `/etc/ssl/cert.pem` lacks a root that an administrator added to a keychain;
@@ -2333,7 +2333,7 @@ and each other command print rustls's words alone. An error should tell what to 
 - Read: the other commands print the error's text: `PodUtils/podssh:crates/podssh-ws/src/client.rs:142` says "TLS
   with the relay failed: {why}"; the TLS of IRC and of the quick tunnel's edge gives the text of
   `PodUtils/podssh:crates/podssh-ws/src/tls.rs:151` (`crates/podssh-relay/src/quick/edge.rs:111-113`).
-- Read: rustls 0.23.46 (`Cargo.lock:6294-6295`) has the errors `Expired`, `ExpiredContext`,
+- Read: rustls 0.23.46 (`Cargo.lock:6314-6315`) has the errors `Expired`, `ExpiredContext`,
   `NotValidYet` and `NotValidYetContext`, and writes the two with a context as "certificate
   expired: verification time" and "certificate not valid yet: verification time" (its
   `src/error.rs`, read in cargo's registry); doctor's match of the text ("expired", "not valid
@@ -3918,3 +3918,41 @@ carries. Planted: one SETTINGS value changed in the shape, and the comparison fa
 ## Start condition
 
 GitHub #224's author lifts [DEFERRED], or the owner orders it.
+
+# T-785: The Dev Tunnels road with a tunnel's access token, or none for an anonymous tunnel
+
+**Source:** podcrates `v0.47.0` (COORD-100), its entry 489.
+**Category:** feature
+**Milestone:** M10
+**Priority:** P3
+**Effort:** S
+**Status:** open
+
+## Problem
+
+podssh's Dev Tunnels road (T-755) connects with a user token alone. podcrates `v0.47.0` lets `pod-devtunnel`
+connect with a tunnel's access token, or with no token to a tunnel that allows anonymous access, and a refusal
+names the form, never a token. A tester who shares a tunnel then needs to give no account of theirs.
+
+## Premise
+
+- Read at podcrates `v0.47.0`: `pod-devtunnel`'s `Relay::connect` takes `impl Into<Credential>`, and
+  `Management::connect_info(&Credential)`; `Credential::Anonymous` and `AccessToken::new` (COORD-100).
+
+## Approach
+
+1. Where no user token is given, the road asks with `Credential::Anonymous`; a tunnel access token from a private
+   file (a flag beside the user token's, and its variable) goes as `AccessToken::new`. Never in argv or a log.
+2. The manual and `docs/cli.md`; a refusal names which form was refused.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-cli --features devtunnel --lib devtunnel
+```
+
+Against the stand-in of `pod-devtunnel` (`podssh-relay/devtunnel-standin`): an anonymous tunnel is reached with no
+token; one that refuses anonymous access is refused with the form named; an access token from its file passes.
+Planted: the anonymous form sent where an access token was given, and the test fails.
+

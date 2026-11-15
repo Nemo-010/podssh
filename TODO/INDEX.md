@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**739 entries: 44 open, 31 partial, 14 blocked, 650 done.**
+**742 entries: 47 open, 31 partial, 12 blocked, 652 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 3 | 3 | 3 | 75 | 84 |
-| P2 | 7 | 19 | 2 | 279 | 307 |
-| P3 | 34 | 9 | 9 | 295 | 347 |
-| **All** | 44 | 31 | 14 | 650 | 739 |
+| P2 | 8 | 19 | 2 | 279 | 308 |
+| P3 | 36 | 9 | 7 | 297 | 349 |
+| **All** | 47 | 31 | 12 | 652 | 742 |
 
 ## Entries
 
@@ -560,7 +560,7 @@ repository and CI).
 | [T-493](mesh.md) | P2 | M | M10 | feature | done | Shadowsocks in a WebSocket, as Outline's servers serve it, and `ssconf://` keys |
 | [T-494](mesh.md) | P3 | S | M10 | measurement | done | `--via` against NaiveProxy's server, and the words of a probe-resistant proxy |
 | [T-495](mesh.md) | P3 | M | M10 | feature | done | `-J upterm://SESSION@HOST`: a session of upterm's host as the first hop |
-| [T-496](mesh.md) | P3 | S | M10 | feature | blocked | ntfy.sh, a meeting point of the pairing where a proxy refuses the WebSocket upgrade |
+| [T-496](mesh.md) | P3 | S | M10 | feature | done | ntfy.sh, a meeting point of the pairing where a proxy refuses the WebSocket upgrade |
 | [T-497](mesh.md) | P3 | S | M10 | feature | done | A second public Piping Server, `piping.onrender.com` |
 | [T-498](mesh.md) | P3 | L | M10 | feature | done | frp's protocol: a podssh node behind the user's frps, and its visitor |
 | [T-499](mesh.md) | P3 | M | M10 | feature | open | IETF's connect-tcp, once it is an RFC |
@@ -725,7 +725,7 @@ repository and CI).
 | [T-692](robustness.md) | P1 | S | none | defect | done | Two background probes of the relay rank met the relay 439 ms apart on Windows, under a gap of 1.2 s |
 | [T-693](mesh.md) | P3 | S | M10 | feature | done | `--trojan` against trojan-gfw's and trojan-go's own servers |
 | [T-694](mesh.md) | P3 | M | M10 | feature | done | croc's relay through `wss://getcroc.com/ws` as a road and a meeting point of a podssh pair |
-| [T-695](mesh.md) | P3 | M | M10 | feature | blocked | WebTorrent's trackers as a meeting point of the pairing, after Nostr's |
+| [T-695](mesh.md) | P3 | M | M10 | feature | done | WebTorrent's trackers as a meeting point of the pairing, after Nostr's |
 | [T-696](robustness.md) | P1 | S | none | defect | done | A change of a node's shares that waited behind other changes, each of which ended, was refused after 5 s on Windows |
 | [T-697](reverse.md) | P2 | S | M10 | defect | done | `podssh ssh node://NAME` and `--exit NAME` refuse `--relay-host`, `--relay-failover` and `PODSSH_RELAY`, as `podssh proxy node://NAME` does |
 | [T-698](serve.md) | P2 | S | M5 | feature | done | `podssh serve` drops each capability of its start, with the relay role's drop in a module that both share |
@@ -815,3 +815,6 @@ repository and CI).
 | [T-782](multi.md) | P3 | M | M10 | feature | done | `each`, `run` and `job` reach an `iroh:` or a `derp:` destination |
 | [T-783](robustness.md) | P1 | S | M10 | defect | done | `pipe exec:` beside `udp:node:` lost a program's last answer when a send to it failed after its exit |
 | [T-784](robustness.md) | P1 | S | M10 | defect | done | On macOS, `pipe_listen`'s stale socket was still served by a child of another test |
+| [T-785](ws.md) | P3 | S | M10 | feature | open | The Dev Tunnels road with a tunnel's access token, or none for an anonymous tunnel |
+| [T-786](machine.md) | P2 | M | M10 | measurement | open | An outage and its catch-up, measured beside osewa and OpenSSH |
+| [T-787](machine.md) | P3 | S | M10 | defect | open | A QUIC socket whose reads keep failing must not spin a core |

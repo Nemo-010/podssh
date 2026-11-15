@@ -44,8 +44,13 @@ Read on 2026-11-13.
    `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`, `pod-dns`,
    `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e` and `pod-relay`
    (2026-11-12), and `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue); podssh keeps glue over them (`resolve.rs` of `podssh-ws`; `code/`, `session/`,
-   `src/e2e/` and the relay client's modules over `context.rs` of `podssh-relay`). No file of podssh is
-   frozen now.
+   `src/e2e/` and the relay client's modules over `context.rs` of `podssh-relay`). **Frozen from
+   2026-11-15** (COORD-071, #248: podcrates imports them at podssh's `b9c04657`; fixes only, each sent by a
+   COORD issue): `crates/podssh-relay/src/transit/` (not `link.rs`) for `pod-transit`,
+   `crates/podssh-cli/src/acme/` for `pod-acme`, `crates/podssh-relay/src/piping/` for `pod-piping`,
+   `crates/podssh-relay/src/opentunnel/` for `pod-opentunnel` and `crates/podssh-relay/src/derp/` for
+   `pod-derp`: one tag. Then `pod-egress`; then `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
+   `pod-relay-serve` last.
 8. **Drafts.** In work: none. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
    T-118's, T-117's, T-114's, T-112's,
    T-110's, T-109's, T-108's with T-222, T-107's, T-771's, T-773's, T-738's second and third, T-321's
@@ -61,6 +66,12 @@ Read on 2026-11-13.
    local branch `merge-NNN`, never on `main`.
 
 ## Tonight
+
+**First, from 2026-11-15 (the operator's ruling, `docs/decisions.md`): T-684 is fast-tracked.** podssh asks
+podcrates for Q101's waves 3 and 4 (COORD-071, #248), freezes each module as podcrates names it, and takes each
+tag at once; `v1.1.0-beta.4` waits for the move, then goes out with its testers' guide (a GitHub issue). Beside
+it, while podcrates builds: T-707's live test (Q106), the cell of an outage (T-786), the netem lab of T-625,
+T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
 Actions; "offline" needs none. A test that fails at random, or a red gate, goes before the next
@@ -86,8 +97,8 @@ item whenever it appears.
 6. **T-576** (done, 2026-11-14): the demo of HTTP Relay never answered on three days.
 7. **Then the open work by its order** (below): T-779 (partial: a copy through `serve NAME` that failed once, then four runs in four passed; it waits for the next failure); then T-598's run in the build image (T-251; T-772 and T-585 are done) (the
    `none` entries); then M10's P3 entries: T-566's and T-567's live runs, from `last-roads-live.yml` now that
-   `v0.42.0` names their services; T-575, T-532 and T-622 (done); T-545, T-695 and T-496 are blocked on
-   podcrates' meeting points of the pairing (COORD-058, #235; COORD-060, #237); T-777 (done, 2026-11-14). Each with its Prove, one entry at a time.
+   `v0.42.0` names their services; T-575, T-532 and T-622 (done); ntfy and the trackers as
+   meeting points are done on podcrates `v0.47.0`, and T-545 (Nostr) is blocked on COORD-070 (#247); T-777 (done, 2026-11-14). Each with its Prove, one entry at a time.
 8. **What waits on others, not tonight:** T-113's real sandbox (the operator's agents run
    `sh scripts/m5-in-sandbox.sh`), T-625 and T-665 (the throughput host's secrets), T-106
    (the operator's tailnet), T-755 (a tester's tunnel), T-319 and T-321's live runs and the build
@@ -125,7 +136,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 739 entries: 44 open, 31 partial, 14 blocked, 650 done.
+`TODO/INDEX.md` holds 742 entries: 47 open, 31 partial, 12 blocked, 652 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
@@ -199,8 +210,8 @@ parts are named so that the open ones read in their place):
 4. The public carriers of Q65 (the Piping Server road from end to end is done; the transit road's misses of 2026-11-06 are done, from a run of `transit-live.yml`; the protocols of Q66 are done), XHTTP over HTTP/1.1 (Q67, done), then
    what the research of more services (done) filed: the protocols of servers that a user runs
    (chisel's, Outline's, Shadowsocks 2022, Trojan, NaiveProxy's, trojan-gfw's, trojan-go's and
-   frp's are done), upterm's door (done) and a second Piping Server (done), T-496 and T-499
-   parked; then what the triage of the sweep of public relays filed, as Q74 to Q79 rule:
+   frp's are done), upterm's door (done) and a second Piping Server (done), ntfy as a meeting point (done) and
+   T-499 parked; then what the triage of the sweep of public relays filed, as Q74 to Q79 rule:
    OpenTunnel's road (Q76, done), and the manual's word on the public services that podssh uses
    and the ones it never names (done); the funnel through OpenTunnel (done); then what the rulings Q74, Q75, Q77, Q78
    and Q82 filed, the P2 ones first: Tailscale's main DERP fleet after tailcat's (done), the public
@@ -208,9 +219,9 @@ parts are named so that the open ones read in their place):
    (done); then the research of the overlay networks (NetBird, Firezone, ZeroTier, Tox,
    Yggdrasil, Cabal, Hyphanet, croc and HyperDHT are done), of the trackers (done) and of the
    pub/sub networks (done), then what they filed: croc's relay as a road and a meeting point
-   (done), WebTorrent's trackers (T-695), ZeroTier's relay (done), Tox's (done), Yggdrasil's
+   (done), WebTorrent's trackers (done), ZeroTier's relay (done), Tox's (done), Yggdrasil's
    peers (done), HyperDHT's road (done) and the public MQTT brokers as a meeting point (done),
-   and Nostr's meeting point (T-545, parked); the other last fallbacks of Q78 (srv.us and tunnl.gg (done),
+   and Nostr's meeting point (T-545, blocked on COORD-070); the other last fallbacks of Q78 (srv.us and tunnl.gg (done),
    serv00's and HTTP Relay's demo (done), the onion services (done), and what the research of 2026-11-10 filed: file hosts as the last
    carrier (T-738), VMess's AEAD form (done) and Bare servers as a hop (T-740); srv.us and tunnl.gg
    done, serv00's done); and the roads over UDP (done: MASQUE over HTTP/3, Hysteria 2's and TUIC's). These are features of a tester's
@@ -246,7 +257,6 @@ it can start.
 | T-303 | T-110 is done: `podssh serve` has a pty; and T-161 has a model of the far end's screen |
 | T-304 | T-303 is done: frames of the screen exist |
 | T-532 | Started on 2026-11-14 from its draft: T-180 and T-530 are done, so `podssh funnel` and OpenTunnel's link exist |
-| T-496 | T-086 is done: the pairing's exchange exists over a mailbox |
 | T-499 | draft-ietf-httpbis-connect-tcp is an RFC, and a server over HTTP/2 or HTTP/1.1 implements it |
 | T-545 | T-086 is done: the pairing's exchange exists over a mailbox |
 | T-566 | T-565 is done: the module for a tunnel of HTTP made by `ssh -R` exists |
@@ -268,12 +278,7 @@ it can start.
 
 ## Questions for the operator
 
-**Q106 (2026-11-14), open: may a session test against the GSRN relay of gsocket?** T-707 (the GSRN road,
-partial) is built and tested against a stand-in of the relay; its Prove asks a short live test against
-`gs-netcat`, both ways, with a throwaway secret in `.work/`. The relay (the data file `hackerschoice-gsr` of
-`pod-services`) is not among the test targets of `AGENTS.md`. Recommendation: allow it as Q91 allowed the
-others, "Any" (Actions and the own host), short: one session each way and one idle registration of 20 s, a
-throwaway secret. Until then T-707 waits for this alone; no other entry waits for it.
+**Q106 (2026-11-14): settled by the operator on 2026-11-15, allowed as recommended** (`docs/decisions.md`): a short live test against the GSRN relay; T-707 runs it next.
 
 Questions asked so far and how they were settled, each
 ruling in `docs/decisions.md`. The operator ruled on the questions of the triage (Q1 to
@@ -333,33 +338,8 @@ Rust 1.97 and edition 2024, and podssh takes it by a git tag of PodUtils/podcrat
   `podssh-core`, `podssh-probe`. podnet keeps its CLI, `podnet-core`, `podnet-netns`,
   `podnet-vnet` and `podnet-serve`. Blocks T-684.
 
-**For the operator to confirm (Q86), from the triage of GitHub #127 to #148 and the study of osewa
-(2026-11-04)**; each call is in its entry's `## Decision`, and the work goes on with it:
-
-- T-638 (#136): a forward token of the relay role stays good for each target that its policy
-  dials, and a grant stays bound by its issuer's door (Q4, T-226); the issue calls both defects.
-  Its draft (2026-11-05) asks the person of `--ask` after the door, never in its place: a yes lets
-  in no key that the door refuses, where the issue asked that an approval alone let a device in.
-- T-640 (#138): a node writes each line to the journal's own socket only when its stderr is that
-  journal's stream already: not an outbound connection under rule 2.
-- T-641 (#139): `doctor`'s line `nat` runs unasked against `stun.cloudflare.com:3478` and
-  `stun.l.google.com:19302`, off with `PODSSH_STUN=no`.
-- T-642 (#140): Encrypted Client Hello only when the user asks for it; the read of a name's HTTPS
-  record before the session is then a read before a session, as Q96 and Q97 are.
-- T-643 (#141): an operator that offers the net's document to a node that answers without it goes
-  on, with a line that says so, where the issue asks for a refusal.
-- T-644 (#142): `relay serve --sshd ADDR:PORT` dials the owner's sshd by the role's way out, the
-  loopback and what `NO_PROXY` names directly and another address through `HTTPS_PROXY`, where its
-  Approach had the dial always direct (rule 2); ADDR is an address, never a name; no limit, token
-  or brake of the contract stands before the sshd, which sees each client as the role's address.
-- T-649 (#147): a CA's validation (`acme-tls/1`) of a name that `relay serve --publish` publishes
-  goes to its node, so that the node can prove the name, where the issue sends each validation to
-  the role; PAIR is a pair's name, read at the start, so a new pair is published by a restart of the
-  role with `--pairs FILE`; a visitor slower than its node meets the contract's bound of 1 MiB.
-  Its draft (2026-11-05) is unbuilt.
-- T-667 (osewa): QUIC and a TCP road race to one host for a short time, as the race between relay
-  hosts does (rule 2), the loser closed at once; QUIC goes first, 300 ms ahead, to a role that
-  offered it, where Q82 puts other projects' roads over UDP after TCP.
+**Q86's calls of 2026-11-04 and 2026-11-05 (T-638, T-640 to T-644, T-649, T-667): confirmed by the operator on
+2026-11-15** (`docs/decisions.md`).
 
 The operator settled Q93 to Q100 on 2026-11-04 (`docs/decisions.md`), each as recommended: the TURN
 road's second connection (Q93), short live tests against smee.io, hostc, Tunnelmole and Sandhole
@@ -542,12 +522,9 @@ before `v1.0.0`.
 
 One blocks entries, none a session:
 
-- **The secrets of the throughput host** (2026-11-12): `PODSSH_THROUGHPUT_SSH` and
-  `PODSSH_THROUGHPUT_KEY` are not set in PodUtils/podssh's Actions (the runs of `wisp-rate.yml`,
-  43285906667, and `iroh-ab.yml`, 43286058774, said so and stopped). The operator's server of Q38 is
-  reached only with them: T-625's step 2 (the Wisp demo's rate), T-665 (the A/B of QUIC's settings)
-  and T-463's live run wait. Set both in the repository's settings (Secrets and variables, Actions);
-  a session cannot.
+- **The secrets of the throughput host** (2026-11-12): no longer needed (2026-11-15, the operator's ruling): T-625,
+  T-665 and T-463 measure in a netem lab on Actions. Setting `PODSSH_THROUGHPUT_SSH` and `PODSSH_THROUGHPUT_KEY`
+  adds an optional run on the real path of Q38.
 
 - At any time: require the status `all` of the workflow `build` for `main`, if the operator wants a
   required check (T-212); `main` requires none today.

@@ -28,6 +28,23 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
           unset, empty or another word: the brokers.",
     ),
     (
+        &["PODSSH_PAIR_NTFY"],
+        "The public ntfy servers of the pairing by code (T-496), the first place after the mailboxes: the two \
+          ends post the code's messages, each 4,095 bytes at most, to a topic that the code's nameplate gives, \
+          and poll it, after a line that says that a third party that nobody vouches for carries them. ntfy.sh \
+          allows 250 messages a day for each address, and a pairing posts seven. An https:// URL: that server \
+          alone; no, or PODSSH_LAST_RESORT=no: none; unset or empty: the servers of podssh's list of services.",
+    ),
+    (
+        &["PODSSH_PAIR_TRACKER"],
+        "The public WebTorrent trackers of the pairing by code (T-695), after the ntfy servers: the code's \
+          messages go as offers and answers between the peers of a hash of its nameplate, after the third \
+          party's line. Both trackers of podssh's list of services are in a filter list of piracy (hagezi's \
+          anti.piracy), so a network that applies it refuses them; the facts filter-list, filter-list-part and \
+          filter-category of each service say so. no, or PODSSH_LAST_RESORT=no: none; unset, empty or another \
+          word: the trackers.",
+    ),
+    (
         &["JOURNAL_STREAM"],
         "Set by systemd for a service whose stderr is the journal: the device and inode of that stream. Where \
           they are those of podssh's own stderr (a program that inherited the variable has another), each error \

@@ -20,7 +20,7 @@ The two studies agree.
 
 - **Reachability: podssh is far ahead.** osewa has no proxy client (no CONNECT, no SOCKS, no
   `HTTPS_PROXY`: its dial is a plain TCP connect), no relay, no NAT traversal, no port 443, no DNS
-  fallback, no reverse road and no bastion (its own issue #2 asks for ProxyJump). It needs an
+  fallback and no reverse road. Since v0.1.2 it reaches a host behind a bastion (`login --via-ssh`, below). It needs an
   inbound port on the host. It cannot connect at all from podssh's target sandbox. Its README's
   claim that the WebSocket "gets through proxies" is not in its code.
 - **Feel between two reachable ends: osewa is ahead, and podssh has measured none of it.** A key's
@@ -44,6 +44,28 @@ The two studies agree.
   and failover, not what a user feels: no echo under load, no cold connect, no throughput on a
   direct wide-area road, no roam of a real client (T-305's 3.0 to 3.2 s is a stand-in's move).
   "Parity with Tailscale" in [mesh.md](../mesh.md) is parity of features.
+
+**Read again on 2026-11-15** (osewa v0.1.5 at `c196de1`, 31 commits past the commit that the studies read,
+`3190718`; through web.pkgforge.dev's `forge` and `read` services). Five releases since v0.1.0. What changes this
+section:
+
+- **A bastion by `ssh -W`** (v0.1.2, `be0591b`, its PR #4 closing issue #2): `osewa login --via-ssh` runs
+  `ssh -W 127.0.0.1:7322 -- TARGET` for each connection and carries its pinned mutual TLS inside that stream;
+  WebSocket alone, QUIC off, a new ssh at each reconnect; `login` falls back to it where `ssh -G` names a proxy
+  and a direct dial fails. It still needs the user's ssh binary, a key on each hop and a target that forwards
+  TCP; it adds no proxy client, relay, NAT traversal or port 443. podssh has `-J`, `-W`, `ProxyCommand` and its
+  node roads, so this is no gap of podssh's: it corrects "no bastion".
+- **Its own benchmark of an outage** (`f64f2c9`, `bench/outage.py`, 2026-11-06; one path, Thailand to Tokyo at
+  about 104 ms, median of five, two outage rounds): after 15 s of no link, the first output in 0.88 s
+  (Eternal Terminal 1.8 to 2.2 s), and the catch-up after 22 MB written during the cut in 1.0 s (ET 3.4 s).
+  podssh has measured no such cell: T-786.
+- **A QUIC socket that spun a core** (v0.1.5, `24058a3`): osewa's own copy of quinn's runtime ends an endpoint
+  after 256 empty reads in a row and redials; it says quinn's runtime still spins on a failing socket. Whether
+  podssh's QUIC (the iroh road, T-667's) meets it: T-787.
+- Not for podssh: a per-user port (7323 and up), the ownership of a session after 30 s away and `~.`'s release
+  of it (osewa's own notion of an owner), and its updates now asked for by default.
+
+`feel-netem.yml` runs osewa v0.1.5 since 2026-11-15.
 
 ## 3. The entries, in their order (Q99: ahead of the rest of M10)
 

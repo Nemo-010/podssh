@@ -42,16 +42,16 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # osewa's one release, read on 2026-11-05 at github.com/rjyo/osewa
-  # (tag v0.1.0, commit 0bab3a0; Apache-2.0, its NOTICE names libghostty-vt
-  # under MIT). It is downloaded and run here, never redistributed. The
+  # osewa's latest release, read on 2026-11-15 at github.com/rjyo/osewa
+  # (tag v0.1.5, commit c196de1; v0.1.0 at 0bab3a0 before it; Apache-2.0,
+  # its NOTICE names libghostty-vt under MIT). It is downloaded and run here, never redistributed. The
   # SHA-256 of the .gz is the one of the release's own SHA256SUMS and of
   # GitHub's digest of the asset, which agree; the binary's is of the file
   # in that checked .gz. A version that moves is a change of this file.
-  OSEWA_VERSION: v0.1.0
+  OSEWA_VERSION: v0.1.5
   OSEWA_GZ: osewa-linux-amd64.gz
-  OSEWA_GZ_SHA256: 8c7e90ffaa8ced0958216c21e708c878bbd6de6ea73b09382f86d73a2a93a2f3
-  OSEWA_SHA256: db832d9d76fedf21e2e57225474da6232f91e3ae22f8186c408b399a382fd5b2
+  OSEWA_GZ_SHA256: cc473cc82311bb6477c4b4900c4bb25d35a3dc9887117e829994655c1318f24a
+  OSEWA_SHA256: 32d6b79cca1f249a3267ca97e56f6222a745ad5fc7f8d031e1cf780b72807662
 
 jobs:
   feel:

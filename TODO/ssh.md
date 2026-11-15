@@ -537,7 +537,7 @@ Read:
   `crates/podssh-ssh/src/hostkey.rs:228-235` (no terminal). `accept-new`
   records the plain key (`crates/podssh-ssh/src/hostkey.rs:198`). GitHub #29
   cites line 91 at `22c3b88`, which builds the question about other key types.
-- `ssh-key` 0.7.0-rc.11 is in the tree (`Cargo.lock:7168-7169`).
+- `ssh-key` 0.7.0-rc.11 is in the tree (`Cargo.lock:7188-7189`).
   `Certificate::validate_at` checks the signature, the SHA-256 fingerprint of
   the CA and the validity window. The caller must check the certificate type,
   the principals and the critical options (the crate's documentation).
@@ -816,7 +816,7 @@ measured: a race needs two processes; the test below makes it certain.
    (`crates/podssh-ssh/src/hostkey.rs:352-376`). Else append.
 3. Hold the lock only for the read and the write, never across a prompt.
 4. When the file system refuses locks, append as today, with a verbose note
-   (a fallback that says so, `AGENTS.md:376`).
+   (a fallback that says so, `AGENTS.md:377`).
 
 ## Prove
 
@@ -2990,7 +2990,7 @@ registers none (`openssh/openssh-portable:clientloop.c`, `client_global_request_
    that podssh could not read, then russh's words; a connection lost while the forwards were asked
    for names russh's cause, as a lost session does (the reading of T-464).
 5. The patch offered to russh upstream. That is the operator's to send, as no session changes
-   another repository (`docs/decisions.md:80` says "no session changes another repository"); the
+   another repository (`docs/decisions.md:84` says "no session changes another repository"); the
    copy goes once a release of russh reads such replies.
 6. `docs/cli.md` (the keepalive, and `-R`'s refusal), `docs/STATUS.md`.
 
@@ -3555,6 +3555,13 @@ same day.
   Waits: the live test through the live relay, to the server of `PODSSH_THROUGHPUT_SSH`, which this
   session has not (its target is a call for the operator to confirm, Q86); and the watch for
   `--persist` and `--upgrade` (Decision), for a later entry.
+
+2026-11-15, the operator's ruling "the wide-area measurements run in a netem lab, a real path optional"
+(`docs/decisions.md`): its live run of a session silent 3 minutes runs through the lab's shaped link to an sshd of the lab, with a proxy of the lab that holds an idle tunnel as the reporter's did. The lab is GitHub Actions' runner with `tc netem` on its loopback, as
+`feel-netem.yml`, with podssh's own sshd and proxy behind a shaped link, and profiles of latency, jitter, loss and rate
+that the entry names; it needs no secret. A run on the operator's real path (Q38) stays an optional extra, if
+`PODSSH_THROUGHPUT_SSH` and `PODSSH_THROUGHPUT_KEY` are ever set; the record says that a lab shows no real
+ISP's queues, middleboxes or NAT.
 
 # T-464: A connection that ends right after the login reads as a refused session, or as a loss with no cause
 

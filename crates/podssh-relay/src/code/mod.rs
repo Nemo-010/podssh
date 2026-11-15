@@ -28,7 +28,7 @@ use std::time::Duration;
 use podssh_ws::url::WsUrl;
 use podssh_ws::{ProxyChoice, Trust};
 
-pub use pod_wormhole::{mailbox, mqtt, phrase, words, wormhole, Code, Failed, WORDS};
+pub use pod_wormhole::{mailbox, mqtt, nostr, ntfy, phrase, tracker, words, wormhole, Code, Failed, WORDS};
 
 /// podssh's application in the mailbox, as magic-wormhole asks each to name
 /// one: nameplates and mailboxes of another application never meet it.
@@ -50,9 +50,6 @@ pub const MQTT_ENV: &str = "PODSSH_MQTT";
 /// `PODSSH_LAST_RESORT=no` (the last fallbacks of Q78), gives none; another
 /// value of `PODSSH_MQTT` is no setting of its own and leaves them on.
 pub fn brokers(mqtt: Option<&str>, last_resort: Option<&str>) -> Vec<mqtt::Point> {
-    let no = |v: Option<&str>| {
-        matches!(v.map(|v| v.trim().to_ascii_lowercase()).as_deref(), Some("no" | "off" | "false" | "0"))
-    };
     if no(mqtt) || no(last_resort) {
         return Vec::new();
     }
@@ -67,6 +64,57 @@ pub fn brokers(mqtt: Option<&str>, last_resort: Option<&str>) -> Vec<mqtt::Point
         })
         .collect()
 }
+/// Whether a switch's value turns its place off.
+fn no(value: Option<&str>) -> bool {
+    matches!(value.map(|v| v.trim().to_ascii_lowercase()).as_deref(), Some("no" | "off" | "false" | "0"))
+}
+
+/// `no` gives the pairing no ntfy server; an `https://` URL names one in
+/// place of the public ones (T-496).
+pub const NTFY_ENV: &str = "PODSSH_PAIR_NTFY";
+/// `no` gives the pairing no WebTorrent tracker (T-695).
+pub const TRACKER_ENV: &str = "PODSSH_PAIR_TRACKER";
+
+/// The ntfy servers, after the mailboxes (T-496, the operator's ruling Q65):
+/// the one that `PODSSH_PAIR_NTFY` names, else the services of the kind
+/// `ntfy-server` of `pod-services`, by their rank. `no`, or
+/// `PODSSH_LAST_RESORT=no`, gives none; a value that is no server's URL is
+/// refused.
+pub fn ntfy_servers(env: Option<&str>, last_resort: Option<&str>) -> Result<Vec<ntfy::Point>, String> {
+    if no(env) || no(last_resort) {
+        return Ok(Vec::new());
+    }
+    match env.map(str::trim).filter(|v| !v.is_empty()) {
+        Some(url) => ntfy::Point::parse(url).map(|point| vec![point]).map_err(|why| format!("{NTFY_ENV}: {why}")),
+        None => Ok(pod_services::of_kind("ntfy-server")
+            .filter_map(|service| ntfy::Point::parse(&service.endpoint("server")?.url()).ok())
+            .collect()),
+    }
+}
+
+/// The endpoints `endpoint` of the services of `kind`, by their rank, as
+/// WebSocket URLs: none when `env` or `PODSSH_LAST_RESORT` is `no`.
+fn sockets(kind: &str, endpoint: &str, env: Option<&str>, last_resort: Option<&str>) -> Vec<WsUrl> {
+    if no(env) || no(last_resort) {
+        return Vec::new();
+    }
+    pod_services::of_kind(kind).filter_map(|s| WsUrl::parse(&s.endpoint(endpoint)?.url()).ok()).collect()
+}
+
+/// The public Nostr relays, after the ntfy servers (T-545, the operator's
+/// ruling Q77): the services of the kind `nostr-relay`, by their rank. A
+/// pairing takes them once pod-relay's run of a code passes over them; its
+/// switch comes with them.
+pub fn nostr_relays(env: Option<&str>, last_resort: Option<&str>) -> Vec<WsUrl> {
+    sockets("nostr-relay", "relay", env, last_resort)
+}
+
+/// The public WebTorrent trackers, after the relays (T-695, Q77): the
+/// services of the kind `webtorrent-tracker`, by their rank.
+pub fn trackers(env: Option<&str>, last_resort: Option<&str>) -> Vec<WsUrl> {
+    sockets("webtorrent-tracker", "tracker", env, last_resort)
+}
+
 /// How long a code lives: past it the giver leaves, and the code fails.
 pub const LIFETIME: Duration = Duration::from_secs(600);
 
@@ -138,6 +186,26 @@ mod tests {
         let net = mailboxes_for(None, Some("off"), "the net's own way").unwrap_err();
         assert_eq!(net, "PODSSH_PAIR_MAILBOX no turns pairing by code off: the net's own way");
         assert_eq!(mailboxes_for(None, None, "x").unwrap(), public);
+    }
+
+    /// The ntfy servers, the relays and the trackers of the catalog, or the
+    /// server that the variable names; none where a switch says no.
+    #[test]
+    fn the_public_ntfy_servers_relays_and_trackers_come_unless_a_switch_says_no() {
+        let servers = ntfy_servers(None, None).unwrap();
+        assert!(!servers.is_empty(), "pod-services names an ntfy-server");
+        assert!(ntfy_servers(Some("no"), None).unwrap().is_empty());
+        assert!(ntfy_servers(None, Some("NO")).unwrap().is_empty());
+        let named = ntfy_servers(Some("https://ntfy.example.org"), None).unwrap();
+        assert_eq!((named.len(), named[0].host.as_str()), (1, "ntfy.example.org"));
+        assert!(ntfy_servers(Some("ftp://x"), None).unwrap_err().starts_with(NTFY_ENV));
+        let relays = nostr_relays(None, None);
+        assert!(!relays.is_empty(), "pod-services names a nostr-relay");
+        assert!(nostr_relays(Some("off"), None).is_empty() && nostr_relays(None, Some("no")).is_empty());
+        let trackers_ = trackers(None, None);
+        assert!(!trackers_.is_empty(), "pod-services names a webtorrent-tracker");
+        assert!(trackers(Some("no"), None).is_empty() && trackers(None, Some("0")).is_empty());
+        assert_eq!(trackers(Some("yes"), None).len(), trackers_.len(), "another word leaves them on");
     }
 
     /// The public broker of the catalog, with its login; none where either

@@ -2268,3 +2268,73 @@ kex), `crates/podssh-ssh/src/kex_first.rs` (the record, `kex-first.txt` of the c
   planted control of a delay of 2 s each way counted on: `faults.delay.control` now has a limit of 3 s, less than
   one round trip of 4 s (`scripts/interop-faults.sh`).
 
+# T-786: An outage and its catch-up, measured beside osewa and OpenSSH
+
+**Source:** the re-reading of osewa on 2026-11-15 (`docs/research/osewa.md`; osewa's `bench/outage.py`, `f64f2c9`).
+**Category:** measurement
+**Milestone:** M10
+**Priority:** P2
+**Effort:** M
+**Status:** open
+
+## Problem
+
+osewa publishes a cut of the link of 15 s, then the time to the first output and to the catch-up after a burst
+written during the cut. podssh's resumable layer has measured no real roam or cut of a client's link: T-305's
+3.0 to 3.2 s is a stand-in's move.
+
+## Premise
+
+- Read at osewa `c196de1`: `bench/outage.py` cuts the egress with `tc netem` at 100% loss for 15 s, two rounds.
+- `docs/research/osewa.md`, section 2: "no roam of a real client" in podssh's own record.
+
+## Approach
+
+1. A cell of `scripts/feel-matrix.py` and `feel-netem.yml`: a session that prints, a cut of 15 s by netem at
+   100% loss, then the time to the first output and the catch-up of 20 MiB written during the cut, for OpenSSH,
+   podssh's resumable layer (`--direct` and a node) and osewa v0.1.5.
+2. The result in `docs/research/osewa.md` and `docs/STATUS.md`; a gap that it shows becomes an entry.
+
+## Prove
+
+```sh
+python3 scripts/feel-matrix.py target/debug/podssh --roads direct --shapes outage
+```
+
+`feel-netem.yml` with the cell, from Actions. Planted: the cut left out, and the cell's check of the cut fails.
+
+# T-787: A QUIC socket whose reads keep failing must not spin a core
+
+**Source:** the re-reading of osewa on 2026-11-15 (osewa v0.1.5, `24058a3`).
+**Category:** defect
+**Milestone:** M10
+**Priority:** P3
+**Effort:** S
+**Status:** open
+
+## Problem
+
+osewa found that quinn's runtime spins a core on a UDP socket whose reads keep failing, and ends such an
+endpoint after 256 empty reads in a row, then redials. podssh's QUIC (the iroh road, the relay role's QUIC of
+T-667) may meet the same.
+
+## Premise
+
+- Read at osewa `c196de1`: its `udp.rs` counts reads that give nothing, and ends the endpoint past 256.
+
+## Approach
+
+1. A test of each of podssh's QUIC endpoints with a socket that fails each read (a stand-in socket): the
+   process's CPU over 5 s stays low.
+2. If it spins: end the endpoint after N empty reads and redial, as osewa does; or ask podcrates where the
+   endpoint is `pod-quic`'s (Rule Q3).
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-relay --features quic quic_socket_fails
+```
+
+Planted: the bound of empty reads left out, and the test of the CPU fails.
+
