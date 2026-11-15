@@ -19,8 +19,8 @@ use crate::vless::Servers;
 pub(super) async fn check(report: &mut Report<'_>, servers: &Servers, trust: &Trust) {
     let target = dial::authority(forward_host(), 22);
     let road = Dial {
-        trust,
-        proxy: &ProxyChoice::FromEnvironment,
+        trust: trust.clone(),
+        way: podssh_ws::client::way(&ProxyChoice::FromEnvironment),
         timeout: TIMEOUT,
         answer: vless::ANSWER_WAIT,
         silence_is_ready: false,

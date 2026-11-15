@@ -80,7 +80,7 @@ russh <-> VLESS (request, answer) <-> a WebSocket, or XHTTP on HTTP/2 <-> TLS to
   Where the server refused HTTP/2, XHTTP goes over HTTP/1.1 on two
   connections to it: the GET on one, the upload on a second (Q67, T-456).
 
-  `podssh-ws` (`crates/podssh-ws/src/vless/`) reads the share link, sends
+  `podssh-ws` (`crates/podssh-ws/src/vless.rs`, over `pod-egress` of PodUtils/podcrates) reads the share link, sends
   VLESS's request (the user's ID, then the target) as the stream's first
   bytes, and reads the server's answer, which comes with the target's first
   bytes, before them. The stream is a WebSocket's binary messages, or XHTTP:

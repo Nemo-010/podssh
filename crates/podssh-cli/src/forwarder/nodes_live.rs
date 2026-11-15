@@ -17,8 +17,8 @@ use super::nodes::{NODE_WAIT, PLAN};
 async fn version_line(node: &podssh_ws::proxy_nodes::Node) -> Result<String, String> {
     let trust = Trust::Default;
     let dial = Dial {
-        trust: &trust,
-        proxy: &ProxyChoice::FromEnvironment,
+        trust: trust.clone(),
+        way: podssh_ws::client::way(&ProxyChoice::FromEnvironment),
         timeout: NODE_WAIT - Duration::from_secs(4),
         answer: NODE_WAIT - Duration::from_secs(4),
         silence_is_ready: false,

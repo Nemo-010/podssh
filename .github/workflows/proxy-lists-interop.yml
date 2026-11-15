@@ -21,7 +21,8 @@ on:
       - "crates/podssh-cli/src/forwarder/nodes.rs"
       - "crates/podssh-cli/src/forwarder/fallback.rs"
       - "crates/podssh-ws/src/proxy_nodes/**"
-      - "crates/podssh-ws/src/vless/**"
+      - "crates/podssh-ws/src/vless.rs"
+      - "crates/podssh-ws/Cargo.toml"
       - "crates/podssh-cli/tests/proxy_lists.rs"
       - ".github/workflows/proxy-lists-interop.yml"
 

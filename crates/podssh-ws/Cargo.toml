@@ -10,54 +10,49 @@ publish.workspace = true
 [dependencies]
 # TLS: the trust, the configurations, the pure-Rust crypto provider, the
 # server's side and Encrypted Client Hello, with podssh's settings (tls.rs).
-pod-core = { git = "https://github.com/PodUtils/podcrates", tag = "v0.51.0" }
-pod-tls = { git = "https://github.com/PodUtils/podcrates", tag = "v0.51.0", features = ["pure", "rsa", "ech"] }
+pod-core = { git = "https://github.com/PodUtils/podcrates", tag = "v0.52.0" }
+pod-tls = { git = "https://github.com/PodUtils/podcrates", tag = "v0.52.0", features = ["pure", "rsa", "ech"] }
 # The dial, the proxies, the race of addresses, Multipath TCP, the HTTP/1.1
 # heads, the GET client (sealed with ECH where asked) and STUN's codec, with
 # podssh's settings (dial.rs).
-pod-proxy = { git = "https://github.com/PodUtils/podcrates", tag = "v0.51.0", features = ["ech"] }
+pod-proxy = { git = "https://github.com/PodUtils/podcrates", tag = "v0.52.0", features = ["ech"] }
 # The resolver: an IP literal, the pins, the system, the cache of addresses
 # and DNS over HTTPS, the SRV and HTTPS records (resolve.rs), with its reader
 # of ECH lists for pod-tls.
-pod-dns = { git = "https://github.com/PodUtils/podcrates", tag = "v0.51.0", features = ["ech"] }
+pod-dns = { git = "https://github.com/PodUtils/podcrates", tag = "v0.52.0", features = ["ech"] }
 # The WebSocket: the frames, the session, the client of the relay on each
 # road (TLS, HTTP/2, cleartext), a URL's WebSocket and the server's side,
 # over podssh's way out (client.rs), with ECH.
-pod-ws = { git = "https://github.com/PodUtils/podcrates", tag = "v0.51.0", features = ["ech"] }
+pod-ws = { git = "https://github.com/PodUtils/podcrates", tag = "v0.52.0", features = ["ech"] }
 # The roads out that are not the relay: a second proxy over TLS, the
 # forwarders, Wisp, wstunnel, meek_lite, WebTunnel and the Access client of
 # Cloudflare (via.rs, forwarder.rs, wstunnel.rs, wisp.rs, meek.rs,
-# webtunnel.rs, pt.rs, cloudflare.rs: podssh's way out and words over it).
-pod-egress = { git = "https://github.com/PodUtils/podcrates", tag = "v0.51.0", features = ["via", "forwarder", "wisp", "wstunnel", "meek", "webtunnel", "cloudflare"] }
+# webtunnel.rs, pt.rs, cloudflare.rs: podssh's way out and words over it);
+# VLESS, VMess, Trojan and Shadowsocks (vless.rs, vmess.rs, trojan.rs,
+# shadowsocks.rs); EICE and IAP (eice.rs, iap.rs).
+pod-egress = { git = "https://github.com/PodUtils/podcrates", tag = "v0.52.0", features = ["via", "forwarder", "wisp", "wstunnel", "meek", "webtunnel", "cloudflare", "vless", "vmess", "trojan", "shadowsocks", "eice", "iap"] }
 tokio = { workspace = true }
 rustls = { workspace = true }
 tokio-rustls = { workspace = true }
 rustls-pki-types = { workspace = true }
 sha2 = { workspace = true }
 hmac = { workspace = true }
-hkdf = { workspace = true }
 base64 = { workspace = true }
 zeroize = { workspace = true }
-# HTTP/2 for the roads of VLESS (vless/xhttp.rs) and of an HTTP/2 relay
-# (h2_road/): h2 and its types, pure Rust, in the lock already through the
-# quick tunnel of podssh-relay.
+# HTTP/2 of an HTTP/2 relay (h2_road/) and of the VLESS stand-ins of the
+# tests (tests/vless_support/): h2 and its types, pure Rust, in the lock
+# already through the quick tunnel of podssh-relay.
 h2 = "0.4.19"
 http = "1.5"
 bytes = "1.12"
 # The tokens of wstunnel and the answers of a forwarder are JSON.
 serde_json = { workspace = true }
-# Shadowsocks (T-373): its master key is OpenSSL's EVP_BytesToKey with MD5,
-# and each stream's key HKDF-SHA1 of it, with the HKDF above. Both pure
-# Rust, and both in the lock already: md5 0.8 through podssh-ssh, sha1 0.11
-# (digest 0.11, as hkdf 0.13 takes it, T-386) through podssh-ssh and russh.
-# No `asm` of sha1, which would compile assembly.
+# frp's messages (frp/msg.rs) and TURN's MESSAGE-INTEGRITY (turn/msg.rs):
+# MD5 and SHA-1, pure Rust, in the lock already: md5 0.8 through podssh-ssh,
+# sha1 0.11 through podssh-ssh and russh. No `asm` of sha1, which would
+# compile assembly.
 md5 = { version = "0.8", default-features = false }
 sha1 = { version = "0.11", default-features = false }
-# Shadowsocks 2022 (T-492): each stream's key is BLAKE3's derive_key, once
-# for each stream, so its SIMD buys nothing: `pure` builds no C and no
-# assembly, and the default build compiles as before. The lock holds 1.8.7
-# already, through iroh.
-blake3 = { version = "1.8.7", default-features = false, features = ["std", "pure"] }
 # frp's control stream (T-498): AES-128 in CFB mode with a key of
 # PBKDF2-HMAC-SHA1 (frp/cfb.rs, with the HMAC and SHA-1 above). The block
 # cipher alone, pure Rust, in the lock already through podssh-ssh.
@@ -66,7 +61,7 @@ aes = { workspace = true }
 # connection and probe of UDP on noq, the quick tunnel's. Only with the
 # feature `quic`, which the binary turns on. BLAKE2b-256 of Hysteria's
 # Salamander, pure Rust, in the lock already (0.11, through argon2).
-pod-quic = { git = "https://github.com/PodUtils/podcrates", tag = "v0.51.0", optional = true }
+pod-quic = { git = "https://github.com/PodUtils/podcrates", tag = "v0.52.0", optional = true }
 blake2 = { version = "0.11", default-features = false, optional = true }
 
 # The clocks of a host that slept (wake.rs): CLOCK_BOOTTIME beside
@@ -84,7 +79,7 @@ plain-ws = ["pod-ws/plain-ws", "pod-egress/plain-ws"]
 quic = ["dep:pod-quic", "dep:blake2"]
 
 [dev-dependencies]
-pod-testkit = { git = "https://github.com/PodUtils/podcrates", tag = "v0.51.0", features = ["screen"] }
+pod-testkit = { git = "https://github.com/PodUtils/podcrates", tag = "v0.52.0", features = ["screen"] }
 # The doctor is async because it may be asked to perform a handshake, and
 # the plants that assert `????` rather than `ok` have to drive it as a caller
 # would. `macros` is what makes `#[tokio::test]` exist.
@@ -99,10 +94,6 @@ rustls-pki-types = { workspace = true }
 # p256's own `Generate`, which the curves' 0.14 take in place of a rand
 # generator; the library draws from rustls's source alone.
 p256 = { workspace = true, features = ["getrandom"] }
-# The far end of a Shadowsocks server, sealed with the AEADs of the
-# specification itself (tests/shadowsocks.rs).
-aes-gcm = { workspace = true }
-chacha20poly1305 = { workspace = true }
 # The terminal oracle (T-200): a model terminal shows the text that the
 # sanitizer leaves, and the cells it takes (tests/terminal_oracle.rs).
 vt100 = { workspace = true }

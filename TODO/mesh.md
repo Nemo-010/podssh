@@ -2163,12 +2163,14 @@ with two facts more: each XHTTP request carries a padding that the server checks
 a query `x_padding=` of 100 to 1000 characters, and a 400 otherwise; and the server answers with
 the target's first bytes, and ends the session with no answer for an ID that it does not know.
 
+The test target `vless` of `podssh-ws` moved to `pod-egress` of PodUtils/podcrates when podssh took the crate: `cargo test -p pod-egress --all-features --test vless` there runs it, with its name.
+
 ## Done
 
 2026-11-02: drafted by an agent in a worktree of its own (branch `worktree-agent-t440-vless`),
 which built and ran nothing; merged and measured by the main session the same day.
 
-- podssh-ws, `crates/podssh-ws/src/vless/`: the share link and its ID (`link.rs`), `extra`
+- podssh-ws, `PodUtils/podcrates:crates/pod-egress/src/vless/`: the share link and its ID (`link.rs`), `extra`
   (`extra.rs`), VLESS's request and the reader of its answer (`header.rs`), the WebSocket
   (`ws.rs`), XHTTP's connection, padding and streamed modes (`xhttp.rs`), packet-up
   (`packet.rs`), the stream of two halves (`split.rs`), and the dial, the errors and the modes of
@@ -4015,16 +4017,18 @@ moved code then runs there.
 this entry is still podssh's work. The Premise holds: the refusal was `xhttp.rs`'s
 `VlessError::Http1` after a TLS handshake that chose no `h2`.
 
+The test target `vless` of `podssh-ws` moved to `pod-egress` of PodUtils/podcrates when podssh took the crate: `cargo test -p pod-egress --all-features --test vless` there runs it, with its name.
+
 ## Done
 
 2026-11-06. Drafted by a drafting agent, unbuilt (`draft-t456`, `34d1459`), then merged, built and
 tested by the main session: it built and passed with no repair.
 
-- `crates/podssh-ws/src/vless/xhttp.rs`: the first connection says what the server took
+- `PodUtils/podcrates:crates/pod-egress/src/vless/xhttp.rs`: the first connection says what the server took
   (`Spoken::H2` or `Spoken::H1`, a TLS that chose no `h2`); with no TLS, HTTP/2 with prior knowledge
   that fails at its first requests (a failure of the connection, not a refusal by status) is tried
   again over HTTP/1.1 on a new connection; the TLS step is `xhttp::tls`, which both use.
-- `crates/podssh-ws/src/vless/h1.rs` (new): a request's head as `xhttp::request` makes it (padding,
+- `PodUtils/podcrates:crates/pod-egress/src/vless/h1.rs` (new): a request's head as `xhttp::request` makes it (padding,
   `User-Agent`, the link's headers, gRPC's type on a streamed upload) with `Host` once and the
   body's framing; a response's head (a `100` passed over, 64 KiB at most) and its body as a stream:
   by its length, in chunks decoded as they come with the trailer read so that a kept connection's
@@ -4032,7 +4036,7 @@ tested by the main session: it built and passed with no repair.
   settings of a dial, so that the uploads' task dials again. Unit tests: a chunked body and the
   next answer after its trailer, a length, a close, an early end, an answer that is not HTTP; a
   streamed body's chunks.
-- `crates/podssh-ws/src/vless/h1_modes.rs` (new): packet-up (the GET on the first connection, its
+- `PodUtils/podcrates:crates/pod-egress/src/vless/h1_modes.rs` (new): packet-up (the GET on the first connection, its
   body piped to the read half; the POSTs of `PATH/SESSION/SEQ` with their lengths on a second
   connection, one at a time, each answer and its body read; a connection that the server closed,
   or that `Connection: close` ended, dialed again once for the next POST), stream-up (the same GET,
@@ -4040,7 +4044,7 @@ tested by the main session: it built and passed with no repair.
   stream-one refused (`VlessError::Http1`, exit 78) with its reason. `how` is "XHTTP MODE over
   HTTP/1.1 on two connections", which `-v` and `doctor --vless` print
   (`crates/podssh-cli/src/doctor/vless.rs`).
-- The test: `crates/podssh-ws/tests/vless.rs`, `http1_alone_carries_packet_up_and_stream_up_on_two_connections`,
+- The test: `PodUtils/podcrates:crates/pod-egress/tests/vless.rs`, `http1_alone_carries_packet_up_and_stream_up_on_two_connections`,
   against a stand-in of HTTP/1.1 alone (`tests/vless_support/xhttp1.rs`, on the same table of
   sessions as the HTTP/2 one), over TLS that offers `http/1.1` alone and with no TLS (the client's
   HTTP/2 refused first): packet-up, stream-up and auto carry 2,500,000 bytes each way; the stand-in
@@ -5273,7 +5277,7 @@ VLESS (T-440) but not Trojan, whose request is smaller.
   v26.10.21), and serves it over TLS and over a WebSocket; trojan-go's WebSocket mode carries it
   through a CDN.
 - `--vless` reads share links, with TLS and a WebSocket among its transports:
-  `crates/podssh-ws/src/vless/link.rs:3` says "vless://ID@HOST:PORT?type=ws|xhttp".
+  `PodUtils/podcrates:crates/pod-egress/src/vless/link.rs` says "vless://ID@HOST:PORT?type=ws|xhttp".
 
 ## Approach
 
@@ -5330,9 +5334,11 @@ PodUtils/podcrates") applies: from the import podssh makes fixes only, and once 
 crate the work is done in PodUtils/podcrates, which podssh takes by the next tag; a test of the
 moved code then runs there.
 
-2026-11-06 (the drafting agent). Read again: the Premise holds (`crates/podssh-ws/src/vless/link.rs:3`).
+2026-11-06 (the drafting agent). Read again: the Premise holds (`PodUtils/podcrates:crates/pod-egress/src/vless/link.rs`).
 `vless/` is not yet in a `repo PodUtils/podssh` block of podcrates' `PodUtils/podssh:crates/*/SOURCES`, so this work
 is still podssh's; the Trojan road sits beside it and moves with it.
+
+The test target `trojan` of `podssh-ws` moved to `pod-egress` of PodUtils/podcrates when podssh took the crate: `cargo test -p pod-egress --all-features --test trojan` there runs it, with its name.
 
 ## Done
 
@@ -5344,7 +5350,7 @@ module. trojan-gfw's and trojan-go's own servers, whose digests no one has read 
 script and the baseline for T-693, as a placeholder id that never prints `ok` nor `FAIL` fails the
 baseline's test.
 
-- `crates/podssh-ws/src/trojan/`: `link.rs` (the share link: `Password`, the hex of SHA-224 in lower
+- `PodUtils/podcrates:crates/pod-egress/src/trojan/`: `link.rs` (the share link: `Password`, the hex of SHA-224 in lower
   case, the password dropped; `Server`, `Transport::Tls` and `Transport::Ws`; the refusals by name;
   unit tests in `link_tests.rs`, with SHA-224's published vector), `request.rs` (the request: the
   hash, CRLF, CONNECT, the SOCKS5 address, the port, CRLF; unit tests of each address type),
@@ -5359,7 +5365,7 @@ baseline's test.
   `parsed.rs`, `tree.rs`, `dispatch.rs`, `proxy.rs`, `proxy_node.rs`, `containers/list.rs`,
   `ssh/carried.rs`; `--trojan` wins over `PODSSH_CHISEL` as the other flags do: the CLI's library, 992 passed;
   clippy and rustfmt clean.
-- The test: `crates/podssh-ws/tests/trojan.rs`, stand-ins of trojan-gfw's behaviour in TLS alone and
+- The test: `PodUtils/podcrates:crates/pod-egress/tests/trojan.rs`, stand-ins of trojan-gfw's behaviour in TLS alone and
   in a WebSocket at `/tr` (a wrong hash to a fallback that answers `400`): a session each way, 300 kB
   echoed; a wrong password said as the fallback's answer, with no password in the words; a wrong
   path, a 404; a pipe whose target waits: `cargo test -p podssh-ws --test trojan`, 3 passed. Planted:
@@ -5378,7 +5384,7 @@ baseline's test.
 Later the same day, in the crate's whole run with `plain-ws`, `a_session_goes_in_tls_alone_and_in_a_websocket`
 timed out once: its `carries` wrote the 300 kB whole before it read the echo, so the buffers on the
 way filled and both ends waited. It reads the echo while it writes now, and so does VLESS's
-`carries` in `crates/podssh-ws/tests/vless.rs`, which had the same pattern with 2.5 MB; 3 runs of
+`carries` in `PodUtils/podcrates:crates/pod-egress/tests/vless.rs`, which had the same pattern with 2.5 MB; 3 runs of
 each passed.
 
 The gate of `8f21bf9a` (run 42248490766, its step `libs`) found that the Trojan test left its roots'
@@ -5477,34 +5483,36 @@ podcrates (its `SOURCES` named no file of it after v0.4.0), so the change is pod
 adds `tests/shadowsocks_2022.rs` and the library's tests, where the 2022 stream is read by a
 stand-in of the specification; `tests/shadowsocks.rs` stays the AEAD form's.
 
+The test targets `shadowsocks` and `shadowsocks_2022` of `podssh-ws`, and its unit tests of `shadowsocks`, moved to `pod-egress` of PodUtils/podcrates when podssh took the crate: `cargo test -p pod-egress --all-features --test shadowsocks --test shadowsocks_2022 --lib shadowsocks` there runs them, with their names.
+
 ## Done
 
 2026-11-06. Drafted by a drafting agent, unbuilt (`draft-t492`, `9c2bf1d5`), then merged, built and
 tested by the main session. Two tests of before used a 2022 method as the example of a refused
 method; it is a method now, and they want the refusal of a key that is not base64 of its length
-(`crates/podssh-ws/tests/shadowsocks.rs`).
+(`PodUtils/podcrates:crates/pod-egress/tests/shadowsocks.rs`).
 
-- `crates/podssh-ws/src/shadowsocks/mod.rs`: `Method` gains `Blake3Aes128Gcm`, `Blake3Aes256Gcm`
+- `PodUtils/podcrates:crates/pod-egress/src/shadowsocks/mod.rs`: `Method` gains `Blake3Aes128Gcm`, `Blake3Aes256Gcm`
   and `Blake3Chacha20Poly1305` (`Method::SIP022`, `is_2022`), read by their names;
   `stream_key` gives each stream's key by HKDF-SHA1 or by BLAKE3.
-- `crates/podssh-ws/src/shadowsocks/sip022.rs` (new): `session_key` (BLAKE3's `derive_key`, its
+- `PodUtils/podcrates:crates/pod-egress/src/shadowsocks/sip022.rs` (new): `session_key` (BLAKE3's `derive_key`, its
   first 16 bytes for AES-128), `psk` (base64 of the method's length; SIP023 refused by name),
   the request's fixed and variable headers, random padding of 1 to 900 bytes, the response's
   header read and checked (type, timestamp within 30 s, the request's salt), and its server's
   side for the tests. Unit tests: the key against BLAKE3's stream, the keys and their refusals,
   the checks of a response, the headers' layout.
-- `crates/podssh-ws/src/shadowsocks/codec.rs`: `Encoder::first` (the address in the first chunk,
+- `PodUtils/podcrates:crates/pod-egress/src/shadowsocks/codec.rs`: `Encoder::first` (the address in the first chunk,
   or SIP022's headers), `first_at`, `request_salt`; `Decoder::answer`, which reads a response's
   header before the first payload and takes lengths up to 0xFFFF; `ChunkError::Header`, `Kind`,
   `Clock` (the skew, and this host's clock in HTTP's date) and `Salt`. Unit test: a request read
   by the server's side and its answer read back, for each method, and another key refused at the
   header: `cargo test -p podssh-ws --lib`, 163 passed.
-- `crates/podssh-ws/src/shadowsocks/open.rs`: the first request by `Encoder::first`, the answer by
+- `PodUtils/podcrates:crates/pod-egress/src/shadowsocks/open.rs`: the first request by `Encoder::first`, the answer by
   `Decoder::answer`; a refused header said as "its answer was refused". `uri.rs`: a 2022 key
   checked in `Node::new`, the pre-shared key as the master key, a kept URI percent-encoded.
   `crates/podssh-ws/Cargo.toml`: `blake3` 1.8.7 with `std` and `pure`, and its line in
   `Cargo.lock`'s list of podssh-ws (`cargo metadata --locked` takes the lock as it is).
-- `crates/podssh-ws/tests/shadowsocks_2022.rs` (new): a stand-in of SIP022 written from the
+- `PodUtils/podcrates:crates/pod-egress/tests/shadowsocks_2022.rs` (new): a stand-in of SIP022 written from the
   specification; with each method, `open` names the target and carries 100,000 bytes each way;
   a wrong key ends in silence naming the server and not the key; a server 60 s off and one that
   names another salt refused with their words; a 2022 key read from a percent-encoded `ss://` line
@@ -5538,7 +5546,7 @@ keys that name it; podssh reads neither.
 
 ## Premise
 
-- `crates/podssh-ws/src/shadowsocks/mod.rs:19` says "through the proxy of the environment".
+- `PodUtils/podcrates:crates/pod-egress/src/shadowsocks/mod.rs` says "through the proxy of the environment".
 - Read on 2026-11-02 (docs/carriers.md, "Servers that a user runs"): outline-ss-server since
   1.9.0 has the listeners `websocket-stream` and `websocket-packet`, each on a path of a web server
   of its own that a TLS front such as Caddy covers
@@ -5562,7 +5570,7 @@ keys that name it; podssh reads neither.
 
 2026-11-06 (the drafting agent). Three calls:
 
-1. The key's YAML is read by a reader of its own (`crates/podssh-ws/src/shadowsocks/yaml.rs`, into
+1. The key's YAML is read by a reader of its own (`PodUtils/podcrates:crates/pod-egress/src/shadowsocks/yaml.rs`, into
    `serde_json`'s values): block mappings and lists, plain and quoted scalars, comments, `---`,
    anchors and aliases, which Outline's examples use; flow collections, block scalars, tags and
    merge keys are refused by name. Lost: a YAML crate (`serde_norway`, `saphyr`), which reads all of
@@ -5614,7 +5622,7 @@ test's TLS proxy. Approach item 1's "https:// ones marked as a key" is `key http
 2026-11-06. Drafted by a drafting agent, unbuilt (`draft-t493`, `fb99826c`), then merged, built and
 tested by the main session after the take of podcrates v0.4.0: it built and passed with no repair.
 
-- `crates/podssh-ws/src/shadowsocks/`: `Node` gains `ws`, the `wss://` URL of a WebSocket that carries
+- `PodUtils/podcrates:crates/pod-egress/src/shadowsocks/`: `Node` gains `ws`, the `wss://` URL of a WebSocket that carries
   its stream (`Node::over_websocket`, `with_websocket`, `websocket_text`; `shown()` is
   `wss://HOST/...`, with no path); `ws.rs` opens podssh's WebSocket to it (`url::dial`, TLS with the
   `Dial`'s new `trust`, through the proxy) and carries the bytes in binary messages
@@ -9732,7 +9740,7 @@ are out of T-574's reach.
 
 - `docs/decisions.md:38` says "and the lists of public proxy nodes (VLESS, VMess, Trojan) are a
   last fallback".
-- `crates/podssh-ws/src/vless/mod.rs:1` says "VLESS (T-440, the operator's ruling Q66): a server
+- `PodUtils/podcrates:crates/pod-egress/src/vless/mod.rs` says "VLESS (T-440, the operator's ruling Q66): a server
   that the user runs,".
 
 ## Approach
@@ -9764,7 +9772,7 @@ in `pod-egress` (PodUtils/podcrates, Q101, wave 4), as T-440's VLESS does. Rule 
 fixes only, and once podssh takes the crate the work is done in PodUtils/podcrates, which podssh
 takes by the next tag; a test of the moved code then runs there.
 
-2026-11-10. The Premise holds. T-491 is done (`crates/podssh-ws/src/trojan/mod.rs:1`), so the road of T-574 reads
+2026-11-10. The Premise holds. T-491 is done (`PodUtils/podcrates:crates/pod-egress/src/trojan/mod.rs`), so the road of T-574 reads
 VLESS and Trojan lines and VMess is the one form missing; the Correction of 2026-11-05 above stands, and the code
 of T-739 is in `podssh-ws` until `pod-egress` is taken.
 
@@ -9802,7 +9810,7 @@ that the lists of public proxy nodes are a last fallback.
   last fallback".
 - `docs/carriers.md:389-390` says "operators are anonymous and answer for nothing, and a list
   changes within hours".
-- `crates/podssh-ws/src/vless/mod.rs:1` says "VLESS (T-440, the operator's ruling Q66): a server
+- `PodUtils/podcrates:crates/pod-egress/src/vless/mod.rs` says "VLESS (T-440, the operator's ruling Q66): a server
   that the user runs,".
 
 ## Approach
@@ -9882,7 +9890,7 @@ crate the work is done in PodUtils/podcrates, which podssh takes by the next tag
 moved code then runs there.
 
 2026-11-09 (a draft). The Premise holds, with three changes. `docs/carriers.md` says it at lines
-374-377 now, not 376-377. T-491 (Trojan) is done (`crates/podssh-ws/src/trojan/`), so Approach step 2
+374-377 now, not 376-377. T-491 (Trojan) is done (`PodUtils/podcrates:crates/pod-egress/src/trojan/`), so Approach step 2
 takes Trojan; VMess waits for T-573. And Q90 ruled on step 3 and the Decision: the binary ships a
 short list of nodes as the fallback where no list can be fetched. Q79 (no host of another party in
 the repository) and rule 5 of the migration (`AGENTS.md`: no hardcoded host of another party; those
@@ -10704,7 +10712,7 @@ State, item 7), so the road is in `podssh-ws` (`tuic/`, behind its feature `quic
 VMess is; podcrates imports it with the other roads of `pod-egress`. The QUIC that it needs is `pod-quic`'s,
 taken on 2026-11-12 (the endpoint, the connection within its wait, the probe of UDP), used as it is: no
 change of a taken crate, and no QUIC helper of podssh's own. The Prove's sshd is a stand-in that sends a
-version line first, as `crates/podssh-ws/tests/vmess.rs` uses; the server is Itsusinn's tuic,
+version line first, as `PodUtils/podcrates:crates/pod-egress/tests/vmess.rs` uses; the server is Itsusinn's tuic,
 `v2.0.0-dev10`, its static build checked by the SHA-256 that GitHub records for it
 (`.github/workflows/tuic-interop.yml`).
 
@@ -12312,7 +12320,7 @@ through an HTTP CONNECT proxy.
   its file crates/podssh-ws/src/turn/mod.rs, and its docs/poc.md: "proxy logs 2 CONNECTs").
   `AGENTS.md:333` says "Make one outbound connection", with five exceptions, none for this road.
 - podssh-ws holds the parts of TURN's long-term credential in pure Rust: `hmac`
-  (`crates/podssh-ws/Cargo.toml:37`), and `md5` and `sha1` (`crates/podssh-ws/Cargo.toml:54-55`);
+  (`crates/podssh-ws/Cargo.toml:39`), and `md5` and `sha1` (`crates/podssh-ws/Cargo.toml:54-55`);
   and a resolver order of its own (`PodUtils/podssh:crates/podssh-ws/src/resolve.rs:2` says "resolver works. In
   order"), as a Connect names an address, not a name.
 - No code of podssh names TURN: `PodUtils/podcrates:crates/pod-egress/src/forwarder/template.rs` says "a
@@ -13370,7 +13378,7 @@ read from the project's own page. The Approach takes these pins.
 - A defect found on the way, repaired: a fallback that quotes the request it could not read
   (Python's `http.server`: "Bad request syntax ('...')") showed the start of the request, the
   SHA-224 of the link's password, in podssh's line of the refusal, which holds a credential's
-  equivalent. `crates/podssh-ws/src/trojan/answer.rs`, `status_of`: the line ends before a quote or
+  equivalent. `PodUtils/podcrates:crates/pod-egress/src/trojan/answer.rs`, `status_of`: the line ends before a quote or
   a bracket, and a run of 16 hex digits or more is left out; the test
   `a_fallback_that_quotes_the_request_shows_no_hash`.
 
@@ -13389,7 +13397,7 @@ the next gate request asks.
 The runner's Python is 3.12, whose `http.server` reads a line that it cannot parse as HTTP/0.9 and
 answers with its page alone, with no status line (measured here: Python 3.12 answers
 `<!DOCTYPE HTML>`, 3.13 `HTTP/1.0 400`); podssh took the page for the target's bytes. A defect of
-podssh, repaired: `crates/podssh-ws/src/trojan/answer.rs` names an HTML page with no status line as
+podssh, repaired: `PodUtils/podcrates:crates/pod-egress/src/trojan/answer.rs` names an HTML page with no status line as
 a fallback's answer too ("an HTML page with no status line"), never showing the page, which quotes
 the request. The test `a_fallback_s_page_with_no_status_line_is_named_and_not_shown`: planted, the
 page not checked, it fails; `cargo test -p podssh-ws --lib`: 185 passed. The next run of
@@ -15080,7 +15088,7 @@ VMess (T-574 reads VLESS and Trojan lines alone).
 
 - `docs/decisions.md:38` says "and the lists of public proxy nodes (VLESS, VMess, Trojan) are a
   last fallback".
-- `crates/podssh-ws/src/vless/mod.rs:1` and `crates/podssh-ws/src/trojan/mod.rs:1` are the neighbours: the same
+- `PodUtils/podcrates:crates/pod-egress/src/vless/mod.rs` and `PodUtils/podcrates:crates/pod-egress/src/trojan/mod.rs` are the neighbours: the same
   WebSocket and TLS, and a `link` parser for each.
 - `docs/carriers.md`, "The verdicts of T-572, T-573 and T-577", has the header, the keys, the ciphers and the counts.
 
@@ -15112,14 +15120,18 @@ sshd's banner with each cipher; a client with a clock 5 minutes off is refused; 
 the MD5 form is recorded, not relied on. A header built by the test from the spec's own bytes (v2fly's page)
 decodes in the test's reader. Planted: the KDF's label changed, and the test against Xray-core fails.
 
+## Correction
+
+The test target `vmess` of `podssh-ws` moved to `pod-egress` of PodUtils/podcrates when podssh took the crate: `cargo test -p pod-egress --all-features --test vmess` there runs it, with its name, in PodUtils/podcrates:.github/workflows/vmess-interop.yml.
+
 ## Done
 
 Done (2026-11-12). The draft `draft/t739-vmess` (`6d271ec4`) merged, built and tested, with `mod.rs` and `ws.rs` as
-Trojan's (`crates/podssh-ws/src/vmess/`), `Node::Vmess` in `proxy_nodes` (the word "VMess" in each line of a node), and
+Trojan's (`PodUtils/podcrates:crates/pod-egress/src/vmess/`), `Node::Vmess` in `proxy_nodes` (the word "VMess" in each line of a node), and
 the list reader's `vmess://` lines (`proxy_nodes/list.rs`); the manual's `PODSSH_PROXY_LISTS` and `docs/cli.md` name it.
 
 - Against Xray-core v26.10.21 (the release and SHA-256 that `scripts/interop-vless.sh` pins), run natively on the
-  loopback by `crates/podssh-ws/tests/vmess.rs` over a WebSocket and TLS at `/vm`, with a root and a leaf that
+  loopback by `PodUtils/podcrates:crates/pod-egress/tests/vmess.rs` over a WebSocket and TLS at `/vm`, with a root and a leaf that
   `openssl` makes for the run: `PODSSH_XRAY_TEST_BIN=.work/xray/bin/xray cargo test -p podssh-ws --test vmess`,
   3 passed in 3.2 s: AES-128-GCM, ChaCha20-Poly1305 and `auto` each carry the target's version line and 300 KB
   echoed whole; a pipe takes a stream whose target waits; a clock 5 minutes behind, 5 minutes ahead, and another ID

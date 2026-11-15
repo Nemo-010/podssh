@@ -178,8 +178,8 @@ pub async fn round(
     fail: &mut (dyn FnMut(&str) + Send),
 ) -> Option<(Carried, String)> {
     let dial = Dial {
-        trust,
-        proxy: &ProxyChoice::FromEnvironment,
+        trust: trust.clone(),
+        way: podssh_ws::client::way(&ProxyChoice::FromEnvironment),
         timeout: NODE_WAIT - Duration::from_secs(4),
         answer: if how == Use::Pipe { vless::EARLY_WAIT } else { NODE_WAIT - Duration::from_secs(4) },
         silence_is_ready: how == Use::Pipe,

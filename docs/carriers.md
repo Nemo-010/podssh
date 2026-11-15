@@ -486,7 +486,7 @@ because its entry has to measure it.
 - **Over a WebSocket and TLS.** The stream rides binary messages after the upgrade, with a path,
   a `Host`, and an optional early first packet in the path (`?ed=2560`) or in the
   `Sec-WebSocket-Protocol` header; TLS is `http/1.1` by ALPN [R573-5][R573-6]. The VLESS road of
-  `crates/podssh-ws/src/vless/ws.rs` carries the same shape, so the WebSocket and the TLS are
+  `ws.rs` of `pod_egress::vless` (PodUtils/podcrates) carries the same shape, so the WebSocket and the TLS are
   podssh's already; the early data stays off, as in VLESS.
 - **The ciphers against podssh-ws's.** All of them are in the workspace in pure Rust: `aes-gcm`
   0.11 and `chacha20poly1305` 0.11 (`Cargo.toml`), `sha2` and `hmac` for the KDF, `md5` 0.8 for

@@ -33,8 +33,8 @@ fn closed_port() -> u16 {
     std::net::TcpListener::bind("127.0.0.1:0").unwrap().local_addr().unwrap().port()
 }
 
-fn dial<'a>(trust: &'a Trust, proxy: &'a ProxyChoice) -> Dial<'a> {
-    Dial { trust, proxy, timeout: LIMIT, answer: vless::ANSWER_WAIT, silence_is_ready: false, at_end: AtEnd::Now }
+fn dial(trust: &Trust, proxy: &ProxyChoice) -> Dial {
+    vless::dial(trust, proxy, LIMIT, vless::ANSWER_WAIT, false, AtEnd::Now)
 }
 
 /// The first nodes fail, each in its own words; the last carries.

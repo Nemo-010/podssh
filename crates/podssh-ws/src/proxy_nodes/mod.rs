@@ -94,7 +94,7 @@ pub async fn carry(
     nodes: &[Node],
     host: &str,
     port: u16,
-    dial: &Dial<'_>,
+    dial: &Dial,
     (each, most): (Duration, usize),
     say: &mut (dyn FnMut(&str) + Send),
 ) -> Result<Carried, Vec<String>> {
@@ -122,7 +122,7 @@ pub async fn carry(
 async fn one(
     node: &Node,
     (host, port): (&str, u16),
-    dial: &Dial<'_>,
+    dial: &Dial,
     shown: &str,
     target: &str,
 ) -> Result<(Box<dyn Duplex>, String), (String, bool)> {

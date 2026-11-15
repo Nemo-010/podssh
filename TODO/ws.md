@@ -1988,7 +1988,7 @@ command says what to do. Four of the eight release binaries are for Windows and 
 - Read: `windows-sys` 0.61 is already a dependency of `podssh-relay` on Windows
   (`crates/podssh-relay/Cargo.toml:245-246`), a crate with no C; `rustls-native-certs` 0.8.4,
   `schannel` and `security-framework` are in the lock through other crates
-  (`Cargo.lock:6495-6496`).
+  (`Cargo.lock:6496-6497`).
 - Read: one proxy that re-terminates TLS was measured, with its CA in `SSL_CERT_FILE` and in the
   system's store of Linux (`docs/target-environment.md:61-67`).
 - Inferred: on macOS, `/etc/ssl/cert.pem` lacks a root that an administrator added to a keychain;
@@ -2333,7 +2333,7 @@ and each other command print rustls's words alone. An error should tell what to 
 - Read: the other commands print the error's text: `PodUtils/podssh:crates/podssh-ws/src/client.rs:142` says "TLS
   with the relay failed: {why}"; the TLS of IRC and of the quick tunnel's edge gives the text of
   `PodUtils/podssh:crates/podssh-ws/src/tls.rs:151` (`crates/podssh-relay/src/quick/edge.rs:111-113`).
-- Read: rustls 0.23.46 (`Cargo.lock:6445-6446`) has the errors `Expired`, `ExpiredContext`,
+- Read: rustls 0.23.46 (`Cargo.lock:6446-6447`) has the errors `Expired`, `ExpiredContext`,
   `NotValidYet` and `NotValidYetContext`, and writes the two with a context as "certificate
   expired: verification time" and "certificate not valid yet: verification time" (its
   `src/error.rs`, read in cargo's registry); doctor's match of the text ("expired", "not valid
@@ -3490,23 +3490,23 @@ bytes, padded where the session had less, done once.
 ## Premise
 
 - The request rides the first binary message of the WebSocket form:
-  `crates/podssh-ws/src/vless/ws.rs:8` says "No early data goes in", and
-  `crates/podssh-ws/src/vless/ws.rs:52` sends `first` as one message, with no coalescing of the
+  `PodUtils/podcrates:crates/pod-egress/src/vless/ws.rs` says "No early data goes in", and
+  `PodUtils/podcrates:crates/pod-egress/src/vless/ws.rs` sends `first` as one message, with no coalescing of the
   session's bytes after it.
-- The server answers with the target's first bytes (`crates/podssh-ws/src/vless/header.rs:7-9`),
-  and a pipe waits `EARLY_WAIT` for an end (`crates/podssh-ws/src/vless/mod.rs:41-43`).
+- The server answers with the target's first bytes (`PodUtils/podcrates:crates/pod-egress/src/vless/header.rs`),
+  and a pipe waits `EARLY_WAIT` for an end (`PodUtils/podcrates:crates/pod-egress/src/vless/mod.rs`).
 - The issue reads that vless/link.rs records a 3,333-byte first-write target that no code
-  reaches. That does not hold on `fb78681`: `crates/podssh-ws/src/vless/link.rs` is the share
+  reaches. That does not hold on `fb78681`: `PodUtils/podcrates:crates/pod-egress/src/vless/link.rs` is the share
   link's reader, and no source file of the workspace holds 3333 as a size (searched 2026-11-13).
   The target is the issue's number, not podssh's.
-- VLESS's code is podssh's own (`crates/podssh-ws/src/vless/`), not a crate of PodUtils/podcrates.
+- VLESS's code is podssh's own (`PodUtils/podcrates:crates/pod-egress/src/vless/`), not a crate of PodUtils/podcrates.
 
 ## Approach
 
 1. The first write of a session: VLESS's request and the session's first bytes gathered for at
    most a short wait, then written as one message of exactly 3,333 bytes of payload where the
    protocol allows padding (the XHTTP forms carry padding already,
-   `crates/podssh-ws/src/vless/xhttp.rs:4-6`); a short first write is padded and the session
+   `PodUtils/podcrates:crates/pod-egress/src/vless/xhttp.rs`); a short first write is padded and the session
    records that it was short (COALESCE-2).
 2. Coalesce once (COALESCE-3): a flag on the session, and a test that a second coalesce cannot
    happen.
@@ -3563,7 +3563,7 @@ falling back to 1-RTT inside itself rather than opening a second one.
   0-RTT (searched 2026-11-13); TLS resumes, across runs, only once T-672 is unblocked.
 - The relay role's TLS server is `pod-tls`'s too (`crates/podssh-ws/src/tls_server.rs:12`).
 - The VLESS road's WebSocket form puts no early data in a header
-  (`crates/podssh-ws/src/vless/ws.rs:8`).
+  (`PodUtils/podcrates:crates/pod-egress/src/vless/ws.rs`).
 - `pod-tls` is a crate that podssh took (`TODO/PROGRESS.md`, state item 7), so its work is done in
   PodUtils/podcrates (Rule Q3, `docs/decisions.md`); the record layer and its replay window are
   PodUtils/podnet#472's, which the issue names as the one implementation to share.
@@ -3622,27 +3622,27 @@ two requests in two directions.
 
 ## Premise
 
-- The split is a stream of two halves (`crates/podssh-ws/src/vless/split.rs:1-4`).
+- The split is a stream of two halves (`PodUtils/podcrates:crates/pod-egress/src/vless/split.rs`).
 - `docs/STATUS.md:302` records VLESS over XHTTP against Xray-core v26.10.21, shoes and nginx in
   front of Xray-core, in packet-up, stream-up and stream-one on HTTP/2, with HTTP/1.1 refused
   with 78. That refusal is older than T-456: `docs/STATUS.md:1042` records packet-up and stream-up
   over HTTP/1.1 on two connections, and stream-one alone refused
-  (`crates/podssh-ws/src/vless/h1_modes.rs:12`, its reason at
-  `crates/podssh-ws/src/vless/h1_modes.rs:29-30`). The issue's "keep the 78 refusal" reads as:
+  (`PodUtils/podcrates:crates/pod-egress/src/vless/h1_modes.rs`, its reason at
+  `PodUtils/podcrates:crates/pod-egress/src/vless/h1_modes.rs`). The issue's "keep the 78 refusal" reads as:
   keep stream-one's refusal, and say why in `doctor`.
 - `podssh doctor --vless` exists (`crates/podssh-cli/src/doctor/mod.rs:96-97`).
 
 ## Approach
 
 1. A stand-in proxy in the test that buffers each response whole before it passes it on (as some
-   corporate proxies do), in front of the stand-in of `crates/podssh-ws/tests/vless.rs`; the
+   corporate proxies do), in front of the stand-in of `PodUtils/podcrates:crates/pod-egress/tests/vless.rs`; the
    split modes' behaviour behind it is measured: packet-up should pass (each download is a short
    response), stream-up and stream-one stall. The road's line names the buffering where it can
    tell, and `auto` moves to packet-up.
 2. The stand-in counts requests and their methods: the test asserts one GET down and POSTs up
    (XHTTP-2), not only the echo.
 3. `doctor --vless` says, for a link of stream-one over HTTP/1.1, the reason of
-   `crates/podssh-ws/src/vless/h1_modes.rs:29-30` (XHTTP-3).
+   `PodUtils/podcrates:crates/pod-egress/src/vless/h1_modes.rs` (XHTTP-3).
 
 ## Decision
 
@@ -3690,13 +3690,13 @@ is there than that, but not in one place:
 
 - Shadowsocks' AEAD form: known answers that Python's `hashlib` and the `cryptography` package
   computed, and a codec written from the specification in the test
-  (`crates/podssh-ws/tests/shadowsocks.rs:1-9`); the encoder takes a fixed salt for vectors
-  (`crates/podssh-ws/src/shadowsocks/codec.rs:144`). SIP022 has no TCP vectors in its
-  specification (`crates/podssh-ws/tests/shadowsocks_2022.rs:11-12`).
+  (`PodUtils/podcrates:crates/pod-egress/tests/shadowsocks.rs`); the encoder takes a fixed salt for vectors
+  (`PodUtils/podcrates:crates/pod-egress/src/shadowsocks/codec.rs`). SIP022 has no TCP vectors in its
+  specification (`PodUtils/podcrates:crates/pod-egress/tests/shadowsocks_2022.rs`).
 - Trojan: stand-ins on the loopback, and the runs against trojan-gfw, trojan-go and Xray-core in
-  `scripts/interop-trojan.sh` (`crates/podssh-ws/tests/trojan.rs:12-13`).
-- VMess's AEAD form against Xray-core (`crates/podssh-ws/tests/vmess.rs:1-9`). An `aid` above 0
-  (the MD5 form, `alterId`) is refused by name (`crates/podssh-ws/src/vmess/link.rs:64-66`).
+  `scripts/interop-trojan.sh` (`PodUtils/podcrates:crates/pod-egress/tests/trojan.rs`).
+- VMess's AEAD form against Xray-core (`PodUtils/podcrates:crates/pod-egress/tests/vmess.rs`). An `aid` above 0
+  (the MD5 form, `alterId`) is refused by name (`PodUtils/podcrates:crates/pod-egress/src/vmess/link.rs`).
 - `pod-testkit` is a crate that podssh took (`TODO/PROGRESS.md`, state item 7); its work is
   done in PodUtils/podcrates (Rule Q3, `docs/decisions.md`). PodUtils/podnet#471 scopes
   Shadowsocks and Trojan as services at a peer, with the published vectors as its acceptance.
@@ -3756,8 +3756,8 @@ of UDP only from the source. The tester accepts either outcome: UDP associate bu
 
 ## Premise
 
-- `crates/podssh-ws/src/trojan/request.rs:12` says "is not spoken" of UDP's command, and the
-  request writes CONNECT alone (`crates/podssh-ws/src/trojan/request.rs:13`).
+- `PodUtils/podcrates:crates/pod-egress/src/trojan/request.rs` says "is not spoken" of UDP's command, and the
+  request writes CONNECT alone (`PodUtils/podcrates:crates/pod-egress/src/trojan/request.rs`).
 - `podssh doctor` has a section for VLESS's servers (`crates/podssh-cli/src/doctor/mod.rs:96-97`)
   and none that names Trojan (no file of `crates/podssh-cli/src/doctor/` names it, searched
   2026-11-13).

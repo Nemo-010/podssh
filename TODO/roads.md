@@ -5127,11 +5127,11 @@ Read at `5877a00` on 2026-10-31.
 2026-10-31: drafted in the worktree `cloud` (branch `draft-cloud`, `058d364`), then merged and
 measured; the live run waits for the operator's throwaway accounts (T-376), as Q51 rules.
 
-- IAP: the messages (`crates/podssh-ws/src/iap/frame.rs`), the flow (`crates/podssh-ws/src/iap/flow.rs`), the
-  close codes (`crates/podssh-ws/src/iap/close.rs`), the upgrade (`crates/podssh-ws/src/iap/mod.rs`) and the
-  carriage with its reconnect (`crates/podssh-ws/src/iap/carry.rs`). `cargo test -p podssh-ws --lib iap`:
+- IAP: the messages (`PodUtils/podcrates:crates/pod-egress/src/iap/frame.rs`), the flow (`PodUtils/podcrates:crates/pod-egress/src/iap/flow.rs`), the
+  close codes (`PodUtils/podcrates:crates/pod-egress/src/iap/close.rs`), the upgrade (`PodUtils/podcrates:crates/pod-egress/src/iap/mod.rs`) and the
+  carriage with its reconnect (`PodUtils/podcrates:crates/pod-egress/src/iap/carry.rs`). `cargo test -p podssh-ws --lib iap`:
   22 passed.
-- EICE: SigV4 (`crates/podssh-ws/src/eice/sigv4.rs`) and the road (`crates/podssh-ws/src/eice/mod.rs`).
+- EICE: SigV4 (`PodUtils/podcrates:crates/pod-egress/src/eice/sigv4.rs`) and the road (`PodUtils/podcrates:crates/pod-egress/src/eice/mod.rs`).
   `cargo test -p podssh-ws --lib eice`: 11 passed (aws-c-auth's three vectors and aws-cli's four
   URLs).
 - The command line: `crates/podssh-cli/src/ssh/cloud.rs` and its directory (the destinations, the token
@@ -5143,7 +5143,7 @@ measured; the live run waits for the operator's throwaway accounts (T-376), as Q
 - At the merge, the test of a session taken up on a new link failed 8 runs in 20: `up` sent an
   acknowledgement before the bytes that SSH had just given, and a link that broke on it returned
   before those bytes were kept, so the new link never sent them. They are kept first now
-  (`crates/podssh-ws/src/iap/carry.rs`), the order on the wire unchanged: 40 runs of 40 passed. clippy
+  (`PodUtils/podcrates:crates/pod-egress/src/iap/carry.rs`), the order on the wire unchanged: 40 runs of 40 passed. clippy
   named a `from_file` with `self`, now `read_file`, and an array of bytes in a test.
 - Planted: the token printed on stderr where its file is read: three tests of `iap_cli` failed,
   each naming the token shown. The workspace: 2539 passed; clippy `-D warnings` clean.
@@ -6854,7 +6854,7 @@ Read at `60c2414` on 2026-11-01.
 
 2026-11-01, done: drafted in a worktree (`1be3e28`), merged and measured here.
 
-- podssh-ws, `crates/podssh-ws/src/shadowsocks/`: the methods and the keys (`mod.rs`), the codec
+- podssh-ws, `PodUtils/podcrates:crates/pod-egress/src/shadowsocks/`: the methods and the keys (`mod.rs`), the codec
   of a stream with the address header (`codec.rs`), SIP002's URI and its older form (`uri.rs`), a
   subscription's list in three forms (`list.rs`), `open` with its wait for the first chunk and the
   lines of its failures (`open.rs`), and the carry of a stream (`carry.rs`).
@@ -9442,9 +9442,9 @@ banner where a hop holds the body: the form needs a test of the way and a fallba
 - `crates/podssh-cli/src/doctor/stream/mod.rs:2` says "passes as it comes or is held until its
   end, whether a request's body": podssh measures whether a request's body passes as it comes
   (T-325).
-- `crates/podssh-ws/src/vless/xhttp.rs:10` says "stream-one: one POST to the path, its body up and
+- `PodUtils/podcrates:crates/pod-egress/src/vless/xhttp.rs` says "stream-one: one POST to the path, its body up and
   its answer down": podssh speaks the form inside XHTTP to Xray-core, over HTTP/2 alone, as
-  `crates/podssh-ws/src/vless/xhttp.rs:21-23` says why stream-one is refused on HTTP/1.1 (T-456).
+  `PodUtils/podcrates:crates/pod-egress/src/vless/xhttp.rs` says why stream-one is refused on HTTP/1.1 (T-456).
 - The archive found no public server of the form: one relay of that shape on a public name wants
   a key (Read in its results/http-relay-hunt.json), and its own relay is a test of about 130 lines
   on the loopback. A server of the form that a user has is podssh's relay role.
@@ -10006,7 +10006,7 @@ new road from getting the rule wrong, and no test per road keeps it.
   (`crates/podssh-cli/src/forwarder/reach.rs:57`).
 - Read: `PodUtils/podcrates:crates/pod-egress/src/carry.rs`: with `close_at_end` false, the read task
   waits for `down_ended_rx` before it sends Close.
-- Read: `PodUtils/podcrates:crates/pod-egress/src/wisp/mux.rs` and `crates/podssh-ws/src/vless/ws.rs:114`
+- Read: `PodUtils/podcrates:crates/pod-egress/src/wisp/mux.rs` and `PodUtils/podcrates:crates/pod-egress/src/vless/ws.rs`
   derive the same branch again. Wisp has no half-close: a pipe waits for the server's end.
 - Read: a road to podssh's own relay already drains after the client's Close (T-671, done;
   `docs/relay.md`, the paragraph of the half-close), and the layer road has `END` (T-632, done). A
@@ -10064,7 +10064,7 @@ Premise misses some places of the bool, and two roads that have no choice:
    `AtEnd`. The roads that write `false` are the four `pipe.rs` of `crates/podssh-cli/src/`
    (`forwarder`, `trojan`, `vless`, `wstunnel`); those that write `true` are their four `reach.rs`
    and two probes of `doctor` (`doctor/forwarder.rs`, `doctor/vless.rs`). Each keeps its value.
-2. Shadowsocks's carrier (`crates/podssh-ws/src/shadowsocks/carry.rs`) and Trojan in TLS alone end
+2. Shadowsocks's carrier (`PodUtils/podcrates:crates/pod-egress/src/shadowsocks/carry.rs`) and Trojan in TLS alone end
    with TCP's half-close, and XHTTP's modes end their upload and never read the bool. They take no
    helper, as they have no choice to make; each half-close road gets its test all the same.
 3. The type is `AtEnd` (`AtEnd::Now`, `AtEnd::AfterPeer`), not `End`: `podssh_ws::wisp::End` (a

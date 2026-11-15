@@ -1,12 +1,12 @@
 //! A WebSocket forwarder that takes its target from the client (T-369):
 //! `pod-egress` of PodUtils/podcrates, over podssh's way out ([`dial`]).
-//! The carrier of a session and the end of its input are the crate's shared
-//! parts, which podssh's other roads take too.
+//! The carrier of a session is the crate's shared part, which podssh's
+//! other roads take too.
 
 use std::time::Duration;
 
+pub(crate) use pod_egress::carry;
 pub use pod_egress::forwarder::*;
-pub(crate) use pod_egress::{carry, end};
 
 use crate::dial::ProxyChoice;
 use crate::tls::Trust;

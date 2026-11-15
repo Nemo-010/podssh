@@ -103,8 +103,8 @@ pub async fn open(
     }
     let target = podssh_ws::dial::authority(host, port);
     let dial = Dial {
-        proxy: &ProxyChoice::FromEnvironment,
-        trust,
+        way: podssh_ws::client::way(&ProxyChoice::FromEnvironment),
+        trust: trust.clone(),
         timeout: podssh_relay::open::CONNECT_TIMEOUT,
         answer: Some(EARLY_WAIT),
         silence_is_ready: true,

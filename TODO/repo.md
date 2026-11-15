@@ -5844,7 +5844,17 @@ T-787's test runs again and passes. Each of the 16 steps of `pod-egress.run` pas
 failed; the consumer checks of podcrates). `cargo clippy --workspace --all-targets`: clean; `cargo test
 --workspace --no-fail-fast`: 3951 passed, 0 failed, 82 ignored (the moved tests left with their modules).
 
-Next: parts 2 and 3 of step 2 (VLESS, VMess, Trojan, Shadowsocks, EICE, IAP) in `v0.52.0`, then the rest of Q101.
+2026-11-15, podcrates `v0.52.0` (`7998b72`, COORD-106, PodUtils/podcrates#176), step 2 of COORD-071, parts 2 and 3:
+VLESS (WebSocket and XHTTP), VMess's AEAD form, Trojan, Shadowsocks (AEAD and SIP022), EICE and IAP leave podssh-ws,
+with `adoption/podssh/pod-egress-part2.patch` and `pod-egress-part3.patch` by `git apply --3way` on the take of
+`v0.51.0`. No commit of `main` after `2ffb7cd7` touched those modules. The conflicts: the manifests, main's side with
+the tag moved and, in `podssh-ws`, the features of both parts on `pod-egress`; four pins that the patches' base did not
+hold, moved by hand; and one citation of `TODO/ws.md` (the split's file at podcrates, main's line of
+`docs/STATUS.md`). Each of the 19 steps of the two `.run` files passed (287 tests, 0 failed). `cargo clippy
+--workspace --all-targets`: clean; `cargo test --workspace --no-fail-fast`: 3837 passed, 0 failed, 82 ignored.
+
+Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
+`pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
 
 **Source:** the operator, 2026-11-05: "we use whatever is necessary, including c, zig, modern rust,

@@ -106,8 +106,8 @@ messages carry the stream, with acknowledgements and a reconnect that takes
 a lost link up, as gcloud does; a service account's key signs its JWT in
 aws-lc-rs, in the binary. EICE's URL is presigned with SigV4 and carries the
 credential: the one exception to the rule above, made for each connection
-and never shown. The protocol code is in `podssh-ws` (`iap`, `eice`), with
-no C; the files of the accounts, the JWT and the token's exchange are in
+and never shown. The protocol code is in `pod-egress` of PodUtils/podcrates
+(`iap`, `eice`), with podssh's way out in `podssh-ws`, with no C; the files of the accounts, the JWT and the token's exchange are in
 the binary (`crates/podssh-cli/src/ssh/cloud.rs`). Checked against
 stand-ins, in memory and on the loopback, that speak each protocol as
 gcloud's, IAP Desktop's and aws-cli's sources say, with bytes that gcloud's

@@ -316,7 +316,7 @@ in the entry); "new" that the record does not hold it.
 | # | Finding (the archive's) | podssh's record | Verdict |
 | --- | --- | --- | --- |
 | 1 | No public service of the forward shape over HTTP: the hunt found one relay, which wants a key; the sweep of 541 names found none. | `docs/carriers.md:22-24`: no provider with no account carries any TCP target over a WebSocket. | confirms, for plain HTTP too |
-| 2 | One POST whose body is the way up and whose answer is the way down carries SSH where no hop holds a body; the same hangs where one does. | XHTTP's stream-one inside VLESS (`crates/podssh-ws/src/vless/xhttp.rs:10-11`); the HTTP road's split and serial forms for hops that hold bodies (T-319); no raw form. | new; T-622 |
+| 2 | One POST whose body is the way up and whose answer is the way down carries SSH where no hop holds a body; the same hangs where one does. | XHTTP's stream-one inside VLESS (`xhttp.rs` of `pod_egress::vless`, PodUtils/podcrates); the HTTP road's split and serial forms for hops that hold bodies (T-319); no raw form. | new; T-622 |
 | 3 | The discriminator: a response byte before the request's body ends. | `doctor`'s stream probe measures whether a request's body passes as it comes (`crates/podssh-cli/src/doctor/stream/mod.rs:1-3`, T-325). | known |
 | 4 | A carrier that buffers passes a bulk test and hangs a session. | The Piping road's numbered pieces after 15 s (crates/podssh-relay/src/piping/flow.rs:21-24 at `b9c04657`); T-319's forms. | known |
 | 5 | TURN with RFC 6062 to a coturn carries SSH, directly and through a CONNECT proxy, on two connections. | No TURN client in podssh; `docs/carriers.md:377`, `docs/carriers.md:1022-1026`, `docs/carriers.md:1569-1570`. | new; T-621 |
@@ -366,7 +366,7 @@ host's resolver).
 
 - podssh has: none of TURN (no code names it); the parts that it takes,
   each pure Rust: `hmac`, `md5` and `sha1` in podssh-ws
-  (`crates/podssh-ws/Cargo.toml:37`, `crates/podssh-ws/Cargo.toml:54-55`),
+  (`crates/podssh-ws/Cargo.toml:39`, `crates/podssh-ws/Cargo.toml:54-55`),
   the dial through `HTTPS_PROXY` (`crates/podssh-ws/src/dial.rs:86`) and TLS
   over it (`PodUtils/podssh:crates/podssh-ws/src/tls.rs:135`), and its own resolver order
   (`crates/podssh-ws/src/resolve.rs:2`).
@@ -402,7 +402,7 @@ and httpstream/forward.rs (78 lines: the session, the bytes up in chunks of
   `https://` template that `crates/podssh-ws/src/forwarder/template.rs:198`
   tests); the same shape inside XHTTP's stream-one, over HTTP/2 alone, as
   Go's server reads a whole body before it answers on HTTP/1.1
-  (`crates/podssh-ws/src/vless/xhttp.rs:21-23`); the HTTP road of podssh's
+  (`xhttp.rs` of `pod_egress::vless`, PodUtils/podcrates); the HTTP road of podssh's
   relay role for hops that refuse the upgrade and hold bodies (T-319); and
   chunked HTTP/1.1 in the Piping Server road
   (crates/podssh-relay/src/piping/http1.rs at `b9c04657`).

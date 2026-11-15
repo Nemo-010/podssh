@@ -34,8 +34,8 @@ pub async fn reach(
         return Err(NotReached { lines: vec![OpenError::Target(why).line("", &target)], code: EX_USAGE });
     }
     let dial = Dial {
-        proxy: &ProxyChoice::FromEnvironment,
-        trust,
+        way: podssh_ws::client::way(&ProxyChoice::FromEnvironment),
+        trust: trust.clone(),
         timeout: podssh_relay::open::CONNECT_TIMEOUT,
         answer: Some(shadowsocks::ANSWER_WAIT),
         silence_is_ready: false,

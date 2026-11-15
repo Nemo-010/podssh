@@ -14,7 +14,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "crates/podssh-ws/src/shadowsocks/**"
+      - "crates/podssh-ws/src/shadowsocks.rs"
+      - "crates/podssh-ws/Cargo.toml"
       - "crates/podssh-cli/src/shadowsocks/**"
       - "scripts/interop-outline.sh"
       - ".github/workflows/outline-interop.yml"

@@ -13,7 +13,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "crates/podssh-ws/src/trojan/**"
+      - "crates/podssh-ws/src/trojan.rs"
+      - "crates/podssh-ws/Cargo.toml"
       - "crates/podssh-cli/src/trojan/**"
       - "scripts/interop-trojan.sh"
       - ".github/workflows/trojan-interop.yml"

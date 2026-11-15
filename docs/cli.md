@@ -1249,7 +1249,7 @@ and `proxy`:
   show the password.
 - The AEAD form alone: `chacha20-ietf-poly1305`, `aes-256-gcm` and
   `aes-128-gcm`, written in podssh-ws with the ciphers of podssh's own TLS
-  (`crates/podssh-ws/src/shadowsocks/`): a salt, then chunks, each the
+  (`pod_egress::shadowsocks` of PodUtils/podcrates): a salt, then chunks, each the
   payload's length sealed on its own and the sealed payload; the master key
   by `EVP_BytesToKey` with MD5, each stream's key by HKDF-SHA1 with
   `ss-subkey`; the nonce a counter of 12 bytes, little-endian, that each seal
@@ -1289,12 +1289,12 @@ and `proxy`:
   `secret` and `endpoint`: `HOST:PORT`, a `websocket` with its `wss://` URL,
   or `first-supported` with its `options`, the first that podssh reads). A
   reader of the subset of YAML that the keys use
-  (`crates/podssh-ws/src/shadowsocks/yaml.rs`): block mappings and lists,
+  (`yaml.rs` of `pod_egress::shadowsocks`, PodUtils/podcrates): block mappings and lists,
   plain and quoted scalars, comments, anchors; flow collections, block
   scalars, tags and merge keys are refused by name. A salt's `prefix`, a
   WebSocket with an `endpoint` of its own, and Outline's other types are
   refused by name; the UDP part is not read.
-- Shadowsocks in a WebSocket (`crates/podssh-ws/src/shadowsocks/ws.rs`), as
+- Shadowsocks in a WebSocket (`ws.rs` of `pod_egress::shadowsocks`, PodUtils/podcrates), as
   outline-ss-server's listener `websocket-stream` serves it behind a TLS
   front: podssh's WebSocket to the `wss://` URL (TLS checked for its host,
   through `HTTPS_PROXY`), then the same stream in binary messages, as the
@@ -1316,7 +1316,7 @@ and `proxy`:
 Tested against `ssserver` and `sslocal` of shadowsocks-rust
 (`crates/podssh-cli/tests/shadowsocks_cli.rs`), and against a codec written
 from the specification with known answers that OpenSSL computed
-(`crates/podssh-ws/tests/shadowsocks.rs`). The access keys and the WebSocket are tested
+(`shadowsocks.rs` of the tests of `pod-egress`, PodUtils/podcrates). The access keys and the WebSocket are tested
 against a stand-in of outline-ss-server's listener in the same test, and
 against outline-ss-server's own release behind nginx by
 `scripts/interop-outline.sh` (`.github/workflows/outline-interop.yml`),
@@ -1390,7 +1390,7 @@ server as `ssh` does, `proxy` and `doctor`, which checks each:
   1 to 30 bytes, which is UUIDv5 of it under the zero namespace, as
   `XTLS/Xray-core:common/uuid/uuid.go` maps it. No message shows a line or an
   ID: a refusal names the line's number.
-- VLESS's request (`crates/podssh-ws/src/vless/header.rs`): the version 0,
+- VLESS's request (`header.rs` of `pod_egress::vless`, PodUtils/podcrates): the version 0,
   the ID's 16 bytes, no add-ons, the command TCP, the port, then the address
   (a type byte: 1 IPv4, 2 a name, 3 IPv6). The server's answer is the
   version and its add-ons, sent with the target's first bytes; a server that
@@ -1440,7 +1440,7 @@ server as `ssh` does, `proxy` and `doctor`, which checks each:
   key on `github.com:22` through it.
 
 Tested against stand-ins on the loopback, h2's own server for XHTTP and
-a stand-in of HTTP/1.1 alone (`crates/podssh-ws/tests/vless.rs`), and against Xray-core and shoes in
+a stand-in of HTTP/1.1 alone (`vless.rs` of the tests of `pod-egress`, PodUtils/podcrates), and against Xray-core and shoes in
 containers, through a plain squid as the host's proxy and behind nginx,
 which does not pass the upgrade (`scripts/interop-vless.sh`,
 `.github/workflows/vless-interop.yml`).

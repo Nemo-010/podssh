@@ -18,12 +18,12 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## Each podcrates take
 
-podssh pins every podcrates crate at `tag = "v0.51.0"` (COORD-105, PodUtils/podcrates#172; podssh's answer is
-COORD-077). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
+podssh pins every podcrates crate at `tag = "v0.52.0"` (COORD-106, PodUtils/podcrates#176; podssh's answer is
+COORD-079). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
 
 - Taken: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`,
   `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`, `pod-relay`,
-  `pod-transit`, `pod-acme`, `pod-piping`, `pod-opentunnel`, `pod-derp`, `pod-egress` (part 1) and `pod-warp` (`crates/podssh-warp` is its glue: podssh's way out, its proxy and its resolver). Work on them is done in PodUtils/podcrates (Rule Q3); podssh keeps the glue.
+  `pod-transit`, `pod-acme`, `pod-piping`, `pod-opentunnel`, `pod-derp`, `pod-egress` and `pod-warp` (`crates/podssh-warp` is its glue: podssh's way out, its proxy and its resolver). Work on them is done in PodUtils/podcrates (Rule Q3); podssh keeps the glue.
 - `v0.40.0` (taken 2026-11-13) brought the forms of the file hosts (COORD-053, #230, closed; T-738 reads
   `fetch-link-prefix` and `on-by-default`) and `pod-netstack`'s tests of T-599's cases (COORD-054, #231,
   closed; T-599 and T-771 name them).
@@ -58,7 +58,10 @@ COORD-077). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; 
   `acme/mod.rs` stay as glue; `piping/`, `opentunnel/` and `derp/` go whole.
 - `v0.51.0` (taken 2026-11-15) is step 2, part 1: `pod-egress` from podssh-ws at `2ffb7cd7` (via, the forwarders,
   Wisp, wstunnel, meek_lite, WebTunnel, Cloudflare's Access client), whose modules become glue files; and
-  `pod-quic`'s bound of a way's failed reads (COORD-075, #253; T-787 done). Parts 2 and 3 come in `v0.52.0`.
+  `pod-quic`'s bound of a way's failed reads (COORD-075, #253; T-787 done).
+- `v0.52.0` (taken 2026-11-15) is step 2, parts 2 and 3: VLESS, VMess's AEAD form, Trojan, Shadowsocks, EICE and
+  IAP leave podssh-ws for glue files (`vless.rs`, `vmess.rs`, `trojan.rs`, `shadowsocks.rs`, `eice.rs`, `iap.rs`);
+  `tests/vless_support/` and `trojan_support/` stay for the tests of the proxy nodes, Hysteria and TUIC.
 
 ## Open COORD issues
 
@@ -77,7 +80,7 @@ road). Each has a planted run that must fail, and each did.
 | Tox (T-734, done) | `tox-interop.yml` | passed; live through 205.185.115.131:443 |
 | Yggdrasil (T-735, done) | `ygg-interop.yml` | passed; live through a wss:// peer |
 | HyperDHT (T-736, done) | `hyperdht-interop.yml` | passed, run 43152296592 |
-| VMess's AEAD form (T-739, done) | `vmess-interop.yml` | passed, run 43178390705, against Xray-core v26.10.21 |
+| VMess's AEAD form (T-739, done) | PodUtils/podcrates:.github/workflows/vmess-interop.yml | passed, run 43178390705, against Xray-core v26.10.21 |
 | Syncthing's relays (T-571, done) | `strelay-interop.yml` | passed, run 43164842738, live through the pool on 443 |
 | The binary's proxy nodes (T-574, done) | `proxy-nodes-live.yml` | 8 of 8 nodes passed, run 43305389601, after #207 dropped two |
 | The proxy lists' round against Xray-core (T-574, done) | `proxy-lists-interop.yml` | passed (`9c9b706`) |
