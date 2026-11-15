@@ -98,7 +98,7 @@ item whenever it appears.
 7. **Then the open work by its order** (below): T-779 (partial: a copy through `serve NAME` that failed once, then four runs in four passed; it waits for the next failure); then T-598's run in the build image (T-251; T-772 and T-585 are done) (the
    `none` entries); then M10's P3 entries: T-566's and T-567's live runs, from `last-roads-live.yml` now that
    `v0.42.0` names their services; T-575, T-532 and T-622 (done); ntfy and the trackers as
-   meeting points are done on podcrates `v0.47.0`, and T-545 (Nostr) is blocked on COORD-070 (#247); T-777 (done, 2026-11-14). Each with its Prove, one entry at a time.
+   meeting points are done on podcrates `v0.47.0`, and Nostr's (done, on `v0.49.0`); T-777 (done, 2026-11-14). Each with its Prove, one entry at a time.
 8. **What waits on others, not tonight:** T-113's real sandbox (the operator's agents run
    `sh scripts/m5-in-sandbox.sh`), T-625 and T-665 (the throughput host's secrets), T-106
    (the operator's tailnet), T-755 (a tester's tunnel), T-319 and T-321's live runs and the build
@@ -136,7 +136,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 743 entries: 47 open, 32 partial, 12 blocked, 652 done.
+`TODO/INDEX.md` holds 743 entries: 47 open, 32 partial, 11 blocked, 653 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
@@ -168,7 +168,7 @@ operator interrupts it.
    2026-11-14: `v0.41.0`, with pod-term's mode that follows a termios (COORD-055, #232), which serve's tty with no pty drives (done);
    and `v0.42.0`, with the answers to COORD-057, 059, 061 and 062.
 4. The testers' defects, then their features (Q84, Q85): the defects first among the `none`
-   entries, P1 before any other; their features (T-545,
+   entries, P1 before any other; their features (those
    which Q74, Q75, Q77, Q78 and Q82 filed) by priority, beside
    M10. Between entries: the `none` entries, the highest priority first, but for the testers'.
    Dependabot's #123 waits for an iroh-dns that takes simple-dns 0.13.
@@ -221,7 +221,7 @@ parts are named so that the open ones read in their place):
    pub/sub networks (done), then what they filed: croc's relay as a road and a meeting point
    (done), WebTorrent's trackers (done), ZeroTier's relay (done), Tox's (done), Yggdrasil's
    peers (done), HyperDHT's road (done) and the public MQTT brokers as a meeting point (done),
-   and Nostr's meeting point (T-545, blocked on COORD-070); the other last fallbacks of Q78 (srv.us and tunnl.gg (done),
+   and Nostr's meeting point (done); the other last fallbacks of Q78 (srv.us and tunnl.gg (done),
    serv00's and HTTP Relay's demo (done), the onion services (done), and what the research of 2026-11-10 filed: file hosts as the last
    carrier (T-738), VMess's AEAD form (done) and Bare servers as a hop (T-740); srv.us and tunnl.gg
    done, serv00's done); and the roads over UDP (done: MASQUE over HTTP/3, Hysteria 2's and TUIC's). These are features of a tester's

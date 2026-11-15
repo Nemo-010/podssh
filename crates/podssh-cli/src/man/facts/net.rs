@@ -36,8 +36,14 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
           alone; no, or PODSSH_LAST_RESORT=no: none; unset or empty: the servers of podssh's list of services.",
     ),
     (
+        &["PODSSH_PAIR_NOSTR"],
+        "The public Nostr relays of the pairing by code (T-545), after the ntfy servers: the code's messages go \
+          as ephemeral events tagged from its nameplate, over a WebSocket on 443, after the third party's line. \
+          no, or PODSSH_LAST_RESORT=no: none; unset, empty or another word: the relays of podssh's list of services.",
+    ),
+    (
         &["PODSSH_PAIR_TRACKER"],
-        "The public WebTorrent trackers of the pairing by code (T-695), after the ntfy servers: the code's \
+        "The public WebTorrent trackers of the pairing by code (T-695), after the Nostr relays: the code's \
           messages go as offers and answers between the peers of a hash of its nameplate, after the third \
           party's line. Both trackers of podssh's list of services are in a filter list of piracy (hagezi's \
           anti.piracy), so a network that applies it refuses them; the facts filter-list, filter-list-part and \

@@ -22,8 +22,8 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## Each podcrates take
 
-podssh pins every podcrates crate at `tag = "v0.48.0"` (COORD-102, PodUtils/podcrates#162; podssh's answer is
-COORD-073). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
+podssh pins every podcrates crate at `tag = "v0.49.0"` (COORD-103, PodUtils/podcrates#163; podssh's answer is
+COORD-074). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
 
 - Taken: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`,
   `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`, `pod-relay`
@@ -55,12 +55,13 @@ COORD-073). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; 
   points of a code: podssh fills ntfy and the trackers (T-496, T-695); the Nostr relays wait for podcrates' fix
   (its entry 634, COORD-070), which comes in the tag after `v0.48.0` (T-545).
 - `v0.48.0` (taken 2026-11-15) changes `pod-guest` alone: the bump of the tag only.
+- `v0.49.0` (taken 2026-11-15) carries podcrates' entry 634, the fix of the run of a code over the Nostr relays
+  (COORD-070, closed): podssh fills `Ends::relays` (T-545 done).
 
 ## Open COORD issues
 
 | Issue | Waits for |
 | --- | --- |
-| #247 (COORD-070) | podcrates' fix of the run of a code over Nostr (its entry 634); then T-545 |
 | #248 (COORD-071) | podcrates' order of Q101's waves 3 and 4; then each tag, taken at once (T-684) |
 
 ## The live runs and interop harnesses

@@ -3926,8 +3926,8 @@ info` with `--relay-host` reads the order named, and `--json` has `relay_order` 
 - `crates/podssh-cli/src/relay_diag.rs:167-172`: `relay info` reads the order before it prints,
   and `--json` adds `relay_order` and `relay_list` (each `host` and `port`) beside `info`,
   `pool_order` and `signed_list`, which stay as they were.
-- The manual's note of `relay info` (`crates/podssh-cli/src/man/notes_relay.rs:90-102`) and of the
-  default list's rank (`:123-124`), `docs/cli.md` and `docs/relay.md` say the same; the interop
+- The manual's note of `relay info` (`crates/podssh-cli/src/man/notes_relay.rs:91-103`) and of the
+  default list's rank (`:124-125`), `docs/cli.md` and `docs/relay.md` say the same; the interop
   check `relay.info` (`scripts/interop-relay.sh`) greps the line of the measures with `relay rank`
   and the line of the order named.
 - Tests: `the_text_names_relay_rank_and_the_order_that_a_run_takes` (each of `rank`, `samples`,

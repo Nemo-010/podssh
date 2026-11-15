@@ -39,6 +39,10 @@ const FIRST: Duration = Duration::from_secs(10);
 /// The pause after a failed registration, doubled up to the longest.
 const PAUSE: Duration = Duration::from_secs(1);
 const PAUSE_MOST: Duration = Duration::from_secs(30);
+/// The first pause before asking again for an address that a pairing still
+/// holds; it doubles to [`IN_USE_MOST`] while the relay keeps saying so.
+const IN_USE_PAUSE: Duration = Duration::from_millis(250);
+const IN_USE_MOST: Duration = Duration::from_secs(5);
 
 /// One registration's wait for a client.
 type Opening = Pin<Box<dyn Future<Output = Result<Stream, Failure>> + Send>>;
@@ -57,12 +61,12 @@ fn opener(dial: Arc<dyn Dial>, gsr: Settings, secret: Secret) -> Opener {
 /// The registrations, one at a time, from `first` on: each client goes to
 /// `queue`, until the node ends it.
 async fn registrations(first: Opening, open: Opener, queue: mpsc::Sender<Visitor>, host: String, say: Say) {
-    let (mut pending, mut pause) = (Some(first), PAUSE);
+    let (mut pending, mut pause, mut in_use) = (Some(first), PAUSE, IN_USE_PAUSE);
     loop {
         let opening = pending.take().unwrap_or_else(|| open());
         match opening.await {
             Ok(stream) => {
-                pause = PAUSE;
+                (pause, in_use) = (PAUSE, IN_USE_PAUSE);
                 let peer = format!("the GSRN relay {host}");
                 if queue.send(Visitor { stream: Box::new(stream), peer }).await.is_err() {
                     return;
@@ -70,6 +74,12 @@ async fn registrations(first: Opening, open: Opener, queue: mpsc::Sender<Visitor
             }
             // The wait ended with no client: register again at once.
             Err(failure) if podssh_gsr::no_peer_yet(&failure) => {}
+            // The registration that a client just paired with holds the
+            // address a moment: ask again soon, and say nothing of it.
+            Err(failure) if podssh_gsr::address_in_use(&failure) => {
+                tokio::time::sleep(in_use).await;
+                in_use = (in_use * 2).min(IN_USE_MOST);
+            }
             Err(failure) => {
                 say(format!("the GSRN relay {host}: {}; registering again in {} s", failure.chain(), pause.as_secs()));
                 tokio::time::sleep(pause).await;

@@ -10416,6 +10416,14 @@ the road, which the node says. The live test is now `a_node_at_the_gsrn_relay_se
 of `crates/podssh-cli/tests/last_roads_live.rs` (the feature `gsr`, a secret of the run in a private file), a job of
 `last-roads-live.yml` with `--features gsr`, from GitHub Actions; it runs after the push.
 
+First live run from Actions, 2026-11-15 (`last-roads-live.yml` run 43661434700): the node registered at
+`j.gs.thc.org:443`, and `greet` passed through the road (the GSRN road answered in 1.3 s). The second session, the
+1 MiB down, failed: after the first pairing the relay answered the node's new registration "the address is in use
+(code 1)" a moment, the node paused 1 s and more, and the client gave up at its first "no peer is listening (code
+2)". Repaired: the node asks again for an address in use from 250 ms, doubling to 5 s, and says nothing of it; the
+client asks again where no peer listens, each 500 ms for 20 s (`podssh_gsr::nobody_listens`, `address_in_use`,
+their test `the_relay_s_status_1_and_2_are_told_apart`). The live job runs again after the push.
+
 # T-718: Access service-token headers from files on each WebSocket road
 
 **Source:** PodUtils/podcrates#35, cfb's ask A-C-04 (COORD-014, PodUtils/podcrates#38)

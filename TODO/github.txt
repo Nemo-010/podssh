@@ -252,7 +252,7 @@
 244 issue closed
 245 issue closed
 246 issue closed
-247 issue open
+247 issue closed
 248 issue open
 249 issue open
 250 issue closed

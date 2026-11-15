@@ -101,9 +101,18 @@ impl GsrRoads {
         }
         let dial = podssh_gsr::dialer(&podssh_ws::ProxyChoice::FromEnvironment);
         let role = podssh_gsr::Role::Connect;
-        let stream = podssh_gsr::open(&*dial, &self.settings, role, self.secret.expose(), LIMIT)
-            .await
-            .map_err(|failure| format!("the GSRN relay {host}: {}", failure.chain()))?;
+        // A node registers again after each pairing, so a second session can
+        // come between two registrations: no peer, then one, a moment later.
+        let started = tokio::time::Instant::now();
+        let stream = loop {
+            match podssh_gsr::open(&*dial, &self.settings, role, self.secret.expose(), LIMIT).await {
+                Ok(stream) => break stream,
+                Err(failure) if podssh_gsr::nobody_listens(&failure) && started.elapsed() < NOBODY_WAIT => {
+                    tokio::time::sleep(NOBODY_PAUSE).await;
+                }
+                Err(failure) => return Err(format!("the GSRN relay {host}: {}", failure.chain())),
+            }
+        };
         Ok(Road::Gsr(Box::new(stream)))
     }
 
@@ -120,3 +129,10 @@ impl GsrRoads {
 /// waits there (its status 2), else the node's `ACCEPT`.
 #[cfg(feature = "gsr")]
 const LIMIT: std::time::Duration = std::time::Duration::from_secs(30);
+/// How long a client asks again where no peer listens yet: a node's next
+/// registration after a pairing, and the relay's moment to free the address.
+#[cfg_attr(not(feature = "gsr"), allow(dead_code))]
+const NOBODY_WAIT: std::time::Duration = std::time::Duration::from_secs(20);
+/// The pause between two such asks.
+#[cfg_attr(not(feature = "gsr"), allow(dead_code))]
+const NOBODY_PAUSE: std::time::Duration = std::time::Duration::from_millis(500);

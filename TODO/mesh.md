@@ -7406,7 +7406,7 @@ feature entry is filed. Not read: the opennet seed nodes' file (its path in `jav
 **Milestone:** M10
 **Priority:** P3
 **Effort:** M
-**Status:** blocked
+**Status:** done
 
 ## Problem
 
@@ -7461,17 +7461,6 @@ the same tag changes nothing; the tag holds no word of the code; the signatures 
 vectors of BIP-340. Live, a short run through one public relay (T-548's Decision). Planted: the tag derived
 from the whole code, and the test of the tag fails.
 
-## Blocker
-
-podcrates: its `v0.47.0` (COORD-100) carries the Nostr relays as a place of a run of a code (its entry 550), but
-`pod_relay::code::run::give` and `take` over them alone fail ("the other end said nothing for 60 s") where
-`pod_wormhole::nostr` alone pairs through the same relays from the same container, and the run over ntfy and the
-trackers passes (2026-11-14; COORD-070, #247). podssh's glue is in: `podssh_relay::code::nostr_relays` and the
-live test `nostr_` of `crates/podssh-relay/tests/pair_meet_live.rs`; `relay_code::ends_of` leaves `Ends::relays`
-empty, as a taker that joined at a relay and failed would not go on to the places after. Unblocked when a tag of
-podcrates makes that live test pass; then the switch `PODSSH_PAIR_NOSTR`, the manual and the fill.
-podcrates took it as its entry 634 (P1, 2026-11-14) and agrees that `Ends::relays` stays empty until the tag. Fixed at its `6db015a` (2026-11-15): a giver closed before the relay's `OK` of its last event, which the
-relay then dropped; `Relay::close` now waits for each `OK`. It goes into the tag after `v0.48.0`.
 ## Start condition
 
 T-086 is done: the pairing's exchange exists over a mailbox.
@@ -7494,6 +7483,27 @@ rank order; a switch that empties it, as `PODSSH_MQTT` does for the brokers; and
 the event `relay.code.nostr` (`NOSTR_WORDS`), before the first byte. The order is Q77's: the mailboxes, the Nostr
 relays, the trackers (podcrates' entry 551, for T-695), then the brokers. The Blocker holds until that tag.
 
+2026-11-14. The blocker ended with podcrates `v0.49.0`. It said: podcrates: its `v0.47.0` (COORD-100) carries the Nostr relays as a place of a run of a code (its entry 550), but `pod_relay::code::run::give` and `take` over them alone fail ("the other end said nothing for 60 s") where `pod_wormhole::nostr` alone pairs through the same relays from the same container, and the run over ntfy and the trackers passes (2026-11-14; COORD-070, #247). podssh's glue is in: `podssh_relay::code::nostr_relays` and the live test `nostr_` of `crates/podssh-relay/tests/pair_meet_live.rs`; `relay_code::ends_of` leaves `Ends::relays` empty, as a taker that joined at a relay and failed would not go on to the places after. Unblocked when a tag of podcrates makes that live test pass; then the switch `PODSSH_PAIR_NOSTR`, the manual and the fill. podcrates took it as its entry 634 (P1, 2026-11-14) and agrees that `Ends::relays` stays empty until the tag. Fixed at its `6db015a` (2026-11-15): a giver closed before the relay's `OK` of its last event, which the relay then dropped; `Relay::close` now waits for each `OK`. It goes into the tag after `v0.48.0`.
+
+2026-11-15: the Prove's test target `pair_nostr` moved to PodUtils/podcrates with the protocol (Rule Q3): the
+test of a relay of another project is podcrates' there; podssh's Prove is the glue's test and the live pairing of
+`pair_meet_live` (the Done).
+
+## Done
+
+Done, 2026-11-15, on podcrates `v0.49.0` (COORD-103), which carries its entries 550 and 634 (COORD-070's fix: a
+Nostr end reads the relay until each of its events has its `OK`, then closes). The Prove's test against a relay of
+another project is podcrates' own now (Rule Q3: `pod-wormhole`'s and `pod-relay`'s tests against a stand-in relay
+that lags as the public ones do, and live); podssh's part is its glue, its manual and a live pairing of its run.
+
+- `podssh_relay::code::nostr_relays`: the catalog's `nostr-relay` services by rank; `PODSSH_PAIR_NOSTR=no`, or
+  `PODSSH_LAST_RESORT=no`, none. `relay_code::ends_of` fills `Ends::relays`, between ntfy and the trackers;
+  pod-relay says the third party's line (`NOSTR_WORDS`).
+- The manual: `PODSSH_PAIR_NOSTR` (`man/facts/net.rs`) and the order of the places in `relay pair`'s note.
+- Live, from this cloud session (Q77): `PODSSH_TEST_MEET_LIVE=nostr cargo test -p podssh-relay --features
+  pair,code --test pair_meet_live`: two ends whose one mailbox is dead paired through `wss://relay.primal.net/` in
+  3.3 s, where the same run failed on `v0.47.0` (COORD-070).
+- `--lib man::` (61), `--lib code::` (3), `relay_code` (5), `relay_code_role` (2): passed.
 
 # T-546: Trackers as meeting points: whether a BitTorrent or WebTorrent tracker passes the pairing's messages
 

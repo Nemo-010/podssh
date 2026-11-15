@@ -77,7 +77,8 @@ pub const RELAY: &[&str] = &[
      --pair-mailbox URLS or PODSSH_PAIR_MAILBOX names others, such as podssh relay serve's, and no turns \
      the pairing by code off. Both ends name the same ones. Where no mailbox answers, the ends meet at \
      the next place, in this order: a public ntfy server's topic of the code (PODSSH_PAIR_NTFY), a public \
-     WebTorrent tracker's peers (PODSSH_PAIR_TRACKER), then a public MQTT broker's topic (PODSSH_MQTT); a line names each third party \
+     Nostr relay's ephemeral events (PODSSH_PAIR_NOSTR), a public WebTorrent tracker's peers \
+     (PODSSH_PAIR_TRACKER), then a public MQTT broker's topic (PODSSH_MQTT); a line names each third party \
      before its first byte, and the pairing's proof keeps the messages secret from it.",
     "podssh relay spec reads the relay's /health and its published document, /llms-full.txt, and checks \
      the document against the facts that podssh was built with (see RELAY FACTS). It prints ok, with the \

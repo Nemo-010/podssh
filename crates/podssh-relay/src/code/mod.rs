@@ -72,6 +72,8 @@ fn no(value: Option<&str>) -> bool {
 /// `no` gives the pairing no ntfy server; an `https://` URL names one in
 /// place of the public ones (T-496).
 pub const NTFY_ENV: &str = "PODSSH_PAIR_NTFY";
+/// `no` gives the pairing no Nostr relay (T-545).
+pub const NOSTR_ENV: &str = "PODSSH_PAIR_NOSTR";
 /// `no` gives the pairing no WebTorrent tracker (T-695).
 pub const TRACKER_ENV: &str = "PODSSH_PAIR_TRACKER";
 
@@ -102,9 +104,7 @@ fn sockets(kind: &str, endpoint: &str, env: Option<&str>, last_resort: Option<&s
 }
 
 /// The public Nostr relays, after the ntfy servers (T-545, the operator's
-/// ruling Q77): the services of the kind `nostr-relay`, by their rank. A
-/// pairing takes them once pod-relay's run of a code passes over them; its
-/// switch comes with them.
+/// ruling Q77): the services of the kind `nostr-relay`, by their rank.
 pub fn nostr_relays(env: Option<&str>, last_resort: Option<&str>) -> Vec<WsUrl> {
     sockets("nostr-relay", "relay", env, last_resort)
 }

@@ -254,13 +254,12 @@ pub(crate) fn ends_of(
     let var = |name: &str| std::env::var(name).ok();
     let last = var("PODSSH_LAST_RESORT");
     ends.brokers = code::brokers(var(code::MQTT_ENV).as_deref(), last.as_deref());
-    // Then the places of T-496 and T-695, in pod-relay's order: the
-    // mailboxes, ntfy, the trackers, the brokers. No probe of the upgrade
-    // runs before a pairing (rule 2): ntfy then comes after the mailboxes,
-    // as where the upgrade passes. Not yet the Nostr relays (T-545): a run
-    // of a code over them fails where a pairing through them alone passes,
-    // and a taker that joined at a relay would not go on to the places after.
+    // Then the places of T-496, T-545 and T-695, in pod-relay's order: the
+    // mailboxes, ntfy, the Nostr relays, the trackers, the brokers. No probe
+    // of the upgrade runs before a pairing (rule 2): ntfy then comes after
+    // the mailboxes, as where the upgrade passes.
     ends.ntfy = code::ntfy_servers(var(code::NTFY_ENV).as_deref(), last.as_deref()).map_err(Refusal::config)?;
+    ends.relays = code::nostr_relays(var(code::NOSTR_ENV).as_deref(), last.as_deref());
     ends.trackers = code::trackers(var(code::TRACKER_ENV).as_deref(), last.as_deref());
     Ok(ends)
 }

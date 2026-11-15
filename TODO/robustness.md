@@ -2524,6 +2524,15 @@ It passed each gate of the six before this one. It waits for its next failure, a
 
 The next gate, at `213968e` (run 43621390272, 2026-11-14), passed the step whole, its iroh road after a new address among them.
 
+A third time, on 2026-11-15, at `2ffb7cd` (podcrates `v0.48.0`, run of the gate after 43661427667's push): a
+third test of the step, `the_layer_survives_a_stall_of_3_minutes`, did not end within 600 s. The client said "the
+link failed: nothing came from the far end for 30 s; resuming the session", then "the session resumed after
+190.7 s, 753664 bytes sent again", and nothing after; the node's lines end at "came in, by the door". So three
+shapes now, each a session of the layer that stops moving and never ends: with no fault (`f9e12b3`), the iroh road
+after a new address (`02c0cf3`), and after the resume that followed a stall (`2ffb7cd`). Next: run this test here
+until it fails, with the layer's lines at their most (`-v` and the node's), and read which end holds the bytes after
+the resume: the replay of 736 KiB that the client sent again, or the node's acknowledgement of it.
+
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes
 
 **Source:** the live job of T-565 in `last-roads-live.yml` (runs 42989086142, 42994885604 and 43560494966).

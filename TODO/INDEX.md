@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**743 entries: 47 open, 32 partial, 12 blocked, 652 done.**
+**743 entries: 47 open, 32 partial, 11 blocked, 653 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 3 | 4 | 3 | 75 | 85 |
 | P2 | 8 | 19 | 2 | 279 | 308 |
-| P3 | 36 | 9 | 7 | 297 | 349 |
-| **All** | 47 | 32 | 12 | 652 | 743 |
+| P3 | 36 | 9 | 6 | 298 | 349 |
+| **All** | 47 | 32 | 11 | 653 | 743 |
 
 ## Entries
 
@@ -592,7 +592,7 @@ repository and CI).
 | [T-542](mesh.md) | P3 | M | M10 | research | done | HyperDHT: whether Holepunch's DHT and its relays reach a podssh end by its key |
 | [T-543](mesh.md) | P3 | S | M10 | research | done | Cabal: whether it adds a carrier or a meeting point beyond HyperDHT |
 | [T-544](mesh.md) | P3 | S | M10 | research | done | Hyphanet: whether a podssh end can use it with no node of its own |
-| [T-545](mesh.md) | P3 | M | M10 | feature | blocked | Nostr's ephemeral events as a meeting point of the pairing by a short code |
+| [T-545](mesh.md) | P3 | M | M10 | feature | done | Nostr's ephemeral events as a meeting point of the pairing by a short code |
 | [T-546](mesh.md) | P3 | S | M10 | research | done | Trackers as meeting points: whether a BitTorrent or WebTorrent tracker passes the pairing's messages |
 | [T-547](mesh.md) | P3 | M | M10 | research | done | The pub/sub networks and the public MQTT brokers, as carriers or meeting points |
 | [T-548](mesh.md) | P2 | L | M10 | feature | done | Pinggy as a last fallback of the reverse road: SSH inside TLS on 443, and a TLS tunnel that ends at the node |

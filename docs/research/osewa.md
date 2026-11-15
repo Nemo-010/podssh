@@ -67,6 +67,24 @@ section:
 
 `feel-netem.yml` runs osewa v0.1.5 since 2026-11-15.
 
+**Measured on 2026-11-15** (`feel-netem.yml` run 43661468065, `ubuntu-24.04`, podssh of the gate's build of
+`568f9b2` (it says `1.1.0-beta.3`, the version of the tree), osewa v0.1.5, `tc netem` on the loopback): a key's
+echo beside a download (p50, and p95 where it tells), and the cold connect (p50):
+
+| Link | OpenSSH | podssh `--direct` | osewa (QUIC) | osewa (WebSocket) |
+| --- | --- | --- | --- | --- |
+| far, 120 ms | 339.7 ms; connect 1,602 ms | 121.1 ms; 1,013 ms | 183.7 ms; 366 ms | 146.6 ms; 725 ms |
+| cellular, 60 ms | 1,679.6 ms; 886 ms | 81.6 ms; 535 ms | 142.1 ms; 191 ms | 82.3 ms; 367 ms |
+| wifi, 20 ms | 629.5 ms; 402 ms | 51.3 ms; 212 ms | 90.2 ms; 67 ms | 87.3 ms; 124 ms |
+| slow, 100 ms, 1% loss | 3,615.0 ms; 1,421 ms | 300.3 ms (p95 1,760); 885 ms | 226.3 ms; 369 ms | 156.4 ms (p95 291); 634 ms |
+
+The download while typing on the far link: OpenSSH 5.7 MiB/s, podssh 3.0, osewa 5.6 and 5.5.
+
+The reading: podssh's echo beside a download is now nearer the idle echo than osewa's best on the far, cellular
+and wifi links, and 3 to 12 times nearer than OpenSSH's on each link; on the slow lossy link osewa's WebSocket is
+ahead, at the p95 most (T-681's queue under loss). osewa's cold connect is 2.4 to 3.2 times faster on each link,
+and its download while typing on the far link nearly twice podssh's (T-670). These are the gaps left.
+
 ## 3. The entries, in their order (Q99: ahead of the rest of M10)
 
 - T-660 (P2, M): What a user feels, measured on each road: a key's echo while a download runs, a cold connect and its first command, a bulk copy while one types.

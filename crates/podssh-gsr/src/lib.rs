@@ -92,6 +92,20 @@ pub fn no_peer_yet(failure: &Failure) -> bool {
     failure.class == Class::Timeout && failure.stage == Stage::Relay
 }
 
+/// Whether the relay answered that no peer listens for the secret (status
+/// 2): a node between two registrations, which a client meets again a
+/// moment later.
+pub fn nobody_listens(failure: &Failure) -> bool {
+    failure.class == Class::Unavailable && failure.text().contains("(code 2)")
+}
+
+/// Whether the relay answered that the address is in use (status 1): the
+/// registration that a client just paired with still holds it, a moment
+/// after the pairing.
+pub fn address_in_use(failure: &Failure) -> bool {
+    failure.text().contains("(code 1)")
+}
+
 /// A secret that nobody holds, of 24 hex digits, whose address is on the
 /// shard of `like` when one is given: a probe of the relay that reaches the
 /// shard of the user's own secret, and pairs with nobody.
@@ -126,9 +140,7 @@ pub async fn round_trip(
     match open(dial, settings, Role::Connect, &secret, limit).await {
         // Status 2 alone: a relay that closed the connection is Unavailable
         // too, with no answer.
-        Err(failure) if failure.class == Class::Unavailable && failure.text().contains("(code 2)") => {
-            Ok(started.elapsed())
-        }
+        Err(failure) if nobody_listens(&failure) => Ok(started.elapsed()),
         Err(failure) => Err(failure.chain()),
         // Nobody holds the secret: a peer here would be a defect of the relay.
         Ok(_) => Err("a peer answered a secret that nobody holds".into()),
@@ -150,6 +162,17 @@ pub async fn idle_holds(dial: &dyn Dial, settings: &Settings, hold: Duration) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_relay_s_status_1_and_2_are_told_apart() {
+        let nobody = Failure::new(Stage::Relay, Class::Unavailable, "no peer is listening for this secret (code 2)");
+        let in_use =
+            Failure::new(Stage::Relay, Class::Unavailable, "the relay says that the address is in use (code 1)");
+        assert!(nobody_listens(&nobody) && !address_in_use(&nobody));
+        assert!(address_in_use(&in_use) && !nobody_listens(&in_use));
+        let closed = Failure::new(Stage::Relay, Class::Unavailable, "the relay closed the connection");
+        assert!(!nobody_listens(&closed) && !address_in_use(&closed));
+    }
 
     #[test]
     fn the_host_of_a_secret_is_its_shard_of_the_data_file_s_domain() {
