@@ -311,10 +311,11 @@ and num-bigint 0.5) are T-754.
 | #245 | COORD-068: podssh took podcrates v0.45.0 at 16d53cb (to podcrates) | closed 2026-11-14: podcrates recorded the take of `v0.45.0` | T-684 |
 | #246 | COORD-069: podssh took podcrates v0.46.0 at 5ac90a3 (to podcrates) | closed 2026-11-14: podcrates recorded the take of `v0.46.0` | T-684 |
 | #247 | COORD-070: pod-relay's run of a code fails over Nostr alone, though pod-wormhole's nostr pairs (to podcrates) | closed 2026-11-15: fixed in podcrates `v0.49.0` (its entry 634), taken by podssh | T-545 |
-| #248 | COORD-071: fast-track T-684: Q101's waves 3 and 4, the crates that still live in podssh (to podcrates) | open (2026-11-15: podcrates fast-tracked it; the first five modules frozen at `b9c04657`) | T-684 |
+| #248 | COORD-071: fast-track T-684: Q101's waves 3 and 4, the crates that still live in podssh (to podcrates) | open (2026-11-15: podcrates fast-tracked it; step 1 frozen at `b9c04657`, step 2 at `2ffb7cd7`, podssh's answer on its glue in the body) | T-684 |
 | #249 | Testers' guide: v1.1.0-beta.4 (in preparation) | open (2026-11-15: posted; updated when the beta is tagged) | T-446 |
 | #250 | COORD-072: podssh took podcrates v0.47.0 at 568f9b2 (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.47.0` | T-684 |
 | #251 | COORD-073: podssh took podcrates v0.48.0 at 3e7c5a2 (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.48.0` | T-684 |
+| #252 | COORD-074: podssh took podcrates v0.49.0 at a99de1d (to podcrates) | open (2026-11-15: posted) | T-545, T-684 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,

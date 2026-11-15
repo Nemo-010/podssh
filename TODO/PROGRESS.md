@@ -49,7 +49,9 @@ Read on 2026-11-13.
    COORD issue): `crates/podssh-relay/src/transit/` (not `link.rs`) for `pod-transit`,
    `crates/podssh-cli/src/acme/` for `pod-acme`, `crates/podssh-relay/src/piping/` for `pod-piping`,
    `crates/podssh-relay/src/opentunnel/` for `pod-opentunnel` and `crates/podssh-relay/src/derp/` for
-   `pod-derp`: one tag. Then `pod-egress`; then `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
+   `pod-derp`: one tag (`v0.50.0`). **Frozen from 2026-11-15 too** (step 2, at podssh's `2ffb7cd7`), for
+   `pod-egress`: `crates/podssh-ws/src/` `via/`, `forwarder/`, `wstunnel/`, `wisp/`, `meek.rs`, `meek/`,
+   `webtunnel.rs`, `pt.rs`, `cloudflare.rs`, `vless/`, `vmess/`, `trojan/`, `shadowsocks/`, `eice/` and `iap/`. Then `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
    `pod-relay-serve` last.
 8. **Drafts.** In work: none. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
    T-118's, T-117's, T-114's, T-112's,
