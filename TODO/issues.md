@@ -333,6 +333,7 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |
+| #270 | COORD-083: a watcher of each repository's Actions runs, so that no session waits in the dark for a run (to all) | open 2026-11-15: offers `scripts/agent/watch-runs.py` at `cc0caa2` to each session | T-684 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,
