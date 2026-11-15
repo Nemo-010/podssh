@@ -83,13 +83,38 @@ def ms(seconds):
     return round(seconds * 1000, 1)
 
 
+class Stamped:
+    """The child's stderr into `err`, each line after the seconds since the
+    round's start, with the cut and the return on the same clock: a `-v`
+    line is read against the cut's end (T-789)."""
+
+    def __init__(self, proc, err):
+        self.t0, self.lock = time.monotonic(), threading.Lock()
+        self.sink = open(err, "ab")
+        self.thread = threading.Thread(target=self.pump, args=(proc.stderr,), daemon=True)
+        self.thread.start()
+
+    def line(self, text):
+        with self.lock:
+            self.sink.write(f"{time.monotonic() - self.t0:9.3f} {text}".encode(errors="replace"))
+            self.sink.flush()
+
+    def pump(self, stream):
+        for raw in iter(stream.readline, b""):
+            self.line(raw.decode(errors="replace").rstrip("\n") + "\n")
+
+    def close(self):
+        self.thread.join(5)
+        self.sink.close()
+
+
 def one_round(argv, env, cut, err, cut_s=CUT_S, burst=BURST, pause=PAUSE_S):
     """One session through `argv` + the far command; `cut(on)` cuts and
     restores the link. Its figures, or an `error`."""
     got = {"exit": None, "error": None}
-    with open(err, "ab") as errors:
-        proc = subprocess.Popen(argv + [far_command(burst, pause)], stdin=subprocess.DEVNULL,
-                                stdout=subprocess.PIPE, stderr=errors, env=env)
+    proc = subprocess.Popen(argv + [far_command(burst, pause)], stdin=subprocess.DEVNULL,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    stamped = Stamped(proc, err)
     reader, cut_on = Reader(proc), False
     try:
         if not reader.wait(lambda: reader.ready is not None, READY_LIMIT):
@@ -98,10 +123,12 @@ def one_round(argv, env, cut, err, cut_s=CUT_S, burst=BURST, pause=PAUSE_S):
         began = time.monotonic()
         cut(True)
         cut_on = True
+        stamped.line("feel: the cut begins\n")
         time.sleep(cut_s)
         up = time.monotonic()
         cut(False)
         cut_on = False
+        stamped.line("feel: the link is back\n")
         leaked = reader.bytes_between(began + GRACE_S, up)
         got["leaked_bytes"] = leaked
         got["held"] = leaked == 0
@@ -123,6 +150,7 @@ def one_round(argv, env, cut, err, cut_s=CUT_S, burst=BURST, pause=PAUSE_S):
             got["exit"] = proc.wait()
             got["error"] = got["error"] or f"no exit within {EXIT_LIMIT:.0f} s of END"
         reader.thread.join(5)
+        stamped.close()
     if got["exit"] != 0 and got["error"] is None:
         got["error"] = f"exit {got['exit']}"
     return got
@@ -178,6 +206,9 @@ def cell(bench, road, links, osewa_road):
         # the role's own leg uses; the name of `bench.road` is the loopback.
         env = bench.env(PODSSH_RELAY_ADDR="relay-a.test=127.0.0.1")
         ports = [bench.role_port]
+        # The layer's lines (each spare link, each resume) in ROAD.outage.err,
+        # to read against the cut's end (T-789).
+        argv = argv[:2] + ["-v"] + argv[2:]
     doc = measure(road, argv, env, netem_cut(links, ports), bench.out / f"{road}.outage.err")
     with open(bench.out / f"{road}.outage.json", "w", encoding="utf-8") as f:
         json.dump(doc, f, indent=1)

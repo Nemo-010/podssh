@@ -4266,7 +4266,7 @@ repair: the guard moved from `tries` into `layer_alive::apply`, as rustfmt took 
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -4297,4 +4297,12 @@ osewa does not, but it loses about 12 s where a link that redials at once would 
 
 `feel-netem.yml` with `shapes=outage` and `roads=role`, from Actions: the first byte within 2 s of the return in
 each round, and T-781's tunnels of HTTP still make progress (`last-roads-live.yml`).
+
+## Done
+
+Partial, 2026-11-15. Step 1's tool: `feel_outage.py` runs the role's road with `-v`, and writes each line of the
+child's stderr after the seconds since the round's start, with "feel: the cut begins" and "feel: the link is back" on
+the same clock (`Stamped`). Here, with a stand-in cut that does nothing: the layer's lines ("opened resumable session",
+its heartbeat) and the two marks, stamped, in `role.outage.err`; `--self-test` passed. UNVERIFIED: the run from
+Actions (`feel-netem.yml`, `shapes=outage`, `roads=role`) and what its lines show of the spares.
 

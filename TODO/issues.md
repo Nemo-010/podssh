@@ -322,6 +322,7 @@ and num-bigint 0.5) are T-754.
 | #256 | `[gh action] requested`: the netem labs of T-665 and T-625, and T-786's error files | closed 2026-11-15: iroh-ab 43691396393 and wisp-rate 43691399331 passed, T-786's error files read | T-665, T-625, T-786 |
 | #257 | `[gh action] requested`: the gate on `main` after T-665's default | closed 2026-11-15: the gate passed (run 43704942887, `6732178`) | T-665 |
 | #258 | `[gh action] requested`: T-786's outage cell with the role's road | closed 2026-11-15: run 43709370293 read (T-786 done, T-789 filed) | T-786, T-789 |
+| #259 | `[gh action] requested`: T-789's outage cell of the role's road with `-v` | open 2026-11-15: waits for the owner's agent | T-789 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,
