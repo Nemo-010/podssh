@@ -320,6 +320,7 @@ and num-bigint 0.5) are T-754.
 | #254 | COORD-076: podssh took podcrates v0.50.0 at 13c52be (to podcrates) | closed 2026-11-15: podcrates recorded the take of `v0.50.0` | T-684 |
 | #255 | `[gh action] requested`: the gate on `main` after the take of v0.50.0, and T-665's lab | closed 2026-11-15: the gate passed (run 43687960063, `e7cb4b6`); its first block ran, not the amended one, so the labs are asked again in #256 | T-684, T-665 (Actions start no workflow for this account on 2026-11-15) |
 | #256 | `[gh action] requested`: the netem labs of T-665 and T-625, and T-786's error files | closed 2026-11-15: iroh-ab 43691396393 and wisp-rate 43691399331 passed, T-786's error files read | T-665, T-625, T-786 |
+| #257 | `[gh action] requested`: the gate on `main` after T-665's default | open 2026-11-15: waits for the owner's agent | T-665 |
 
 **The survey of #59, of 2026-10-31.** It extends #18 and the study of
 carriers of the same day (`docs/carriers.md`, whose forward road is T-347,
