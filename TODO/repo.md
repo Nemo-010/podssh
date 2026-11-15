@@ -5873,7 +5873,9 @@ sync, and changes no other crate. podssh turns the sync on: `issue_rules = "on"`
 `.github/workflows/issue-sync.yml` calls podcrates' workflow at `v0.56.0`. On `v0.55.0`: `cargo clippy --workspace
 --all-targets` clean, `cargo test --workspace --no-fail-fast` 3837 passed, 0 failed, 82 ignored; on `v0.56.0`, whose
 only change of code is `pod-todo`: clippy clean, `cargo test -p podssh-todo` passed, `cargo todo check` agrees with the
-rules on.
+rules on. `v0.57.0` (`0d6421c0`, the same issue) changes only podcrates' `issue-sync.yml`, which builds `pod-todo`
+outside the caller's workspace (podcrates T-724): podssh's workflow calls it at `v0.57.0`, and the crates stay pinned
+at `v0.56.0`, whose code is the same.
 
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.
