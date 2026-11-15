@@ -18,6 +18,11 @@ Windows.
 
 The two studies agree.
 
+- **A cut of 15 s, measured (2026-11-15, T-786, `feel-netem.yml` run 43709370293):** osewa v0.1.5
+  ends its session at the cut on both carriers ("no pong in 10s"); podssh's resumable layer outlives it,
+  first byte 12.5 to 12.7 s after the link's return, which T-789 shortens; OpenSSH and podssh `--direct`
+  over plain TCP come back in 0.4 to 0.8 s, or about 12 s when TCP's retransmission has backed off.
+
 - **Reachability: podssh is far ahead.** osewa has no proxy client (no CONNECT, no SOCKS, no
   `HTTPS_PROXY`: its dial is a plain TCP connect), no relay, no NAT traversal, no port 443, no DNS
   fallback and no reverse road. Since v0.1.2 it reaches a host behind a bastion (`login --via-ssh`, below). It needs an

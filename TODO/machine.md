@@ -2275,7 +2275,7 @@ kex), `crates/podssh-ssh/src/kex_first.rs` (the record, `kex-first.txt` of the c
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -2302,6 +2302,12 @@ python3 scripts/feel-matrix.py target/debug/podssh --roads direct --shapes outag
 ```
 
 `feel-netem.yml` with the cell, from Actions. Planted: the cut left out, and the cell's check of the cut fails.
+
+## Correction
+
+2026-11-15. Approach 1 names a node for the resumable layer; the cell runs the relay role's road instead. A node's leg
+to the role is on the role's port, which the cut must close for the client, so a cut by port would cut both legs; the
+role's own leg to the sshd is on the sshd's port, which stays up. The layer is the same (`pod-session`).
 
 ## Done
 
@@ -2336,8 +2342,17 @@ stays up), and `feel-matrix.py` runs `role` with `--links netem` for the outage 
 given); a node's road stays out, as its leg to the role is on the cut port too. Its plumbing here, with a stand-in cut
 that does nothing (this kernel has no netem): the cut was asked on the role's port alone (not the sshd's), the burst of
 20 MiB crossed the role, and the cell failed as it must, "the cut did not hold: 20971525 bytes arrived during it".
-`python3 -I scripts/feel_outage.py --self-test`: passed. UNVERIFIED: `feel-netem.yml` with `shapes=outage` and
-`roads=openssh,direct,role,osewa-quic,osewa-ws`.
+`python3 -I scripts/feel_outage.py --self-test`: passed.
+
+2026-11-15, done. `feel-netem.yml` run 43709370293 (`shapes=outage`, `roads=openssh,direct,role,osewa-quic,osewa-ws`,
+podssh of the gate's run 43704942887 at `6732178`, osewa v0.1.5; asked by #258), each cut of 15 s held, first byte and
+catch-up after the return, two rounds: OpenSSH 773.9 and 919.3 ms, 430.4 and 582.5 ms; podssh `--direct` 507.8 and
+787.7 ms, 11,721.8 and 11,968.6 ms (TCP's backed-off retransmission); podssh's resumable layer on the role's road
+12,676.9 and 14,106.6 ms, 12,523.2 and 13,506.0 ms; osewa-quic and osewa-ws ended each session at the cut ("no pong in
+10s"; 6 bytes, no END within 180 s), so the run's own exit is 1 by design of the cell. The layer outlives a cut that
+osewa does not, and is about 12 s late after it: that gap is T-789. The result is in `docs/research/osewa.md` (its
+section 2) and `docs/STATUS.md`. The run is the Prove's `feel-netem.yml` with the cell; the planted cut that leaks is
+the self-test's (6 checks).
 
 # T-787: A QUIC socket whose reads keep failing must not spin a core
 

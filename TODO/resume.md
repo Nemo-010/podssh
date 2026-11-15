@@ -4258,3 +4258,43 @@ repair: the guard moved from `tries` into `layer_alive::apply`, as rustfmt took 
 - Measured: `cargo +1.99 test -q -p podssh-cli --test cloudflare_layer_alive`: `test result: ok. 5
   passed`, 0.5 s, three runs in a row. Planted (`decide` answers `Keep` where it answered `Warn`): the
   first test fails, the other four pass; reverted.
+
+# T-789: The resumable layer comes back about 12.5 s after a cut of 15 s ends, where TCP alone can in under 1 s
+
+**Source:** T-786's outage cell (`feel-netem.yml` run 43709370293, #258).
+**Category:** defect
+**Milestone:** M10
+**Priority:** P2
+**Effort:** S
+**Status:** open
+
+## Problem
+
+After a cut of the client's leg of 15 s (netem at 100% loss), a session on the relay role's road with the
+resumable layer gave its first byte 12.7 and 12.5 s after the link's return, and caught up 14.1 and 13.5 s after
+it. OpenSSH over plain TCP in the same cell gave its first byte 0.77 and 0.43 s after the return; podssh
+`--direct`, 0.51 s once and 11.7 s once (TCP's backed-off retransmission). The layer survives the cut, which
+osewa does not, but it loses about 12 s where a link that redials at once would lose a round trip.
+
+## Premise
+
+- The spare link of T-305 opens one spare each 10 s at most, after 3 s with nothing from the far end while bytes
+  wait (T-305's Decision); since podcrates `v0.45.0` the wait doubles after a spare that moved no byte (podcrates
+  T-579, COORD-065, T-781). During a cut each spare moves no byte, so the waits grow, and the first spare after
+  the return can come seconds after it. Not yet read: the cell's runs had no `-v`, so the spares' times are
+  inferred, not seen.
+
+## Approach
+
+1. Read the times: the outage cell with `-v` for the role's road (feel_outage passes it to podssh), from
+   Actions, and the spares' lines against the cut's end.
+2. If the doubled wait is the cause: ask podcrates by a COORD issue for a spare whose dial did not connect at all
+   (no TCP answer, no TLS) to keep the short wait, so that the doubling stays for a spare that connected and moved
+   nothing (T-781's case); `pod-session` is podcrates' (Rule Q3). Take the tag, and run the cell again.
+3. The target: the first byte within 2 s of the return, both rounds.
+
+## Prove
+
+`feel-netem.yml` with `shapes=outage` and `roads=role`, from Actions: the first byte within 2 s of the return in
+each round, and T-781's tunnels of HTTP still make progress (`last-roads-live.yml`).
+

@@ -80,8 +80,9 @@ commits after it are pushed with this note. For the next session, in order:
 3. COORD-075 (#253, T-787, blocked): when podcrates fixes `pod-quic`, take the tag and un-ignore
    `crates/podssh-relay/tests/quic_socket_fails.rs`.
 4. The netem labs: T-665 and T-625 are done (2026-11-15, runs 43691396393 and 43691399331: `tuned` is the iroh
-   road's default; the Wisp road holds the demo server's bound each way). T-786 is partial: osewa's cells got no
-   END in run 43670350662, as osewa closed each session at the cut ("no pong in 10s"); its entry names the step.
+   road's default; the Wisp road holds the demo server's bound each way). T-786 is done (run 43709370293): the
+   resumable layer outlives a cut of 15 s that osewa does not, but comes back about 12.5 s after it; T-789 (P2,
+   open) reads the spares' times with `-v` and asks podcrates for a quicker spare after a dial that never connected.
 5. T-780 and T-788 wait for their next failure; then `v1.1.0-beta.4` after T-684, and update the testers' guide #249.
 
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
@@ -147,7 +148,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 743 entries: 44 open, 30 partial, 12 blocked, 657 done.
+`TODO/INDEX.md` holds 744 entries: 45 open, 29 partial, 12 blocked, 658 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
