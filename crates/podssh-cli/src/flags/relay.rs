@@ -217,7 +217,7 @@ pub const DOCTOR_FLAGS: &[FlagRow] = &[
     // The Dev Tunnels road (T-755).
     row(None, "devtunnel", Some("TUNNEL"), FlagKind::Supported,
         "also check TUNNEL[:PORT] of Microsoft Dev Tunnels (a name, or ID.CLUSTER; port 22 by default) with the \
-         token of PODSSH_DEVTUNNEL_TOKEN_FILE: the management API, the relay's WebSocket, its SSH and a channel to \
+         token of PODSSH_DEVTUNNEL_TOKEN_FILE, the access token of PODSSH_DEVTUNNEL_ACCESS_FILE, or none: the management API, the relay's WebSocket, its SSH and a channel to \
          the port, whose first bytes it reads; a failure names its stage; in a build with the feature devtunnel", None),
     // The exit of the net, and one session from it (T-458).
     row(None, "exit", Some("NAME"), FlagKind::Supported,

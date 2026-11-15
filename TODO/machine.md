@@ -2321,6 +2321,8 @@ Partial, 2026-11-15 (main session).
   own leg to the sshd).
 - UNVERIFIED: the run in `feel-netem.yml` with `shapes=outage`; this host's kernel has no netem.
 
+2026-11-15, the first run (`feel-netem.yml`, run 43670350662, `shapes=outage`, podssh of the gate's artifact of `a99de1d`, osewa v0.1.5): each cut held. OpenSSH: first byte 533.8 ms and caught up 612.4 ms after the return in round 1, 11,815.2 and 11,903.1 ms in round 2; podssh `--direct`: 11,884.1 and 11,982.4 ms, then 11,920.3 and 12,011.6 ms (TCP's backed-off retransmission timer). osewa-quic and osewa-ws failed: 6 bytes (READY) and no END within 180 s of the return, both rounds; whether osewa exec stops at the cut or the cell's `osewa exec feel -- sh -c` is wrong is not known yet. Next: read the cells' `.outage.err` in the run's artifact; then compare with podssh's resumable layer, which the netem matrix cannot run (a node).
+
 # T-787: A QUIC socket whose reads keep failing must not spin a core
 
 **Source:** the re-reading of osewa on 2026-11-15 (osewa v0.1.5, `24058a3`).
@@ -2328,7 +2330,7 @@ Partial, 2026-11-15 (main session).
 **Milestone:** M10
 **Priority:** P3
 **Effort:** S
-**Status:** open
+**Status:** blocked
 
 ## Problem
 
@@ -2355,4 +2357,13 @@ cargo test -p podssh-relay --features quic quic_socket_fails
 ```
 
 Planted: the bound of empty reads left out, and the test of the CPU fails.
+
+## Blocker
+
+PodUtils/podcrates (COORD-075): `pod-quic`'s socket must bound a way's failed reads.
+
+## Correction
+
+2026-11-15 (main session). The defect is real. noq 1.4.0's receive loop (`endpoint.rs`, `poll_socket`) answers ECONNRESET and EMSGSIZE with `continue`, before its work limiter. `pod-quic`'s `DatagramSocket::poll_recv` passes each error of the way through. So a way that fails each read so pins a worker for ever, holding the endpoint's lock, and even a drop of the endpoint hangs. `crates/podssh-relay/tests/quic_socket_fails.rs` (`--features quic`): 19,971,985 failed reads and 2.998 s of CPU in 3 s. It is `#[ignore]` with its reason until podssh takes the tag with the fix; then it runs, and its plant is the bound left out. The fix is podcrates': in `pod-quic`, count failed reads in a row in `DatagramSocket` (and a wrapper of the system socket of `on_socket`), and past a bound (osewa: 256) give an error that noq does not skip, so the driver ends and the caller redials. iroh's own socket is iroh's.
+
 

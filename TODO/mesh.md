@@ -11419,7 +11419,7 @@ roads, and a carrier must be one of them.
   (`crates/podssh-cli/src/man/notes_pair.rs:307-308`), and needs the net's role exit, signed by
   its owner (`:305-306`).
 - Read: `podssh exit NAME --listen` gives SOCKS5, SOCKS4a and HTTP CONNECT on a loopback address
-  (`docs/STATUS.md:165`).
+  (`docs/STATUS.md:167`).
 - In the issue's case the end with egress starts the channel (`ssh -T sandbox CMD`), so the node
   of the exit runs there with `--carrier exec:...`, and the closed host runs the client,
   `podssh exit NAME --listen 127.0.0.1:1080 --carrier stdio`.
@@ -12721,6 +12721,8 @@ ISP's queues, middleboxes or NAT.
 2026-11-15 (main session), a correction of the note above: `wisp-rate.yml` has no Wisp server of the lab, and podssh serves no Wisp (it is a client of `wisp+wss://` alone). The lab's step 2 therefore needs a Wisp server of another party on the runner (Mercury Workshop's `wisp-server-python` or `wisp-server-node`), in front of the runner's sshd, with `--forwarder wisp+ws://127.0.0.1:PORT/` and netem's far link on its port. That measures podssh's Wisp client on a shaped link, not the demo server's own bound: the demo server cannot reach a runner, so its rate needs a public far end, and that stays the optional real path (Q38). The demo server's bound stays as it publishes it (500 kB/s for each address, `docs/carriers.md`), cited as published, not measured. Next: the lab's run of step 2, by `wisp-rate.yml` with an input `lab`, as `iroh-ab.yml` takes one.
 
 2026-11-15 (main session): `wisp-rate.yml` takes the input `lab` (none, far, cellular, wifi, slow; default far; empty for the demo server and the operator's host). The lab runs Mercury Workshop's `wisp-python` 0.11.0, pinned, in a venv, with `--limits --bandwidth 500` (the demo server's published bound) and `--allow-loopback`, in front of the runner's sshd with a throwaway key; `scripts/feel_netem.py ports LINK OUT 6011` shapes the Wisp server's port. Tried here with no netem (this kernel has none): `podssh ssh --forwarder wisp+ws://127.0.0.1:6011/` to a local sshd, `true` in 0.15 s, then 4 MiB down in 8.16 s, 0.490 MiB/s, the bound of 500 kB/s (0.477 MiB/s) as the server enforces it. UNVERIFIED: the lab's run in Actions.
+
+2026-11-15, the lab's first run (`wisp-rate.yml`, run 43670347317, `lab=far`: 60 ms each way, 50 Mbit/s, on the Wisp server's port): open and login 1.31, 1.01 and 1.01 s; 4 MiB down in 6.09, 4.03 and 4.01 s (0.657, 0.993 and 0.998 MiB/s); 4 MiB up in 1.10, 1.41 and 1.40 s (3.641, 2.846 and 2.863 MiB/s). Down is above `--bandwidth 500` (0.477 MiB/s) and up is not bounded at all: wisp-python's limit is not the bound that its flag names, or it bounds one way only. Next: read wisp-python 0.11.0's limiter, then record what the lab's bound is before the rates go into `docs/carriers.md`.
 
 # T-626: I2P, Nym and cjdns: whether an overlay of peer addresses carries a podssh pair: the research
 

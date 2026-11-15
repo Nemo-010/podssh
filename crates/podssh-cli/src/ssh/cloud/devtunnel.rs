@@ -8,7 +8,9 @@
 //! tunnel's name, or `ID.CLUSTER` as the vendor's tools show it.
 //!
 //! The user's token comes from the private file of
-//! [`podssh_relay::devtunnel::TOKEN_FILE_ENV`], never from argv. The road is
+//! [`podssh_relay::devtunnel::TOKEN_FILE_ENV`], or a tunnel's access token
+//! from that of [`podssh_relay::devtunnel::ACCESS_FILE_ENV`], or with
+//! neither no token, for an anonymous tunnel (T-785); never from argv. The road is
 //! in a build with the feature `devtunnel` only; without it, a
 //! `devtunnel://` destination is refused before anything connects, with
 //! exit 70.

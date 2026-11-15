@@ -3623,9 +3623,9 @@ two requests in two directions.
 ## Premise
 
 - The split is a stream of two halves (`crates/podssh-ws/src/vless/split.rs:1-4`).
-- `docs/STATUS.md:300` records VLESS over XHTTP against Xray-core v26.10.21, shoes and nginx in
+- `docs/STATUS.md:302` records VLESS over XHTTP against Xray-core v26.10.21, shoes and nginx in
   front of Xray-core, in packet-up, stream-up and stream-one on HTTP/2, with HTTP/1.1 refused
-  with 78. That refusal is older than T-456: `docs/STATUS.md:1040` records packet-up and stream-up
+  with 78. That refusal is older than T-456: `docs/STATUS.md:1042` records packet-up and stream-up
   over HTTP/1.1 on two connections, and stream-one alone refused
   (`crates/podssh-ws/src/vless/h1_modes.rs:12`, its reason at
   `crates/podssh-ws/src/vless/h1_modes.rs:29-30`). The issue's "keep the 78 refusal" reads as:
@@ -3926,7 +3926,7 @@ GitHub #224's author lifts [DEFERRED], or the owner orders it.
 **Milestone:** M10
 **Priority:** P3
 **Effort:** S
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -3955,4 +3955,17 @@ cargo test -p podssh-cli --features devtunnel --lib devtunnel
 Against the stand-in of `pod-devtunnel` (`podssh-relay/devtunnel-standin`): an anonymous tunnel is reached with no
 token; one that refuses anonymous access is refused with the form named; an access token from its file passes.
 Planted: the anonymous form sent where an access token was given, and the test fails.
+
+## Correction
+
+2026-11-15. The Prove's stand-in tests are `podssh-relay`'s (`tests/devtunnel_credentials.rs`, feature `devtunnel-standin`), where the road's credential is chosen; `cargo test -p podssh-cli --features devtunnel --lib` covers the manual and the CLI's glue.
+
+## Done
+
+2026-11-15 (main session). `Road` holds a `Credential` of `pod-devtunnel` `v0.47.0`+: `credential_from` takes the user's token from the file of `PODSSH_DEVTUNNEL_TOKEN_FILE`, a tunnel's access token from the file of the new `PODSSH_DEVTUNNEL_ACCESS_FILE` (one word, a private file), or with neither `Credential::Anonymous`; both set is refused (78). The manual, the doctor flag's help and `docs/cli.md` say so.
+
+- `cargo test -p podssh-relay --features devtunnel-standin --test devtunnel_credentials --test devtunnel`: 4 and 4 passed (an anonymous tunnel reached; a refusal naming "no token"; an access token from its file, another refused with no token in its text; both files refused).
+- Planted: the anonymous form sent where an access token was given: the access-token test failed (3 passed, 1 failed); restored.
+- `cargo test -p podssh-cli --features devtunnel --lib`: 1189 passed. Clippy: no warning in the changed files.
+
 

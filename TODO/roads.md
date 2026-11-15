@@ -6520,7 +6520,7 @@ a hop. `doctor` has no line for a hop, so a user cannot see whether one is reach
 - Read: through the agent proxy of a cloud container, a CONNECT to `ssh.github.com:443` got `200`,
   and then a reset: `TODO/ws.md:1196` says "gets 200, then a reset". A proxy that waits for TLS
   carries no SSH on port 443; T-372 wraps SSH in TLS for it. Through the relay, GitHub's SSH on
-  port 443 answers (`docs/STATUS.md:258`).
+  port 443 answers (`docs/STATUS.md:260`).
 - Read: `doctor` asks the proxy for the relay and for `github.com` only
   (`crates/podssh-cli/src/doctor/net.rs:202-263`).
 - Read in GitHub #61 (a tester's measurement of 2026-10-31, from a host with direct egress; not
@@ -9674,6 +9674,8 @@ that the entry names; it needs no secret. A run on the operator's real path (Q38
 ISP's queues, middleboxes or NAT.
 
 2026-11-15 (main session): the lab is built. `iroh-ab.yml` takes the input `lab` (none, far, cellular, wifi, slow; default far; empty for the operator's real path through the secrets). In the lab the far end is the runner's own sshd on the loopback, with a throwaway key, and `scripts/feel_netem.py udp LINK OUT` shapes each UDP packet of the loopback but a resolver's (IPv4 and IPv6, one netem, so each way takes the link's delay once): the iroh road's direct path between the two ends of the runner crosses the link, and the node's TCP leg to sshd does not. n0's relays only introduce the ends (Q38), in place of a lab relay: podssh has no binary that runs `podssh_iroh::test_relay`, and the relay carries no measured byte once the path is direct (each sample records its path). This host's kernel has no netem (`tc qdisc add dev lo root netem`: "Specified qdisc kind is unknown"), so the shape is first tried in Actions. UNVERIFIED: the lab's A/B run.
+
+2026-11-15, the lab's first run (`iroh-ab.yml`, run 43670344623, `lab=far`) failed in its shaping step: `tc filter add dev lo parent 1: protocol ipv6 prio 1 u32 match ip6 protocol 17 0xff match ip6 dport 53 0xffff flowid 1:2` gave "We have an error talking to the kernel" (exit 2). Next: in `feel_netem.shape_udp`, the IPv6 filters on a prio of their own (u32 refuses two protocols at one prio of one parent), or IPv4 alone with the ends bound to IPv4; then run the A/B again.
 
 # T-666: Bulk off the interactive stream: a copy beside a terminal on its own QUIC stream of the same iroh connection
 

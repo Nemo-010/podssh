@@ -5,8 +5,9 @@
 //! management API, the relay WebSocket, SSH with no user authentication to
 //! the tunnel's host, the channels and a bounded reconnect); this module
 //! gives it podssh's parts: the way out through `HTTPS_PROXY` with
-//! podssh's TLS, its SSH name, the user's token from a private file
-//! ([`token`]), and its lines ([`lines`]).
+//! podssh's TLS, its SSH name, the credential (the user's token or a
+//! tunnel's access token from a private file, or none for a tunnel that
+//! allows anonymous access: [`token`], T-785), and its lines ([`lines`]).
 //!
 //! No token goes in argv, a line, an event, the journal or `--json`: the
 //! file's path is the only thing that the user gives, and each type of the
@@ -23,14 +24,19 @@ use std::task::{Context, Poll};
 
 pub use pod_core::{Class, Failure, Report};
 pub use pod_devtunnel::stream::SESSION_ENDED;
-pub use pod_devtunnel::{step_of, steps_of, Base, Locator, Relay, Scheme, Settings, Step, Stream, UserToken, Way};
+pub use pod_devtunnel::{
+    step_of, steps_of, AccessToken, Base, Credential, Locator, Relay, Scheme, Settings, Step, Stream, UserToken, Way,
+};
 use podssh_ws::{ProxyChoice, Trust};
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
-pub use token::{parse_token, read_token_file};
+pub use token::{parse_access, parse_token, read_access_file, read_token_file};
 
 /// The variable that names the private file of the user's token.
 pub const TOKEN_FILE_ENV: &str = "PODSSH_DEVTUNNEL_TOKEN_FILE";
+/// The variable that names the private file of a tunnel's access token
+/// (T-785): a tester who shares a tunnel gives that, and no account.
+pub const ACCESS_FILE_ENV: &str = "PODSSH_DEVTUNNEL_ACCESS_FILE";
 /// Another base of the management API, `https://HOST[:PORT]`: another
 /// environment of the service, or a stand-in on the loopback (`http://`).
 pub const API_ENV: &str = "PODSSH_DEVTUNNEL_API";
@@ -70,11 +76,11 @@ pub fn way(proxy: &ProxyChoice, trust: Trust) -> Way {
     Way { http: podssh_ws::client::getter(proxy), ws: podssh_ws::client::way(proxy), trust }
 }
 
-/// A tunnel, the user's token for it, and how to reach it.
+/// A tunnel, the credential for it, and how to reach it.
 #[derive(Clone)]
 pub struct Road {
     pub locator: Locator,
-    user: UserToken,
+    credential: Credential,
     pub settings: Settings,
     pub trust: Trust,
     pub proxy: ProxyChoice,
@@ -84,42 +90,38 @@ impl fmt::Debug for Road {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Road")
             .field("locator", &self.locator)
-            .field("user", &self.user)
+            .field("credential", &self.credential.form())
             .field("management", &self.settings.management)
             .finish_non_exhaustive()
     }
 }
 
 impl Road {
-    /// The road to `tunnel` (`NAME` or `ID.CLUSTER`), with the token of
-    /// `user`.
+    /// The road to `tunnel` (`NAME` or `ID.CLUSTER`), with `credential`:
+    /// a user's token, a tunnel's access token, or [`Credential::Anonymous`].
     pub fn new(
         tunnel: &str,
-        user: UserToken,
+        credential: impl Into<Credential>,
         settings: Settings,
         trust: Trust,
         proxy: ProxyChoice,
     ) -> Result<Road, Failure> {
-        Ok(Road { locator: Locator::parse(tunnel)?, user, settings, trust, proxy })
+        Ok(Road { locator: Locator::parse(tunnel)?, credential: credential.into(), settings, trust, proxy })
     }
 
-    /// The road as the environment gives it: the token of the file of
-    /// [`TOKEN_FILE_ENV`] and the base of [`API_ENV`]. No file named is a
-    /// configuration failure that names the variable.
+    /// The form of the road's credential, never a byte of it.
+    pub fn form(&self) -> &'static str {
+        self.credential.form()
+    }
+
+    /// The road as the environment gives it: the credential of
+    /// [`credential_from`] and the base of [`API_ENV`].
     pub fn from_env(tunnel: &str, trust: Trust, proxy: ProxyChoice) -> Result<Road, Failure> {
         let var = |name: &str| std::env::var(name).ok().filter(|v| !v.trim().is_empty());
-        let Some(file) = var(TOKEN_FILE_ENV) else {
-            let why = format!(
-                "Dev Tunnels asks the user's token: set {TOKEN_FILE_ENV} to a private file with one line \
-                 SCHEME TOKEN (github, aad or bearer)"
-            );
-            return Err(Failure::new(pod_core::Stage::Host, pod_core::Class::Config, why));
-        };
-        let user = read_token_file(Path::new(&file))
-            .map_err(|f| Failure::new(f.stage, f.class, format!("{TOKEN_FILE_ENV}: {}", f.text())))?;
+        let credential = credential_from(var(TOKEN_FILE_ENV), var(ACCESS_FILE_ENV))?;
         let settings = settings(var(API_ENV).as_deref())
             .map_err(|f| Failure::new(f.stage, f.class, format!("{API_ENV}: {}", f.chain())))?;
-        Road::new(tunnel, user, settings, trust, proxy)
+        Road::new(tunnel, credential, settings, trust, proxy)
     }
 
     /// The tunnel as messages and `known_hosts` show it.
@@ -131,7 +133,7 @@ impl Road {
     /// `report`.
     pub async fn connect(&self, report: Report) -> Result<Relay, Failure> {
         let way = way(&self.proxy, self.trust.clone());
-        Relay::connect(way, self.settings.clone(), self.locator.clone(), self.user.clone(), report).await
+        Relay::connect(way, self.settings.clone(), self.locator.clone(), self.credential.clone(), report).await
     }
 
     /// A stream to `port` of the tunnel's host on a session of its own: the
@@ -139,6 +141,26 @@ impl Road {
     pub async fn open(&self, port: u16, report: Report) -> Result<Tunneled, Failure> {
         let relay = self.connect(report).await?;
         open(&relay, port).await
+    }
+}
+
+/// The credential of the files that the variables name (T-785): the user's
+/// token from the file of [`TOKEN_FILE_ENV`], a tunnel's access token from
+/// the file of [`ACCESS_FILE_ENV`], or with neither none at all, for a
+/// tunnel that allows anonymous access; the service's refusal then names
+/// that form. Both named is a configuration failure: which one to send
+/// would be a guess.
+pub fn credential_from(user_file: Option<String>, access_file: Option<String>) -> Result<Credential, Failure> {
+    let named = |name: &str, f: Failure| Failure::new(f.stage, f.class, format!("{name}: {}", f.text()));
+    match (user_file, access_file) {
+        (Some(_), Some(_)) => Err(Failure::new(
+            pod_core::Stage::Host,
+            pod_core::Class::Config,
+            format!("both {TOKEN_FILE_ENV} and {ACCESS_FILE_ENV} are set: set the one whose token to send"),
+        )),
+        (Some(file), None) => Ok(read_token_file(Path::new(&file)).map_err(|f| named(TOKEN_FILE_ENV, f))?.into()),
+        (None, Some(file)) => Ok(read_access_file(Path::new(&file)).map_err(|f| named(ACCESS_FILE_ENV, f))?.into()),
+        (None, None) => Ok(Credential::Anonymous),
     }
 }
 

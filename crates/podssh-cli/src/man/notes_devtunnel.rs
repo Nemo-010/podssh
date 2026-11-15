@@ -5,12 +5,15 @@ pub const SSH: &str = "devtunnel://[user@]TUNNEL[:PORT] reaches a port of the ho
      tunnel, 22 by default, through the service's relay on port 443, in a build with the feature devtunnel \
      (70 in another build): TUNNEL is the tunnel's name, or ID.CLUSTER as the devtunnel tool shows it. podssh \
      asks the management API for the tunnel's relay and a connect token with your token, from the private file \
-     of PODSSH_DEVTUNNEL_TOKEN_FILE (see FILES), never from argv; opens the relay's WebSocket through \
+     of PODSSH_DEVTUNNEL_TOKEN_FILE (see FILES), or with a tunnel's access token, from the private file of \
+     PODSSH_DEVTUNNEL_ACCESS_FILE, or with neither set with no token, for a tunnel that allows anonymous \
+     access; never from argv, and both set is refused (78); opens the relay's WebSocket through \
      HTTPS_PROXY when one is set, checked with podssh's trust; runs SSH to the tunnel's host inside it, whose key \
      must be one that the API names, with no user authentication; and opens a direct-tcpip channel to \
      127.0.0.1:PORT of that host, which carries the session. The host of the tunnel must have the port; \
      your own SSH server behind it checks you as on each road. The host key is recorded under \
-     devtunnel://TUNNEL. A failure names its stage, management, websocket, ssh or channel: a token that the \
+     devtunnel://TUNNEL. A failure names its stage, management, websocket, ssh or channel, and a refusal the form \
+     of what was sent (a user token, a tunnel access token, no token), never a token: a token that the \
      API refuses and a host key that is not the tunnel's are 77, a tunnel that does not exist or has no host \
      connected and a refused port 69, a time limit or the API's 429 75, a token file or a setting that \
      cannot be used 78. A relay session that ends is opened again with a fresh connect token, a few times at \
@@ -23,7 +26,8 @@ pub const PROXY: &str = "podssh proxy devtunnel://TUNNEL:PORT carries the pipe t
 
 pub const DOCTOR: &str = "With --devtunnel TUNNEL[:PORT], in a build with the feature devtunnel, the section \
      devtunnel gives a line for that tunnel, after the roads over TCP that the run names: the road of a \
-     devtunnel:// destination with the token of PODSSH_DEVTUNNEL_TOKEN_FILE, its time, and the host key of the \
+     devtunnel:// destination with the credential that podssh ssh takes (the token of PODSSH_DEVTUNNEL_TOKEN_FILE, \
+     the access token of PODSSH_DEVTUNNEL_ACCESS_FILE, or none), its time, and the host key of the \
      SSH server at the port, or why it has none. A failure names its stage: setup (the token file or a \
      setting), management, websocket, ssh, channel or reconnect. In another build the flag is refused (70).";
 
@@ -32,7 +36,15 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_DEVTUNNEL_TOKEN_FILE"],
         "The file of your token of Microsoft Dev Tunnels, for a devtunnel:// destination and podssh doctor \
-      --devtunnel (see FILES). Unset or empty, the road is refused (78). A build with the feature devtunnel.",
+      --devtunnel (see FILES). Unset or empty with PODSSH_DEVTUNNEL_ACCESS_FILE unset too, the road asks with \
+      no token, which a tunnel that allows anonymous access takes. A build with the feature devtunnel.",
+    ),
+    (
+        &["PODSSH_DEVTUNNEL_ACCESS_FILE"],
+        "The file of a tunnel's access token of Dev Tunnels (devtunnel token TUNNEL --scopes connect prints \
+      one), for a tunnel that its owner shares with you: one line, the token alone, # a comment; a private \
+      file as the token file is (see FILES). With PODSSH_DEVTUNNEL_TOKEN_FILE also set, the road is refused \
+      (78). A build with the feature devtunnel.",
     ),
     (
         &["PODSSH_DEVTUNNEL_API"],

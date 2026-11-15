@@ -6942,8 +6942,13 @@ before anything connects.
   with a fresh connect token, at most four tries, and never after a refused
   token (401, 403) or a tunnel that is gone (404).
 - The token: `PODSSH_DEVTUNNEL_TOKEN_FILE` names a private file of one line,
-  `SCHEME TOKEN` (`github`, `aad` or `bearer`). It is never in argv, a line,
-  the journal or `--json`. `PODSSH_DEVTUNNEL_API` names another base of the
+  `SCHEME TOKEN` (`github`, `aad` or `bearer`). Or (T-785)
+  `PODSSH_DEVTUNNEL_ACCESS_FILE` names a private file of a tunnel's access
+  token alone (`devtunnel token TUNNEL --scopes connect`), for a tunnel that
+  its owner shares; with neither set the road asks with no token, which a
+  tunnel with anonymous access takes; both set is refused (78). A refusal
+  names the form that was sent, never a token. A token is never in argv, a
+  line, the journal or `--json`. `PODSSH_DEVTUNNEL_API` names another base of the
   management API (`http://` to the loopback alone, for a test).
 - A failure names its stage (`management`, `websocket`, `ssh`, `channel`,
   `reconnect`, or `setup` for the token file) and exits by its class: a
@@ -6957,7 +6962,9 @@ before anything connects.
   stand-in (feature `devtunnel-standin`): a session of SSH to a server of
   the test behind the tunnel runs a command; a relay that goes away ends a
   stream with the named error, and a new stream after it works; no token is
-  in a line, a `Debug` or a failure.
+  in a line, a `Debug` or a failure. `devtunnel_credentials.rs`: an
+  anonymous tunnel with no token file, a refusal that names "no token", an
+  access token from its file, and both files refused.
 
 ## The GSRN road: `--gsr` (T-707)
 

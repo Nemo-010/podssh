@@ -75,6 +75,18 @@ tag at once; `v1.1.0-beta.4` waits for the move, then goes out with its testers'
 it, while podcrates builds: the GSRN road's live test (done), the cell of an outage (T-786), the netem lab of T-625,
 T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 
+**Hand-off of 2026-11-15 (the session ended at the operator's word).** Pushed and green up to `a99de1d`'s gate; the
+commits after it are pushed with this note. For the next session, in order:
+1. Read the gate of the last push; repair a failure first.
+2. T-684: watch for podcrates `v0.50.0` (step 1: transit, acme, piping, opentunnel, derp) and take it at once
+   (`docs/HANDOFF.md`, "A take of podcrates"); answer with COORD-076. Step 2 (pod-egress) stays frozen.
+3. COORD-075 (#253, T-787, blocked): when podcrates fixes `pod-quic`, take the tag and un-ignore
+   `crates/podssh-relay/tests/quic_socket_fails.rs`.
+4. The netem labs (T-665, T-625, T-786), each partial with its next step in its entry: T-665's IPv6 tc filter
+   refused (run 43670344623); T-625's lab rates are above wisp-python's flag (run 43670347317); T-786's osewa
+   cells got no END (run 43670350662).
+5. T-780 and T-788 wait for their next failure; then `v1.1.0-beta.4` after T-684, and update the testers' guide #249.
+
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
 Actions; "offline" needs none. A test that fails at random, or a red gate, goes before the next
 item whenever it appears.
@@ -138,7 +150,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 743 entries: 46 open, 32 partial, 11 blocked, 654 done.
+`TODO/INDEX.md` holds 743 entries: 44 open, 32 partial, 12 blocked, 655 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
