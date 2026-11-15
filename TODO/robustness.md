@@ -2533,6 +2533,8 @@ after a new address (`02c0cf3`), and after the resume that followed a stall (`2f
 until it fails, with the layer's lines at their most (`-v` and the node's), and read which end holds the bytes after
 the resume: the replay of 736 KiB that the client sent again, or the node's acknowledgement of it.
 
+2026-11-15, on this cloud host (no fault planted): the stall test alone passed 5 of 5 runs (197 to 230 s each), and the whole m6 step run as the gate runs it (`cargo test -q -p podssh-cli --features podssh-cli/iroh-test --test m6_exit -- --ignored --test-threads 1`) passed 11 of 11 in 631 s. The hang is not seen here; the entry waits for its next failure in the gate, whose log then gives the fourth shape.
+
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes
 
 **Source:** the live job of T-565 in `last-roads-live.yml` (runs 42989086142, 42994885604 and 43560494966).
