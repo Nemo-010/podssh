@@ -2570,6 +2570,9 @@ that holds without an `ACK` due: the up half's `room` is the link's own, the rea
 resume sets the acknowledged offset to the peer's received one. `through_the_layer` of
 `crates/podssh-cli/tests/m6_exit.rs` now runs `ssh -v` too, so that the next failure gives the layer's spare and retry
 lines.
+Here, on podcrates `v0.56.0` with each of the 4 cores held busy by a loop of the shell, `cargo test -p podssh-cli --test
+m6_exit -- --ignored --exact the_layer_survives_a_new_address` passed 12 runs in 12 (about 30 s each). It waits for its
+next failure in the gate.
 
 
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes

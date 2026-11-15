@@ -335,6 +335,8 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #273 | [gh action] requested: the gate after m6's iroh client with `-v` | closed 2026-11-15: run 43745453729 passed | T-780 |
 | #274 | COORD-084: podssh took podcrates v0.54.0 at d00ca78 (to podcrates) | open 2026-11-15: until podcrates records the take | T-684 |
 | #275 | [gh action] requested | closed 2026-11-15: the gate at `d00ca78` (run 43766309151) red in `gate (m6)` (T-780); the outage cell (run 43770482263) passed T-789 | T-684, T-780, T-789 |
+| #276 | [gh action] requested: the gate after the take of v0.56.0, and the dry run of issue-sync | open 2026-11-15: asks the gate at `0363272` and the first dry run of the sync | T-684 |
+| #277 | COORD-085: podssh took podcrates v0.56.0 at 0363272, with the sync of the issues on (to podcrates) | open 2026-11-15: until podcrates records the take | T-684 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |
