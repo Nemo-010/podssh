@@ -5877,6 +5877,13 @@ rules on. `v0.57.0` (`0d6421c0`, the same issue) changes only podcrates' `issue-
 outside the caller's workspace (podcrates T-724): podssh's workflow calls it at `v0.57.0`, and the crates stay pinned
 at `v0.56.0`, whose code is the same.
 
+2026-11-16, podcrates `v0.58.0` (`ca1107f1`, COORD-116, PodUtils/podcrates#200), a bump of the tag with no patch for
+podssh: the installer core of the owner's ruling "Installer" (`scripts/install/core.sh`, for T-793), `podlab` as a
+release asset with `run --allow-connect PORT` (T-791, COORD-086), and podnet's gaps of `pod-manual`; its breaking
+changes are in `pod-manual` and `pod-lab`, which no crate of podssh depends on. `issue-sync.yml` is the same at the
+tag, so the call stays at `v0.57.0`. `cargo clippy --workspace --all-targets` clean; `cargo test --workspace
+--no-fail-fast` 3837 passed, 0 failed, 82 ignored.
+
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021

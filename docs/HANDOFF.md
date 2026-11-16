@@ -19,8 +19,8 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## Each podcrates take
 
-podssh pins every podcrates crate at `tag = "v0.56.0"` (COORD-115, PodUtils/podcrates#194; podssh's answer is
-COORD-085). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
+podssh pins every podcrates crate at `tag = "v0.58.0"` (COORD-116, PodUtils/podcrates#200; podssh's answer is
+COORD-087). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
 
 - Taken: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`,
   `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`, `pod-relay`,
