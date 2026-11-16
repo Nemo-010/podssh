@@ -6,8 +6,7 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## The state of `main`
 
-- The gate is green at `687d17c` (2026-11-15, run 43745453729, asked by #273): the take of podcrates `v0.52.0`,
-  T-794, and m6's iroh client with `-v` (T-780).
+- The gate is green at `71ebc9d` (2026-11-16, run 43814811221), and `release.yml` by hand there (run 43815141894).
 - The record agrees (`cargo todo check`), and `python scripts/check-repo.py` passes.
 - No draft waits for its merge ("Drafts" in `TODO/PROGRESS.md`).
 
@@ -136,7 +135,8 @@ T-200). cfb's asks, T-708 to T-731, stay behind podssh's own work order.
   them since `78220a35`).
 - **A cloud session's proxy** passes HTTPS alone: raw SSH and other ports go through GitHub Actions.
 - **Pushes:** each push queues a gate on the runners; batch the record's commits.
-- **A session whose account cannot start Actions** (2026-11-15: a push of it starts no run): ask the operator's
+- **A session's account starts runs** (2026-11-16: a push starts `build.yml`, and `gh workflow run` starts one by hand),
+  so no `[gh action] requested` is needed then. **A session whose account cannot start Actions** (2026-11-15: a push of it starts no run): ask the operator's
   local agent by an issue of this repository titled `[gh action] requested`, as PodUtils/podvm#387 does: why, one
   `sh` block that dispatches each workflow and watches it to its end, and "Run the block as it is, once. Then write
   here: the output of the last line, or the line where it stopped and its error." Read the runs as usual. podcrates' `watch.py` (`AGENTS.md`, step 7) says when each asked run
