@@ -5967,3 +5967,51 @@ certificate. Planted: the check of the leaf's names skipped, and the test fails.
 ## Start condition
 
 GitHub #225's author lifts [DEFERRED], or the owner orders it.
+
+
+# T-798: The resumable layer over the HTTP road, where the way refuses the WebSocket upgrade
+
+**Source:** T-791's lane in `pod-lab`'s class `ws-upgrade-refused` (2026-11-16).
+**Category:** feature
+**Milestone:** M10
+**Priority:** P2
+**Effort:** M
+**Status:** blocked
+
+## Problem
+
+Behind a proxy that refuses the WebSocket upgrade, `podssh ssh`, `proxy`, `pipe` and `cp` reach podssh's relay role over
+its HTTP road (T-319), but the resumable layer's links are WebSocket upgrades too, so its first link is refused and the
+session goes on with no resume: a cut of the client's link ends it (255). That class is the cloud container's, where a
+dropped link is most common.
+
+## Premise
+
+- `scripts/pod-lab-serve-lane.sh`'s command 6 in `ws-upgrade-refused` (2026-11-16): "the class refuses the resumable
+  layer, so the cut ended the session (255)", while in `proxy-only` "the session resumed after 0.1 s".
+- `crates/podssh-cli/src/relay_layer.rs:63` says "the session goes on with no resume" when the first link fails.
+- The client of each link is `pod-relay`'s (`forward_layer::client`, PodUtils/podcrates); the HTTP road's client takes a
+  `Target` of a host and a port alone (`pod-relay/src/http_road/client.rs`, `Target`), so it cannot name the layer.
+
+## Approach
+
+1. Ask podcrates (COORD-095, #287) for a link of the layer over the HTTP road in `pod-relay`'s client: the HTTP road opened to
+   the layer's endpoint of a session (a target that names the layer, its session id and its resume), each new link a new
+   road session, in the forms that the road has.
+2. podssh's relay role (`crates/podssh-relay/src/serve/http_road`, `serve/layer.rs`) hands such a road session to the
+   layer as one link.
+3. `relay_layer.rs` takes that link where the way refused the first link's upgrade, with one line.
+
+## Prove
+
+```sh
+podlab run --serve 8443 --serve-ca PKI/ca.pem ws-upgrade-refused -- sh scripts/pod-lab-serve-lane.sh PODSSH PKI
+```
+
+Command 6 says "the session resumed" in `ws-upgrade-refused` too. Planted: the role refuses the layer over the road, and
+command 6 ends the session.
+
+## Blocker
+
+PodUtils/podcrates: `pod-relay`'s client of the HTTP road names no target but a host and a port (COORD-095, #287). Then steps 2
+and 3 are podssh's.

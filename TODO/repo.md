@@ -6822,9 +6822,8 @@ gives the road as an end of a pipe, which `proxy` and `pipe`'s `relay:` take; a 
 on the code before it ("the relay refused the session: HTTP 403"). Then podlab exit 0 there too, command 6 saying that
 the class refuses the resumable layer, so the cut ended the session (255). Planted: `PODSSH_RELAY_LAYER=no` in
 `proxy-only` made command 6 fail (exit 1, 4 lines of 12, "the connection between podssh and the relay broke").
-`cargo test -p podssh-cli --lib` 1168 passed; clippy (the gate's lints) and rustfmt clean. Next: the resume over the
-HTTP road of `ws-upgrade-refused`, the classes with no proxy once a lab gives them a way out, and the release steps that
-name the run.
+`cargo test -p podssh-cli --lib` 1168 passed; clippy (the gate's lints) and rustfmt clean. Next: the classes with no proxy once a lab gives them a way out, and the release steps that name the run. The resume
+over the HTTP road of `ws-upgrade-refused` is T-798 (COORD-095, #287).
 
 # T-792: The state of each GitHub issue written from the record by podcrates' workflow
 
