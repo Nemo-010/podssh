@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**751 entries: 44 open, 33 partial, 11 blocked, 663 done.**
+**752 entries: 44 open, 34 partial, 11 blocked, 663 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 3 | 8 | 3 | 78 | 92 |
-| P2 | 7 | 19 | 2 | 281 | 309 |
+| P2 | 7 | 20 | 2 | 281 | 310 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 44 | 33 | 11 | 663 | 751 |
+| **All** | 44 | 34 | 11 | 663 | 752 |
 
 ## Entries
 
@@ -827,3 +827,4 @@ repository and CI).
 | [T-794](ssh.md) | P1 | S | M10 | defect | done | `cold_connect`'s test of the auth request failed at random on a busy runner |
 | [T-795](serve.md) | P1 | S | M10 | defect | done | `podssh serve` as root refused to start in a release build: a thread of ZeroTier's static constructor held its capabilities |
 | [T-796](robustness.md) | P1 | S | M10 | defect | partial | The gate's OpenSSH and Dropbear interop hung past the job's 45 min, and left no line of where |
+| [T-797](robustness.md) | P2 | S | M10 | defect | partial | The weekly fuzz run stopped before its first target, two weeks running, on a count of seeds that had moved |

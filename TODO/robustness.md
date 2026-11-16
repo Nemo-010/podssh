@@ -2837,3 +2837,42 @@ time and under the job's 45 min with the build before it. In the build image (`r
 busybox's `timeout`), the gate's own `run` function: a step that said two checks and then slept ended at its bound with
 `exit=143` and both lines shown; planted, the same step with no bound, cut from outside, showed none. It waits for the
 next hang of the step, whose lines then name the check that held.
+
+# T-797: The weekly fuzz run stopped before its first target, two weeks running, on a count of seeds that had moved
+
+**Source:** `fuzz.yml`'s scheduled runs of 2026-11-09 (run 42624714624, at `7e38d5b`) and 2026-11-16 (run 43872863719,
+at `5340fbb`).
+**Category:** defect
+**Milestone:** M10
+**Priority:** P2
+**Effort:** S
+**Status:** partial
+
+## Problem
+
+`scripts/fuzz.sh` runs `scripts/fuzz-seeds.py` before its targets, and the script's last line counted seeds that it no
+longer made: `NameError: name 'answers' is not defined` on 2026-11-09, `name 'hosts' is not defined` on 2026-11-16.
+The relay's lists, the DNS answers and the WebSocket frames moved with their code to PodUtils/podcrates (T-684), and
+their seeds with them, but the line that counts them stayed. So no target of T-198 ran for two weeks; the record did not
+know.
+
+## Premise
+
+- The summary line named `hosts` and `answers`, which nothing in the script defines any more, and the script still wrote
+  the seeds of `ws_frame`, a target that `fuzz/Cargo.toml` no longer has.
+
+## Approach
+
+Count only what the script writes; drop the seeds of the gone target; say in its head where the moved seeds are.
+
+## Prove
+
+`python3 -I scripts/fuzz-seeds.py` exits 0 (the code before it exits 1 with the `NameError`), and `fuzz.yml` run by hand
+on the commit runs each target.
+
+## Done
+
+Partial, 2026-11-16. `scripts/fuzz-seeds.py` counts the IRC lines and the messages of Cap'n Proto that it writes, and no
+longer writes `ws_frame`'s seeds; its head names the targets that moved. `python3 -I scripts/fuzz-seeds.py`: "51 IRC
+lines, 23 messages of Cap'n Proto", exit 0; the code before it, run the same way here: exit 1, `NameError: name 'hosts'
+is not defined`. UNVERIFIED: `fuzz.yml` by hand on the push, each target run.
