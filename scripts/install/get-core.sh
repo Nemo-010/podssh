@@ -10,9 +10,9 @@
 # A new pin: the commit of a podcrates tag, and the SHA-256 of each file at
 # it. A file that does not agree is removed, and the run fails.
 set -eu
-COMMIT=cbbd0168d467e9a09372a5e948aaef10b651734c # podcrates v0.61.0
-CORE_SHA=11d55d5ceaa2f63db8689f0a5ff46a72e39fdc87d45157c877ff5a4d8f911282
-NET_SHA=6004ef84d274be1d3477590d38413d0a49e9c571aba2430947e90b4160de373c
+COMMIT=d21fd638d8aa82465643eb33b80537a1d1ddd00f # podcrates v0.63.0
+CORE_SHA=1ab8578a5e2e44982d8d8f4b37fd910261958afc8666e8b0415fc8a1071beaaa
+NET_SHA=63d365203c9bb1a1f8d322f2b83187e21f400f4023e6084a49e54a8d99f0def8
 PINS_SHA=7a3632c60494b4aace45db37e88b277a1353e8713d60c288430b452e16ea0205
 dir=${1:-$(dirname "$0")}
 mkdir -p "$dir"

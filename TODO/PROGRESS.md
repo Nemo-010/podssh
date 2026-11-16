@@ -8,7 +8,8 @@ this page keeps no history (git does).
 
 Read on 2026-11-15.
 
-1. **The gate.** Green at `d13ab01` (2026-11-16, run 43839740067, podcrates `v0.61.0`; `gate (release)` on attempt 2:
+1. **The gate.** Green at `0f2c8a0` (2026-11-16, run 43859588499, podcrates `v0.62.0` and T-796's bound, each job on its
+   first attempt). Green at `d13ab01` (2026-11-16, run 43839740067, podcrates `v0.61.0`; `gate (release)` on attempt 2:
    its interop hung past the job's limit on attempt 1, T-796). Green at `f5b4f43` (2026-11-16, run 43823925587, the take of `v0.60.0`; its `gate (m6)` failed once,
    T-780's sixth, and passed on attempt 2). Green at `71ebc9d` (run 43814811221, by its push; `release.yml` by hand there, run
    43815141894, green). This session's account starts runs by a push and by hand. #276's runs at `bde7f17`
@@ -44,7 +45,7 @@ Read on 2026-11-15.
    take of `v0.42.0`, which answered each. cfb's asks, T-708 to T-731 (#195), wait behind podssh's own work order, M10
    included (the owner's ruling "Priority").
 7. **The move to PodUtils/podcrates** (T-684, Q101, Rule Q3). podssh pins each podcrates crate at
-   `v0.62.0` (COORD-122, PodUtils/podcrates#210; podssh's answer is COORD-093). Taken, so worked on in
+   `v0.63.0` (COORD-123, PodUtils/podcrates#211; podssh's answer is COORD-094). Taken, so worked on in
    PodUtils/podcrates: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`,
    `pod-proxy`, `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`
    and `pod-relay` (2026-11-12), `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue), and

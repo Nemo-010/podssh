@@ -6,7 +6,7 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## The state of `main`
 
-- The gate is green at `f5b4f43` (2026-11-16, run 43823925587, attempt 2 for T-780's m6) and at `71ebc9d` (run 43814811221), and `release.yml` by hand there (run 43815141894).
+- The gate is green at `0f2c8a0` (2026-11-16, run 43859588499), at `f5b4f43` (2026-11-16, run 43823925587, attempt 2 for T-780's m6) and at `71ebc9d` (run 43814811221), and `release.yml` by hand there (run 43815141894).
 - The record agrees (`cargo todo check`), and `python scripts/check-repo.py` passes.
 - No draft waits for its merge ("Drafts" in `TODO/PROGRESS.md`).
 
@@ -18,8 +18,8 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## Each podcrates take
 
-podssh pins every podcrates crate at `tag = "v0.62.0"` (COORD-122, PodUtils/podcrates#210; podssh's answer is
-COORD-093). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
+podssh pins every podcrates crate at `tag = "v0.63.0"` (COORD-123, PodUtils/podcrates#211; podssh's answer is
+COORD-094). It took `pod-warp` at `v0.37.0` (COORD-075, PodUtils/podcrates#135; podssh's answer is COORD-050).
 
 - Taken: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`, `pod-proxy`,
   `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`, `pod-relay`,
