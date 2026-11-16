@@ -81,7 +81,7 @@ draft is the branch `draft/t791-lane` (below). No run of Actions has passed sinc
 session, in order:
 1. **#276 waits for the owner's agent**: the gate of `build.yml`, the first dry run of `issue-sync.yml`
    (`dry_run=true`), and `release.yml` by hand with no tag (it runs T-793's new step of the installer). Its block names
-   `bde7f17f`; move `SHA` to the newest commit of `main` before it runs (amend the body, with a `state:` line), or
+   `763cac5d`; move `SHA` to the newest commit of `main` before it runs (amend the body, with a `state:` line), or
    close it and ask anew. Read each run when it ends (`watch.py` shows it): a red gate first; the dry run of the sync
    before any real run of it (the sync then closes and opens issues from the record: read what it would change).
 2. **T-780** (P1, partial): m6's session hangs after a resume at random in the gate, five shapes so far, none made
@@ -97,7 +97,7 @@ session, in order:
 5. **T-790** (partial): no work id and no sentence over 25 words in the manual, the help and the lines of a run. Next:
    the manual on `pod-manual`'s model, with its checks (`check::texts`, `check::variables`, `check::exit_codes`).
 6. **T-684**: podcrates `v0.59.0` is taken (3837 passed). COORD-088 tells podcrates; the open COORD issues of the take
-   (#274, #277, #279) close when podcrates records each. Each next tag is taken at once.
+   (#274, #277, #279, #280) close when podcrates records each. Each next tag is taken at once.
 7. `v1.1.0-beta.4` after T-684 and T-791, with the testers' guide (#249).
 
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
