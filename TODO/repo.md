@@ -6662,7 +6662,11 @@ this cloud container, whose only way out is an HTTP CONNECT proxy on the loopbac
 of them ("Permission denied (publickey)", as no key was offered). In `bind-denied` doctor exited 1 with 19 FAIL, each
 a refused connect to the proxy, and `ssh` reached nothing: the profile refuses each TCP connect (Landlock with no TCP
 port), so podssh has no way out there. podcrates is asked to give podssh's row of it command 1 alone, or a lab a port
-for a connect to the host's proxy (COORD-086, #278). Next: commands 3 to 6 (a copy of 200 MiB each way, `serve` with
+for a connect to the host's proxy (COORD-086, #278); podcrates gave `podlab run --allow-connect PORT` (its T-737), in
+its next tag. The Prove, the same day, with a release build of `cd55ede` (`cargo build --release -p podssh-cli
+--features iroh,warp,zerotier`): `podlab run PROFILE -- sh scripts/release-short.sh target/release/podssh --net`
+exited 0 in the nine profiles above, each ending at GitHub's SSH banner through the live relay; in `bind-denied` it
+exited 1 at that step, for the same refused connect. Next: commands 3 to 6 (a copy of 200 MiB each way, `serve` with
 `vi`, `less` and Ctrl-C, `pipe`, a session after a kill of its relay link) in the same profiles, then the release
 steps that name the run. The network classes (`proxy-only` and the others of COORD-081) wait for podnet's data in
 `pod-lab` (podcrates T-716).
