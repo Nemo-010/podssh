@@ -90,7 +90,7 @@ index bd00b12..6fe0719 100644
                      Some(GlobalRequestResponse::Keepalive) => {
                          // ignore keepalives
 diff --git a/src/client/mod.rs b/src/client/mod.rs
-index 5998944..57a11d3 100644
+index d0579a4..1b254c0 100644
 --- a/src/client/mod.rs
 +++ b/src/client/mod.rs
 @@ -80,6 +80,11 @@ mod session;
@@ -105,7 +105,7 @@ index 5998944..57a11d3 100644
  /// Actual client session's state.
  ///
  /// It is in charge of multiplexing and keeping track of various channels
-@@ -2125,7 +2130,7 @@ mod tests {
+@@ -2126,7 +2131,7 @@ mod tests {
      use crate::sshbuffer::{IncomingSshPacket, PacketWriter, SSHBuffer};
      use crate::{CryptoVec, cipher, mac};
  
@@ -114,7 +114,7 @@ index 5998944..57a11d3 100644
  
      impl Handler for TestHandler {
          type Error = crate::Error;
-@@ -2138,7 +2143,7 @@ mod tests {
+@@ -2139,7 +2144,7 @@ mod tests {
          }
      }
  

@@ -21,7 +21,7 @@ index c4daede..22de244 100644
                          if window > 0 {
                              self.target_window_size = window
 diff --git a/src/server/mod.rs b/src/server/mod.rs
-index 3b4ab69..fa279b5 100644
+index 1a6279d..9990db9 100644
 --- a/src/server/mod.rs
 +++ b/src/server/mod.rs
 @@ -543,6 +543,17 @@ pub trait Handler: Sized {

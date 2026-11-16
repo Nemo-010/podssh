@@ -112,7 +112,7 @@ pod-devtunnel = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0"
 # The SSH server behind the stand-in's tunnel and the client of the session
 # through it in tests/devtunnel.rs: the release that vendor/russh patches,
 # with podssh's own crypto; only with `devtunnel-standin`.
-russh = { version = "0.65.0", default-features = false, features = ["aws-lc-rs"], optional = true }
+russh = { version = "0.65.2", default-features = false, features = ["aws-lc-rs"], optional = true }
 
 [features]
 # Pairs of the reverse road: `POST /v1/pair`, the status of a pair and

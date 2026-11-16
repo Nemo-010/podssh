@@ -310,3 +310,42 @@ fn keygen_certifies_with_the_agents_ca() {
     assert!(shown.contains("Key ID: \"by-agent\""), "{shown}");
     drop(running);
 }
+
+/// The agent's FAILURE is a refusal, not a success: an unlock with a wrong
+/// password and the removal of a key that the agent does not hold each fail.
+/// russh's agent client took each answer for success before 0.65.1.
+#[cfg(unix)]
+#[test]
+fn agent_failures_of_unlock_and_remove_are_refusals() {
+    use std::os::unix::fs::PermissionsExt;
+    let home = scratch("refusals");
+    let askpass = home.join("askpass");
+    std::fs::write(&askpass, "#!/bin/sh\nprintf '%s\\n' \"$LOCK_PASSWORD\"\n").unwrap();
+    std::fs::set_permissions(&askpass, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let key = home.join("id_held_not");
+    let made = Command::new(env!("CARGO_BIN_EXE_podssh"))
+        .args(["keygen", "-q", "-t", "ed25519", "-N", "", "-f"])
+        .arg(&key)
+        .status()
+        .unwrap();
+    assert!(made.success());
+    let (_running, sock) = agent(&home, &[]);
+    let with_password = |args: &[&str], password: &str| {
+        let mut cmd = podssh(&home, Some(&sock), args);
+        cmd.env("SSH_ASKPASS", &askpass).env("SSH_ASKPASS_REQUIRE", "force").env("LOCK_PASSWORD", password);
+        ran(cmd)
+    };
+    let locked = with_password(&["agent", "lock"], "right-one");
+    assert_eq!(locked.status.code(), Some(0), "{}", String::from_utf8_lossy(&locked.stderr));
+    let wrong = with_password(&["agent", "unlock"], "wrong-one");
+    let err = String::from_utf8_lossy(&wrong.stderr);
+    assert_eq!(wrong.status.code(), Some(77), "a wrong password is refused: {err}");
+    assert!(!err.contains("Agent unlocked."), "{err}");
+    let right = with_password(&["agent", "unlock"], "right-one");
+    assert_eq!(right.status.code(), Some(0), "{}", String::from_utf8_lossy(&right.stderr));
+
+    let removed = ran(podssh(&home, Some(&sock), &["agent", "remove", key.to_str().unwrap()]));
+    let err = String::from_utf8_lossy(&removed.stderr);
+    assert_ne!(removed.status.code(), Some(0), "a key that the agent does not hold: {err}");
+    assert!(!err.contains("Identity removed"), "{err}");
+}

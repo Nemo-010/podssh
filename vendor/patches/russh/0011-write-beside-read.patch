@@ -1,5 +1,5 @@
 diff --git a/src/client/mod.rs b/src/client/mod.rs
-index 4fa2afe..2184ae2 100644
+index 5c5dcf4..6ade9ee 100644
 --- a/src/client/mod.rs
 +++ b/src/client/mod.rs
 @@ -1428,6 +1428,8 @@ impl Session {

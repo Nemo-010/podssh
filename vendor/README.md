@@ -13,8 +13,13 @@ read" (or `deny.toml`'s ignores) with the day and the reason.
 
 - **Upstream**: <https://github.com/tailscale/tailscale-rs>
 - **Commit**: `f4781c480e8d1376aed89f737beefe7425e8b866` (2026-09-29)
-- **Upstream read**: `v0.6.1` on 2026-10-31, the newest release, which the
-  commit above is past. Its head moves each day; its releases are what the
+- **Upstream read**: `v0.7.1` on 2026-11-16 (T-799), and held: v0.7.0 moves
+  each crate under `crates/` (38b80f3), so each patch would need a rebase,
+  and b44db0d (an auth key refused as an error) changes the control runner
+  and `src/lib.rs` that 0011 to 0028 patch; its fixes (half-closed accepts,
+  cancel on drop) reach no path of podssh's, #439's unwraps and the
+  WebSocket are still absent, and v0.7.1 only turns off cubic. Before it,
+  `v0.6.1` on 2026-10-31, which the commit above is past. Its head moves each day; its releases are what the
   watch reads (T-341).
 - **Vendored**: 2026-10-05, from the clone `.tmp/tailscale-rs`
   (MEASURED 2026-10-05: `git log -1 --format='%H %cd'` in that clone printed
@@ -91,13 +96,18 @@ Not done here: the home-region override, and connecting again after a drop
 ## russh
 
 - **Upstream**: <https://github.com/warp-tech/russh> (once Eugeny/russh),
-  the release 0.65.0 of crates.io, whose `.cargo_vcs_info.json` names the
-  commit `183a22e8f8f490fa09b6eb7bd044ef99d8c4414f`.
-- **Upstream read**: 0.65.0 on 2026-11-02, the copy's own release and the
-  newest of crates.io; its default branch reads such replies as 0.65.0 does.
-- **Vendored**: 2026-11-02 (T-460), from the copy that cargo unpacked of
-  that release, whose archive has the SHA-256 of `Cargo.lock`'s checksum
-  (`3bb77a4b...`). The import is the published crate byte for byte, but
+  the release 0.65.2 of crates.io, whose `.cargo_vcs_info.json` names the
+  commit `56a999871aa134072e4f2a7395fe2de313870e21`.
+- **Upstream read**: 0.65.2 on 2026-11-16 (T-799), the copy's own release and
+  the newest of crates.io; 0.65.1 fixed GHSA-736f-c93q-9fwx and
+  GHSA-9264-jvgf-6w2f, the agent client's lock, unlock and remove that took a
+  FAILURE for success (43a46d6), and padded ECDSA signatures, and took in
+  0008's strict-kex order of a wrong guess for its server (7c59594); 0.65.2
+  takes rsa 0.10 and pins ssh-key 0.7.0-rc.12.
+- **Vendored**: 2026-11-02 (T-460) at 0.65.0, and carried to 0.65.2 on
+  2026-11-16 (T-799), from the crate of crates.io whose SHA-256 is the
+  index's checksum (`78229f06...`); 0008's two hunks of `src/negotiation.rs`
+  moved beside upstream's new `guessed_ignored`, each other patch as it was. The import is the published crate byte for byte, but
   `.cargo-ok`, a mark of cargo's own; the shipped tree is the import plus
   the patches of `patches/russh/`, in the order of their numbers
   (`0001-reply-data.patch`, `0002-window-target.patch` of T-661,
@@ -110,7 +120,7 @@ Not done here: the home-region override, and connecting again after a drop
 - **How podssh uses it**: the root `Cargo.toml` puts it in the place of the
   release with `[patch.crates-io]`, and excludes it from the workspace, so
   its tests, examples and benches are not podssh's; `fuzz/Cargo.toml` does
-  the same. The version stays 0.65.0, so no requirement changes, and the
+  the same. The crates require 0.65.2 (T-799), and the
   lock files' `russh` entries have no source and no checksum, as a path
   package has none. `scripts/check-repo.py` fails when a lock leaves the
   patch unused, as it would after an update of russh that did not move it.
@@ -218,15 +228,17 @@ a `socks5h://` proxy for one that speaks TLS.
 ## ssh-key
 
 - **Upstream**: <https://github.com/RustCrypto/SSH> (its directory
-  `ssh-key`), the release 0.7.0-rc.11 of crates.io, whose
+  `ssh-key`), the release 0.7.0-rc.12 of crates.io, whose
   `.cargo_vcs_info.json` names the commit
-  `7a1c757d2e2fcde32680e373d5226481de6d434e`.
-- **Upstream read**: 0.7.0-rc.11 on 2026-11-03, the copy's own release and
-  the newest version of crates.io (its newest stable, 0.6.7, is older); the
-  watch reads the newest version of all for a copy of a prerelease.
-- **Vendored**: 2026-11-03 (T-609), from the copy that cargo unpacked of that
-  release, whose archive has the SHA-256 of `Cargo.lock`'s old checksum
-  (`f9a32fae...`). The import is the published crate byte for byte, but
+  `9a7a73baf33d83dd3d8b8b862c417a04c1e613eb`.
+- **Upstream read**: 0.7.0-rc.12 on 2026-11-16 (T-799), the copy's own
+  release, which russh 0.65.2 pins; it refuses a certificate whose CA key is
+  a certificate (8eac39f) and takes rsa 0.10 and the curves' 0.14; its
+  `ecdsa.rs` is rc.11's, so 0001 stays. The watch reads the newest version
+  of all for a copy of a prerelease.
+- **Vendored**: 2026-11-03 (T-609) at 0.7.0-rc.11, and carried to rc.12 on
+  2026-11-16 (T-799), from the crate of crates.io whose SHA-256 is the
+  index's checksum (`0701b552...`). The import is the published crate byte for byte, but
   `.cargo-ok`, a mark of cargo's own, and two of its test keys,
   `tests/examples/id_ed25519` and `tests/examples/id_ed25519.64cols`, which
   GitHub's push protection refuses as SSH private keys (they log in nowhere,
@@ -239,8 +251,8 @@ a `socks5h://` proxy for one that speaks TLS.
   format, plain and encrypted, and PuTTY's). The root `Cargo.toml` and
   `fuzz/Cargo.toml` put it in the place of the release with
   `[patch.crates-io]`, and the root excludes it from the workspace, so its
-  tests, examples and benches are not podssh's. The version stays
-  0.7.0-rc.11, so no requirement changes, and the lock files' `ssh-key`
+  tests, examples and benches are not podssh's. russh 0.65.2 requires
+  0.7.0-rc.12 exactly, and the lock files' `ssh-key`
   entries have no source and no checksum.
 - **Its test keys**: `tests/examples/` and its doc comments hold the
   crate's own throwaway keys, which log in nowhere; the secrets scan reads

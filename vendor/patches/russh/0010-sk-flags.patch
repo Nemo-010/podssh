@@ -31,7 +31,7 @@ index 22de244..1137fdb 100644
                                      handler.auth_publickey(user, key).await?
                                  }
 diff --git a/src/server/mod.rs b/src/server/mod.rs
-index fa279b5..fd1bba7 100644
+index 9990db9..fbfbd18 100644
 --- a/src/server/mod.rs
 +++ b/src/server/mod.rs
 @@ -239,6 +239,14 @@ pub struct VerifiedPublicKey<'a> {

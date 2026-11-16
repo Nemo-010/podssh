@@ -1,5 +1,5 @@
 diff --git a/src/client/mod.rs b/src/client/mod.rs
-index 44fd5ace..c47c724f 100644
+index 2415d8f..2a31f40 100644
 --- a/src/client/mod.rs
 +++ b/src/client/mod.rs
 @@ -199,6 +199,11 @@ pub enum Msg {
@@ -62,7 +62,7 @@ index 44fd5ace..c47c724f 100644
                  reply_channel,
                  address,
 diff --git a/src/client/session.rs b/src/client/session.rs
-index b18c0528..14acd5a8 100644
+index b18c052..14acd5a 100644
 --- a/src/client/session.rs
 +++ b/src/client/session.rs
 @@ -99,6 +99,17 @@ impl Session {

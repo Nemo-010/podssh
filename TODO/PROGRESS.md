@@ -8,7 +8,7 @@ this page keeps no history (git does).
 
 Read on 2026-11-15.
 
-1. **The gate.** Green at `5340fbb` (2026-11-16, run 43870922795, podcrates `v0.63.0`; `gate (m6)` on attempt 2: its first
+1. **The gate.** Green at `0370b0b` (2026-11-16, run 43894316171, each job on its first attempt). Green at `5340fbb` (2026-11-16, run 43870922795, podcrates `v0.63.0`; `gate (m6)` on attempt 2: its first
    hung, T-780's seventh). Green at `0f2c8a0` (2026-11-16, run 43859588499, podcrates `v0.62.0` and T-796's bound, each job on its
    first attempt). Green at `d13ab01` (2026-11-16, run 43839740067, podcrates `v0.61.0`; `gate (release)` on attempt 2:
    its interop hung past the job's limit on attempt 1, T-796). Green at `f5b4f43` (2026-11-16, run 43823925587, the take of `v0.60.0`; its `gate (m6)` failed once,
@@ -64,7 +64,7 @@ Read on 2026-11-15.
    `acme/mod.rs` of `podssh-cli`). Nothing is frozen now (2026-11-15). Next, as podcrates names
    them: `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
    `pod-relay-serve` last.
-8. **Drafts.** In work: T-791's lane script (the file pod-lab-lane.sh of scripts/) on the branch `draft/t791-lane` (pushed to GitHub, one commit "WIP T-791"; commands 2, 3 and 5 of the lane, 5 UNVERIFIED; not built into the gate). Merged on 2026-11-15: T-790's sentences of the manual at 25 words or fewer. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
+8. **Drafts.** In work: T-790's step six, podssh man's writers on pod-manual's (`draft-t790-writers`, a worktree of this machine). Superseded: `draft/t791-lane` (its commands 5 and 6 are in `scripts/pod-lab-serve-lane.sh`, 2026-11-16; the owner deletes the branch by hand). Merged on 2026-11-16: T-790's model on pod-manual and the five drafts of its long sentences. Merged on 2026-11-15: T-790's sentences of the manual at 25 words or fewer. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
    T-118's, T-117's, T-114's, T-112's,
    T-110's, T-109's, T-108's with T-222, T-107's, T-771's, T-773's, T-738's second and third, T-321's
    CLI test of `podssh each`, T-319's item 2, and the takes of podcrates v0.36.0 to v0.39.0 and
@@ -85,6 +85,13 @@ podcrates for Q101's waves 3 and 4 (COORD-071, #248), freezes each module as pod
 tag at once; `v1.1.0-beta.4` waits for the move, then goes out with its testers' guide (a GitHub issue). Beside
 it, while podcrates builds: the GSRN road's live test (done), the cell of an outage (T-786), the netem lab of T-625,
 T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
+
+**Session of 2026-11-16, late (cloud).** Done: T-797 (the fuzz run whole at `a37ea01`); T-791's commands 5 and 6 behind
+five network classes, and the release steps that name the lane, with a repair of `relay:` of `podssh pipe` that took no
+HTTP road; T-790's model on `pod-manual` with each of its checks, and the 860 long sentences rewritten (`check::texts`
+finds nothing); `fuzz/Cargo.lock` refreshed; T-798 filed (the layer over the HTTP road, COORD-095, #287); T-799 (the
+weekly `upstream.yml` failed on three new releases: russh 0.65.2 and ssh-key rc.12 taken, tailscale-rs v0.7.1 held).
+Open: T-790's writers (a draft); T-780 waits for podcrates (COORD-091); T-796 for its next hang.
 
 **Hand-off of 2026-11-16, evening (cloud; the session ended at the operator's word).** Each change is on `main` (`a37ea01`).
 Done: #276's red jobs repaired (`71ebc9d`); podcrates `v0.60.0` to `v0.63.0` taken (COORD-089, 092, 093, 094; #281,
@@ -193,7 +200,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 753 entries: 44 open, 33 partial, 12 blocked, 664 done.
+`TODO/INDEX.md` holds 754 entries: 44 open, 34 partial, 12 blocked, 664 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 

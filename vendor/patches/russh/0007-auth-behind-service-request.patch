@@ -1,5 +1,5 @@
 diff --git a/src/auth.rs b/src/auth.rs
-index d4e4581a..44e258bc 100644
+index d4e4581..44e258b 100644
 --- a/src/auth.rs
 +++ b/src/auth.rs
 @@ -370,6 +370,10 @@ pub struct AuthRequest {
@@ -30,7 +30,7 @@ index d4e4581a..44e258bc 100644
      }
  
 diff --git a/src/client/encrypted.rs b/src/client/encrypted.rs
-index 0884e863..3191ec96 100644
+index 0884e86..3191ec9 100644
 --- a/src/client/encrypted.rs
 +++ b/src/client/encrypted.rs
 @@ -430,6 +430,16 @@ impl Session {

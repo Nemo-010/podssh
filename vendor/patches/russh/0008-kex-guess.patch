@@ -1,8 +1,8 @@
 diff --git a/src/client/kex.rs b/src/client/kex.rs
-index d96cc785..22daaca1 100644
+index 9797921..a1cc670 100644
 --- a/src/client/kex.rs
 +++ b/src/client/kex.rs
-@@ -50,6 +50,9 @@ pub(crate) struct ClientKex {
+@@ -77,6 +77,9 @@ pub(crate) struct ClientKex {
      cause: KexCause,
      state: ClientKexState,
      config: Arc<Config>,
@@ -12,7 +12,7 @@ index d96cc785..22daaca1 100644
  }
  
  impl Debug for ClientKex {
-@@ -87,9 +90,39 @@ impl ClientKex {
+@@ -114,9 +117,39 @@ impl ClientKex {
              exchange,
              cause,
              state: ClientKexState::Created,
@@ -52,7 +52,7 @@ index d96cc785..22daaca1 100644
      /// `Created` is "our KEXINIT is out, the peer's has not arrived".
      pub fn peer_kexinit_received(&self) -> bool {
          !matches!(self.state, ClientKexState::Created)
-@@ -154,6 +187,17 @@ impl ClientKex {
+@@ -181,6 +214,17 @@ impl ClientKex {
                      ));
                  }
  
@@ -71,7 +71,7 @@ index d96cc785..22daaca1 100644
  
                  if kex.skip_exchange() {
 diff --git a/src/client/mod.rs b/src/client/mod.rs
-index c47c724f..4fa2afe8 100644
+index 2a31f40..5c5dcf4 100644
 --- a/src/client/mod.rs
 +++ b/src/client/mod.rs
 @@ -1270,13 +1270,20 @@ where
@@ -123,7 +123,7 @@ index c47c724f..4fa2afe8 100644
      let (kex_done_signal, kex_done_signal_rx) = oneshot::channel();
      let join = russh_util::runtime::spawn(session.run(stream, handler, Some(kex_done_signal)));
  
-@@ -2809,6 +2822,12 @@ pub struct Config {
+@@ -2810,6 +2823,12 @@ pub struct Config {
      pub gex: GexParams,
      /// If active, invoke `set_nodelay(true)` on the ssh socket; disabled by default (i.e. Nagle's algorithm is active).
      pub nodelay: bool,
@@ -136,7 +136,7 @@ index c47c724f..4fa2afe8 100644
  }
  
  impl Default for Config {
-@@ -2831,6 +2850,7 @@ impl Default for Config {
+@@ -2832,6 +2851,7 @@ impl Default for Config {
              anonymous: false,
              gex: Default::default(),
              nodelay: false,
@@ -145,7 +145,7 @@ index c47c724f..4fa2afe8 100644
      }
  }
 diff --git a/src/msg.rs b/src/msg.rs
-index 4f5e4828..ef0f4977 100644
+index 4f5e482..ef0f497 100644
 --- a/src/msg.rs
 +++ b/src/msg.rs
 @@ -130,6 +130,12 @@ pub(crate) fn validate_client_msg_strict_kex(msg_type: u8, seqno: usize) -> Resu
@@ -162,13 +162,13 @@ index 4f5e4828..ef0f4977 100644
          )
      {
 diff --git a/src/negotiation.rs b/src/negotiation.rs
-index 42f86747..50a325b8 100644
+index 73b9569..01dbc84 100644
 --- a/src/negotiation.rs
 +++ b/src/negotiation.rs
-@@ -50,6 +50,14 @@ pub struct Names {
-     pub server_compression: compression::Compression,
-     pub client_compression: compression::Compression,
-     pub ignore_guessed: bool,
+@@ -53,6 +53,14 @@ pub struct Names {
+     /// A wrong `first_kex_packet_follows` guess was received and ignored: the peer's real KEX packet
+     /// and everything after it arrive one sequence number later than the strict-kex order expects.
+     pub guessed_ignored: bool,
 +    /// The first key exchange and the first host key algorithms of both
 +    /// lists agree: a `first_kex_packet_follows` guess of ours is right.
 +    /// podssh's patch (vendor/patches/russh/).
@@ -180,7 +180,7 @@ index 42f86747..50a325b8 100644
      /// Whether `key` was negotiated as a certificate algorithm or not
      pub(crate) host_key_is_certificate: bool,
      // Prevent accidentally contructing [Names] without a [KeyCause]
-@@ -175,7 +183,7 @@ const SAFE_KEX_ORDER: &[kex::Name] = &[
+@@ -178,7 +186,7 @@ const SAFE_KEX_ORDER: &[kex::Name] = &[
      kex::EXTENSION_OPENSSH_STRICT_KEX_AS_SERVER,
  ];
  
@@ -189,7 +189,7 @@ index 42f86747..50a325b8 100644
      kex::EXTENSION_SUPPORT_AS_CLIENT,
      kex::EXTENSION_SUPPORT_AS_SERVER,
      kex::EXTENSION_OPENSSH_STRICT_KEX_AS_CLIENT,
-@@ -295,6 +303,7 @@ pub(crate) trait Select {
+@@ -298,6 +306,7 @@ pub(crate) trait Select {
                      .unwrap_or(true)
              })
              .collect::<Vec<_>>();
@@ -197,7 +197,7 @@ index 42f86747..50a325b8 100644
          let (kex_both_first, kex_algorithm) = Self::select(
              &_local_kexes_no_ext,
              &_remote_kexes_no_ext,
-@@ -432,6 +441,7 @@ pub(crate) trait Select {
+@@ -435,6 +444,7 @@ pub(crate) trait Select {
          String::decode(&mut r)?; // languages client-to-server
          String::decode(&mut r)?; // languages server-to-client
  
@@ -205,16 +205,16 @@ index 42f86747..50a325b8 100644
          let follows = u8::decode(&mut r)? != 0;
          u32::decode(&mut r)?;
          ensure_end(&r)?;
-@@ -446,6 +456,8 @@ pub(crate) trait Select {
-             host_key_is_certificate,
+@@ -450,6 +460,8 @@ pub(crate) trait Select {
              // Ignore the next packet if (1) it follows and (2) it's not the correct guess.
              ignore_guessed: follows && !(kex_both_first && key_both_first),
+             guessed_ignored: false,
 +            guess_right: kex_both_first && key_both_first,
 +            peer_first,
              strict_kex: (strict_kex_requested && strict_kex_provided) || cause.is_strict_rekey(),
          })
      }
-@@ -512,6 +524,17 @@ pub(crate) fn write_kex(
+@@ -516,6 +528,17 @@ pub(crate) fn write_kex(
      prefs: &Preferred,
      writer: &mut PacketWriter,
      server_config: Option<&Config>,
@@ -232,7 +232,7 @@ index 42f86747..50a325b8 100644
  ) -> Result<Bytes, Error> {
      writer.packet_bytes(|w| {
          msg::KEXINIT.encode(w)?;
-@@ -628,7 +651,7 @@ pub(crate) fn write_kex(
+@@ -632,7 +655,7 @@ pub(crate) fn write_kex(
          Vec::<String>::new().encode(w)?; // languages client to server
          Vec::<String>::new().encode(w)?; // languages server to client
  
@@ -242,7 +242,7 @@ index 42f86747..50a325b8 100644
          Ok(())
      })
 diff --git a/src/sshbuffer.rs b/src/sshbuffer.rs
-index d0c64396..4a5bd810 100644
+index d0c6439..4a5bd81 100644
 --- a/src/sshbuffer.rs
 +++ b/src/sshbuffer.rs
 @@ -410,6 +410,17 @@ impl PacketWriter {

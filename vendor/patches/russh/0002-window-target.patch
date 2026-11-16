@@ -38,10 +38,10 @@ index 6fe0719..af4c38d 100644
 +    }
 +}
 diff --git a/src/client/mod.rs b/src/client/mod.rs
-index 57a11d3..6c88232 100644
+index 1b254c0..09bfdb0 100644
 --- a/src/client/mod.rs
 +++ b/src/client/mod.rs
-@@ -3169,6 +3169,18 @@ pub trait Handler: Sized + Send {
+@@ -3175,6 +3175,18 @@ pub trait Handler: Sized + Send {
          window
      }
  
@@ -60,7 +60,7 @@ index 57a11d3..6c88232 100644
      /// Called when the server announces its host keys
      /// (`hostkeys-00@openssh.com`, sent by OpenSSH after authentication).
      ///
-@@ -3205,3 +3217,8 @@ pub trait Handler: Sized + Send {
+@@ -3211,3 +3223,8 @@ pub trait Handler: Sized + Send {
          }
      }
  }

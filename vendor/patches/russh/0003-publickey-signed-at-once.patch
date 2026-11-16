@@ -169,7 +169,7 @@ index af4c38d..9d19593 100644
          push_packet!(self.write, {
              msg::USERAUTH_INFO_RESPONSE.encode(&mut self.write)?;
 diff --git a/src/client/mod.rs b/src/client/mod.rs
-index 6c88232..1d5eebe 100644
+index 09bfdb0..1157d98 100644
 --- a/src/client/mod.rs
 +++ b/src/client/mod.rs
 @@ -511,6 +511,27 @@ impl<H: Handler> Handle<H> {

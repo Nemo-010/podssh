@@ -2961,7 +2961,7 @@ registers none (`openssh/openssh-portable:clientloop.c`, `client_global_request_
   after the login, as the failure's decode ends it. #83's 15 bytes are a failure's too, then: a
   Go server that knows no `keepalive@openssh.com` refuses it.
 - Read: the project carries a patched crate in `vendor/` through `[patch.crates-io]`, iroh-relay's
-  (`vendor/README.md:164-183`, `Cargo.toml:237-239`), and watches its upstream (T-341); russh's
+  (`vendor/README.md:174-193`, `Cargo.toml:237-239`), and watches its upstream (T-341); russh's
   copy went with T-356, as 0.65.0 gave what its patch had added.
 
 ## Approach
@@ -4596,7 +4596,7 @@ SSH, so it works against any sshd and through any relay, with nothing installed 
 - `crates/podssh-ssh/src/run.rs:30` says "pub(crate) const WINDOW: u32 = 512 * 1024;": one window for
   each channel, on each road.
 - russh's client asks its handler for each channel's next window target,
-  `vendor/russh/src/client/mod.rs:3255` says "fn adjust_window(&mut self, channel: ChannelId, window: u32) -> u32 {",
+  `vendor/russh/src/client/mod.rs:3261` says "fn adjust_window(&mut self, channel: ChannelId, window: u32) -> u32 {",
   and podssh's handler does not take that hook (no `fn adjust_window` under `crates/`).
 - osewa's own lab shows the gain is its flow control, not QUIC: over its TCP WebSocket the echo
   under load was lower than over QUIC (`docs/research/osewa-paper.md`, section 0, item 4).
@@ -5454,3 +5454,64 @@ subtracted, and `FAR` of 800 ms. `cargo test -p podssh-ssh --test cold_connect`:
 `vendor/russh/src/client/encrypted.rs` (the client waits for the service's answer again): "the login took 3.23689951s,
 35.994077ms of it with no delay: 4.0 answers late", failed; reverted. rustfmt clean.
 
+
+
+# T-799: russh 0.65.2 and ssh-key 0.7.0-rc.12 in the place of the copies; tailscale-rs v0.7.1 read and held
+
+**Source:** `upstream.yml`'s scheduled run of 2026-11-16 (run 43906617031, at `0370b0b`), job `vendored`.
+**Category:** defect
+**Milestone:** M10
+**Priority:** P1
+**Effort:** M
+**Status:** partial
+
+## Problem
+
+`scripts/check-vendored.py` failed: russh released 0.65.2, ssh-key 0.7.0-rc.12 and tailscale-rs v0.7.1, none of them
+the copy or the release read. russh 0.65.1 fixed two advisories (GHSA-736f-c93q-9fwx, GHSA-9264-jvgf-6w2f) and a
+defect that podssh hits: its agent client's `lock`, `unlock`, `remove_identity` and `extension` took the agent's
+FAILURE for success (43a46d6), so `podssh agent unlock` with a wrong password said "Agent unlocked." and exited 0.
+russh 0.65.2 pins `ssh-key = "=0.7.0-rc.12"`, so both move together.
+
+## Premise
+
+- The run's lines: "FAIL russh released 0.65.2, which is neither the copy (0.65.0) nor the one judged (0.65.0)", and
+  the same of ssh-key 0.7.0-rc.12 and tailscale-rs 0.7.1.
+- `vendor/README.md` ("russh", "How to carry it to another version") gives the steps; each patch is a diff of the tree
+  before it.
+
+## Approach
+
+1. russh: the published 0.65.2, then the eleven patches in order; 0008's hunks of `src/negotiation.rs` moved beside
+   upstream's new `guessed_ignored`; its hunk of `src/msg.rs` kept (upstream's 7c59594 takes the same order; the
+   patch's only matches more).
+2. ssh-key: the published 0.7.0-rc.12, its patch 0001 (the short ECDSA scalar, which rc.12 still refuses), and the two
+   test keys out as before.
+3. The requirements and the lock files follow; podssh's code follows rsa 0.10 where it names it.
+4. tailscale-rs: read and held (each crate moved under `crates/`, so each of 29 patches would need a rebase, and none
+   of its fixes reaches a path of podssh's); the line "Upstream read" says so.
+
+## Prove
+
+```sh
+python3 scripts/check-vendored.py
+cargo test -p podssh-ssh -p podssh-cli
+cargo test --manifest-path vendor/russh/Cargo.toml --target-dir .work/russh-target --lib client::
+```
+
+`podssh agent unlock` with a wrong password exits non-zero; the patches' tests and podssh's tests of them pass.
+
+## Done
+
+Partial, 2026-11-16. Each release read (a reading of the changes from 0.65.0 to 0.65.2, rc.11 to rc.12 and v0.6.1 to
+v0.7.1, by the crates of crates.io and the commits): russh 0.65.2 and ssh-key 0.7.0-rc.12 are the copies now, each from
+the crate whose SHA-256 is the index's checksum (`78229f06...`, `0701b552...`); russh's patches 0001 to 0007 and 0009 to
+0011 applied as they were, 0008's two hunks of `src/negotiation.rs` moved beside upstream's `guessed_ignored`, and each
+patch was written again against the new tree (the shipped tree is the crate plus the patches, `diff -r` empty);
+ssh-key's 0001 applied as it was, the two test keys out. The crates require russh 0.65.2; `Cargo.lock` takes rsa
+0.10.0 and pkcs1 0.8.0, `fuzz/Cargo.lock` the two copies. tailscale-rs v0.7.1 is held, its line "Upstream read" says
+why. `vendor/README.md` says each. A test, `agent_failures_of_unlock_and_remove_are_refusals` of
+`tests/agent_cli.rs`: a wrong unlock password exits 77 and a key that the agent does not hold is not "removed"; on
+russh 0.65.0 it fails ("Agent unlocked.", exit 0). `cargo test -p podssh-ssh -p podssh-cli` 2891 passed, 0 failed;
+russh's own `--lib` 235 passed; clippy (the gate's lints) and rustfmt clean. UNVERIFIED: `scripts/check-vendored.py`,
+which reads GitHub's API that this host's proxy refuses: `upstream.yml` by hand on the push.

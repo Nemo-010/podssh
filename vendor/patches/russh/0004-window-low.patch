@@ -44,10 +44,10 @@ index 9d19593..0884e86 100644
 +    }
 +}
 diff --git a/src/client/mod.rs b/src/client/mod.rs
-index 1d5eebe..44fd5ac 100644
+index 1157d98..2415d8f 100644
 --- a/src/client/mod.rs
 +++ b/src/client/mod.rs
-@@ -3202,6 +3202,18 @@ pub trait Handler: Sized + Send {
+@@ -3208,6 +3208,18 @@ pub trait Handler: Sized + Send {
          window
      }
  

@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**753 entries: 44 open, 33 partial, 12 blocked, 664 done.**
+**754 entries: 44 open, 34 partial, 12 blocked, 664 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 3 | 8 | 3 | 78 | 92 |
+| P1 | 3 | 9 | 3 | 78 | 93 |
 | P2 | 7 | 19 | 3 | 282 | 311 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 44 | 33 | 12 | 664 | 753 |
+| **All** | 44 | 34 | 12 | 664 | 754 |
 
 ## Entries
 
@@ -829,3 +829,4 @@ repository and CI).
 | [T-796](robustness.md) | P1 | S | M10 | defect | partial | The gate's OpenSSH and Dropbear interop hung past the job's 45 min, and left no line of where |
 | [T-797](robustness.md) | P2 | S | M10 | defect | done | The weekly fuzz run stopped before its first target, two weeks running, on a count of seeds that had moved |
 | [T-798](relay.md) | P2 | M | M10 | feature | blocked | The resumable layer over the HTTP road, where the way refuses the WebSocket upgrade |
+| [T-799](ssh.md) | P1 | M | M10 | defect | partial | russh 0.65.2 and ssh-key 0.7.0-rc.12 in the place of the copies; tailscale-rs v0.7.1 read and held |

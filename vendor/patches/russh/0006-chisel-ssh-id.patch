@@ -1,7 +1,8 @@
 diff --git a/src/ssh_read.rs b/src/ssh_read.rs
+index 0342039..ac2ae98 100644
 --- a/src/ssh_read.rs
 +++ b/src/ssh_read.rs
-@@ -190,7 +190,9 @@
+@@ -190,7 +190,9 @@ impl<R: AsyncRead + Unpin> SshRead<R> {
                      // Check if we have a valid SSH protocol identifier
                      #[allow(clippy::indexing_slicing)]
                      if let Ok(s) = std::str::from_utf8(&ssh_id.buf[..i])
@@ -12,10 +13,11 @@ diff --git a/src/ssh_read.rs b/src/ssh_read.rs
                      {
                          ssh_id.sshid_len = i;
                          return Ok(ssh_id.id());
-@@ -219,6 +221,15 @@
+@@ -218,6 +220,15 @@ mod tests {
+     use super::*;
      use std::iter;
  
-     #[tokio::test]
++    #[tokio::test]
 +    async fn test_ssh_id_chisel() {
 +        let data = "SSH-chisel-v3-server\r\n";
 +        let mut read = SshRead::new(data.as_bytes());
@@ -24,7 +26,6 @@ diff --git a/src/ssh_read.rs b/src/ssh_read.rs
 +        assert_eq!(received, b"SSH-chisel-v3-server");
 +    }
 +
-+    #[tokio::test]
+     #[tokio::test]
      async fn test_ssh_id_openssh() {
          let data = "SSH-2.0-OpenSSH_10.2\r\n";
-         let mut read = SshRead::new(data.as_bytes());
