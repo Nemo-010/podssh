@@ -200,7 +200,7 @@ pub fn is_label(text: &str) -> bool {
 pub fn third_party_line(service: &Service) -> String {
     format!(
         "the localtunnel road, a last fallback: {service}, a third party that nobody vouches for, carries this \
-         session (the operator's ruling Q78); it ends the visitors' TLS and sees the times, the sizes and the \
+         session; it ends the visitors' TLS and sees the times, the sizes and the \
          layer's bytes, which the end-to-end channel keeps private; {ENV}=no or {}=no turns it off",
         crate::pinggy::LAST_RESORT
     )
@@ -256,7 +256,7 @@ mod tests {
     #[test]
     fn the_line_of_the_third_party_names_it_and_both_switches() {
         let line = third_party_line(&stand_in());
-        let words = ["lt.stand-in.test", "nobody vouches for", "Q78", "PODSSH_LOCALTUNNEL=no", "PODSSH_LAST_RESORT=no"];
+        let words = ["lt.stand-in.test", "nobody vouches for", "PODSSH_LOCALTUNNEL=no", "PODSSH_LAST_RESORT=no"];
         for word in words {
             assert!(line.contains(word), "{word}: {line}");
         }

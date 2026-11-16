@@ -86,7 +86,7 @@ pub(super) async fn check(report: &mut Report<'_>, text: &str, trust: &Trust) {
             " inside TLS; a hop of plain SSH is written without ssh+tls://"
         } else {
             ". A proxy that waits for TLS carries no SSH: a hop whose SSH is inside TLS, as stunnel serves it, is \
-             written ssh+tls://HOST (T-372), and without --direct the relay carries SSH over HTTPS"
+             written ssh+tls://HOST, and without --direct the relay carries SSH over HTTPS"
         };
         let detail =
             format!("{target} {via}: the connection opened, then {why}: no SSH server answered{instead}; {summary}");

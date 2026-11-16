@@ -194,7 +194,7 @@ pub fn unnamed_words() -> String {
 pub fn third_party_line(service: &Service) -> String {
     format!(
         "the bore road, a last fallback: {service}, a third party that nobody vouches for, carries this session \
-         over raw TCP, its control port {} and a public port of the node's key (the operator's ruling Q78); it sees \
+         over raw TCP, its control port {} and a public port of the node's key; it sees \
          the times and the sizes, and the end-to-end channel keeps the bytes private; {ENV}=no or {LAST_RESORT}=no \
          turns it off",
         service.port
@@ -235,7 +235,7 @@ mod tests {
     #[test]
     fn the_line_of_the_third_party_names_it_both_switches_and_raw_tcp() {
         let line = third_party_line(&stand_in());
-        for word in ["bore.stand-in.test", "nobody vouches for", "Q78", "PODSSH_BORE=no", "PODSSH_LAST_RESORT=no"] {
+        for word in ["bore.stand-in.test", "nobody vouches for", "PODSSH_BORE=no", "PODSSH_LAST_RESORT=no"] {
             assert!(line.contains(word), "{word}: {line}");
         }
         assert!(line.contains("raw TCP") && line.contains("control port 7835"), "{line}");

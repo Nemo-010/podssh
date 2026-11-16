@@ -53,7 +53,7 @@ pub fn server_refused(server: Option<&str>, pin: Option<&str>) -> Result<(), Str
     }
     Err(format!(
         "{SERVER_ENV} and {SERVER_PIN_ENV}: this build takes WARP's endpoint alone, as pod-warp does not speak \
-         connect-ip over HTTP/3 to a server of the user's own (PodUtils/podcrates T-481); unset both"
+         connect-ip over HTTP/3 to a server of the user's own; unset both"
     ))
 }
 
@@ -84,7 +84,7 @@ mod tests {
     fn a_server_of_the_user_s_own_is_refused() {
         assert_eq!(server_refused(None, Some(" ")), Ok(()));
         let why = server_refused(Some("https://masque.example:443"), None).unwrap_err();
-        assert!(why.contains("PodUtils/podcrates T-481"), "{why}");
+        assert!(why.contains("a server of the user's own; unset both") && !why.contains("T-481"), "{why}");
         assert!(server_refused(None, Some("ab")).is_err());
     }
 }

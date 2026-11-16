@@ -41,7 +41,7 @@ pub(crate) async fn pairs(identity: &Identity, own: &Relay, trust: &Trust, say: 
         let at = relay_name(&relay);
         match once::create_by(&ctx, false, Some(identity)).await {
             Ok((pair, _)) => {
-                say(format!("and at the net's relay member {at}, by this node's key (T-434)"));
+                say(format!("and at the net's relay member {at}, by this node's key"));
                 made.push(pair);
             }
             Err(e) => say(format!("no pair at the net's relay member {at}: {e}")),

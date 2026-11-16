@@ -342,38 +342,33 @@ pub(super) fn order(kinds: &[Kind], unasked: Unasked) -> String {
         let when = match (at, kind) {
             (0, _) => "first".to_string(),
             (_, Kind::Derp) if unasked.derp => "when each road before it failed (a kept ticket)".to_string(),
-            (_, Kind::Transit) => "when each road before it failed (Q65)".to_string(),
-            (_, kind) if kind.of_the_pair_last() => {
-                "when each road before it failed (the last fallback of Q78)".to_string()
-            }
-            (_, Kind::OpenTunnel) if unasked.opentunnel => {
-                "when each road before it failed (a kept name, Q76)".to_string()
-            }
+            (_, Kind::Transit) => "when each road before it failed".to_string(),
+            (_, kind) if kind.of_the_pair_last() => "when each road before it failed (the last fallback)".to_string(),
+            (_, Kind::OpenTunnel) if unasked.opentunnel => "when each road before it failed (a kept name)".to_string(),
             (_, Kind::Record(_)) if !matches!(kinds[at - 1], Kind::Record(_)) => {
-                "when each road before it failed (the node's record of pkarr, T-445)".to_string()
+                "when each road before it failed (the node's record of pkarr)".to_string()
             }
-            (_, Kind::Member) => "when each road before it failed (a member of the net that relays, T-434)".to_string(),
-            (_, Kind::Frp) => "when each road before it failed (the user's frps, T-498)".to_string(),
-            (_, Kind::Gsr) => "when each road before it failed (the shared secret, T-707)".to_string(),
+            (_, Kind::Member) => "when each road before it failed (a member of the net that relays)".to_string(),
+            (_, Kind::Frp) => "when each road before it failed (the user's frps)".to_string(),
+            (_, Kind::Gsr) => "when each road before it failed (the shared secret)".to_string(),
             (_, Kind::Pinggy) if unasked.pinggy.is_some() => {
                 let from = unasked.pinggy.unwrap_or_default();
-                format!("when each road before it failed ({from}, the last fallback of Q78)")
+                format!("when each road before it failed ({from}, the last fallback)")
             }
             (_, Kind::Serveo) => {
-                "when each road before it failed (the alias of the node's key, the last fallback of Q78)".to_string()
+                "when each road before it failed (the alias of the node's key, the last fallback)".to_string()
             }
             (_, Kind::SshJ | Kind::SrvUs | Kind::LocalTunnel | Kind::Bore) => {
-                "when each road before it failed (the node's key, the last fallback of Q78)".to_string()
+                "when each road before it failed (the node's key, the last fallback)".to_string()
             }
             (_, Kind::Bare) => {
-                "when each road before it failed (the tunnel's name through a Bare node, the last fallback of Q78)"
-                    .to_string()
+                "when each road before it failed (the tunnel's name through a Bare node, the last fallback)".to_string()
             }
             (_, Kind::SshHttp(false, _)) => {
-                "when each road before it failed (a kept name or its record, the last fallback of Q78)".to_string()
+                "when each road before it failed (a kept name or its record, the last fallback)".to_string()
             }
             (_, Kind::Piping) if unasked.piping => {
-                "when each road before it failed and one found the WebSocket upgrade refused (Q65)".to_string()
+                "when each road before it failed and one found the WebSocket upgrade refused".to_string()
             }
             _ => format!("{} ms after", HEAD_START.as_millis()),
         };

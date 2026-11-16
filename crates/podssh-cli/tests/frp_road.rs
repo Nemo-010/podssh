@@ -289,7 +289,7 @@ fn with_the_pair_s_road_down_the_race_gives_the_session_to_frps_and_another_secr
     assert_eq!(rc, 0, "stdout {out:?}, stderr {err}");
     assert_eq!(out, GREETING, "the command's output over the road");
     assert!(err.contains("the frp road answered first"), "{err}");
-    assert!(err.contains("the frp road when each road before it failed (the user's frps, T-498)"), "{err}");
+    assert!(err.contains("the frp road when each road before it failed (the user's frps)"), "{err}");
     assert!(lab.frps.visits.load(Ordering::SeqCst) >= 1, "a visitor came through frps");
     assert!(!err.contains(TOKEN) && !err.contains(SECRET), "{err}");
 

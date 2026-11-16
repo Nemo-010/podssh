@@ -73,7 +73,7 @@ pub const RELAY: &[&str] = &[
      and fingerprint and the expiry. A code that nobody holds (it expired, it was used, or it was typed \
      wrong at its number) and a wrong code are 77; no mailbox reached is 69. The mailboxes: \
      magic-wormhole's public one, wss://relay.magic-wormhole.io/v1, then Least Authority's, \
-     wss://mailbox.mw.leastauthority.com/v1, which the operator's ruling Q65 lets podssh use unasked; \
+     wss://mailbox.mw.leastauthority.com/v1, which podssh may use unasked; \
      --pair-mailbox URLS or PODSSH_PAIR_MAILBOX names others, such as podssh relay serve's, and no turns \
      the pairing by code off. Both ends name the same ones. Where no mailbox answers, the ends meet at \
      the next place, in this order: a public ntfy server's topic of the code (PODSSH_PAIR_NTFY), a public \

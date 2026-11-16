@@ -107,7 +107,7 @@ fn pick<'a>(name: &str, peers: &'a [String]) -> Option<&'a String> {
 /// The line of Q78, before the first byte goes to the peer.
 pub fn third_party_line(peer: &str) -> String {
     format!(
-        "the public peer {peer} of Yggdrasil's network carries this session, a last fallback of Q78: this end joins \
+        "the public peer {peer} of Yggdrasil's network carries this session, a last fallback: this end joins \
          the network and routes for it while the road is up; the peers on the path see the two ends' keys, the \
          times and the sizes; the end-to-end channel keeps the bytes ({ENV}=no turns it off)"
     )

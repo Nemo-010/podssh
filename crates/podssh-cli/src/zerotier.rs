@@ -89,7 +89,7 @@ pub(crate) fn relay() -> Option<(SocketAddr, bool)> {
 /// The line of Q78, before the first byte goes to ZeroTier Inc.
 pub fn third_party_line(relay: SocketAddr) -> String {
     format!(
-        "ZeroTier Inc.'s roots and its TCP relay {relay} carry this session, a last fallback of Q78: they see the \
+        "ZeroTier Inc.'s roots and its TCP relay {relay} carry this session, a last fallback: they see the \
          two ZeroTier addresses, the times and the sizes; the end-to-end channel keeps the bytes ({ENV}=no turns it off)"
     )
 }

@@ -134,7 +134,7 @@ fn pick<'a>(name: &str, relays: &'a [Relay]) -> Option<&'a Relay> {
 /// The line of Q78, before the first byte goes to the relay.
 pub fn third_party_line(relay: SocketAddr) -> String {
     format!(
-        "the Tox project's public TCP relay {relay} carries this session, a last fallback of Q78: it sees the two \
+        "the Tox project's public TCP relay {relay} carries this session, a last fallback: it sees the two \
          ends' keys of the relay, the times and the sizes; the end-to-end channel keeps the bytes ({ENV}=no turns it off)"
     )
 }

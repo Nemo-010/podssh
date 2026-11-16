@@ -90,7 +90,7 @@ pub(crate) fn bootstrap() -> Option<(Vec<String>, bool)> {
 /// The line of Q78, before this end joins the public DHT.
 pub fn third_party_line() -> String {
     format!(
-        "HyperDHT's public network carries this session where UDP passes, a road of Q77 and Q82: its nodes see this \
+        "HyperDHT's public network carries this session where UDP passes, a road of a third party: its nodes see this \
          end's address and the node's topic, and the hole punched between the two ends; the end-to-end channel keeps \
          the bytes ({ENV}=no turns it off)"
     )

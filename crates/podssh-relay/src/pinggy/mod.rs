@@ -188,8 +188,8 @@ pub fn setting(value: Option<&str>, last: Option<&str>) -> Result<Setting, Strin
 /// The line that a run says before Pinggy carries a session of its own (Q78).
 pub fn third_party_line(service: &Service) -> String {
     format!(
-        "the Pinggy road, a last fallback: {service}, a third party that nobody vouches for, carries this session \
-         (the operator's ruling Q78); SSH and the end-to-end channel keep its bytes private; {ENV}=no or \
+        "the Pinggy road, a last fallback: {service}, a third party that nobody vouches for, carries this session; \
+        SSH and the end-to-end channel keep its bytes private; {ENV}=no or \
          {LAST_RESORT}=no turns it off"
     )
 }
@@ -238,7 +238,7 @@ mod tests {
     #[test]
     fn the_line_of_the_third_party_names_it_and_both_switches() {
         let line = third_party_line(&Service::parse("relay.example.test").unwrap());
-        for word in ["relay.example.test", "nobody vouches for", "Q78", "PODSSH_PINGGY=no", "PODSSH_LAST_RESORT=no"] {
+        for word in ["relay.example.test", "nobody vouches for", "PODSSH_PINGGY=no", "PODSSH_LAST_RESORT=no"] {
             assert!(line.contains(word), "{word}: {line}");
         }
     }

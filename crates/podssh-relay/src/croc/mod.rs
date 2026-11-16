@@ -147,7 +147,7 @@ pub fn setting(value: Option<&str>, last: Option<&str>) -> Result<Setting, Strin
 pub fn third_party_line(shown: &str) -> String {
     format!(
         "croc's relay road, a last fallback: {shown}, a volunteer's service that nobody vouches for, carries \
-         this session (the operator's ruling Q78); SSH and the end-to-end channel keep its bytes private; \
+         this session; SSH and the end-to-end channel keep its bytes private; \
          {ENV}=no or {LAST_RESORT}=no turns it off"
     )
 }

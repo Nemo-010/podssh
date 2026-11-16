@@ -322,7 +322,7 @@ pub fn third_party_line(service: &Service) -> String {
     let word = service.word;
     format!(
         "the {} road, a last fallback: {service}, a third party that nobody vouches for, carries this session \
-         over HTTPS that it ends (the operator's ruling Q78); it sees the times and the sizes, and the end-to-end \
+         over HTTPS that it ends; it sees the times and the sizes, and the end-to-end \
          channel keeps the bytes private; {}=no or {LAST_RESORT}=no turns it off",
         word.name, word.env
     )
@@ -334,7 +334,7 @@ pub fn third_party_line(service: &Service) -> String {
 pub fn client_line(word: Word, host: &str) -> String {
     format!(
         "the {} road, a last fallback: {host}, a tunnel's name at {}, a third party that nobody vouches for, \
-         carries this session over HTTPS that it ends (the operator's ruling Q78); the end-to-end channel keeps \
+         carries this session over HTTPS that it ends; the end-to-end channel keeps \
          its bytes private; {}=no or {LAST_RESORT}=no turns it off",
         word.name, word.name, word.env
     )
@@ -425,13 +425,13 @@ mod tests {
     #[test]
     fn the_line_of_the_third_party_names_it_both_switches_and_what_it_sees() {
         let line = third_party_line(&stand_in());
-        for word in ["localhost.run", "lhr.stand-in.test", "nobody vouches for", "Q78", "PODSSH_LOCALHOST_RUN=no"] {
+        for word in ["localhost.run", "lhr.stand-in.test", "nobody vouches for", "PODSSH_LOCALHOST_RUN=no"] {
             assert!(line.contains(word), "{word}: {line}");
         }
         assert!(line.contains("PODSSH_LAST_RESORT=no") && line.contains("end-to-end channel"), "{line}");
         assert!(unnamed_words(LOCALHOST_RUN).contains("PODSSH_LOCALHOST_RUN=HOST[:PORT]"));
         let client = client_line(LOCALHOST_RUN, "a1.lhr.life");
-        for word in ["a1.lhr.life", "localhost.run", "nobody vouches for", "Q78", "PODSSH_LAST_RESORT=no"] {
+        for word in ["a1.lhr.life", "localhost.run", "nobody vouches for", "PODSSH_LAST_RESORT=no"] {
             assert!(client.contains(word), "{word}: {client}");
         }
     }

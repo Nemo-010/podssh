@@ -200,8 +200,8 @@ pub fn unnamed_words() -> String {
 /// The line that a node says before the road carries a session (Q78).
 pub fn third_party_line(service: &Service) -> String {
     format!(
-        "the hostc road, a last fallback: {service}, a third party that nobody vouches for, carries this session \
-         (the operator's ruling Q78); it ends the visitors' TLS and sees the times, the sizes and the layer's \
+        "the hostc road, a last fallback: {service}, a third party that nobody vouches for, carries this session; \
+        it ends the visitors' TLS and sees the times, the sizes and the layer's \
          bytes, which the end-to-end channel keeps private; {ENV}=no or {LAST_RESORT}=no turns it off"
     )
 }
@@ -211,7 +211,7 @@ pub fn third_party_line(service: &Service) -> String {
 pub fn client_line(host: &str) -> String {
     format!(
         "the hostc road, a last fallback: {host}, a tunnel's name at hostc, a third party that nobody vouches for, \
-         carries this session over HTTPS that it ends (the operator's ruling Q78); the end-to-end channel keeps \
+         carries this session over HTTPS that it ends; the end-to-end channel keeps \
          its bytes private; {ENV}=no or {LAST_RESORT}=no turns it off"
     )
 }
@@ -270,7 +270,7 @@ mod tests {
     #[test]
     fn each_line_names_the_third_party_both_switches_and_a_refused_version_the_way_on() {
         let line = third_party_line(&stand_in());
-        for word in ["hostc.stand-in.test", "nobody vouches for", "Q78", "PODSSH_HOSTC=no", "PODSSH_LAST_RESORT=no"] {
+        for word in ["hostc.stand-in.test", "nobody vouches for", "PODSSH_HOSTC=no", "PODSSH_LAST_RESORT=no"] {
             assert!(line.contains(word), "{word}: {line}");
         }
         assert!(client_line("abc.tunnels.test").contains("PODSSH_HOSTC=no"));

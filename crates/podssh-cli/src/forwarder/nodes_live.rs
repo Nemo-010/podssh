@@ -64,5 +64,5 @@ async fn live_each_node_of_the_binary_carries_a_session_to_github() {
             }
         }
     }
-    assert!(failed.is_empty(), "drop from the catalog (Q90): {failed:?}");
+    assert!(failed.is_empty(), "drop from the catalog: {failed:?}");
 }

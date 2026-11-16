@@ -327,7 +327,7 @@ fn with_the_pair_s_road_down_the_race_gives_the_session_to_opentunnel_and_a_kept
     let (rc, out, err) = run(&mut lab.ssh(&["-v", "node://tester@lab", "greet"]));
     assert_eq!(rc, 0, "stdout {out:?}, stderr {err}");
     assert_eq!(out, GREETING);
-    assert!(err.contains("when each road before it failed (a kept name, Q76)"), "{err}");
+    assert!(err.contains("when each road before it failed (a kept name)"), "{err}");
 
     // PODSSH_OPENTUNNEL=no: the pair's road alone, which fails.
     let (rc, out, err) = run(lab.ssh(&["node://tester@lab", "greet"]).env("PODSSH_OPENTUNNEL", "no"));

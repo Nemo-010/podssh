@@ -160,7 +160,7 @@ pub(crate) fn relay_for(name: &str) -> Option<(Relay, bool)> {
 /// The line of Q78, before the first byte goes to the relay.
 pub fn third_party_line(relay: SocketAddr) -> String {
     format!(
-        "a public relay of Syncthing's pool, {relay}, carries this session, a last fallback of Q78: it sees the two \
+        "a public relay of Syncthing's pool, {relay}, carries this session, a last fallback: it sees the two \
          ends' certificates, the times and the sizes; the end-to-end channel keeps the bytes ({ENV}=no turns it off)"
     )
 }

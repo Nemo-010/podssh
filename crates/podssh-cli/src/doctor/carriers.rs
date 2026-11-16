@@ -165,7 +165,7 @@ async fn croc_line(report: &mut Report<'_>, bridge: &Bridge, trust: &Trust) {
         Ok(Ok(session)) => {
             let ms = started.elapsed().as_millis();
             let _ = tokio::time::timeout(Duration::from_secs(2), session.send_close(1000, "")).await;
-            let whose = if bridge.public { ", a third party's (Q78)" } else { "" };
+            let whose = if bridge.public { ", a third party's" } else { "" };
             report.ok(&label, format!("the WebSocket to relay 0 opened in {ms} ms{whose}; no room joined"));
         }
         Ok(Err(why)) => report.fail(&label, why),

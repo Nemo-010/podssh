@@ -64,7 +64,7 @@ pub(crate) async fn first_hop_to(
         Ok(false) => return Err(format!("{direct}; {fallback}=no keeps the forwarders out")),
         Err(refusal) => return Err(format!("{direct}; {}", refusal.message)),
     }
-    log.verbose(&format!("{direct}; the forwarders that the binary names now (Q56)"));
+    log.verbose(&format!("{direct}; the forwarders that the binary names now"));
     let forwarders = forwarder::public::chain(forwarder::builtins(), &forwarder::public::forwarders());
     match forwarder::reach::carry(&forwarders, trust, host, port, log, true).await {
         Ok(reached) => Ok(Box::new(reached.stream)),

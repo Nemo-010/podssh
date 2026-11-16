@@ -283,4 +283,4 @@
 275 issue closed
 276 issue open
 277 issue open
-278 issue open
+278 issue closed

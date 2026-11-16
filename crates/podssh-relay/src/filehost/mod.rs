@@ -155,8 +155,8 @@ pub fn third_party_line(host: &str, one_person: bool) -> String {
     let run_by = if one_person { ", run by one person," } else { "" };
     format!(
         "the file-host road, the last of the last fallbacks: {host}, a public file host{run_by} that nobody \
-         vouches for, keeps each piece of this session until it is read or its shortest life ends (the \
-         operator's ruling Q78); each piece is sealed, and SSH and the end-to-end channel keep the bytes \
+         vouches for, keeps each piece of this session until it is read or its shortest life ends; \
+         each piece is sealed, and SSH and the end-to-end channel keep the bytes \
          private; the road is slow, for output and files, not for typing; {ENV}=no or {LAST_RESORT}=no turns \
          it off"
     )
@@ -201,7 +201,6 @@ mod tests {
             "files.stand-in.test",
             "run by one person",
             "nobody vouches for",
-            "Q78",
             "sealed",
             "slow",
             "PODSSH_FILEHOSTS=no",

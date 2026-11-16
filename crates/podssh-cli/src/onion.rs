@@ -121,7 +121,7 @@ pub fn third_party_line(network: Option<&str>) -> String {
         |file| format!("the Tor network of {file} carries this session"),
     );
     format!(
-        "{which} through an onion service, the last fallback of Q78: no relay sees both ends, and the end-to-end \
+        "{which} through an onion service, the last fallback: no relay sees both ends, and the end-to-end \
          channel keeps the bytes ({ENV}=no turns it off)"
     )
 }

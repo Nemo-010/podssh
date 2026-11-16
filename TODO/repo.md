@@ -6614,6 +6614,16 @@ character. `cargo clippy -p podssh-cli --all-targets` clean, rustfmt clean, `car
 0 failed, and `sh scripts/interop-man.sh target/debug/podssh` (groff and mandoc of this host) 7 checks ok. Next: the
 model on `pod-manual` and its checks, as above.
 
+Step three, 2026-11-16, the lines of the run: a node's line under the release's features still said "a last fallback
+of Q78" (ZeroTier's road), so each string literal of each crate's code, the test modules aside, was read for an id
+(`T-NNN`, `QNN`, `COORD-NNN`): 37 more, in the lines of the third parties' roads (`podssh-relay`'s bore, hostc,
+localtunnel, pinggy, serveo, ssh_http and filehost), of the last fallbacks (`road_link.rs`, onion, strelay, tox,
+yggdrasil, zerotier, hyperdht), of doctor, of a net's member and of the manual's mailboxes. Each phrase of an id is
+rewritten so that the sentence stays whole ("the last fallback of Q78" is "the last fallback"; "(the operator's
+ruling Q78)" goes); the tests that looked for an id look for the line's other words. After it: none. `cargo clippy -p
+podssh-cli -p podssh-relay --all-targets` with the release's features clean; `cargo test -p podssh-relay -p
+podssh-cli` 2826 passed with 6 failed (the tests of the old wording), then those and the roads' tests 114 passed.
+
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
 
@@ -6666,8 +6676,15 @@ for a connect to the host's proxy (COORD-086, #278); podcrates gave `podlab run 
 its next tag. The Prove, the same day, with a release build of `cd55ede` (`cargo build --release -p podssh-cli
 --features iroh,warp,zerotier`): `podlab run PROFILE -- sh scripts/release-short.sh target/release/podssh --net`
 exited 0 in the nine profiles above, each ending at GitHub's SSH banner through the live relay; in `bind-denied` it
-exited 1 at that step, for the same refused connect. Next: commands 3 to 6 (a copy of 200 MiB each way, `serve` with
-`vi`, `less` and Ctrl-C, `pipe`, a session after a kill of its relay link) in the same profiles, then the release
+exited 1 at that step, for the same refused connect. Commands 2 and 3 through a node: outside the lab a throwaway
+OpenSSH server on the loopback, a pair on the live relay (`podssh relay pair`) and `podssh node NAME 127.0.0.1:PORT`;
+inside it `podssh ssh -i KEY node://root@NAME echo`, then `podssh cp --timeout 600s` of 200 MiB of random bytes up and
+back, each compared by SHA-256. In each of the nine profiles: the echo came back, and both copies were whole, up in 37
+to 42 s and down in 44 to 50 s (about 4.5 MiB/s, the same as outside a lab). With `podlab` of `v0.58.0` (its release asset, checked against its
+`SHA256SUMS`), `podlab run --allow-connect PORT bind-denied`, PORT the proxy's: doctor exited 0 (70 ok, 0 FAIL),
+`release-short.sh --net` exited 0, and the lane's ssh and both copies passed (up 42 s, down 45 s): the target sandbox
+in a lab with no root. Next: commands 4 to 6 (`serve` with `vi`, `less` and Ctrl-C, `pipe`, a session after a
+kill of its relay link) in the same profiles, and a script of the lane in `scripts/`, then the release
 steps that name the run. The network classes (`proxy-only` and the others of COORD-081) wait for podnet's data in
 `pod-lab` (podcrates T-716).
 
