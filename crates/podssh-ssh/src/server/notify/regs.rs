@@ -74,7 +74,13 @@ mod arch {
     const NT_PRSTATUS: libc::c_int = 1;
     const NT_ARM_SYSTEM_CALL: libc::c_int = 0x404;
 
-    fn regset<T>(op: libc::c_uint, pid: i32, note: libc::c_int, value: &mut T) -> io::Result<()> {
+    /// A ptrace request: glibc declares it unsigned, musl signed.
+    #[cfg(target_env = "musl")]
+    type Request = libc::c_int;
+    #[cfg(not(target_env = "musl"))]
+    type Request = libc::c_uint;
+
+    fn regset<T>(op: Request, pid: i32, note: libc::c_int, value: &mut T) -> io::Result<()> {
         let mut iov = libc::iovec { iov_base: (value as *mut T).cast(), iov_len: std::mem::size_of::<T>() };
         // SAFETY: the iovec names `value`, of its own size, which outlives the call.
         let rc = unsafe { libc::ptrace(op, pid, note as libc::c_long, &mut iov as *mut libc::iovec) };

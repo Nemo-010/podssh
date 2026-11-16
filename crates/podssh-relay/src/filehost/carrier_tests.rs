@@ -151,7 +151,10 @@ async fn a_busy_host_rests_and_the_next_host_serves_the_next_piece() {
     }
     let lines = ends.lines.lock().unwrap().clone();
     assert!(lines.iter().any(|l| l.contains("busy.stand-in.test is busy")), "{lines:?}");
-    assert!(lines.iter().any(|l| l.contains("next.stand-in.test") && l.contains("nobody vouches for")), "the next host's line");
+    assert!(
+        lines.iter().any(|l| l.contains("next.stand-in.test") && l.contains("nobody vouches for")),
+        "the next host's line"
+    );
 }
 
 #[tokio::test(start_paused = true)]

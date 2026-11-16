@@ -8,8 +8,9 @@ this page keeps no history (git does).
 
 Read on 2026-11-15.
 
-1. **The gate.** Green at `687d17c` (2026-11-15, run 43745453729, #273, first attempt): the takes of podcrates
-   `v0.51.0` and `v0.52.0`, T-794's repair of `cold_connect`, and m6's iroh client with `-v` (T-780). This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
+1. **The gate.** Green at `687d17c` (2026-11-15, run 43745453729, #273, first attempt). #276's runs at `bde7f17`
+   (2026-11-16): `build.yml` red in `gate (lint)` and `gate (iroh)`, `release.yml` red in its aarch64 musl build,
+   `issue-sync.yml`'s dry run green; the three are repaired on 2026-11-16 (`docs/STATUS.md`, "Where things stand"). This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
    owner's agent by an issue `[gh action] requested` (`docs/HANDOFF.md`, "How to test"), one new issue for each ask,
    never an amended one (the agent ran #255's first block). The record agrees (`cargo todo check`), and
    `python scripts/check-repo.py` passes. A push cancels the gate of the one before it, so a commit's gate is
@@ -79,7 +80,7 @@ draft is the branch `draft/t791-lane` (below). No run of Actions has passed sinc
 `gate (m6)`, T-780). This session's GitHub account starts no workflow: each run is asked by a new issue
 `[gh action] requested` with one `sh` block, for the owner's local agent (PodUtils/podvm#387 has the form). For the next
 session, in order:
-1. **#276 waits for the owner's agent**: the gate of `build.yml`, the first dry run of `issue-sync.yml`
+1. **#276 ran on 2026-11-16** (its three red jobs repaired the same day; next, the gate and `release.yml` again): the gate of `build.yml`, the first dry run of `issue-sync.yml`
    (`dry_run=true`), and `release.yml` by hand with no tag (it runs T-793's new step of the installer). Its block reads
    the newest commit of `main` itself, so a later push does not stale it. Read each run when it ends (`watch.py` shows it): a red gate first; the dry run of the sync
    before any real run of it (the sync then closes and opens issues from the record: read what it would change).

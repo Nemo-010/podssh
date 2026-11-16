@@ -74,7 +74,7 @@ fn a_member_with_no_address_given_or_kept_reaches_the_node_by_the_pinggy_address
     assert_eq!(rc, 0, "stdout {out:?}, stderr {err}");
     assert_eq!(out, GREETING, "the command's output over the road");
     assert!(err.contains("asking the node's record"), "{err}");
-    let order = "the Pinggy road when each road before it failed (the node's record, the last fallback of Q78)";
+    let order = "the Pinggy road when each road before it failed (the node's record, the last fallback)";
     assert!(err.contains(order), "{err}");
     let from = format!("the Pinggy road dials {address}, the address of its record of pkarr");
     assert!(err.contains(&from), "the road came from the record: {err}");
