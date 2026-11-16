@@ -41,6 +41,9 @@ fn main() {
     files.push(Path::new(env!("CARGO_MANIFEST_DIR")).join("src/shim.cpp"));
     files.push(Path::new(env!("CARGO_MANIFEST_DIR")).join("src/seed.cpp"));
     build.include(&root);
+    // Each header of the tree too: a change of one (a patch of the vendored
+    // tree) builds the core again, which the sources alone would not tell.
+    println!("cargo:rerun-if-changed={}", root.display());
     for file in &files {
         println!("cargo:rerun-if-changed={}", file.display());
         build.file(file);

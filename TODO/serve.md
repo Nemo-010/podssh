@@ -3397,3 +3397,67 @@ traces. Doctor's line `pty ptrace`; the manual's note of serve and `docs/cli.md`
   function, where the kernel reads a pointer; a tracee's stops come to its tracer's `waitid` with no
   `WSTOPPED`, which the loop took for the leader's exit (it reads `si_code` now); and the probe's bound could
   have killed a pid given again after the reap.
+
+
+# T-795: `podssh serve` as root refused to start in a release build: a thread of ZeroTier's static constructor held its capabilities
+
+**Source:** T-791's lane, 2026-11-16: `scripts/m5-in-sandbox.sh` in `pod-lab`'s `listen-denied`, and as root outside a lab.
+**Category:** defect
+**Milestone:** M10
+**Priority:** P1
+**Effort:** S
+**Status:** done
+
+## Problem
+
+A release build (`--features iroh,warp,zerotier`) of `podssh serve`, started as root, said "the threads N of this
+process keep capabilities after the drop; the role does not serve with them" and exited 78, each time. The thread is
+not podssh's: ZeroTier's `node/Metrics.cpp` holds a global `SaveToFile saver` of prometheus-cpp-lite, whose member
+`std::thread worker_thread` starts in the static constructor, before `main` (`gdb`: `pthread_create` from
+`std::thread` under `__libc_start_main`'s `call_init`), and sleeps 10 ms in a loop for the life of the process, until
+the destructor (`strace -f`). The drop of `harden::give_up_at` reaches this thread and the first, not that one, so it
+kept root's capabilities, and the check refused. The same thread woke each 10 ms in each process of a release build,
+as root or not.
+
+## Premise
+
+- `crates/podssh-cli/src/harden.rs:314` says "keep capabilities after the drop; the role does not serve with them":
+  the refusal.
+
+## Approach
+
+1. The vendored header (`save_to_file.h` of `vendor/zerotier-node/ext/prometheus-cpp-lite-1.0`) starts the saver's
+   thread only when a file is given (its constructor with a file calls `restart`), and joins it only when it runs:
+   ZeroTier's core never gives its global `saver` a file, so no thread starts before `main`.
+2. The patch in `vendor/patches/zerotier-node/`, and the change in `vendor/zerotier-node/README.podssh.md`.
+
+## Decision
+
+The patch of the vendored header, over a wait in podssh's check for a thread that ends (it never ends), over a call
+of the saver's `stop` at the start of `main` (its destructor then joins a thread that is gone, which throws at exit),
+and over a refusal's exception for the thread (it would serve with a thread that holds root's capabilities). It also
+ends the wake each 10 ms of each process.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo build --release -p podssh-cli --features iroh,warp,zerotier
+sh scripts/m5-in-sandbox.sh target/release/podssh
+```
+
+As root, `podssh serve` starts, and no thread of the process is older than `main`'s first.
+
+## Done
+
+2026-11-16. The header is patched (`vendor/patches/zerotier-node/0001-saver-starts-no-thread-before-main.patch`,
+noted in `vendor/zerotier-node/README.podssh.md`). A first try, a wait of 1 s in `harden.rs` for a thread that ends,
+did not help (each start refused): the thread never ends, and that change is gone. A second defect on the way:
+`crates/podssh-zerotier/build.rs` named only the sources as its inputs, so a change of a vendored header built no
+new core, and the first build of the patch still started the thread; it names the tree too now. With a release build
+(`--features iroh,warp,zerotier`), as root: five starts of `podssh serve` each dropped the capabilities "on each of its
+2 threads" and went on (to "no pair is stored", 78, as no pair was); `scripts/m5-in-sandbox.sh target/release/podssh`
+exited 0 here (a tty, Ctrl-C's 130, vi, less, `exit 9`, 200 MiB up in 52 s and down in 45 s, SHA-256 equal), and in each
+of `pod-lab`'s `listen-denied`, `udp-denied`, `no-ptmx`, `no-passwd-entry`, `noexec-home`, `no-proc`,
+`seccomp-nonewprivs`, `ro-etc-ssl`, `no-tun` and `bind-denied` (with `--allow-connect` of the proxy's port), each step
+ok. `cargo test --release -p podssh-zerotier` 14 passed.

@@ -1,0 +1,40 @@
+--- a/ext/prometheus-cpp-lite-1.0/core/include/prometheus/save_to_file.h
++++ b/ext/prometheus-cpp-lite-1.0/core/include/prometheus/save_to_file.h
+@@ -13,7 +13,9 @@
+   class SaveToFile {
+     std::chrono::seconds      period        { 1 };
+     std::string               filename;
+-    std::thread               worker_thread { &SaveToFile::worker_function, this };
++    // podssh: no thread until a registry and a file are set (restart), so
++    // that a global saver starts none before main.
++    std::thread               worker_thread;
+     std::shared_ptr<Registry> registry_ptr  { nullptr };
+     bool                      must_die      { false };
+ 
+@@ -52,7 +54,8 @@
+ 
+     void stop() {
+       must_die = true;
+-      worker_thread.join();
++      if (worker_thread.joinable())
++        worker_thread.join();
+     }
+ 
+     void restart() {
+@@ -62,13 +65,15 @@
+ 
+     ~SaveToFile() {
+       must_die = true;
+-      worker_thread.join();
++      if (worker_thread.joinable())
++        worker_thread.join();
+     }
+ 
+     SaveToFile(std::shared_ptr<Registry>& registry_, const std::chrono::seconds& period_, const std::string& filename_) {
+       set_registry(registry_);
+       set_delay(period_);
+       set_out_file(filename_);
++      restart();
+     }
+ 
+     void set_delay (const std::chrono::seconds& new_period) {

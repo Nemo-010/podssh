@@ -6690,8 +6690,10 @@ back, each compared by SHA-256. In each of the nine profiles: the echo came back
 to 42 s and down in 44 to 50 s (about 4.5 MiB/s, the same as outside a lab). With `podlab` of `v0.58.0` (its release asset, checked against its
 `SHA256SUMS`), `podlab run --allow-connect PORT bind-denied`, PORT the proxy's: doctor exited 0 (70 ok, 0 FAIL),
 `release-short.sh --net` exited 0, and the lane's ssh and both copies passed (up 42 s, down 45 s): the target sandbox
-in a lab with no root. Next: commands 4 to 6 (`serve` with `vi`, `less` and Ctrl-C, `pipe`, a session after a
-kill of its relay link) in the same profiles, and a script of the lane in `scripts/`, then the release
+in a lab with no root. Commands 3 and 4 by `scripts/m5-in-sandbox.sh` (both ends in the lab: `podssh serve` as the
+node, `podssh ssh -tt` with a tty, Ctrl-C, vi, less and `exit 9`, then 200 MiB each way): after T-795's repair, exit 0
+in each of the ten profiles, `bind-denied` with `--allow-connect`. Next: commands 5 and 6 (`pipe`, a session after a kill of its relay link) in the same
+profiles, and a script of the lane in `scripts/`, then the release
 steps that name the run. The network classes (`proxy-only` and the others of COORD-081) wait for podnet's data in
 `pod-lab` (podcrates T-716).
 

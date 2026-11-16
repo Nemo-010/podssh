@@ -3813,7 +3813,7 @@ allow, and which features does that close, before the user tries a session.
 
 - Read: the probes exist and each is local: `crates/podssh-cli/src/doctor/host.rs:251-265` (exec,
   with `ok` and `unknown`, never `FAIL` for a refusal), `crates/podssh-cli/src/doctor/unix.rs:95-110`
-  (`pty`), `crates/podssh-cli/src/harden.rs:276` (`status_sets`, reads `CapEff`,
+  (`pty`), `crates/podssh-cli/src/harden.rs:302` (`status_sets`, reads `CapEff`,
   `CapPrm`, `CapInh`), `crates/podssh-ws/src/resolve.rs:1-18` (the order of the resolver).
 - Read: no `--tier` and no composed verdict exist; a search for `tier` in `crates/podssh-cli/src/doctor/`
   and in `crates/podssh-cli/src/flags.rs` finds nothing.
