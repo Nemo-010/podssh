@@ -241,4 +241,8 @@ pub const STATUS_FLAGS: &[FlagRow] = &[
     row(None, "net", None, FlagKind::Supported,
         "also each member of the net held: its roles, key, tickets and routes, and the road that last reached it \
          from this host, or the race that last found none", None),
+    // For a fleet tool that fills an allowlist: public halves only, none made.
+    row(None, "keys", None, FlagKind::Supported,
+        "also the public part of each key that podssh keeps on this host: the client's, each node's, each ACME \
+         account, the WARP device, and the net's owner; never a private byte", None),
 ];

@@ -289,6 +289,7 @@ pub fn parse_verb(verb: &'static Verb, rest: &[std::ffi::OsString]) -> Parsed {
             relay_addr: matches.get_one::<String>("relay-addr").cloned(),
             destination: matches.get_one::<String>("destination").cloned(),
             net: matches.get_flag("net"),
+            keys: matches.get_flag("keys"),
             refused,
         };
     }

@@ -5049,7 +5049,7 @@ the net's key legs in one run. The beta that has the code (`v1.1.0-beta.2`) has 
 2. Repair each defect that the test finds (rule 8). Say in `docs/mesh.md` what lasts: the renewal, the
    key legs, and what ends a node (a revoked key, a pair that the relay refuses).
 3. `status` shows the end of the pair and whether a renewal is on (`pairs` of `status --json`,
-   `crates/podssh-cli/src/status.rs:97`); add `renews` there if it does not show.
+   `crates/podssh-cli/src/status.rs:108`); add `renews` there if it does not show.
 4. The beta: betas are allowed again (the owner, 2026-11-09). Cut `v1.1.0-beta.4` when the test passes and
    the gate is green at its commit (AGENTS.md section 2, "Releases"). Its notes (`docs/releases/`) name this
    test and the ask. T-446 carries the clause.

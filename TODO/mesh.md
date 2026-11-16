@@ -13692,7 +13692,7 @@ output that lists what is on.
 - Read: the switches now are `PODSSH_FORWARDER_FALLBACK` (`crates/podssh-cli/src/forwarder/fallback.rs:36`),
   `PODSSH_DERP`, `PODSSH_DERP_MAIN`, `PODSSH_PIPING`, `PODSSH_IROH_PKARR`, `PODSSH_IROH_RELAY`,
   `PODSSH_TRANSIT`, `PODSSH_OPENTUNNEL`, `PODSSH_OFFLINE` (all of `PodUtils/podssh:crates/*/src`); there is no common one.
-- Read: `podssh status` is JSON already (`crates/podssh-cli/src/status.rs:73-99`); it has `offline` and no
+- Read: `podssh status` is JSON already (`crates/podssh-cli/src/status.rs:84-111`); it has `offline` and no
   public set.
 - Read: the lists of other parties' hosts moved to `pod-services` (v0.7.0 is taken,
   `crates/podssh-cli/Cargo.toml:101`); no host is named in this entry or in the new code.
@@ -13811,7 +13811,7 @@ reached each and measures nothing.
 - Read: `ping NAME` races the roads of a member and gives each its time and the winner
   (T-435; `crates/podssh-cli/src/ping/node.rs:79-164`); `--json` exists (`crates/podssh-cli/src/flags/ping.rs:50`).
 - Read: `ping` takes one destination (`crates/podssh-cli/src/flags/ping.rs`, the positional).
-- Read: `status --net` measures no road (`crates/podssh-cli/src/status.rs:26`).
+- Read: `status --net` measures no road (`crates/podssh-cli/src/status.rs:29`).
 - Read: each probe drops its link before `OPEN` (`TODO/mesh.md`, T-435 Decision), so no session starts.
 
 ## Approach

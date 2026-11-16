@@ -46,3 +46,17 @@ pub const KEYGEN: &[&str] = &[
      user's name as podssh ssh takes it: PODSSH_USER, USER, LOGNAME or USERNAME, else the user database's \
      entry (see ENVIRONMENT).",
 ];
+
+/// The note of `podssh status --keys`, beside keygen's, as both show the
+/// public half of a key: the notes of status name it.
+pub const STATUS_KEYS: &str = "With --keys, the line's keys lists the public part of each key that podssh keeps on \
+     this host. It is read with no connection, and no key is made. Each entry has role, label, path, type, public, \
+     fingerprint, iroh and state. role is client, the key that reaches a node, or node, one for each label. acme is \
+     the account of podssh relay serve at each certificate authority; warp is the device of a warp:// destination. \
+     net_owner, when this host holds a net, is the owner's key from the net's document. Its path is the key of ~/.ssh \
+     whose .pub file holds that key, which podssh does not open. state is present, absent or unreadable, with error, \
+     which names the file and never its text. public is a line of OpenSSH for an Ed25519 key, the JWK of an account, \
+     and the base64 of a device's SubjectPublicKeyInfo. fingerprint is the SHA-256 fingerprint that podssh keygen -l \
+     prints, or an account's thumbprint. iroh is an Ed25519 key in iroh's hex, the node's name on the iroh road. With \
+     PODSSH_CACHE_DIR=none, each key is absent. --keys with a destination is refused (64); without --keys, keys is \
+     null.";

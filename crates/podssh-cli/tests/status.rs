@@ -4,6 +4,8 @@
 //! and a cache directory that the run does not change.
 
 mod cleanup;
+// `--keys` (T-716), in a file of its own.
+mod status_keys;
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};

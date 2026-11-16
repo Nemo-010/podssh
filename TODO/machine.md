@@ -44,7 +44,7 @@ failed (lines 156-168). The sections are "this host", "egress" and "relay" (line
 3. One model and two renderers, as `podssh man` has (`crates/podssh-cli/src/man/model.rs`).
 4. Add the row to `DOCTOR_FLAGS` (`crates/podssh-cli/src/flags/relay.rs:170-228`), read it into
    `Parsed::Doctor` (`crates/podssh-cli/src/tree.rs` lines 172-181 and 384-392 at `c6f09a8`), and pass it on in
-   `crates/podssh-cli/src/dispatch.rs:235-288`. `tree.rs` has 454 lines and `dispatch.rs` 448:
+   `crates/podssh-cli/src/dispatch.rs:236-289`. `tree.rs` has 454 lines and `dispatch.rs` 448:
    keep the additions small, or split first.
 5. The JSON carries the same detail strings as the text, which hide proxy credentials and
    tokens today (`crates/podssh-cli/tests/doctor.rs:142-167`).
@@ -910,7 +910,7 @@ pump at `crates/podssh-cli/src/pipe/pump.rs:120` and
 `crates/podssh-cli/src/pipe/pump.rs:130-158`, and the relay's close at
 `crates/podssh-cli/src/pipe/relay.rs:239`. `SessionLog` at
 `crates/podssh-cli/src/settings.rs:269-272`, and `podssh status` at
-`crates/podssh-cli/src/status.rs:136-147`. The variable in VARIABLES, the
+`crates/podssh-cli/src/status.rs:148-159`. The variable in VARIABLES, the
 two files in FILES, and `docs/cli.md`.
 
 The test `crates/podssh-cli/tests/session_log.rs`, 4 tests, against the
@@ -1920,7 +1920,7 @@ unchanged, and no line goes to stderr.
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -1948,6 +1948,30 @@ node's, the client's, the iroh key, the net owner's) sit in the cache, and the t
 3. A key under `PODSSH_CACHE_DIR=none` shows `absent`. `--keys` with a destination is refused.
 4. The schema stays 1 (a new member is not a break; `status.rs:25`).
 
+## Decision
+
+- **The rows.** `client` (always one row, `absent` with no file), `node` (one for each label whose file the cache
+  holds: `node-LABEL.key` or the old `iroh-node-LABEL.key`), `acme` (one for each CA's directory under `acme/` that
+  holds `account.key`; the label is that directory, `HOST-DIGEST`), `warp` (always one row) and `net_owner` (only
+  when a net is held). Each row has `role`, `label`, `path`, `type`, `public`, `fingerprint`, `iroh`, `state` and
+  `error`, null where it does not apply. Lost: a row of each role always (a node or a CA with no file has no
+  label); a separate row `iroh` (the same key twice).
+- **The forms.** An Ed25519 key: `public` the OpenSSH line, `fingerprint` as `ssh-keygen -l` prints it (both what
+  an allowlist takes), `iroh` its hex. An ACME account (P-256): `public` the JWK, `fingerprint` its RFC 7638
+  thumbprint, as the CA knows it. WARP's device (P-256): `public` the base64 SubjectPublicKeyInfo of its
+  certificate, as the service enrols it, `fingerprint` `SHA256:` and the base64 of its digest. Lost: an OpenSSH
+  line for the P-256 keys, which no reader of these two takes.
+- **What is read.** The identity files through `existing` on `Place::File` of the path found (the same search as
+  `pod-identity`'s: each name in each directory of `pod_places().read()`, the new name first), so no key is made.
+  The ACME key is parsed to derive its public half (pod-acme's `Account::from_pkcs8`), its text in `Zeroizing`.
+  WARP's record is parsed as JSON for `cert_pem` alone, and each string of the parsed value is wiped after; its
+  private key is never parsed. The net owner's private file is never opened: its `.pub` names it.
+- **`state`.** `present`, `absent`, or `unreadable` with `error` (the file's name and the reason, never its text).
+  `encrypted` is not used: no key that podssh keeps has a passphrase, and the owner's private file is not opened.
+- **Without `--keys`**, `keys` is null (as `net` without `--net` is short), so that the member is always there and
+  a run without the flag reads no key file. The schema stays 1.
+- **`--keys` with a destination** is a usage error (64), before anything is read.
+
 ## Prove
 
 ```sh
@@ -1959,6 +1983,44 @@ cargo test -p podssh-cli --test status
 New test: in a temp cache with a node key and a client key, `status --keys` lists both with the same
 fingerprints as `keygen -l`; the run makes no file (the directory listing is equal before and after); the
 private body is not in the output. Planted: a `load` in place of `existing` fails the second check.
+
+## Correction
+
+2026-11-16, read at `5ca8795`.
+
+- `keygen -y` and `-l` are at `crates/podssh-cli/src/flags/keygen.rs:31-34`, not 23-28; the rest holds.
+- In `status.rs`, `SCHEMA` was at line 21 at `5ca8795` and `--net`'s field at line 31 at `5ca8795`, not 25 and 26;
+  the rest holds.
+- The iroh road has no key of its own: `crates/podssh-iroh/src/keys.rs:9-18` reuses the client's and the nodes'
+  files (`client_place`, `node_place`). So no row has the role `iroh`; each Ed25519 row carries `iroh`, the key in
+  iroh's hex, which is the node's name on that road.
+- The net's store holds no key of the owner: the document names the owner's public key (`net/doc.rs`, `owner`),
+  and the private key is the user's own, in the agent or `~/.ssh` (`net/sign.rs`, `found`). The row `net_owner` is
+  that public key, with the file of `~/.ssh` whose `.pub` is that key as its `path`.
+
+## Done
+
+Partial, 2026-11-16 (drafted on `draft-t716`; not built).
+
+- `crates/podssh-cli/src/status/keys.rs` (new, with `keys_tests.rs`): the rows above. `status.rs`: the flag in
+  `StatusArgs`, the refusal with a destination, the member `keys`. `--keys` in `flags/relay.rs` (`STATUS_FLAGS`),
+  `parsed.rs`, `tree.rs`, `dispatch.rs`. The manual: `man/notes_keygen.rs` (`STATUS_KEYS`, in the notes of status
+  after `STATUS_NET`). `docs/cli.md`, section `podssh status`. `docs/STATUS.md`: a row.
+- Tests: `status::keys::tests` (6: the client and a node listed with the fingerprint that OpenSSH's parser gives the
+  line, no file made, a bad key file unreadable and kept, an ACME account's JWK and thumbprint with no line of its
+  PEM, a bad WARP record, the net owner found by its `.pub` with a planted private body not shown);
+  `tests/status_keys/mod.rs`, a module of `--test status` (3: a scratch cache with a client's and a node's key, each
+  fingerprint the one that `podssh keygen -l` prints of its `public`, the listing equal before and after, neither
+  seed in the output; no key made, `PODSSH_CACHE_DIR=none` absent, `keys` null without the flag; 64 with a
+  destination).
+- Merged 2026-11-16: `cargo test -p podssh-cli --lib` 1186 passed (`status::` 8); `--test status` 10 passed; `--test
+  man_flag_parity --test man_page --test man_json --test flag_table` passed; clippy (the gate's lints) and rustfmt
+  clean; the citations moved by `cargo todo remap`. Planted: `status --keys` that first takes the client's key as a
+  session does (`channel::client_identity`, which makes a missing key) fails `keys_makes_no_key_and_none_is_absent`;
+  the unit test `no_key_is_made` reads its own directories, so it does not see the global cache's file. The planted
+  `load` in `identity_row` alone changes nothing, as a row has a path only for a file that is there.
+- Not tested: a WARP record with a real certificate (it needs `--features warp` to make one); so the entry stays
+  partial for that row.
 
 # T-726: A local forward as a service, and the measured rate of the relay role
 

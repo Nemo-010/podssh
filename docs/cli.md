@@ -3164,7 +3164,7 @@ on a terminal no `--timeout`: a person decides how long an edit takes.
 
 ## `podssh status`
 
-`podssh status [--relay-host HOSTS] [--relay-addr HOST=IP] [--net] [[user@]host]`
+`podssh status [--relay-host HOSTS] [--relay-addr HOST=IP] [--net] [--keys] [[user@]host]`
 writes one line of JSON and exits 0 (GitHub #11). It is the cheap call
 before anything else; `podssh doctor` is the report that measures.
 
@@ -3186,7 +3186,7 @@ before anything else; `podssh doctor` is the report that measures.
   (`cache::peek`). It shows no proxy credentials, opens no connection, asks
   no DNS and writes nothing; it reads the signed lists kept, and checks each
   again.
-- A bad flag or destination is 64, a bad variable 78, as for `doctor`.
+- A bad flag or destination is 64, a bad variable 78, as for `doctor`. `--keys` (T-716, `crates/podssh-cli/src/status/keys.rs`) adds `keys`, one row for each key that podssh keeps here: `role` (`client`, `node` with its `label`, `acme` with the CA's directory as `label`, `warp`, and `net_owner` when a net is held), `path`, `type`, `public`, `fingerprint`, `iroh` (an Ed25519 key in iroh's hex) and `state` (`present`, `absent`, or `unreadable` with `error`). It reads each key with `existing`, never `load`, so it makes none; a key file is read only to derive its public half. With a destination it is refused (64); without it, `keys` is null.
 
 ## `podssh ping`
 

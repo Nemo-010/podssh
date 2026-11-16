@@ -349,6 +349,7 @@ const STATUS: &[&str] = &[
      start; null on Windows), and pairs: each stored pair's label, when it expires, whether it expired, and \
      next_now, whether podssh relay pair LABEL makes its next pair now.",
     super::notes_net::STATUS_NET,
+    super::notes_keygen::STATUS_KEYS,
     "It shows no token and no proxy credentials, opens no connection, asks no DNS and writes nothing. A \
      bad --relay-host or destination is a usage error (64), a bad PODSSH_RELAY a configuration error \
      (78). podssh doctor is the report that measures.",

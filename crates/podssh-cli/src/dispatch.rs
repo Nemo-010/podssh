@@ -223,13 +223,14 @@ pub fn run_with(p: &Parsed, s: &mut Streams<'_>, tty: Tty) -> i32 {
         Parsed::Agent(args) if refusals("agent", &args.refused, s.err) => EXIT_USAGE,
         Parsed::Agent(args) => crate::agent::run(args, s.out, s.err),
         Parsed::Status { refused, .. } if refusals("status", refused, s.err) => EXIT_USAGE,
-        Parsed::Status { relay_host, relay_addr, destination, net, .. } => {
+        Parsed::Status { relay_host, relay_addr, destination, net, keys, .. } => {
             let args = crate::status::StatusArgs {
                 relay_host: relay_host.clone(),
                 relay_addr: relay_addr.clone(),
                 destination: destination.clone(),
                 // `--net`: each member of the net held, and its road (T-435).
                 net: *net,
+                keys: *keys,
             };
             crate::status::run_status(&args, tty, s.out, s.err)
         }

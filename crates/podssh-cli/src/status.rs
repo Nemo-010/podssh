@@ -3,9 +3,10 @@
 //! they came from, the cached pool, the token (where it is, for which relay,
 //! until when; never the token), the proxy (never its credentials), whether
 //! podssh has a terminal, and, given a destination, whether its host key is
-//! known; the net held, and with `--net` its members (T-435). It opens no
-//! connection, asks no DNS and writes nothing: `podssh doctor` is the report
-//! that measures.
+//! known; the net held, and with `--net` its members (T-435); with `--keys`
+//! the public part of each key kept here (`keys`). It opens no connection,
+//! asks no DNS and writes nothing: `podssh doctor` is the report that
+//! measures.
 
 use std::io::Write;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -16,6 +17,8 @@ use podssh_relay::relay::{self, RelayList};
 use podssh_relay::{cache, pool, token};
 
 use crate::pager::Tty;
+
+mod keys;
 
 /// The version of the line's shape: a change that breaks a reader raises it.
 pub const SCHEMA: u32 = 1;
@@ -29,6 +32,8 @@ pub struct StatusArgs {
     pub destination: Option<String>,
     /// `--net`: each member of the net held, and its road (T-435).
     pub net: bool,
+    /// `--keys`: the public part of each key that podssh keeps here.
+    pub keys: bool,
 }
 
 /// The variables that name a proxy, in the order podssh reads them.
@@ -47,6 +52,11 @@ fn now_ms() -> i64 {
 pub fn run_status(args: &StatusArgs, tty: Tty, out: &mut dyn Write, err: &mut dyn Write) -> i32 {
     if let Err(refusal) = crate::pins::apply(args.relay_addr.as_deref()) {
         return refusal.report("status", err);
+    }
+    // The keys are of this host, not of a destination's.
+    if args.keys && args.destination.is_some() {
+        let why = "--keys takes no destination: it lists the keys of this host".to_string();
+        return crate::relay_settings::Refusal::usage(why).report("status", err);
     }
     let env_relay = var(relay::RELAY_ENV);
     let relays = match crate::relay_settings::relays(args.relay_host.as_deref(), env_relay.clone()) {
@@ -70,6 +80,7 @@ pub fn run_status(args: &StatusArgs, tty: Tty, out: &mut dyn Write, err: &mut dy
         Err(refusal) => return refusal.report("status", err),
     };
     let attachment = crate::non_interactive::resolve_tty(tty, false);
+    let keys_held = if args.keys { keys::value() } else { Value::Null };
     let line = json!({
         "schema": SCHEMA,
         "podssh": crate::help::version(),
@@ -96,6 +107,7 @@ pub fn run_status(args: &StatusArgs, tty: Tty, out: &mut dyn Write, err: &mut dy
         "open_files": open_files(),
         "pairs": pairs_state(),
         "net": crate::net::state::status_value(args.net),
+        "keys": keys_held,
     });
     let _ = writeln!(out, "{line}");
     let _ = out.flush();

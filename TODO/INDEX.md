@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**755 entries: 44 open, 33 partial, 12 blocked, 666 done.**
+**755 entries: 43 open, 34 partial, 12 blocked, 666 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 3 | 8 | 3 | 80 | 94 |
-| P2 | 7 | 19 | 3 | 282 | 311 |
+| P2 | 6 | 20 | 3 | 282 | 311 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 44 | 33 | 12 | 666 | 755 |
+| **All** | 43 | 34 | 12 | 666 | 755 |
 
 ## Entries
 
@@ -746,7 +746,7 @@ repository and CI).
 | [T-713](relay.md) | P2 | M | M10 | feature | open | `podssh relay conform --relay-host HOST [--reverse] --json` |
 | [T-714](reverse.md) | P2 | M | M10 | feature | open | A node route to a Unix socket, with a first line that names the caller's key and route |
 | [T-715](mesh.md) | P2 | M | M10 | feature | open | A node's door from a signed net document at an HTTPS URL, with a TTL and a stale limit |
-| [T-716](machine.md) | P2 | S | M10 | feature | open | The public parts of each key of this host as JSON, offline: `podssh status --keys` |
+| [T-716](machine.md) | P2 | S | M10 | feature | partial | The public parts of each key of this host as JSON, offline: `podssh status --keys` |
 | [T-717](mesh.md) | P2 | M | M10 | feature | open | Probe each road to a list of nodes as JSON: `podssh ping --nodes` |
 | [T-718](roads.md) | P2 | M | M10 | feature | open | Access service-token headers from files on each WebSocket road |
 | [T-719](ws.md) | P1 | M | M10 | feature | blocked | `podssh link`: the held link of the node agent |

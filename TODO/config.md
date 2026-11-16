@@ -626,7 +626,7 @@ output. Planted defect: copy the password field into a comment; the secret test 
 `crates/podssh-cli/src/config_import/mod.rs:177-230`; the verb in the
 tables at `crates/podssh-cli/src/flags.rs:443-444`,
 `crates/podssh-cli/src/positionals.rs:241-246`,
-`crates/podssh-cli/src/tree.rs:340-346` and
+`crates/podssh-cli/src/tree.rs:341-347` and
 `crates/podssh-cli/src/dispatch.rs:200-201`.
 - `cargo test -p podssh-cli --test config_import`: 5 passed. The fixture
   `crates/podssh-cli/tests/fixtures/ansible/inventory.ini`, read by
@@ -763,8 +763,8 @@ failover below the flag and the variable at
 of a bad file at `crates/podssh-cli/src/pins.rs:13-40`, the CA file at
 `crates/podssh-cli/src/settings.rs:323-333` and, for `podssh ssh`,
 `crates/podssh-cli/src/ssh/resolve.rs:95-99`; `status` at
-`crates/podssh-cli/src/status.rs:65` and
-`crates/podssh-cli/src/status.rs:80`, `doctor` at
+`crates/podssh-cli/src/status.rs:75` and
+`crates/podssh-cli/src/status.rs:91`, `doctor` at
 `crates/podssh-cli/src/doctor/mod.rs:229` and
 `crates/podssh-cli/src/doctor/mod.rs:252`.
 - `cargo test -p podssh-cli --test settings`: 4 passed here, and 5 in the
