@@ -80,9 +80,8 @@ draft is the branch `draft/t791-lane` (below). No run of Actions has passed sinc
 `[gh action] requested` with one `sh` block, for the owner's local agent (PodUtils/podvm#387 has the form). For the next
 session, in order:
 1. **#276 waits for the owner's agent**: the gate of `build.yml`, the first dry run of `issue-sync.yml`
-   (`dry_run=true`), and `release.yml` by hand with no tag (it runs T-793's new step of the installer). Its block names
-   `763cac5d`; move `SHA` to the newest commit of `main` before it runs (amend the body, with a `state:` line), or
-   close it and ask anew. Read each run when it ends (`watch.py` shows it): a red gate first; the dry run of the sync
+   (`dry_run=true`), and `release.yml` by hand with no tag (it runs T-793's new step of the installer). Its block reads
+   the newest commit of `main` itself, so a later push does not stale it. Read each run when it ends (`watch.py` shows it): a red gate first; the dry run of the sync
    before any real run of it (the sync then closes and opens issues from the record: read what it would change).
 2. **T-780** (P1, partial): m6's session hangs after a resume at random in the gate, five shapes so far, none made
    here (12 of 12 under load). Both of m6's clients run with `-v` now; read the next failure's lines.
