@@ -1,6 +1,6 @@
 #!/bin/sh
-# scripts/install/get-core.sh - get the installer core (core.sh) and
-# pins.py of PodUtils/podcrates at their pinned commit, each checked by its
+# scripts/install/get-core.sh - get the installer core (core.sh and
+# core-net.sh) and pins.py of PodUtils/podcrates at their pinned commit, each checked by its
 # SHA-256, into DIR (default: scripts/install, beside podssh.sh, which
 # includes core.sh from its own directory; git ignores both). The release
 # stamps podssh.sh with them; a local test does the same.
@@ -10,9 +10,10 @@
 # A new pin: the commit of a podcrates tag, and the SHA-256 of each file at
 # it. A file that does not agree is removed, and the run fails.
 set -eu
-COMMIT=ca1107f171e4c24ef515a94ef32fed68ab220705 # podcrates v0.58.0
-CORE_SHA=64b5397b4beabce75f41fe4f19c1f813ae4b8647235d5245f5041931bc0077c7
-PINS_SHA=fad06e6cb9843053f722f98bfffa7c2d304bc7e8ea24ce6fe3650264a675f472
+COMMIT=cbbd0168d467e9a09372a5e948aaef10b651734c # podcrates v0.61.0
+CORE_SHA=11d55d5ceaa2f63db8689f0a5ff46a72e39fdc87d45157c877ff5a4d8f911282
+NET_SHA=6004ef84d274be1d3477590d38413d0a49e9c571aba2430947e90b4160de373c
+PINS_SHA=7a3632c60494b4aace45db37e88b277a1353e8713d60c288430b452e16ea0205
 dir=${1:-$(dirname "$0")}
 mkdir -p "$dir"
 base="https://raw.githubusercontent.com/PodUtils/podcrates/$COMMIT/scripts/install"
@@ -27,4 +28,5 @@ get() {
     echo "get-core.sh: $1 at $COMMIT: ok"
 }
 get core.sh "$CORE_SHA"
+get core-net.sh "$NET_SHA"
 get pins.py "$PINS_SHA"

@@ -18,6 +18,8 @@ INST_TARGETS=""
 # BEGIN CORE (scripts/install/pins.py puts scripts/install/core.sh here)
 # shellcheck source=scripts/install/core.sh
 . "$(dirname "$0")/core.sh"
+# shellcheck source=scripts/install/core-net.sh
+. "$(dirname "$0")/core-net.sh"
 # END CORE
 
 # The binary prints "podssh X.Y.Z (COMMIT)": the version, then the commit.

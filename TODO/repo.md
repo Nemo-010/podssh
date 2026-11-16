@@ -5897,6 +5897,14 @@ clippy::collapsible_if` (the gate's flags) clean; `cargo test --workspace --no-f
 loopback alone 3833 passed, 4 failed, 82 ignored, and the 4 (`doctor_upgrade`'s one, `relay_serve`'s OpenSSH case
 and two of `podssh-iroh`'s `endpoint::udp_tests`) passed with the network: 3837 in all.
 
+2026-11-16, podcrates `v0.61.0` (`cbbd0168`, COORD-121, PodUtils/podcrates#209), a bump of the tag with no patch for
+podssh: `podlab run --way-out` (a live lane in a network lab, T-791), `pod-hostprobe`'s rows that send a packet out,
+podvm's fix of `chroot_usable`, and the installer core that checks the cosign signature of `SHA256SUMS` (T-793); its
+breaking changes are in `pod-hostprobe` and `pod-lab`, which no crate of podssh depends on. `issue-sync.yml` calls
+podcrates' workflow at `v0.61.0`. `cargo clippy --workspace --all-targets` with the gate's flags clean; `cargo test
+--workspace --no-fail-fast` in a namespace with the loopback alone 3834 passed, 3 failed, 82 ignored, and the 3
+(`doctor_upgrade`'s one and two of `podssh-iroh`'s `endpoint::udp_tests`) passed with the network: 3837 in all.
+
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
@@ -6820,5 +6828,10 @@ copy of `dist` with two stand-ins. Not here: `busybox sh` (no busybox on this ho
 the step, 2026-11-16, `release.yml` by hand at `71ebc9d` (run 43815141894, each job green): `get-core.sh` checked
 `core.sh` and `pins.py` at their pin, `SHA256SUMS` of 8 files, the installer stamped with the pins of `1.1.0-beta.3`,
 the bundle of 9 files, then `sh dist/podssh-install.sh --prefix PREFIX --offline` installed the x86_64 binary by its
-SHA-256 and its self-check (`podssh man --json`) passed. UNVERIFIED: the installer of a published release, which the
-next beta gives.
+SHA-256 and its self-check (`podssh man --json`) passed. On 2026-11-16 `scripts/install/get-core.sh` pins
+the core of podcrates `v0.61.0` (`cbbd0168`): `core.sh`, `core-net.sh` (new: the core's network half, which
+`podssh.sh` includes too, and git ignores) and `pins.py`, each by its SHA-256; the core checks the keyless cosign
+signature of `SHA256SUMS` where `cosign` is on the host and the run is not offline. The release's step, run here on
+`target/debug/podssh` as the x86_64 asset: stamped, bundled, then under `dash`, `bash --posix` and `sh` a first
+`--offline` install (exit 0, the self-check ok) and a second that said "already installed" (exit 0). UNVERIFIED: the
+installer of a published release, with its signature checked, which the next beta gives.

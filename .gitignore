@@ -33,4 +33,5 @@ __pycache__/
 
 # The installer core and pins.py of podcrates, got by scripts/install/get-core.sh.
 /scripts/install/core.sh
+/scripts/install/core-net.sh
 /scripts/install/pins.py

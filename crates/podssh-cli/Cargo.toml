@@ -98,11 +98,11 @@ podssh-ws = { path = "../podssh-ws", features = ["quic"] }
 # The services of other parties: the facts of doctor's checks, STUN, the
 # DERP map, the zone of OpenTunnel, the ACME directory, the relay of
 # `podssh ts`.
-pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.60.0" }
+pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.61.0" }
 # The ACME client of `relay serve --acme` (src/acme/): pod-acme of
 # PodUtils/podcrates (T-034 there); pod-core for the type of its lines.
-pod-acme = { git = "https://github.com/PodUtils/podcrates", tag = "v0.60.0" }
-pod-core = { git = "https://github.com/PodUtils/podcrates", tag = "v0.60.0" }
+pod-acme = { git = "https://github.com/PodUtils/podcrates", tag = "v0.61.0" }
+pod-core = { git = "https://github.com/PodUtils/podcrates", tag = "v0.61.0" }
 # The leaf of a release's Sigstore bundle, read (T-375): no C, as its
 # feature `verify` (ring) is off; the signatures are podssh-ws's own.
 x509-parser = { version = "0.18", default-features = false }
@@ -174,7 +174,7 @@ zeroize = { workspace = true }
 futures-util = { version = "0.3", default-features = false, features = ["alloc"] }
 # `podssh session` (T-186): where a kept stream of output may start, and its
 # ring (the grammar of T-221), and when the output has stopped.
-pod-term = { git = "https://github.com/PodUtils/podcrates", tag = "v0.60.0" }
+pod-term = { git = "https://github.com/PodUtils/podcrates", tag = "v0.61.0" }
 # `podssh session capture`: the screen that a terminal shows after the
 # session's output. The model of the terminal oracle (T-200), pure Rust over
 # vte, with no build script that compiles C; the lock has it already.
@@ -228,7 +228,7 @@ windows-sys = { version = "0.61", features = [
 ] }
 
 [dev-dependencies]
-pod-testkit = { git = "https://github.com/PodUtils/podcrates", tag = "v0.60.0", features = ["screen"] }
+pod-testkit = { git = "https://github.com/PodUtils/podcrates", tag = "v0.61.0", features = ["screen"] }
 # `test-util` gives the tests a paused clock: the limit of a stuck write is
 # 60 s (tests/direct_write_limit.rs).
 tokio = { workspace = true, features = ["macros", "rt", "test-util"] }
@@ -248,7 +248,7 @@ p256 = { workspace = true, features = ["getrandom"] }
 tokio-rustls = { workspace = true }
 # The stand-in DERP server of `tests/derp_road.rs` (T-379): pod-derp's own
 # (its feature `standin`), which opens the client's info with NaCl's box.
-pod-derp = { git = "https://github.com/PodUtils/podcrates", tag = "v0.60.0", features = ["standin"] }
+pod-derp = { git = "https://github.com/PodUtils/podcrates", tag = "v0.61.0", features = ["standin"] }
 
 # The pseudo console of `tests/console.rs` (T-132): the version above, with
 # the console's functions, which podssh-ssh builds too; and the job objects of
