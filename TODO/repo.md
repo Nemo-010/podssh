@@ -6759,6 +6759,23 @@ TLS with `UnknownIssuer`, which doctor named with the way (a CA in `--ca-file`):
 Next: commands 3 to 6 of the lane (ssh and cp through a node, serve, pipe, a session after a kill of its link) in the
 three classes that pass, and the classes with no proxy once a lab gives them a way out.
 
+2026-11-16, behind each network class with no packet out: `pod-lab` `v0.62.0`'s `podlab run --serve 8443 --serve-ca
+PKI/ca.pem PROFILE` (podcrates T-759, podssh's ask of COORD-090), with `scripts/pod-lab-serve-lane.sh` (new): in the
+lab, podssh's own relay role (`podssh relay serve --listen 127.0.0.1:8443`, a throwaway CA's P-256 certificate of
+`listed.test`, `--mint anyone --allow-private`) and a throwaway OpenSSH server on the loopback; the client reaches the
+role as `listed.test:8443` through the class's own proxy, then `podssh ssh ... echo` and `podssh cp` of 20 MiB of
+random bytes, compared by SHA-256. With a debug build of `9151ebc`: `proxy-only` (the proxy's credential, its ports),
+`proxy-tls-reterminate` (its own CA on `listed.test`), `proxy-per-name`, `ws-upgrade-refused` and `sni-allowlist`
+(`RELAY=listed.test:443 ADDR=--relay-addr=listed.test=192.0.2.1`): podlab exit 0 in each of the five, the ssh's
+echo back and the copy whole in 4 to 5 s. In `ws-upgrade-refused` the client's `-v` lines said that the way refused
+the upgrade (403), that podssh tried its HTTP road there, and that "the HTTP road at listed.test carries the session,
+in its one form" (T-319); and that the resumable layer's first link was refused too, so the session there went on with
+no resume: a session of that class does not outlive a lost link (command 6 of the lane). Planted: the client sent to
+`relay.test`, a name the lab does not serve, so its stand-in answered in the role's place: the lane failed (exit 1,
+"minting a relay token failed: HTTP 200: the response was not the expected JSON"). `no-proxy-no-dns` gets no served
+port in this tag, and `ipv6-only` does not hold here. Next: commands 5 and 6 (pipe, a session after a kill of its
+link) in the lane script, and the resume over the HTTP road of `ws-upgrade-refused`.
+
 # T-792: The state of each GitHub issue written from the record by podcrates' workflow
 
 **Source:** the owner's ruling "Issues", relayed in COORD-110 (PodUtils/podcrates#183), `docs/decisions.md` (2026-11-15).
