@@ -343,6 +343,7 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #281 | COORD-089: podssh took podcrates v0.60.0 at cbef76d (to podcrates) | open 2026-11-16: until podcrates records the take | T-684 |
 | #282 | COORD-090: pod-lab's network labs: a proxy that reaches a server of the command's own, for podssh's lane (to podcrates) | open 2026-11-16: until podcrates answers (its T-751) | T-791 |
 | #283 | COORD-091: pod-session: a resume that the client calls done, after which the session never moves (six failures in podssh's gate) (to podcrates) | open 2026-11-16: until podcrates answers | T-780 |
+| #284 | COORD-092: podssh took podcrates v0.61.0 at d13ab01, with the installer core of the tag (to podcrates) | open 2026-11-16: until podcrates records the take | T-684, T-793 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |
