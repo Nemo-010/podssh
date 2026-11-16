@@ -2857,7 +2857,7 @@ at `5340fbb`).
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -2895,4 +2895,5 @@ command: it now wants the host and port of a proxy over TCP alone, and of the ot
 (`crates/podssh-ws/src/dial.rs` gives `Carrier` beside `Proxy`); the round trip of the URL stays. Checked by the
 target's property on `http+unix:/s+unix:/`, `http://user:pw@proxy.example:3128` (shown as `proxy.example:3128`) and
 `socks5h+unix:/run/p.sock`, each passed, and `cargo check --manifest-path fuzz/Cargo.toml --bin proxy_url`.
-UNVERIFIED: `fuzz.yml` again on the push, each target with no failure.
+`fuzz.yml` by hand at `a37ea01` (run 43889251706, 2026-11-16): success; each of the 16 targets ran its 121 s
+(from 417,747 to 34,533,584 runs) with no crash, `proxy_url` included. Done.

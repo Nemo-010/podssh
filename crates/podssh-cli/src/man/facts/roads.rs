@@ -343,7 +343,8 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     (
         &["PODSSH_HTTP_ROAD"],
         "The HTTP road (see THE RELAY): when each relay host failed and the way to one of them refused the WebSocket \
-          upgrade: podssh ssh, each command that reaches a server as it does, and podssh proxy carry the session over \
+          upgrade: podssh ssh, each command that reaches a server as it does, podssh proxy and relay: of podssh pipe \
+          carry the session over \
           plain HTTPS requests to that host. podssh relay serve serves these requests. Unset, empty, auto or yes: the \
           one-POST form where the host's /relays.json names it (one connection, the bytes both ways in one request; a \
           way that holds its body takes the split form within 2 s, and for the rest of the run); then the split form, \

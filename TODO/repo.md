@@ -6785,6 +6785,23 @@ no resume: a session of that class does not outlive a lost link (command 6 of th
 port in this tag, and `ipv6-only` does not hold here. Next: commands 5 and 6 (pipe, a session after a kill of its
 link) in the lane script, and the resume over the HTTP road of `ws-upgrade-refused`.
 
+2026-11-16, commands 5 and 6 in `scripts/pod-lab-serve-lane.sh`, with `podlab` of `v0.63.0` (its release asset, checked
+against its `SHA256SUMS`) and a debug build of `0370b0b` with the release features: command 5, `podssh pipe --relay-host
+RELAY stdio relay:127.0.0.1:2222`, reads sshd's banner through the class; command 6 runs a session that prints a line
+each second, destroys the client's TCP connections into the class after 4 s (`ss -K`, to the proxy's port, else the
+relay's), and wants each of the 12 lines once and in order with "the session resumed" on stderr. `proxy-only`,
+`proxy-tls-reterminate`, `proxy-per-name` and `sni-allowlist`: podlab exit 0, each step ok, "the session resumed after
+0.1 s". `ws-upgrade-refused`: command 5 found a defect: `relay:` of `podssh pipe` stopped at the refused upgrade ("the
+relay refused the session: HTTP 403"), where `proxy` and `ssh` take the HTTP road. Repaired: `http_road::after_relay_end`
+gives the road as an end of a pipe, which `proxy` and `pipe`'s `relay:` take; a test,
+`podssh_pipe_carries_20_mib_each_way_over_the_split_form` of `tests/http_road_cli.rs`, passes (9 of 9 there) and fails
+on the code before it ("the relay refused the session: HTTP 403"). Then podlab exit 0 there too, command 6 saying that
+the class refuses the resumable layer, so the cut ended the session (255). Planted: `PODSSH_RELAY_LAYER=no` in
+`proxy-only` made command 6 fail (exit 1, 4 lines of 12, "the connection between podssh and the relay broke").
+`cargo test -p podssh-cli --lib` 1168 passed; clippy (the gate's lints) and rustfmt clean. Next: the resume over the
+HTTP road of `ws-upgrade-refused`, the classes with no proxy once a lab gives them a way out, and the release steps that
+name the run.
+
 # T-792: The state of each GitHub issue written from the record by podcrates' workflow
 
 **Source:** the owner's ruling "Issues", relayed in COORD-110 (PodUtils/podcrates#183), `docs/decisions.md` (2026-11-15).

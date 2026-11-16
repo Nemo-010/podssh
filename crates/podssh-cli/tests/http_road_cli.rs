@@ -5,7 +5,8 @@
 //! given with `--ca-file` (`http_road_cli_support`). podssh's WebSocket road
 //! is refused there, so it falls to the HTTP road: `podssh proxy` to an echo
 //! and `podssh ssh` to the test's SSH server (`ssh_harness`, whose `echo`
-//! sends back its input) each move 20 MiB each way with equal digests, in
+//! sends back its input) each move 20 MiB each way, and `podssh pipe stdio
+//! relay:` to the echo in the split form, with equal digests, in
 //! the split form and in the serial form (`PODSSH_HTTP_ROAD`). A close of the
 //! road other than `1000`, the role's byte cap, is said by `ssh` as by
 //! `proxy`: its code and its reason. `podssh doctor` names the road that
@@ -49,6 +50,22 @@ fn proxy_carries_20_mib_each_way(form: &str, seed: u64) {
     bench.carried_in(form);
 }
 
+/// `podssh pipe stdio relay:` through the road in `form` to an echo: 20 MiB
+/// each way, as `proxy` carries it (its `relay:` end once stopped at the
+/// refused upgrade).
+fn pipe_carries_20_mib_each_way(form: &str, seed: u64) {
+    let bench = Bench::start(&format!("http-road-pipe-{form}"), &[]);
+    let mut args = vec!["pipe".to_string()];
+    args.extend(bench.relay_flags());
+    args.extend(["stdio".to_string(), format!("relay:127.0.0.1:{}", echo_target())]);
+    let sent = bytes(SIZE, seed);
+    let ran = run(bench.podssh(&args, Some(form)), sent.clone());
+    assert_eq!(ran.code, Some(0), "{}", ran.err);
+    assert!(ran.err.contains("podssh tries its HTTP road there"), "the road was announced: {}", ran.err);
+    same_bytes(&ran, &sent);
+    bench.carried_in(form);
+}
+
 /// `podssh ssh` through the road in `form` to the test's SSH server, whose
 /// `echo` sends back its input: 20 MiB each way.
 fn ssh_carries_20_mib_each_way(form: &str, seed: u64) {
@@ -74,6 +91,11 @@ fn podssh_proxy_carries_20_mib_each_way_over_the_split_form() {
 #[test]
 fn podssh_proxy_carries_20_mib_each_way_over_the_serial_form() {
     proxy_carries_20_mib_each_way("serial", 32);
+}
+
+#[test]
+fn podssh_pipe_carries_20_mib_each_way_over_the_split_form() {
+    pipe_carries_20_mib_each_way("split", 0x7069_7065);
 }
 
 #[test]

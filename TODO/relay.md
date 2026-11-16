@@ -2840,7 +2840,7 @@ session on 2026-11-03.
   stream that tells the record how its session ended once SSH lets it go, which
   `crates/podssh-cli/src/ssh/transport.rs:225` spawns. `podssh proxy`
   (`crates/podssh-cli/src/proxy.rs:425`) and the relay's end of `podssh pipe` (`carry_opened`)
-  tell it at their end (`crates/podssh-cli/src/pipe/relay.rs:214-216`).
+  tell it at their end (`crates/podssh-cli/src/pipe/relay.rs:221-223`).
 - `podssh status`: `relay_failures` names the road, and `relay_opened` gives the hosts that opened
   lately (`crates/podssh-cli/src/status.rs:228-238`); `podssh doctor`'s line `failed relays` says
   each host tried last, and a line `opened relays` those tried first

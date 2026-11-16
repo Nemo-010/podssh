@@ -13,8 +13,9 @@
 # the lab as --serve-ca names the CA. RELAY (default listed.test:8443) and
 # ADDR (sni-allowlist: RELAY=listed.test:443
 # ADDR=--relay-addr=listed.test=192.0.2.1) say how the class reaches the
-# role. Throwaway keys, in a directory of this run alone. Exit 0 when ssh and
-# a copy of 20 MiB with equal SHA-256 pass.
+# role. Throwaway keys, in a directory of this run alone. Exit 0 when ssh, a
+# copy of 20 MiB with equal SHA-256, pipe (command 5) and a session across a
+# cut of its link (command 6) pass.
 set -u
 B=$1
 # The relay host as the class reaches the served port, and its address where
@@ -72,5 +73,47 @@ if [ "$rc" = 0 ] && [ "$got" = "$want" ]; then
     echo "ok   cp of 20 MiB through the class, equal SHA-256, in $(( $(date +%s) - s )) s"
 else
     echo "FAIL cp rc=$rc"; tail -5 cp.err
+    exit 1
+fi
+# Command 5: podssh pipe to sshd through the role; its first bytes are the
+# server's banner.
+# shellcheck disable=SC2086 # $ADDR is a list of options, a word each
+got=$( (sleep 3) | SSL_CERT_FILE=$W/trust.pem timeout 60 "$B" pipe --relay-host "$RELAY" $ADDR stdio \
+    relay:127.0.0.1:2222 2> pipe.err | head -c 7)
+if [ "$got" = SSH-2.0 ]; then
+    echo "ok   pipe through the class to sshd: its banner"
+else
+    echo "FAIL pipe said '$got'"; tail -5 pipe.err
+    exit 1
+fi
+# Command 6: a session outlives a cut of its link. The client's TCP
+# connections into the class (to its proxy, else to the relay's port) are
+# destroyed in the middle of a session that prints a line each second; the
+# resumable layer carries it on a new link, each line once and in order.
+# A class whose way refuses the layer (ws-upgrade-refused) has no resume:
+# the lane says so and stops there, as T-791 records.
+if [ -n "${HTTPS_PROXY:-}" ]; then
+    hp=${HTTPS_PROXY#*://}; hp=${hp##*@}; hp=${hp%%/*}; P=${hp##*:}
+else
+    P=${RELAY##*:}
+fi
+want=$(seq 1 12 | sed 's/^/tick/')
+# shellcheck disable=SC2086 # $ADDR and $o are lists of options, a word each
+SSL_CERT_FILE=$W/trust.pem timeout 120 "$B" ssh -v --relay-host "$RELAY" $ADDR $o root@127.0.0.1 \
+    'i=1; while [ $i -le 12 ]; do echo tick$i; i=$((i+1)); sleep 1; done' > ticks 2> resume.err &
+pid=$!
+sleep 4
+if ! ss -K -t "dport = :$P" > /dev/null 2>&1; then
+    echo "FAIL the lab let no socket be destroyed (ss -K); command 6 cannot run here"
+    wait $pid; exit 1
+fi
+wait $pid
+rc=$?
+if [ "$rc" = 0 ] && [ "$(cat ticks)" = "$want" ] && grep -q "the session resumed" resume.err; then
+    echo "ok   a session outlived a cut of its link: $(grep -o 'the session resumed after [0-9.]* s' resume.err)"
+elif grep -q "no resume" resume.err; then
+    echo "ok   the class refuses the resumable layer, so the cut ended the session (rc=$rc), as T-791 records"
+else
+    echo "FAIL the session across a cut: rc=$rc, $(wc -l < ticks) lines of 12"; grep -i -E "resum|lost|link" resume.err | tail -8
     exit 1
 fi

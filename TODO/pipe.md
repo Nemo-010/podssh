@@ -27,7 +27,7 @@ the verb, the address grammar, the copy loop, and the local addresses `-`,
 - Measured: `PODSSH_OFFLINE=1 podssh pipe stdio relay:example.org:80` exits
   64 with `podssh: unknown subcommand 'pipe'.` The verb table has no `pipe`
   row (`crates/podssh-cli/src/flags.rs:383-453`).
-- Read: the only pump is `crates/podssh-cli/src/pipe/relay.rs:111-251`. At the end
+- Read: the only pump is `crates/podssh-cli/src/pipe/relay.rs:118-258`. At the end
   of input it stops sending and keeps receiving
   (`crates/podssh-cli/src/proxy.rs:8-11`). T-101 is the opposite defect in
   `crates/podssh-ts/src/pipe.rs`; the new pump must not repeat it.
@@ -47,12 +47,12 @@ the verb, the address grammar, the copy loop, and the local addresses `-`,
    An unknown kind exits 64 and lists the kinds. `-` is `stdio`; `stdio` on
    both sides exits 64. Invariant: both addresses are valid before anything
    starts.
-3. Move the pump of `crates/podssh-cli/src/pipe/relay.rs:111-211` to
+3. Move the pump of `crates/podssh-cli/src/pipe/relay.rs:118-218` to
    crates/podssh-cli/src/pipe/pump.rs, over two duplex ends, with its rules:
    reads of 32 KiB; an end of input half-closes the other side (a shutdown
    of the write side, never a drop, or the reply is lost), and the other
    direction goes on; a reader that is gone ends the pipe with 0
-   (`crates/podssh-cli/src/pipe/relay.rs:249-253`). Keep
+   (`crates/podssh-cli/src/pipe/relay.rs:256-260`). Keep
    `runtime.shutdown_background()` (`crates/podssh-cli/src/proxy.rs:307-309`).
    This is the one path: T-175 moves `podssh proxy` onto it.
 4. `fd:N` (Unix): `fcntl(F_GETFD)` first. A closed N, or N below 3, exits 64.
@@ -179,12 +179,12 @@ local program to a target, and `podssh proxy` stays a second pump.
 2. `relay:HOST:PORT`: parse as `crates/podssh-cli/src/proxy.rs:376-386` does;
    open with `PodUtils/podssh:crates/podssh-relay/src/open.rs:212-298`. Keep the rules of
    proxy: no Close at the end of input, the ping watcher
-   (`crates/podssh-cli/src/pipe/relay.rs:149-151`), empty frames dropped. IPv6
+   (`crates/podssh-cli/src/pipe/relay.rs:156-158`), empty frames dropped. IPv6
    literals follow T-007.
 3. Move `podssh proxy` onto the pipe: `run_proxy`
    (`crates/podssh-cli/src/proxy.rs:89-311`) runs `stdio` and `relay:`. Keep
    its exit codes and messages (`crates/podssh-cli/src/proxy.rs:480-493`,
-   `crates/podssh-cli/src/pipe/relay.rs:224-257`).
+   `crates/podssh-cli/src/pipe/relay.rs:231-264`).
 4. `ssh:[USER@]HOP[,HOP...],HOST:PORT`: the last item is the target, each
    other item a hop, read as `-J` reads it
    (`crates/podssh-cli/src/ssh/resolve.rs:166-170`,

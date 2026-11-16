@@ -1,4 +1,5 @@
-//! The HTTP road (T-319) of `podssh proxy` and `podssh ssh`: once each relay
+//! The HTTP road (T-319) of `podssh proxy`, `podssh ssh` and `relay:` of
+//! `podssh pipe`: once each relay
 //! host failed, and the way to one of them refused the WebSocket upgrade (a
 //! proxy's page, or a `426` of a relay that got the request with its
 //! `Upgrade` taken off, as the probe of the Piping Server road tells the
@@ -119,30 +120,53 @@ pub async fn after_relay_pipe(
     failure: &Failure,
     relays: &RelayList,
     trust: &Trust,
-    (host, port): (&str, u16),
+    to: (&str, u16),
     err: &mut dyn Write,
 ) -> Option<i32> {
+    let opened = {
+        let mut say = |line: &str| {
+            let _ = writeln!(err, "podssh: {line}");
+        };
+        after_relay_end(failure, relays, trust, to, &mut say).await?
+    };
+    match opened {
+        Ok((end, host)) => {
+            crate::session_log::opened(Some(&host));
+            let pumped = crate::pipe::pump::pump(crate::pipe::local::stdio(), end).await;
+            crate::session_log::carried(pumped.carried.0, pumped.carried.1);
+            Some(crate::pipe::report(pumped, "podssh", err).await)
+        }
+        Err(code) => Some(code),
+    }
+}
+
+/// The road after the relay hosts as an end of a pipe, for `podssh proxy`
+/// and `relay:` of `podssh pipe`: the end and the host that carries it, or
+/// the exit code of a setting that cannot be read; `None` where the road
+/// does not apply or did not open, once `say` has its lines.
+pub async fn after_relay_end(
+    failure: &Failure,
+    relays: &RelayList,
+    trust: &Trust,
+    (host, port): (&str, u16),
+    say: &mut dyn FnMut(&str),
+) -> Option<Result<(PipeEnd, String), i32>> {
     let form = match asked(std::env::var(ENV).ok().as_deref()) {
         Ok(Asked::No) => return None,
         Ok(Asked::Auto) => None,
         Ok(Asked::Only(form)) => Some(form),
         Err(why) => {
-            let _ = writeln!(err, "podssh: {why}");
-            return Some(EX_CONFIG);
+            say(&why);
+            return Some(Err(EX_CONFIG));
         }
     };
     let relay = refused_at(failure, relays)?;
-    let _ = writeln!(err, "podssh: {}", announce(&relay));
+    say(&announce(&relay));
     let target = podssh_ws::dial::authority(host, port);
     match open(&relay, trust, Target { host, port, family: None }, form).await {
-        Ok(opened) => {
-            crate::session_log::opened(Some(&relay.host));
-            let pumped = crate::pipe::pump::pump(crate::pipe::local::stdio(), pipe_end(opened, target)).await;
-            crate::session_log::carried(pumped.carried.0, pumped.carried.1);
-            Some(crate::pipe::report(pumped, "podssh", err).await)
-        }
+        Ok(opened) => Some(Ok((pipe_end(opened, target), relay.host))),
         Err(why) => {
-            let _ = writeln!(err, "podssh: the HTTP road at {}: {why}", relay.host);
+            say(&format!("the HTTP road at {}: {why}", relay.host));
             None
         }
     }

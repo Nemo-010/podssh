@@ -76,13 +76,20 @@ pub async fn open(road: &Road<'_>, host: &str, port: u16, say: &mut dyn FnMut(&s
         crate::exit_codes::EXIT_USAGE
     })?;
     let target = podssh_ws::dial::authority(host, port);
-    let opened = session(road, host, port, &path, say).await;
-    opened.map_err(|failure| {
-        for line in failure.lines(&target) {
-            say(&line);
-        }
-        crate::proxy::sysexit(failure.last())
-    })
+    let failure = match session(road, host, port, &path, say).await {
+        Ok(end) => return Ok(end),
+        Err(failure) => failure,
+    };
+    for line in failure.lines(&target) {
+        say(&line);
+    }
+    // The HTTP road at a host whose upgrade the way refused, as `proxy`
+    // and `ssh` take it (T-319).
+    match crate::http_road::after_relay_end(&failure, road.relays, road.trust, (host, port), say).await {
+        Some(Ok((end, _host))) => Ok(end),
+        Some(Err(code)) => Err(code),
+        None => Err(crate::proxy::sysexit(failure.last())),
+    }
 }
 
 /// The session to `host:port` at its forward `path`: the end, or the
