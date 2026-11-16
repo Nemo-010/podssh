@@ -391,7 +391,10 @@ step_release() {
     # skipped or new fails the step.
     if [ -f "$B" ]; then
         mkdir -p /tmp/gate-interop
-        run "interop: OpenSSH and Dropbear" sh scripts/interop.sh "$B"
+        # A bound of its own, under the job's 45 min: run shows a step's lines
+        # only when it ends, so a hang cut by the job's limit left none (CI at
+        # d13ab01). Here it ends as a failure, with each check said so far.
+        run "interop: OpenSSH and Dropbear" timeout 1500 sh scripts/interop.sh "$B"
         cp /tmp/podssh-step.out /tmp/gate-interop/interop.log
         grep -E '^(ok|FAIL|skip|env) |^interop:' /tmp/gate-interop/interop.log
         run "man page: groff and mandoc" sh scripts/interop-man.sh "$B"

@@ -857,7 +857,7 @@ Read:
   names and answers a status (`scripts/fake-proxy.py:1-32`). Neither shapes
   the traffic.
 - `scripts/interop-faults.sh:35-44` starts one stand-in for each fault; its
-  checks are at lines 73-182 at `8d668b7` (`docs/STATUS.md:819-839`, 14 of 14 since T-236).
+  checks are at lines 73-182 at `8d668b7` (`docs/STATUS.md:820-840`, 14 of 14 since T-236).
 - The time limits that latency meets today: the SSH handshake, 60 s
   (`crates/podssh-ssh/src/options.rs:390`, enforced at
   `crates/podssh-ssh/src/run.rs:402-405`); a reply, 30 s
@@ -991,7 +991,7 @@ Read, each claim of GitHub #34 at the lines as they are now:
 - `crates/podssh-ssh/src/io/msg.rs:35-42`, with `crates/podssh-ssh/src/io.rs:68-70`,
   maps an exit status that does not fit
   (the -1 of `railway.new`) to 255, and an exit signal to 128 plus its number
-  (`docs/STATUS.md:242`, `docs/STATUS.md:248`).
+  (`docs/STATUS.md:243`, `docs/STATUS.md:249`).
 - A correction to the framing of #34: for a signal, podssh differs from
   OpenSSH on purpose. `docs/cli.md:6323-6324` says 128 plus the signal's number,
   and that OpenSSH gives 255. `crates/podssh-ssh/src/lib.rs:16` says that the
@@ -2796,3 +2796,44 @@ The gate's job `macos` passes it ten times in a row, or the cause is named and r
 Partial, 2026-11-15: not made here: `cargo test -p podssh-cli --test node_cut a_strict_relay` passed three runs in
 three on Linux. It passed each macOS gate before this one. It waits for its next failure.
 
+
+# T-796: The gate's OpenSSH and Dropbear interop hung past the job's 45 min, and left no line of where
+
+**Source:** the gate of `d13ab01` (2026-11-16, run 43839740067, job `gate (release)`, attempt 1).
+**Category:** defect
+**Milestone:** M10
+**Priority:** P1
+**Effort:** S
+**Status:** partial
+
+## Problem
+
+The step `release` built the static binary in 9 min 53 s, then `interop: OpenSSH and Dropbear` printed nothing for
+34 min, until the job's limit of 45 min cut it (GitHub calls that "cancelled"). The same code passed on attempt 2:
+636 checks in 12 min 44 s; the two green gates before it took 11 min 8 s and 13 min 49 s. So a check hangs at random,
+and the log does not say which.
+
+## Premise
+
+- The gate's `run` writes a step's lines to a file and shows them only when the step ends
+  (`scripts/gate.sh:68`), so a step that the job's limit cuts shows none.
+- The interop step had no bound of its own under the job's 45 min.
+
+## Approach
+
+1. Give the step its own bound under the job's, so that a hang ends as a failure and `run` shows each line said so
+   far: the last check named is the one before the hang.
+2. At the next hang, read which check it was, and give that check its own time limit, or repair what it waits for.
+
+## Prove
+
+The gate's `run` in the build image: a step that hangs under the bound ends with its lines shown; planted, the same
+step with no bound and cut from outside shows none. Then the next hang of the gate names its check.
+
+## Done
+
+Partial, 2026-11-16. `scripts/gate.sh` runs `scripts/interop.sh` under `timeout 1500`, 25 min, about twice its usual
+time and under the job's 45 min with the build before it. In the build image (`rust:1-alpine` at the gate's digest;
+busybox's `timeout`), the gate's own `run` function: a step that said two checks and then slept ended at its bound with
+`exit=143` and both lines shown; planted, the same step with no bound, cut from outside, showed none. It waits for the
+next hang of the step, whose lines then name the check that held.

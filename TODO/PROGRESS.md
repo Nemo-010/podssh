@@ -8,7 +8,8 @@ this page keeps no history (git does).
 
 Read on 2026-11-15.
 
-1. **The gate.** Green at `f5b4f43` (2026-11-16, run 43823925587, the take of `v0.60.0`; its `gate (m6)` failed once,
+1. **The gate.** Green at `d13ab01` (2026-11-16, run 43839740067, podcrates `v0.61.0`; `gate (release)` on attempt 2:
+   its interop hung past the job's limit on attempt 1, T-796). Green at `f5b4f43` (2026-11-16, run 43823925587, the take of `v0.60.0`; its `gate (m6)` failed once,
    T-780's sixth, and passed on attempt 2). Green at `71ebc9d` (run 43814811221, by its push; `release.yml` by hand there, run
    43815141894, green). This session's account starts runs by a push and by hand. #276's runs at `bde7f17`
    (2026-11-16): `build.yml` red in `gate (lint)` and `gate (iroh)`, `release.yml` red in its aarch64 musl build,
@@ -26,7 +27,7 @@ Read on 2026-11-15.
    work since the holds ended (Q92): `podssh serve --stdio` runs commands, shells, a pty, direct-tcpip,
    SFTP and the options of a key line on `main`. See "Work order".
 4. **Partial entries** (24; each `## Done` names its next step): the tests that failed at random, each
-   waiting for its next failure: T-465, T-627, T-753, T-756 and T-780 (T-746 done, 2026-11-14); M5's server, merged and each
+   waiting for its next failure: T-465, T-627, T-753, T-756, T-780 and T-796 (T-746 done, 2026-11-14); M5's server, merged and each
    waiting for its run in the build image (T-251): T-107, T-108, T-109, T-110, T-112, T-114 and
    T-222; the migration, T-684; the release of M10, T-446; T-738 (podcrates' entry 528, COORD-053);
    T-319 and T-321 (a real proxy's path and Apache in the
@@ -171,7 +172,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 750 entries: 44 open, 32 partial, 11 blocked, 663 done.
+`TODO/INDEX.md` holds 751 entries: 44 open, 33 partial, 11 blocked, 663 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
@@ -183,7 +184,7 @@ operator interrupts it.
 
 **The rules of the order**, first to last:
 
-1. A red gate, then a test that fails at random (T-465, T-627, T-753, T-756, T-780), before any other work.
+1. A red gate, then a test that fails at random (T-465, T-627, T-753, T-756, T-780, T-796), before any other work.
 2. A `partial` entry before a new one, and a draft's merge in the order of "Drafts" (State, item 8).
    Each partial entry and what it waits for (2026-11-13): T-107, T-108, T-109, T-110, T-112, T-114
    and T-222, the remap their `## Done` lists and the run in the build image (the release check); T-738,

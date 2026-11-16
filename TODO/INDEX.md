@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**750 entries: 44 open, 32 partial, 11 blocked, 663 done.**
+**751 entries: 44 open, 33 partial, 11 blocked, 663 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 3 | 7 | 3 | 78 | 91 |
+| P1 | 3 | 8 | 3 | 78 | 92 |
 | P2 | 7 | 19 | 2 | 281 | 309 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 44 | 32 | 11 | 663 | 750 |
+| **All** | 44 | 33 | 11 | 663 | 751 |
 
 ## Entries
 
@@ -826,3 +826,4 @@ repository and CI).
 | [T-793](repo.md) | P1 | S | M10 | feature | partial | One POSIX installer for podssh, hermetic, idempotent and fast, on podcrates' shared core |
 | [T-794](ssh.md) | P1 | S | M10 | defect | done | `cold_connect`'s test of the auth request failed at random on a busy runner |
 | [T-795](serve.md) | P1 | S | M10 | defect | done | `podssh serve` as root refused to start in a release build: a thread of ZeroTier's static constructor held its capabilities |
+| [T-796](robustness.md) | P1 | S | M10 | defect | partial | The gate's OpenSSH and Dropbear interop hung past the job's 45 min, and left no line of where |
