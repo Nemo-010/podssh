@@ -86,11 +86,24 @@ tag at once; `v1.1.0-beta.4` waits for the move, then goes out with its testers'
 it, while podcrates builds: the GSRN road's live test (done), the cell of an outage (T-786), the netem lab of T-625,
 T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 
-**The session of 2026-11-16, later (cloud):** #276's three red jobs repaired (`71ebc9d`: the gate and `release.yml` green);
-podcrates `v0.60.0` taken (`cbef76d`, COORD-089, #281); T-792 done; T-793's release step verified; the network labs
-of `pod-lab` run with doctor (T-791), and the lane behind them asked of podcrates (COORD-090, #282). This account
-starts runs by a push and by `gh workflow run`. Next, in order: T-780 (fails here 1 run in 15 now; COORD-091, #283, asks podcrates); T-791's commands 5 and 6 with the draft
-`draft/t791-lane` (live: a pair on the live relay and a throwaway sshd); T-790; each next tag of podcrates.
+**Hand-off of 2026-11-16, evening (cloud; the session ended at the operator's word).** Each change is on `main` (`a37ea01`).
+Done: #276's red jobs repaired (`71ebc9d`); podcrates `v0.60.0` to `v0.63.0` taken (COORD-089, 092, 093, 094; #281,
+#284, #285, #286 wait for podcrates' record of each take); T-792 done; T-793's release step verified and its core at
+`v0.63.0`; T-791's lane passes behind five network classes with `podlab run --serve` (`scripts/pod-lab-serve-lane.sh`);
+seven testers' issues confirmed and open again (state item 6a). This account starts runs itself: a push starts the gate,
+and `gh workflow run` (or the GitHub tool's dispatch) one by hand; no `[gh action] requested` is needed. Open at the end:
+1. **The gate of the newest commit of `main`** (this hand-off's; it holds `a37ea01`'s code) and **`fuzz.yml` by hand at
+   `a37ea01`** (run 43889251706) were still running: read both first. A red gate first; then T-797: if each fuzz target passes, write its run in `## Done` and set it done.
+   `fuzz/Cargo.lock` is far behind the workspace (it names `podssh-terminal`); CI resolves it again each run, as
+   `scripts/fuzz.sh` builds with no `--locked`: refresh it with a fuzz build, in a commit of its own.
+2. **T-780** (P1): its seventh failure, with the far end's line, holds at the node's half that reads the target after the
+   resume of a session that no link carried (COORD-091, #283, amended; asks 2 and 3 wait for podcrates). It failed here
+   1 run in 15 at `f5b4f43`, none in 20 at `v0.62.0`. Take the tag that answers, then loop the test here.
+3. **T-796** (P1): the gate's interop step has its own bound (25 min); at its next hang, read the last check named.
+4. **T-791**: commands 5 and 6 of the lane (pipe; a session after a kill of its link) behind the network classes, and
+   the resume over the HTTP road of `ws-upgrade-refused` (it runs with no resume there). The draft `draft/t791-lane`.
+5. **T-790**, then each next tag of podcrates at once (T-684), then `v1.1.0-beta.4` once T-684 and T-791 end.
+Each build fills most of this host's disk allowance (about 25 GB): remove `target/` whole before the next.
 
 **Hand-off of 2026-11-16 (the session ended at the operator's word).** Every change is pushed to `main`; the one
 draft is the branch `draft/t791-lane` (below). No run of Actions has passed since `d00ca78` (run 43766309151: green but

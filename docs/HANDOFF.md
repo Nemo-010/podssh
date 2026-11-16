@@ -6,6 +6,8 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## The state of `main`
 
+- At the hand-off of 2026-11-16 (evening) the gate of the newest commit of `main` and `fuzz.yml` at `a37ea01` (run
+  43889251706, T-797) were still running; read them first (`TODO/PROGRESS.md`, "Tonight").
 - The gate is green at `5340fbb` (2026-11-16, run 43870922795, m6 on attempt 2), at `0f2c8a0` (run 43859588499), at `f5b4f43` (2026-11-16, run 43823925587, attempt 2 for T-780's m6) and at `71ebc9d` (run 43814811221), and `release.yml` by hand there (run 43815141894).
 - The record agrees (`cargo todo check`), and `python scripts/check-repo.py` passes.
 - No draft waits for its merge ("Drafts" in `TODO/PROGRESS.md`).
