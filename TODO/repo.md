@@ -4022,7 +4022,7 @@ identities (x25519-dalek, `podssh-ws` and `podssh-relay`), and its AEAD
 
 ## Premise
 
-- Read: `crates/podssh-ssh/Cargo.toml:23` and `crates/podssh-cli/Cargo.toml:159`
+- Read: `crates/podssh-ssh/Cargo.toml:23` and `crates/podssh-cli/Cargo.toml:163`
   ask for `sha1` 0.10.7, and the root `Cargo.toml:141` for `hmac` 0.12;
   `Cargo.lock` holds `sha1` 0.10.7 and 0.11.0, `hmac` 0.12.1 and 0.13.0,
   and `digest` 0.10.7 and 0.11.3, as russh 0.64.1 (vendor/russh/Cargo.toml)
@@ -6671,6 +6671,30 @@ rewritten so that the sentence stays whole ("the last fallback of Q78" is "the l
 ruling Q78)" goes); the tests that looked for an id look for the line's other words. After it: none. `cargo clippy -p
 podssh-cli -p podssh-relay --all-targets` with the release's features clean; `cargo test -p podssh-relay -p
 podssh-cli` 2826 passed with 6 failed (the tests of the old wording), then those and the roads' tests 114 passed.
+
+Step four, 2026-11-16 (a draft, `draft-t790-model`), the model on `pod-manual` of podcrates `v0.63.0` and its
+checks in the tests: `pod-manual` is a dependency of podssh-cli, and `crates/podssh-cli/src/man/pod_model.rs` builds a
+`pod_manual::Manual` from the tables that podssh's own model reads (the verbs and the flag rows of `flags.rs`, the
+positionals of the parser, the groups, the options before a command, the notes, the variables, the exit codes, the
+files, the examples, SEE ALSO), with the prose sections as topics. What the crate's model has no place for is named in
+the module's head: the `-o` keywords and the retired variables are topics of their own (`keywords`,
+`retired-variables`); the heading "Conventions" goes; a file row of several names is one path; the row `N` is the
+payload row, signals within it; an exit code has no short name; an accepted flag's reason stays in its help, so its
+`why` is empty; the subcommands parsed as a positional word stay in the usage and the notes. Its tests
+(`man::pod_model::tests`): `check::model`, `check::texts`, `check::variables` over the non-test source of the crates of
+the build (the manual aside, a road's crate with its feature) and `check::exit_codes` against 0 and each constant
+`EXIT_*` and `EX_*` of podssh-cli and podssh-ssh, each with `check::assert_none` and no exemption; a control that the
+sources and the codes are read; the planted drifts (a variable read with no fact, a fact that nothing reads, a code
+with no fact, a fact of a code that nothing gives, a long note) each found; and a test that each part of the manual is
+in the model. `podssh man`'s writers still walk podssh's own model. Merged the same day: each check passed but
+`check::texts`, which found 852 sentences over 25 words (863 with every road's feature; 860 apart) and one work id
+(`GitHub #56` in doctor's notes, now gone): its rule counts a sentence that runs on past a `;` or a `:` up to its end,
+which step two's measure did not. So the text check is a ratchet: `long_sentences.txt` beside the tests lists the 860,
+any long sentence not on it fails, and so does each other finding; planted, one sentence taken off the list fails it.
+`cargo test -p podssh-cli --lib` 1178 passed; `man::` 70 passed with every road's feature, and `man::pod` with `tor`
+alone; clippy (the gate's lints, with the release's features) and rustfmt clean. Next: the 860 sentences rewritten (the
+list shrinks to none, then `assert_none`), the writers (text, roff, JSON, the help) on the crate's, `check::generated`
+for the man page and `llms.txt`, and `check::flags` against the parser.
 
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes

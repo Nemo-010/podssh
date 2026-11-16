@@ -19,6 +19,8 @@ pub mod facts;
 pub mod json;
 pub mod model;
 pub mod notes;
+// The same manual as the model of pod-manual, whose checks the tests run.
+pub mod pod_model;
 // A node's person, asked after its door (T-638).
 mod notes_ask;
 mod notes_chat;

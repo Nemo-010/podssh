@@ -5238,6 +5238,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pod-manual"
+version = "0.63.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.63.0#d21fd638d8aa82465643eb33b80537a1d1ddd00f"
+dependencies = [
+ "libc",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "pod-netstack"
 version = "0.63.0"
 source = "git+https://github.com/PodUtils/podcrates?tag=v0.63.0#d21fd638d8aa82465643eb33b80537a1d1ddd00f"
@@ -5558,6 +5568,7 @@ dependencies = [
  "pod-acme",
  "pod-core",
  "pod-derp",
+ "pod-manual",
  "pod-services",
  "pod-term",
  "pod-testkit",

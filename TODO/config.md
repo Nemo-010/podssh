@@ -542,7 +542,7 @@ work.
 ## Premise
 
 Read: podssh has no import and no `config` command (`crates/podssh-cli/src/flags.rs:383-453`).
-`serde_json` is a dependency of the binary (`crates/podssh-cli/Cargo.toml:154`), so a JSON
+`serde_json` is a dependency of the binary (`crates/podssh-cli/Cargo.toml:158`), so a JSON
 export needs no new crate. XML and YAML need a parser that the binary does not have. The export
 formats of the other clients were not read here. Each step below starts from a real export of
 that client: bytes captured from the real program (`AGENTS.md`, section 6, rule 2).
@@ -1594,7 +1594,7 @@ user asked for is gone with no sign, and an audit finds it.
 - Read: the 50 keywords are accepted with no effect, as they "ask for nothing podssh does
   differently, or limit algorithm lists that podssh keeps modern itself"
   (`crates/podssh-cli/src/ssh/keywords.rs:119-132`), and the manual says "Accepted and ignored,
-  because they change nothing that podssh does" (`crates/podssh-cli/src/man/model.rs:268-272`).
+  because they change nothing that podssh does" (`crates/podssh-cli/src/man/model.rs:272-276`).
 - Read: each one is a note (`crates/podssh-cli/src/ssh/options.rs:272`), "-o NAME has no effect in
   podssh" (`crates/podssh-cli/src/ssh/resolve.rs:335`), said at `-v` alone
   (`crates/podssh-cli/src/ssh/mod.rs:282-284`): "-o" also for the line of a file, with no file and

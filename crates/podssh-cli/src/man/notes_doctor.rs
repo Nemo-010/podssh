@@ -92,7 +92,7 @@ pub(super) const DOCTOR_EXIT: &str = "--exit NAME checks the exit NAME of your n
 
 pub(super) const DOCTOR_CLEARTEXT: &str = "The line cleartext, in the section relay, says what a request with no \
      TLS meets on the way to the first relay host that answered (else the first host), at its port and at port 80 \
-     beside 443, as the cleartext road would meet it (GitHub #56): the CONNECT that the proxy takes, then GET \
+     beside 443, as the cleartext road would meet it: the CONNECT that the proxy takes, then GET \
      /health with no token and no target, and what came back, named: a reset or a close with no answer (a hop that \
      expects TLS cuts cleartext), a record of TLS (the far end speaks TLS alone there), the edge's refusal (a 400 \
      that says that a request of plain HTTP was sent to its HTTPS port), a refusal by policy (403), a redirect, \

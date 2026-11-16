@@ -235,9 +235,13 @@ fn section_of(verb: &'static Verb, blocks: Vec<Block>) -> Section {
     }
 }
 
+/// The heading of the `-o` keywords in the section of `ssh`; `pod_model.rs`
+/// finds the keywords by it.
+pub const KEYWORDS: &str = "Keywords for -o NAME=VALUE";
+
 /// The `-o` keywords of `podssh ssh`.
 fn keyword_blocks() -> Vec<Block> {
-    let mut blocks = vec![Block::Sub("Keywords for -o NAME=VALUE".into())];
+    let mut blocks = vec![Block::Sub(KEYWORDS.into())];
     blocks.push(para(
         "The name is not case-sensitive. NAME=VALUE, NAME VALUE and NAME = VALUE are the same. For a \
          single value, the first one given wins, as in OpenSSH. An unknown keyword is an error before \

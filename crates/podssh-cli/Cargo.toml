@@ -103,6 +103,10 @@ pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0" 
 # PodUtils/podcrates (T-034 there); pod-core for the type of its lines.
 pod-acme = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0" }
 pod-core = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0" }
+# The model of the help and the manual that each command line of PodUtils
+# shares, and its checks of drift (T-790): podssh's manual fills it
+# (src/man/pod_model.rs). Pure Rust; libc for its pager alone.
+pod-manual = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0" }
 # The leaf of a release's Sigstore bundle, read (T-375): no C, as its
 # feature `verify` (ring) is off; the signatures are podssh-ws's own.
 x509-parser = { version = "0.18", default-features = false }

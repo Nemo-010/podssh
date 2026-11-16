@@ -2073,7 +2073,7 @@ and `find` takes the first match (`crates/podssh-cli/src/man/model.rs:61-67`).
 The SECTION help names `relay` (`crates/podssh-cli/src/positionals.rs` line
 37 at `02e4e1f`).
 `each_verb_and_alias_finds_its_section` passes, because the command wins
-(`crates/podssh-cli/src/man/model.rs:344-353`).
+(`crates/podssh-cli/src/man/model.rs:348-357`).
 
 ## Approach
 
@@ -2084,7 +2084,7 @@ The SECTION help names `relay` (`crates/podssh-cli/src/positionals.rs` line
    finds its own section.
 4. Change the SECTION help (`crates/podssh-cli/src/positionals.rs:112`):
    `the_section_argument_names_each_topic` requires each topic key in it
-   (`crates/podssh-cli/src/man/model.rs:411-422`). Same commit: `docs/STATUS.md`.
+   (`crates/podssh-cli/src/man/model.rs:415-426`). Same commit: `docs/STATUS.md`.
 
 ## Decision
 
