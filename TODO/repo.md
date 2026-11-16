@@ -5905,6 +5905,17 @@ podcrates' workflow at `v0.61.0`. `cargo clippy --workspace --all-targets` with 
 --workspace --no-fail-fast` in a namespace with the loopback alone 3834 passed, 3 failed, 82 ignored, and the 3
 (`doctor_upgrade`'s one and two of `podssh-iroh`'s `endpoint::udp_tests`) passed with the network: 3837 in all.
 
+2026-11-16, podcrates `v0.62.0` (`b6b1f479`, COORD-122, PodUtils/podcrates#210), a bump of the tag with no patch for
+podssh: `podlab run --serve PORT` (a server of the command behind each network class, podssh's ask of COORD-090, its
+T-759; T-791 runs it), the far end's line of each resume, `session.resume` (podssh's ask of COORD-091, its T-767;
+podssh's keepers send each event's text to the node's stderr, so T-780's test keeps it), the ids of podvm's user
+namespace, and the proxy variables of other tools that a lab now sets or removes (T-760). Its breaking changes
+(`pod_hostprobe::userns::map_line`, `pod_enter::Plan`, `pod_lab::Options`, the builder `by` of
+`pod_session::far::Accepted`) meet no code of podssh. `issue-sync.yml` calls podcrates' workflow at `v0.62.0`.
+`cargo clippy --workspace --all-targets` with the gate's flags clean; `cargo test --workspace --no-fail-fast` in a
+namespace with the loopback alone 3834 passed, 3 failed, 82 ignored, and the 3 (`doctor_upgrade`'s one and two of
+`podssh-iroh`'s `endpoint::udp_tests`) passed with the network: 3837 in all.
+
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
