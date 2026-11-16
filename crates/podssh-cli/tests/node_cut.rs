@@ -190,6 +190,19 @@ fn both_whole(c: &Cut) {
     );
 }
 
+/// A line that names the close code 1003 as a word of its own: a relay
+/// session's id is random hex, which can hold the digits (a run on macOS
+/// read "...a074100374..." as a 1003).
+fn names_1003(line: &str) -> bool {
+    line.split(|c: char| !c.is_ascii_alphanumeric()).any(|word| word == "1003")
+}
+
+#[test]
+fn a_1003_is_a_word_of_its_own() {
+    assert!(names_1003("the relay closed the node's socket: 1003 unknown session id"));
+    assert!(!names_1003("resume 2 on relay session d36e0a05f2d3a074100374eea299b8e7: the client has 50576276 bytes"));
+}
+
 /// podssh's relay role drops the frames in flight: the node's socket stays,
 /// and no 1003 comes (the session's end fails for one).
 #[test]
@@ -204,7 +217,7 @@ fn the_role_drops_the_frames_in_flight_of_a_lost_link() {
     };
     let c = two_sessions(&session, &cell);
     both_whole(&c);
-    assert!(!c.node.iter().any(|l| l.contains("1003")), "no 1003 reached the node: {:?}", c.node);
+    assert!(!c.node.iter().any(|l| names_1003(l)), "no 1003 reached the node: {:?}", c.node);
 }
 
 /// The strict stand-in closes the node's socket with 1003 for such a frame,
@@ -226,7 +239,7 @@ fn a_strict_relay_s_1003_costs_the_other_session_no_backoff() {
     // The stand-in's own line comes to its log at its end: the node's says it.
     let _ = session.claim_unknown_ids();
     both_whole(&c);
-    let closed: Vec<&String> = c.node.iter().filter(|l| l.contains("1003")).collect();
+    let closed: Vec<&String> = c.node.iter().filter(|l| names_1003(l)).collect();
     assert!(!closed.is_empty(), "the 1003 came: {:?}", c.node);
     for line in closed {
         assert!(line.ends_with("connecting again at once"), "the node went again at once: {line}");

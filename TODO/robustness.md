@@ -2785,7 +2785,7 @@ late (`lateclose:1`); where the cut link had drained before that second, no fram
 
 ## Premise
 
-- `crates/podssh-cli/tests/node_cut.rs:230` says "assert!(!closed.is_empty()": the check of the 1003.
+- `crates/podssh-cli/tests/node_cut.rs:243` says "assert!(!closed.is_empty()": the check of the 1003.
 
 ## Approach
 
@@ -2897,3 +2897,39 @@ target's property on `http+unix:/s+unix:/`, `http://user:pw@proxy.example:3128` 
 `socks5h+unix:/run/p.sock`, each passed, and `cargo check --manifest-path fuzz/Cargo.toml --bin proxy_url`.
 `fuzz.yml` by hand at `a37ea01` (run 43889251706, 2026-11-16): success; each of the 16 targets ran its 121 s
 (from 417,747 to 34,533,584 runs) with no crash, `proxy_url` included. Done.
+
+
+# T-800: `node_cut`'s test of podssh's role failed at random: a relay session's id held the digits 1003
+
+**Source:** the gate at `37f9196` (2026-11-16, run 43912907328), its job `macos`.
+**Category:** defect
+**Milestone:** M10
+**Priority:** P1
+**Effort:** S
+**Status:** done
+
+## Problem
+
+`the_role_drops_the_frames_in_flight_of_a_lost_link` failed: "no 1003 reached the node", while no close reached it.
+The node's line of a resume names the relay session's id, random hex, here `d36e0a05f2d3a074100374eea299b8e7`, and the
+test looked for "1003" anywhere in a line.
+
+## Premise
+
+- `crates/podssh-cli/tests/node_cut.rs` asserted `!c.node.iter().any(|l| l.contains("1003"))`, and its strict twin
+  counted such lines as the close that came.
+
+## Approach
+
+Find 1003 as a word of its own (`names_1003`), in both tests, with a test of the helper on the run's own line.
+
+## Prove
+
+```sh
+cargo test -p podssh-cli --test node_cut
+```
+
+## Done
+
+Done, 2026-11-16. `names_1003` splits a line at each character that is not a letter or a digit; the test of it holds
+the macOS run's line (no 1003) and a close's line (1003). `cargo test -p podssh-cli --test node_cut`: 4 passed. Every other job of that gate passed.
