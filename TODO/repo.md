@@ -6738,7 +6738,7 @@ podssh-cli --lib` 1180 passed (`man::` 73, `each_command_and_flag_is_the_parser_
 `sh scripts/interop-man.sh target/debug/podssh` 7 checks ok (groff `-ww`, mandoc's lint, the planted page failed);
 clippy (the gate's lints) and rustfmt clean. Next: the text and `--help` on the crate's together, with the parity gate's
 readers; the JSON keeps podssh's shape, which `docs/cli.md`, `podssh mcp`'s `man` and GitHub #10 read, until the crate's
-model carries a command's availability and the kinds of flag (the asks above, a COORD issue to podcrates).
+model carries a command's availability and the kinds of flag (the asks above: COORD-096, #288).
 
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
