@@ -121,9 +121,15 @@ While the main session merges and tests, subagents draft the next entries.
 - **A draft lives on one machine** until its branch is on GitHub. Before a
   session ends, push each draft branch as `draft/<branch>` (never to
   `main`), so that a session on another machine can see it.
-- **An agent that searches or reads the web** uses the services of
-  <https://web.pkgforge.dev/llms.txt>: it reads that page first, then the
-  chosen service's own `llms.txt`. Say so in each brief.
+- **Each read of the web or of a forge** (the owner's ruling "Web access")
+  tries the services of <https://web.pkgforge.dev/llms.txt> first: the
+  session and each agent read that page, then the chosen service's own
+  `llms.txt` (the GitHub REST API by `forge.web.pkgforge.dev/github/...`,
+  a raw file by `fetch.`, a search by `search.`), with a changing query
+  parameter against its cache. The harness's own tool (web search, web
+  fetch, `gh api`) comes only after a service failed. Writes to GitHub (a
+  comment, an issue, a dispatch) use the GitHub tools. Say so in each
+  brief.
 - **An agent that stops** (a session limit, a crash): commit what it left
   on its branch as "WIP T-NNN: ...", write its state in the table, and
   later resume it, or start a new agent on that branch.

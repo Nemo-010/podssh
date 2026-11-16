@@ -335,7 +335,7 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #273 | [gh action] requested: the gate after m6's iroh client with `-v` | closed 2026-11-15: run 43745453729 passed | T-780 |
 | #274 | COORD-084: podssh took podcrates v0.54.0 at d00ca78 (to podcrates) | open 2026-11-15: until podcrates records the take | T-684 |
 | #275 | [gh action] requested | closed 2026-11-15: the gate at `d00ca78` (run 43766309151) red in `gate (m6)` (T-780); the outage cell (run 43770482263) passed T-789 | T-684, T-780, T-789 |
-| #276 | [gh action] requested: the gate after the take of v0.56.0, and the dry run of issue-sync | open 2026-11-16: asks the gate, the first dry run of the sync and a dry run of the release at `763cac5` | T-684, T-793 |
+| #276 | [gh action] requested: the gate after the take of v0.56.0, and the dry run of issue-sync | closed 2026-11-16: the runs at `bde7f17`: the gate (run 43804352372) red in `gate (lint)` and `gate (iroh)`, the release (run 43804360577) red in its aarch64 build, the sync's dry run (run 43804356638) green; the three repaired by `71ebc9d` | T-684, T-793 |
 | #277 | COORD-085: podssh took podcrates v0.56.0 at 0363272, with the sync of the issues on (to podcrates) | open 2026-11-15: until podcrates records the take | T-684 |
 | #278 | COORD-086: pod-lab: podssh's row of bind-denied asks for commands that its refused TCP connect cannot run (to podcrates) | closed 2026-11-16: `--allow-connect` in podcrates `v0.58.0`; podssh's lane passed in `bind-denied` with the proxy's port | T-791 |
 | #279 | COORD-087: podssh took podcrates v0.58.0 at 043f32c, and its lane passes in pod-lab (to podcrates) | open 2026-11-16: until podcrates records the take | T-684, T-791 |

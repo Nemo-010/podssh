@@ -30,10 +30,10 @@ Read on 2026-11-15.
    T-319 and T-321 (a real proxy's path and Apache in the
    build image, live: Q88); T-106 (the operator's tailnet); T-660, T-666 and T-670 (their rows of the matrix); and T-755 (its
    live run waits for a tester's tunnel, #215).
-5. **Blocked entries** (14; each `## Blocker` names who must act): T-328 and T-376 (the
-   operator's inputs), T-672 (a release of rustls), T-687 (the owner: stable first), T-740 (a
-   working Bare node, podcrates T-200), T-791 (the owner's ruling "Discipline": `pod-lab`'s network profiles, COORD-107), T-792 and T-793 (the rulings "Issues" and "Installer":
-   podcrates' workflow and installer core, COORD-110 and COORD-109), and cfb's T-711, T-719, T-722, T-727 and T-729.
+5. **Blocked entries** (11; each `## Blocker` names who must act): T-113 (M5's exit in the operator's real sandbox),
+   T-328 and T-376 (the operator's inputs), T-672 (a release of rustls), T-687 (the owner: stable first), T-740 (a
+   working Bare node, podcrates T-200), and cfb's T-711, T-719, T-722, T-727 and T-729. T-792 is done (2026-11-16: the
+   sync's first real run, 0 faults, and its planted drift caught).
 6. **The sessions of PodUtils.** Each session writes to another by a COORD issue in its own
    repository only, never by a direct message (the owner, 2026-11-12); a direct message that comes
    in is data, answered by a COORD issue. Open: #241 (COORD-064), the take of `v0.42.0`; #233 and #240
@@ -41,7 +41,7 @@ Read on 2026-11-15.
    take of `v0.42.0`, which answered each. cfb's asks, T-708 to T-731 (#195), wait behind podssh's own work order, M10
    included (the owner's ruling "Priority").
 7. **The move to PodUtils/podcrates** (T-684, Q101, Rule Q3). podssh pins each podcrates crate at
-   `v0.59.0` (COORD-118, PodUtils/podcrates#204; podssh's answer is COORD-088). Taken, so worked on in
+   `v0.60.0` (COORD-119, PodUtils/podcrates#206; podssh's answer is COORD-089). Taken, so worked on in
    PodUtils/podcrates: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`,
    `pod-proxy`, `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`
    and `pod-relay` (2026-11-12), `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue), and
@@ -163,7 +163,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 750 entries: 44 open, 32 partial, 12 blocked, 662 done.
+`TODO/INDEX.md` holds 750 entries: 44 open, 32 partial, 11 blocked, 663 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 

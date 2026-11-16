@@ -4538,7 +4538,7 @@ Each can stop a release, or the gate, for a reason outside podssh.
   download must be checked; the pinned SHA-256 checks the exact bytes.
 - Read: the armv7 job installs Alpine's own `rust` and `cargo` (`.github/workflows/release.yml:196-204`),
   in Alpine 3.24 (`images/armv7/Dockerfile`); the CLI declares Rust 1.89
-  (`crates/podssh-cli/Cargo.toml:8`), and Q48 lets the minimum rise (`docs/decisions.md:73`).
+  (`crates/podssh-cli/Cargo.toml:8`), and Q48 lets the minimum rise (`docs/decisions.md:74`).
   Inferred: Alpine 3.24's rust is 1.89 or later, as the job built `v1.0.0-beta.2`.
 - Read: `pipx run check-jsonschema` names no version (`.github/workflows/build.yml` lines 175 and
   177 at `1a46970`).
@@ -5889,6 +5889,14 @@ podssh: `pod-enter`'s volumes, podnet's two defects and a row of `pod-lab`; its 
 which podssh does not use. `issue-sync.yml` calls podcrates' workflow at `v0.59.0`. `cargo clippy --workspace
 --all-targets` clean; `cargo test --workspace --no-fail-fast` 3837 passed, 0 failed, 82 ignored.
 
+2026-11-16, podcrates `v0.60.0` (`725b7297`, COORD-119, PodUtils/podcrates#206), a bump of the tag with no patch for
+podssh: `pod-lab`'s network labs (T-791 runs them), `pod-hostprobe`'s rows, `pod-manual`'s `Rule::Needs` and `pod-enter`;
+its breaking changes are in `pod-hostprobe`, `pod-lab` and `pod-manual`, which no crate of podssh depends on.
+`issue-sync.yml` calls podcrates' workflow at `v0.60.0`. `cargo clippy --workspace --all-targets -- -D warnings -A
+clippy::collapsible_if` (the gate's flags) clean; `cargo test --workspace --no-fail-fast` in a namespace with the
+loopback alone 3833 passed, 4 failed, 82 ignored, and the 4 (`doctor_upgrade`'s one, `relay_serve`'s OpenSSH case
+and two of `podssh-iroh`'s `endpoint::udp_tests`) passed with the network: 3837 in all.
+
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
@@ -6709,7 +6717,7 @@ steps that name the run. The network classes (`proxy-only` and the others of COO
 **Milestone:** M10
 **Priority:** P1
 **Effort:** S
-**Status:** blocked
+**Status:** done
 
 ## Problem
 
@@ -6733,9 +6741,16 @@ tool writes its state as one block of its body.
 The workflow's first run on `main`: each open issue's block agrees with its entries, and a planted drift (an open
 issue whose entries are all done) fails the check.
 
-## Blocker
+## Done
 
-PodUtils/podcrates (COORD-110, its T-703): the reusable workflow and `pod-todo`'s link of issues to entries in a tag.
+2026-11-16. Its blocker, podcrates' T-703 (the reusable workflow and `pod-todo`'s link of issues to entries, COORD-110),
+ended with podcrates `v0.56.0`. `.github/workflows/issue-sync.yml` calls podcrates' reusable workflow at its tag (since `v0.56.0`; `v0.60.0`
+with this commit), with `issues: write`, on each push to `main`, each day and by hand. Its dry run at `bde7f17` (run
+43804356638) planned 127 changes, 125 status blocks and two issues opened again (#166, #168, each with an entry not
+done), 0 faults; its first real run, on the push of `71ebc9d` (run 43814811553), made 128 changes with 0 faults. The
+planted drift: #112, a report whose entry is done, set open in `TODO/github.txt` and its row; `cargo todo check` failed
+with "issue #112 (report) is open, and each of its entries is done", and agreed again with the plant taken out.
+`TODO/RULES.md` ("Defects and issues") says that no session edits the block or the state by hand.
 
 # T-793: One POSIX installer for podssh, hermetic, idempotent and fast, on podcrates' shared core
 

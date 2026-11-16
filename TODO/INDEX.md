@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**750 entries: 44 open, 32 partial, 12 blocked, 662 done.**
+**750 entries: 44 open, 32 partial, 11 blocked, 663 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 3 | 7 | 4 | 77 | 91 |
+| P1 | 3 | 7 | 3 | 78 | 91 |
 | P2 | 7 | 19 | 2 | 281 | 309 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 44 | 32 | 12 | 662 | 750 |
+| **All** | 44 | 32 | 11 | 663 | 750 |
 
 ## Entries
 
@@ -822,7 +822,7 @@ repository and CI).
 | [T-789](resume.md) | P2 | S | M10 | defect | done | The resumable layer comes back about 12.5 s after a cut of 15 s ends, where TCP alone can in under 1 s |
 | [T-790](repo.md) | P1 | M | M10 | chore | partial | The help and the manual from `pod-manual`, mechanically free of drift |
 | [T-791](repo.md) | P1 | M | M10 | chore | partial | Each release run first in `pod-lab`'s profiles of podssh's host classes |
-| [T-792](repo.md) | P1 | S | M10 | chore | blocked | The state of each GitHub issue written from the record by podcrates' workflow |
+| [T-792](repo.md) | P1 | S | M10 | chore | done | The state of each GitHub issue written from the record by podcrates' workflow |
 | [T-793](repo.md) | P1 | S | M10 | feature | partial | One POSIX installer for podssh, hermetic, idempotent and fast, on podcrates' shared core |
 | [T-794](ssh.md) | P1 | S | M10 | defect | done | `cold_connect`'s test of the auth request failed at random on a busy runner |
 | [T-795](serve.md) | P1 | S | M10 | defect | done | `podssh serve` as root refused to start in a release build: a thread of ZeroTier's static constructor held its capabilities |
