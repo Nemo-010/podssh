@@ -5463,7 +5463,7 @@ subtracted, and `FAR` of 800 ms. `cargo test -p podssh-ssh --test cold_connect`:
 **Milestone:** M10
 **Priority:** P1
 **Effort:** M
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -5503,7 +5503,7 @@ cargo test --manifest-path vendor/russh/Cargo.toml --target-dir .work/russh-targ
 
 ## Done
 
-Partial, 2026-11-16. Each release read (a reading of the changes from 0.65.0 to 0.65.2, rc.11 to rc.12 and v0.6.1 to
+Done, 2026-11-16. Each release read (a reading of the changes from 0.65.0 to 0.65.2, rc.11 to rc.12 and v0.6.1 to
 v0.7.1, by the crates of crates.io and the commits): russh 0.65.2 and ssh-key 0.7.0-rc.12 are the copies now, each from
 the crate whose SHA-256 is the index's checksum (`78229f06...`, `0701b552...`); russh's patches 0001 to 0007 and 0009 to
 0011 applied as they were, 0008's two hunks of `src/negotiation.rs` moved beside upstream's `guessed_ignored`, and each
@@ -5513,5 +5513,5 @@ ssh-key's 0001 applied as it was, the two test keys out. The crates require russ
 why. `vendor/README.md` says each. A test, `agent_failures_of_unlock_and_remove_are_refusals` of
 `tests/agent_cli.rs`: a wrong unlock password exits 77 and a key that the agent does not hold is not "removed"; on
 russh 0.65.0 it fails ("Agent unlocked.", exit 0). `cargo test -p podssh-ssh -p podssh-cli` 2891 passed, 0 failed;
-russh's own `--lib` 235 passed; clippy (the gate's lints) and rustfmt clean. UNVERIFIED: `scripts/check-vendored.py`,
-which reads GitHub's API that this host's proxy refuses: `upstream.yml` by hand on the push.
+russh's own `--lib` 235 passed; clippy (the gate's lints) and rustfmt clean. `upstream.yml` by hand at
+`a7932ec` (run 43921238333): success, its check of the copies passed; `chisel interop` there passed too. Done.
