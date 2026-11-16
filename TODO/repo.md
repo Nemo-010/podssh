@@ -6732,6 +6732,22 @@ certificate on the relay's name, the filter of SNI) are never reached, and comma
 them: podssh asks podcrates (COORD-090, #282) for a lab's proxy that reaches a server that the command runs, so that podssh's
 own relay role (`podssh relay serve --listen 127.0.0.1:PORT`) and an sshd stand behind the class (podcrates T-751).
 
+2026-11-16, live through `podlab run --way-out` of `pod-lab` `v0.61.0` (COORD-121; its release asset, checked against
+its `SHA256SUMS`), with a debug build of `f014ef8` with the release features (`cargo build -p podssh-cli --features
+iroh,warp,zerotier`): in each lab, the lab's CA and this cloud host's own CA (its proxy re-signs TLS on the way out)
+in `SSL_CERT_FILE`, then `podssh doctor --quick` and `sh scripts/release-short.sh PODSSH --net`, each exit code read in
+the lab. `proxy-only`, `proxy-tls-reterminate` and `proxy-per-name`: doctor exit 0 (46 ok, 0 FAIL), and the short check
+exit 0, ending at GitHub's SSH banner through the live relay. `ws-upgrade-refused`: doctor exit 1 (45 ok, 1 FAIL,
+`forward`) and the short check exit 1, as the class asks: the relay's upgrade was refused (403), then the HTTP road got
+the live relay's 400 (the default deployment serves the reverse road's paths alone; podssh's own relay role serves the
+HTTP road, T-319), then each public forwarder's upgrade was refused (403); each step said in its words. So a host of
+that class reaches nothing through the default relay, only through a relay role of its user's own (T-319).
+`sni-allowlist` and `no-proxy-no-dns` have no stand-in proxy, so `--way-out` refuses them (podlab exit 2), and
+`ipv6-only` does not hold on this kernel. With the lab's CA alone, `proxy-only` and `proxy-per-name` failed the relay's
+TLS with `UnknownIssuer`, which doctor named with the way (a CA in `--ca-file`): this host's proxy, not the class.
+Next: commands 3 to 6 of the lane (ssh and cp through a node, serve, pipe, a session after a kill of its link) in the
+three classes that pass, and the classes with no proxy once a lab gives them a way out.
+
 # T-792: The state of each GitHub issue written from the record by podcrates' workflow
 
 **Source:** the owner's ruling "Issues", relayed in COORD-110 (PodUtils/podcrates#183), `docs/decisions.md` (2026-11-15).
