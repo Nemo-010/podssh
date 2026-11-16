@@ -2585,6 +2585,14 @@ that it calls done after which the session never moves while the link lives. The
 `pod-session`'s (`resume.rs`'s `resume_loop`, `keep.rs`'s `run_resumed` and `take`, the pump), which podcrates owns
 (Rule Q3): podssh gives podcrates the six shapes by COORD-091 (#283), and asks for a line of the far end at each resume
 (its number, the offsets of both ends, the bytes sent again), so that the next failure says which end holds.
+The same day it failed here, for the first time off the gate: `cargo test -p podssh-cli --features
+podssh-cli/iroh-test --test m6_exit -- --ignored --exact the_layer_survives_a_stopped_relay_host`, 15 runs one after
+another at `f5b4f43`, failed once (run 8, 600 s; each other run 15 s). The client resumed twice in a row, "after 0.0 s,
+98304 bytes sent again" and "after 0.0 s, 130126 bytes sent again", then said nothing. After the faults' clock the
+client's proxy logged a CONNECT before the RST and one after it; the node's proxy logged one CONNECT after the RST
+alone, its link to the relay ("online again"), and none for the session. So the node opened no new connection for the
+resumed session, and yet the client heard the far end's greeting and proof: the question for podcrates is which way
+carried the node's half of that resume (COORD-091, amended).
 
 
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes
