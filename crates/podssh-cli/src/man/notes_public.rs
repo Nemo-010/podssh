@@ -7,24 +7,23 @@
 /// The public services that podssh tries last, and the ones it never names.
 pub const PUBLIC: &str =
     "The public services that podssh tries when you named no server of their kind, each after podssh's \
-     own roads and by the operator's rulings: on the forward road, the four forwarders above, wisp last, \
-     then the public Wisp servers that their operators run for the use of others, each named in the line \
-     that says what goes to whom, before the ws:// forms (none is named in this release: PODSSH_FORWARDER_FALLBACK=no \
+     own roads and by the operator's rulings: on the forward road, the four forwarders above, wisp last. Then come the \
+     public Wisp servers that their operators run for the use of others. Each is named in the line that says what goes \
+     to whom. They come before the ws:// forms (none is named in this release: PODSSH_FORWARDER_FALLBACK=no \
      turns them off with the rest); \
-     on the reverse road, Tailscale's DERP servers for tailcat, then Tailscale's main DERP fleet, which \
-     serves Tailscale's own clients and let podssh in when it was tried (PODSSH_DERP_MAIN=no keeps to \
-     tailcat's), Least Authority's transit relay, ppng.io then piping.onrender.com, and n0's server of \
-     pkarr (see podssh node); last, croc's public relays behind croc-web's \
-     bridge, Pinggy's free TLS tunnels, then Serveo's private aliases, then ssh-j.com's names, then \
-     localhost.run's tunnels, then localtunnel's names, then bore.pub's TCP ports, each where \
-     podssh's list of services names its server, whose lines say so \
-     (PODSSH_LAST_RESORT=no turns each such last fallback off). Each is a third party that nobody vouches \
+     on the reverse road, Tailscale's DERP servers for tailcat, then Tailscale's main DERP fleet. That fleet serves \
+     Tailscale's own clients, and let podssh in when it was tried (PODSSH_DERP_MAIN=no keeps to tailcat's). Then come \
+     Least Authority's transit relay, ppng.io then piping.onrender.com, and n0's server of pkarr (see podssh node); \
+     last, croc's public relays behind croc-web's bridge, Pinggy's free TLS tunnels, then Serveo's private aliases, \
+     then ssh-j.com's names. Then come localhost.run's tunnels, then localtunnel's names, then bore.pub's TCP ports. \
+     Each goes where podssh's list of services names its server, whose lines say so. PODSSH_LAST_RESORT=no turns each \
+     such last fallback off. Each is a third party that nobody vouches \
      for: its operator sees the \
      target or the two ends, the sizes and the times, may log them, and may stop serving podssh at any \
      time; the host key of SSH, and on the reverse road the end-to-end channel, keep the bytes from it. \
-     podssh names no other public server of their kinds: no community DERP server, no Wisp server of a \
-     web proxy's list and no public proxy node of an aggregator's list, as none names an operator who \
-     answers for it. A server that you name (--derp-server, --forwarder, --shadowsocks, \
+     podssh names no other public server of their kinds: no community DERP server, no Wisp server of a web proxy's \
+     list and no public proxy node of an aggregator's list. None of them names an operator who answers for it. A \
+     server that you name (--derp-server, --forwarder, --shadowsocks, \
      --vless, --via, --wstunnel) is yours to trust. podssh never uses, and never names, a domain that \
      looks taken over: a school's, a church's or a shop's, or a name made to look like one.";
 
@@ -41,9 +40,9 @@ mod tests {
         assert!(notes[at - 1].starts_with("Four words name public forwarders"), "{}", notes[at - 1]);
         for text in [
             "Each is a third party that nobody vouches for",
-            "then Tailscale's main DERP fleet, which serves Tailscale's own clients",
+            "then Tailscale's main DERP fleet. That fleet serves Tailscale's own clients",
             "podssh never uses, and never names, a domain that looks taken over",
-            "then the public Wisp servers that their operators run for the use of others",
+            "Then come the public Wisp servers that their operators run for the use of others",
         ] {
             assert!(super::PUBLIC.contains(text), "{text}");
         }

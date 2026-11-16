@@ -48,7 +48,7 @@ failed (lines 156-168). The sections are "this host", "egress" and "relay" (line
    keep the additions small, or split first.
 5. The JSON carries the same detail strings as the text, which hide proxy credentials and
    tokens today (`crates/podssh-cli/tests/doctor.rs:142-167`).
-6. Change the `doctor` notes (`crates/podssh-cli/src/man/notes.rs:257-348`) and
+6. Change the `doctor` notes (`crates/podssh-cli/src/man/notes.rs:247-333`) and
    `docs/cli.md` lines 1329-1347 at `48a8744` in the same commit.
 
 ## Decision
@@ -335,7 +335,7 @@ and `crates/podssh-ssh/src/keys.rs:111-143` offers a key to the server.
 5. The line joins the JSON of T-049. The script can call `doctor --full` and keep its OpenSSH
    step.
 6. Change `DOCTOR_FLAGS` (`crates/podssh-cli/src/flags/relay.rs:170-228`), the `doctor` notes
-   (`crates/podssh-cli/src/man/notes.rs:257-348`) and `docs/cli.md` lines 1329-1347 at `48a8744` in the same commit.
+   (`crates/podssh-cli/src/man/notes.rs:247-333`) and `docs/cli.md` lines 1329-1347 at `48a8744` in the same commit.
 
 ## Decision
 
@@ -629,7 +629,7 @@ failure at `crates/podssh-ssh/src/run.rs:136-146` and
 `crates/podssh-cli/src/ssh/transport.rs:226` and its close at
 `crates/podssh-cli/src/ssh/mod.rs:375`. The flag in `SSH_FLAGS`
 (`crates/podssh-cli/src/flags.rs:210`), its note at
-`crates/podssh-cli/src/man/notes_ssh_more.rs:129-143`, and `docs/cli.md`.
+`crates/podssh-cli/src/man/notes_ssh_more.rs:144-158`, and `docs/cli.md`.
 
 The test `crates/podssh-cli/tests/ssh_result.rs`, against the test server,
 whose `exit N` and `kill NAME` are in
@@ -782,7 +782,7 @@ session at `crates/podssh-cli/src/mcp/tools.rs:184-202`, and its result at
 `crates/podssh-cli/src/mcp/child.rs:125-157`. The patterns of
 `--allow-host` at `crates/podssh-cli/src/mcp/allow.rs:36-124`. The flags in
 `crates/podssh-cli/src/flags/mcp.rs`, the risk and the rest in the manual
-(`crates/podssh-cli/src/man/notes_mcp.rs:4-60`), and `docs/cli.md`.
+(`crates/podssh-cli/src/man/notes_mcp.rs:4-58`), and `docs/cli.md`.
 
 The test `crates/podssh-cli/tests/mcp.rs`, 4 tests, over the stdin and the
 stdout of `podssh mcp`, reads each line of stdout as one JSON-RPC answer:

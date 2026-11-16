@@ -964,7 +964,7 @@ filed as it is, with no port, as OpenSSH files it (the Correction).
   a run in the build image stalled on the download of the crates, and the
   checks' plant waits for T-251.
 - `docs/cli.md:137-146` and the manual's note of host keys
-  (`crates/podssh-cli/src/man/notes_ssh.rs:351-362`) say how each hop is checked,
+  (`crates/podssh-cli/src/man/notes_ssh.rs:358-369`) say how each hop is checked,
   and which settings hold for each hop.
 - `cargo test -p podssh-ssh`: 141 passed; `cargo test -p podssh-cli`:
   563 passed, 0 failed, 31 ignored; clippy; rustfmt.
@@ -3754,7 +3754,7 @@ name to give. OpenSSH on the same host connects.
   `docs/decisions.md`; T-222 (on hold) says the same of the shell of `podssh serve`.
 - Read: the same name is `%u`, `Match localuser` (`crates/podssh-cli/src/ssh/config/matching.rs:110`),
   the nick of `chat`, and the default comment of `keygen`, "never from the user database"
-  (`crates/podssh-cli/src/man/notes_keygen.rs:48-49`).
+  (`crates/podssh-cli/src/man/notes_keygen.rs:45-46`).
 - Read, against the report: the README of this repository holds no prompt with `ssh railway.new`
   (no line of `README.md` names Railway, at `01e371e` and at `35a0d19`); that one-liner is
   Railway's own page. Its L-02, Railway's refusal of each login of the day, is the service's state,

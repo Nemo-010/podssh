@@ -286,7 +286,7 @@ fn the_manual_says_which_public_services_podssh_tries_and_which_it_never_names()
     for text in [
         "The public services that podssh tries when you named no server of their kind",
         "Each is a third party that nobody vouches for",
-        "then Tailscale's main DERP fleet, which serves Tailscale's own clients",
+        "then Tailscale's main DERP fleet. That fleet serves Tailscale's own clients",
         "PODSSH_DERP_MAIN=no keeps to tailcat's",
         "no Wisp server of a web proxy's list and no public proxy node of an aggregator's list",
         "podssh never uses, and never names, a domain that looks taken over",
@@ -296,6 +296,9 @@ fn the_manual_says_which_public_services_podssh_tries_and_which_it_never_names()
     let (rc, node, err) = podssh(&["man", "node", "--no-pager"], None);
     assert_eq!(rc, 0, "{err}");
     let node = joined(&node);
-    assert!(node.contains("then to Tailscale's main fleet, which serves Tailscale's own clients"), "the notes of node");
+    assert!(
+        node.contains("Then comes Tailscale's main fleet, which serves Tailscale's own clients"),
+        "the notes of node"
+    );
     assert!(!node.contains("podssh names no server of Tailscale's main fleet"), "the notes of node");
 }

@@ -2,10 +2,10 @@
 //! file stays short.
 
 pub const CONFIG: &[&str] = &[
-    "podssh config import ansible FILE prints a Host block of ssh_config for each host of an Ansible \
-     inventory in its INI form (FILE, or - for stdin), with a summary on stderr; it writes no file, and you \
-     add what it printed to ~/.ssh/config. A host's ansible_host, ansible_port, ansible_user and \
-     ansible_ssh_private_key_file (or their ansible_ssh_ names) give HostName, Port, User and IdentityFile, \
+    "podssh config import ansible FILE reads an Ansible inventory in its INI form, from FILE, or from stdin with -. \
+     It prints a Host block of ssh_config for each host, with a summary on stderr; it writes no file, and you add \
+     what it printed to ~/.ssh/config. A host's ansible_host, ansible_port, ansible_user and \
+     ansible_ssh_private_key_file (or their ansible_ssh_ names) give HostName, Port, User and IdentityFile. They are \
      combined from all, its groups and its own line as Ansible combines them; host:PORT and ranges such as \
      www[01:03] are read as Ansible reads them.",
     "The -o options of ansible_ssh_common_args and ansible_ssh_extra_args, which Ansible gives to ssh, follow \
@@ -16,11 +16,11 @@ pub const CONFIG: &[&str] = &[
      name that a Host line cannot hold (a space, *, ?, !, \" or #) is refused by name. A bad line ends the \
      run with its number (exit 65); a file that cannot be read gives 66.",
     "podssh config import putty FILE reads PuTTY's sessions: a .reg file of the registry's key \
-     Software\\SimonTatham\\PuTTY\\Sessions (from regedit or reg export, in UTF-16 or UTF-8), or the session \
-     files of PuTTY on Unix, a file or its directory. The session Default Settings is PuTTY's template, \
-     not a host. user@host in HostName gives User; a key of PuTTY's format (.ppk), which ssh cannot read, \
-     is a comment that says how puttygen converts it; an SSH proxy gives ProxyJump; ProxyPassword is \
-     counted. Environment, a proxy command and the other proxies are comments with no value.",
+     Software\\SimonTatham\\PuTTY\\Sessions, from regedit or reg export, in UTF-16 or UTF-8. It also reads the \
+     session files of PuTTY on Unix, a file or its directory. The session Default Settings is PuTTY's template, not \
+     a host. user@host in HostName gives User; a key of PuTTY's format (.ppk), which ssh cannot read, is a comment \
+     that says how puttygen converts it; an SSH proxy gives ProxyJump; ProxyPassword is counted. Environment, a \
+     proxy command and the other proxies are comments with no value.",
     "podssh config import mobaxterm FILE reads MobaXterm's sessions, an .mxtsessions export or the \
      bookmarks of MobaXterm.ini: the SSH sessions, each with its folder in a comment; the gateways give \
      ProxyJump; a command after the login, a proxy and a key path in MobaXterm's own form are comments; \
@@ -34,8 +34,8 @@ pub const CONFIG: &[&str] = &[
      a PuTTY session other than Default Settings and SSHOptions are comments with no value; each \
      password is counted, never decrypted; SSH1 is a comment; a file encrypted whole (FullFileEncryption) \
      is refused by name (exit 65).",
-    "A session's label becomes the name of its block, each run of characters that a Host line cannot hold \
-     made one -, with the label itself in a comment above it; a session of another protocol gets a \
-     comment and no block. The formats of FinalShell and Termius, and Ansible's YAML, are refused by name \
-     (exit 64) until a real export of each is at hand to test against.",
+    "A session's label becomes the name of its block, each run of characters that a Host line cannot hold made one \
+     -. The label itself is in a comment above it; a session of another protocol gets a comment and no block. The \
+     formats of FinalShell and Termius, and Ansible's YAML, are refused by name (exit 64). They wait until a real \
+     export of each is at hand to test against.",
 ];

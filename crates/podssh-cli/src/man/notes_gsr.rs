@@ -4,12 +4,12 @@
 //! with the feature `gsr` has the road.
 
 /// The note of `podssh node NAME TARGET --gsr`.
-pub(super) const NODE: &str = "In a build with the feature gsr, --gsr serves TARGET over the GSRN road, the \
-     relay of gsocket (hackerschoice's Global Socket Relay Network, where podssh's list of services names \
-     it), with no account and no token: the node and its clients share one secret, the first line of the \
+pub(super) const NODE: &str = "In a build with the feature gsr, --gsr serves TARGET over the GSRN road. It is \
+     the relay of gsocket (hackerschoice's Global Socket Relay Network, where podssh's list of services names \
+     it). It needs no account and no token: the node and its clients share one secret, the first line of the \
      private file of --gsr-secret-file or PODSSH_GSR_SECRET_FILE, never argv. The secret gives an address \
      and a shard of the relay; the node keeps one registration there, by one TCP connection to port 443, \
-     directly or through HTTPS_PROXY's CONNECT, with a ping each 5 s, under the 15 s at which a proxy was \
+     directly or through HTTPS_PROXY's CONNECT. It sends a ping each 5 s, under the 15 s at which a proxy was \
      seen to cut an idle tunnel; each client that connects with the same secret is paired with it, and the \
      node registers again at once. TLS with SRP of the secret (OpenSSL, built in and linked static, as \
      rustls has no SRP) keeps the bytes from the relay; the resumable layer and the end-to-end channel run \
@@ -24,23 +24,22 @@ pub(super) const NODE: &str = "In a build with the feature gsr, --gsr serves TAR
 
 /// The note of `podssh ssh node://NAME` with the road's secret.
 pub(super) const SSH: &str = "In a build with the feature gsr, node://NAME with --gsr-secret-file FILE or \
-     PODSSH_GSR_SECRET_FILE also races the GSRN road, last, once each road before it failed, and before \
-     the file hosts' road: a connection to the relay of gsocket at the shard that the secret gives, \
-     directly or through HTTPS_PROXY's CONNECT, a CONNECT to the secret's address, and TLS with SRP of the \
-     secret with the node of podssh node --gsr; it needs no pair here. The end-to-end channel checks the \
+     PODSSH_GSR_SECRET_FILE also races the GSRN road. It goes last, once each road before it failed, and before the \
+     file hosts' road: a connection to the relay of gsocket at the shard that the secret gives, directly or through \
+     HTTPS_PROXY's CONNECT. Then a CONNECT to the secret's address, and TLS with SRP of the secret with the node of \
+     podssh node --gsr; it needs no pair here. The end-to-end channel checks the \
      node's key by the pins of NAME, or --node-key, and the resumable layer resumes a session on a new \
-     pairing. A line names the relay as a third party before the first link. Never with --no-e2e; a file \
-     that cannot be used is refused (78) before anything connects, and a build without the feature refuses \
-     --gsr-secret-file (70) and passes the variable over.";
+     pairing. A line names the relay as a third party before the first link. Never with --no-e2e; a file that cannot \
+     be used is refused (78) before anything connects. A build without the feature refuses --gsr-secret-file (70) and \
+     passes the variable over.";
 
 /// The note of `podssh doctor`.
-pub(super) const DOCTOR: &str = "In a build with the feature gsr, the section gsr says whether TLS with SRP \
-     builds on both sides (gsr tls, OpenSSL's version), with no connection. Once PODSSH_GSR_SECRET_FILE \
-     names the road's secret, it makes one round trip of the control protocol with the relay at the shard \
-     of that secret, by a secret that nobody holds, so that no node is disturbed (gsr, its time); with \
-     --full, it holds such a registration with the relay's pings alone for 20 s (gsr idle), which says \
-     whether a proxy on the way cuts a quiet tunnel before the road's keepalive. With no secret named, no \
-     byte goes to the relay.";
+pub(super) const DOCTOR: &str = "In a build with the feature gsr, the section gsr says whether TLS with SRP builds on \
+     both sides (gsr tls, OpenSSL's version). It makes no connection for that. Once PODSSH_GSR_SECRET_FILE names the \
+     road's secret, the section makes one round trip of the control protocol with the relay (gsr, its time). The round \
+     trip goes to the shard of that secret, by a secret that nobody holds, so that no node is disturbed; with --full, \
+     it holds such a registration with the relay's pings alone for 20 s (gsr idle). That says whether a proxy on the \
+     way cuts a quiet tunnel before the road's keepalive. With no secret named, no byte goes to the relay.";
 
 /// The variable of the road.
 pub(super) const VARIABLES: &[(&[&str], &str)] = &[(

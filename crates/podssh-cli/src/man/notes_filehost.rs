@@ -6,34 +6,34 @@
 
 /// The note of `podssh node`, after the smee.io road's.
 pub(super) const NODE: &str = "In a build with the feature filehost (none of a release yet), a node of the \
-     pair's road with the resumable layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP \
-     TARGET also waits for the pair's operators through public file hosts, the last of the last fallbacks, for a proxy that refuses every other road: the hosts of podssh's list \
-     of services whose terms let a program upload unasked and that the list has on by default, or those \
-     that PODSSH_FILEHOSTS names, over HTTPS \
-     by name on 443 through HTTPS_PROXY, with no account. Its door is a topic of the first public MQTT \
-     broker of the list (PODSSH_MQTT), whose name comes from the pair's name and connect token, polled each \
-     2 s at first and each 60 s at most; a client's hello there names a link. Each write of a way of at \
-     most 16 KiB is then a note sealed under the pair's key at a topic of the broker that only the pair can \
-     name, with no host, so the handshakes do not wait for a host; each larger piece, up to 4 MiB, \
-     is one upload sealed under that key, at the host's shortest life, and its host, URL and delete token \
-     such a note. The reader takes the note, downloads a piece, deletes it where the host lets it, and \
-     clears the note. One request of \
-     the road at a time, never two connections; uploads at four fifths of a host's published rate, one each \
-     30 s where it publishes none, and a host that answers 429 rests while the next takes the piece. Its \
-     lines name each host and the broker as third parties that nobody vouches for before their first byte. \
-     Slow: for output and files, not for typing. PODSSH_FILEHOSTS=no, PODSSH_LAST_RESORT=no or PODSSH_MQTT=no \
-     turns the road off.";
+     pair's road waits at public file hosts too. There it waits for the pair's operators, the last of the last \
+     fallbacks, for a proxy that refuses every other road. It does so only with a TCP TARGET, the resumable \
+     layer and the end-to-end channel (no --plain, no --no-e2e). The hosts are those of podssh's list of \
+     services whose terms let a program upload unasked and that the list has on by default. Or they are those \
+     that PODSSH_FILEHOSTS names. The road goes over HTTPS by name on 443 through HTTPS_PROXY, with no account. \
+     Its door is a topic of the first public MQTT broker of the list (PODSSH_MQTT). The topic's name comes from \
+     the pair's name and connect token. The node polls it each 2 s at first and each 60 s at most; a client's \
+     hello there names a link. Each write of a way of at most 16 KiB is then a note sealed under the pair's key. \
+     The note goes to a topic of the broker that only the pair can name, with no host. This way the handshakes \
+     do not wait for a host; each larger piece, up to 4 MiB, is one upload sealed under that key, at the host's \
+     shortest life. Its host, URL and delete token are such a note. The reader takes the note, downloads a \
+     piece, deletes it where the host lets it, and clears the note. One request of the road at a time, never two \
+     connections; uploads at four fifths of a host's published rate, one each 30 s where it publishes none. A \
+     host that answers 429 rests while the next takes the piece. Its lines name each host and the broker as \
+     third parties that nobody vouches for before their first byte. Slow: for output and files, not for typing. \
+     PODSSH_FILEHOSTS=no, PODSSH_LAST_RESORT=no or PODSSH_MQTT=no turns the road off.";
 
 /// The note of `podssh ssh`, after the bore road's.
-pub(super) const SSH: &str = "In a build with the feature filehost, node://NAME also races the file hosts' \
-     road of its pair, only once each road before it failed, after every other road, the last of the \
-     last fallbacks: a hello at the node's door on the public MQTT broker of \
-     podssh's list, then each write of a way of at most 16 KiB a sealed note at the broker, and each \
-     larger piece one sealed upload to a public file host (the listed ones whose terms allow it, or those of \
-     PODSSH_FILEHOSTS) and its URL a sealed note there, one request at a time. A node polls its door each \
-     60 s at most, so the first link may wait that long, until the node takes its hello. Before its first \
-     link a line names the broker, and before each host's first upload a line names the host, as third \
-     parties that nobody vouches for. PODSSH_FILEHOSTS=no, PODSSH_LAST_RESORT=no or PODSSH_MQTT=no turns it \
+pub(super) const SSH: &str =
+    "In a build with the feature filehost, node://NAME also races the file hosts' road of its \
+     pair. It goes only once each road before it failed, after every other road, the last of the last fallbacks: a \
+     hello at the node's door on the public MQTT broker of podssh's list. Then each write of a way of at most 16 KiB \
+     is a sealed note at the broker. Each larger piece is one sealed upload to a public file host, and its URL a \
+     sealed note there. The file hosts are the listed ones whose terms allow it, or those of PODSSH_FILEHOSTS. It \
+     makes one request at a time. A node polls its door each \
+     60 s at most, so the first link may wait that long, until the node takes its hello. Before its first link a line \
+     names the broker, and before each host's first upload a line names the host. Both are third parties that nobody \
+     vouches for. PODSSH_FILEHOSTS=no, PODSSH_LAST_RESORT=no or PODSSH_MQTT=no turns it \
      off, and --no-e2e leaves it out. podssh ping node://NAME does not measure it.";
 
 #[cfg(test)]

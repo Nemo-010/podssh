@@ -4,31 +4,31 @@
 //! that reaches it there. Only a build with the feature `zerotier` has it.
 
 /// The note of `podssh node`, after croc's relay road's.
-pub(super) const NODE: &str = "In a build with the feature zerotier, a node of the pair's road with the \
-     resumable layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP TARGET also waits for \
-     the pair's operators on ZeroTier, the last fallback after croc's relay: \
-     ZeroTierOne's own core, linked into podssh, joins an ad-hoc network of the pair's own (no controller, \
-     no account) through ZeroTier Inc.'s roots and its TCP relay, which podssh's list of services names, or \
-     the relay of PODSSH_ZEROTIER (IP:PORT, ZeroTierOne's tcp-proxy of your own), by one TCP connection \
-     through HTTPS_PROXY. The node's ZeroTier identity, its address and the network's one port come from \
-     the pair's name and connect token, so its operators know them with no word between the two ends; the \
-     node waits at its 6plane address there, serves each connection with the resumable layer under the \
-     keeper of its other roads, and dials the relay again, after 1 s, doubled to 32 s, when it goes. Its \
-     line names the relay and says that ZeroTier Inc.'s roots and relay carry the sessions of this road and \
-     see the two ZeroTier addresses, the times and the sizes; the channel keeps the bytes from them. \
+pub(super) const NODE: &str = "In a build with the feature zerotier, a node of the pair's road also waits for \
+     the pair's operators on ZeroTier. It does so only with a TCP TARGET, the resumable layer and the end-to-end \
+     channel (no --plain, no --no-e2e). This is the last fallback after croc's relay. ZeroTierOne's own core, \
+     linked into podssh, joins an ad-hoc network of the pair's own (no controller, no account). It joins through \
+     ZeroTier Inc.'s roots and its TCP relay, which podssh's list of services names. Or the relay is the one of \
+     PODSSH_ZEROTIER (IP:PORT, ZeroTierOne's tcp-proxy of your own). It uses one TCP connection through \
+     HTTPS_PROXY. The node's ZeroTier identity, its address and the network's one port come from the pair's name \
+     and connect token. Its operators thus know them with no word between the two ends; the node waits at its \
+     6plane address there. It serves each connection with the resumable layer under the keeper of its other \
+     roads. It dials the relay again, after 1 s, doubled to 32 s, when it goes. Its line names the relay. It \
+     says that ZeroTier Inc.'s roots and relay carry the sessions of this road and see the two ZeroTier \
+     addresses, the times and the sizes; the channel keeps the bytes from them. \
      PODSSH_ZEROTIER_PLANET names a planet of your own roots in the place of ZeroTier Inc.'s. \
      PODSSH_ZEROTIER=no or PODSSH_LAST_RESORT=no turns the road off.";
 
 /// The note of `podssh ssh`, after croc's relay road's.
-pub(super) const SSH: &str = "In a build with the feature zerotier, node://NAME also races ZeroTier's road \
-     of its pair, only once each road before it failed, after croc's relay road and the Pinggy road \
-     and before Tox's relay road, a last fallback: a member of the pair's own \
-     ad-hoc network, with the client's own ZeroTier identity (made at its first run and kept in the cache, \
-     a private file), through ZeroTier Inc.'s roots and TCP relay (or those of PODSSH_ZEROTIER and \
-     PODSSH_ZEROTIER_PLANET), to the node's address, which both ends make of the pair's connect token. It \
-     waits 120 s at most for the node to answer: the roots check an identity that they do not know yet, and \
-     that comes through the relay, only in turn with the relay's other users, so a first run is the slow \
-     one. Before its first link through ZeroTier Inc.'s relay, a line says that ZeroTier Inc.'s roots and \
+pub(super) const SSH: &str = "In a build with the feature zerotier, node://NAME also races ZeroTier's road of its \
+     pair, only once each road before it failed. It comes after croc's relay road and the Pinggy road and before Tox's \
+     relay road, a last fallback: a member of the pair's own ad-hoc network, with the client's own ZeroTier identity. \
+     That identity is made at its first run and kept in the cache, a private file. It goes through ZeroTier Inc.'s \
+     roots and TCP relay (or those of PODSSH_ZEROTIER and PODSSH_ZEROTIER_PLANET). It reaches the node's address, \
+     which both ends make of the pair's connect token. It \
+     waits 120 s at most for the node to answer: the roots check an identity that they do not know yet, and that comes \
+     through the relay. They check it only in turn with the relay's other users, so a first run is the slow one. \
+     Before its first link through ZeroTier Inc.'s relay, a line says that ZeroTier Inc.'s roots and \
      relay carry the session. PODSSH_ZEROTIER=no or PODSSH_LAST_RESORT=no turns it off, and --no-e2e leaves \
      it out. podssh ping node://NAME does not measure it.";
 

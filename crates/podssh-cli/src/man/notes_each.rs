@@ -2,23 +2,22 @@
 //! file stays short.
 
 pub const EACH: &[&str] = &[
-    "podssh each HOSTS -- COMMAND runs one command on each host of a comma list, [user@]host[:port],..., \
-     through the relay or with --direct, with the connection flags of podssh ssh: -p and -l for each host \
-     that names none, -i, -o, -F and -J; the Host blocks of ssh_config apply to each host as podssh ssh \
-     applies them. A host can be a node, node://[user@]NAME or a name of the net, reached over the roads \
-     that podssh ssh races to it, one connection for each node, or the node of an iroh: or derp: ticket, over \
-     its road (the client's key of the cache; PODSSH_DERP_SERVER names DERP's servers, and in a build with \
-     the iroh road its variable names the relays). Each host is checked before anything connects: a bad one exits 64, and nothing has run \
-     anywhere. A host named twice runs once. Commas part the hosts of the command line, and a blank parts \
-     none: 'a b', or a tab, is refused (64), and the refusal gives a,b; a blank beside a comma is dropped.",
-    "An item of the list takes the braces of bash: web{1..3} is web1, web2 and web3, {01..12} keeps its \
-     zero padding, {a..c} gives letters, {1..9..2} a step, a{b,c}d is abd and acd, and braces nest. @NAME \
-     is the group NAME of the settings file (see FILES): after a line [groups], each line is NAME HOSTS, \
-     whose hosts are a list of the same kind, parted by commas or blanks, and can name groups. 1000 hosts \
-     at most; more, none, an empty host, a range that runs backwards or a group that is not there is a \
-     usage error (64), and a group that names itself, through others or not, is refused with the file (78). \
-     Square brackets stay an IPv6 address. podssh ssh takes a pattern of one host, and refuses one of more, \
-     naming podssh each.",
+    "podssh each HOSTS -- COMMAND runs one command on each host of a comma list, [user@]host[:port],..., through the \
+     relay or with --direct. It takes the connection flags of podssh ssh: -p and -l for each host that names none, \
+     -i, -o, -F and -J; the Host blocks of ssh_config apply to each host as podssh ssh applies them. A host can be a \
+     node, node://[user@]NAME or a name of the net. It is reached over the roads that podssh ssh races to it, one \
+     connection for each node. A host can also be the node of an iroh: or derp: ticket, over its road (the client's \
+     key of the cache; PODSSH_DERP_SERVER names DERP's servers, and in a build with the iroh road its variable names \
+     the relays). Each host is checked before anything connects: a bad one exits 64, and nothing has run anywhere. A \
+     host named twice runs once. Commas part the hosts of the command line, and a blank parts none: 'a b', or a tab, \
+     is refused (64), and the refusal gives a,b; a blank beside a comma is dropped.",
+    "An item of the list takes the braces of bash: web{1..3} is web1, web2 and web3, {01..12} keeps its zero \
+     padding, {a..c} gives letters, {1..9..2} a step, a{b,c}d is abd and acd, and braces nest. @NAME is the group \
+     NAME of the settings file (see FILES): after a line [groups], each line is NAME HOSTS. Its hosts are a list of \
+     the same kind, parted by commas or blanks, and can name groups. 1000 hosts at most; more, none, an empty host, \
+     a range that runs backwards or a group that is not there is a usage error (64). A group that names itself, \
+     through others or not, is refused with the file (78). Square brackets stay an IPv6 address. podssh ssh takes a \
+     pattern of one host, and refuses one of more, naming podssh each.",
     "At most --parallel hosts run at once (8; 1 to 64), each on a connection of its own. No host gets a \
      terminal or stdin: each session is as podssh ssh -T -n makes it. Nothing asks a question: BatchMode is \
      on, and an unknown host key refuses its host and names its fingerprint and -o \
@@ -31,41 +30,37 @@ pub const EACH: &[&str] = &[
      end; each byte of HOST but a letter, a digit, a dot, an underscore, a hyphen and @ is written %XX. \
      The files are made before anything connects (73 when they cannot be), and a host with no status \
      file did not run.",
-    "--snippet NAME runs the command NAME of the settings file on each host, as podssh ssh --snippet runs \
-     it (see podssh ssh): the words after HOSTS fill {{1}} to {{9}}, and {{host}}, {{user}} and {{port}} \
-     are those of each host. podssh shows each host and its command once, before anything connects and \
-     before a file of --output-dir is made, and asks once for all the hosts; --yes runs them with no \
-     question.",
+    "--snippet NAME runs the command NAME of the settings file on each host, as podssh ssh --snippet runs it (see \
+     podssh ssh): the words after HOSTS fill {{1}} to {{9}}, and {{host}}, {{user}} and {{port}} are those of each \
+     host. podssh shows each host and its command once, before anything connects and before a file of --output-dir \
+     is made. It asks once for all the hosts; --yes runs them with no question.",
     "At the end a summary on stderr gives each host and its status; -q leaves it out. The exit status is \
      the largest of the hosts': 0 only when each host gave 0, and 255 when one could not connect or log \
      in. With --fail-fast no host starts after one failed, and the hosts that run end as they end.",
-    "For a program: --result-file FILE writes one JSON object to FILE at the end, a new file for its \
-     owner alone, and the lines stay as they are; - is refused (64). --json writes the same object on \
-     stdout once each host ended, with each host's stdout and stderr in its record in place of the lines: \
-     1 MiB of each at most, as text when it is UTF-8 and else as base64, as stdout_encoding and \
-     stderr_encoding say, and truncated when more came; podssh's own lines stay on stderr. With \
-     --output-dir the bytes go to the files, and the record names them (files). The object has schema, \
-     podssh (the version), exit, counts (hosts, ok, failed and not_started) and hosts, in the order of the \
-     list, each with host, destination (user@host:port), exit (its part, null when it did not start), \
-     status, signal, end, failure, bytes and relay as podssh ssh --result-file gives them, error (the \
-     words of its failure), duration_ms and files. Each host's facts are its own session's, also when \
-     hosts fail at once. With --interactive, --json and --result-file are refused (64).",
-    "podssh each --interactive HOSTS opens a shell with no pty on each host, 64 hosts at most, and \
-     each line typed goes to the hosts of the selection, at first each host; the output of each comes as \
-     HOST: LINE. The terminal keeps its normal mode, so that its own line discipline edits the line. A line \
-     that starts with : is for podssh: :all, :none, :only HOST... (braces and @GROUP as in HOSTS, and USER@ \
-     may be left out), :list, :intr (signal INT to each selected host, which a server may ignore) and \
-     :help; a line that starts with :: goes to the hosts with one : less. With --confirm, a line for more \
-     than one host waits for a second Enter, and another line drops it. A COMMAND, --parallel, --fail-fast \
-     and --output-dir are refused (64).",
-    "The emergency stop is Ctrl-\\ (SIGQUIT) on Unix and Ctrl-Break on Windows: at once, also while a line \
-     is half typed, no host is selected, and each byte that waits for a host is dropped; podssh says \
-     broadcast stopped; :all starts it again. On Unix, --stop-key ^X makes another control key the stop \
-     for the run, as the terminal's QUIT character, and puts the old one back at the end; a key that the \
-     terminal keeps for INTR, EOF, SUSP, ERASE, KILL or the end of a line is refused (64), and so is the \
-     flag on Windows. It is armed before anything connects, and where it cannot \
-     be, podssh exits 78. Each host has a queue of 64 KiB, what its shell has not read yet: a line that \
-     does not fit does not go to that host, which leaves the selection, and podssh names it. Ctrl-C goes \
-     to no host. At the end of the input (Ctrl-D, or Ctrl-Z on Windows), each shell reads what waits for \
-     it, then its end; Ctrl-C then cuts the hosts whose shell still runs, each with 130.",
+    "For a program: --result-file FILE writes one JSON object to FILE at the end, a new file for its owner alone, \
+     and the lines stay as they are; - is refused (64). --json writes the same object on stdout once each host \
+     ended, with each host's stdout and stderr in its record in place of the lines: 1 MiB of each at most, and \
+     truncated when more came. Each is text when it is UTF-8 and else base64, as stdout_encoding and stderr_encoding \
+     say; podssh's own lines stay on stderr. With --output-dir the bytes go to the files, and the record names them \
+     (files). The object has schema, podssh (the version), exit, counts (hosts, ok, failed and not_started) and \
+     hosts, in the order of the list. Each host has host, destination (user@host:port) and exit (its part, null when \
+     it did not start). It has status, signal, end, failure, bytes and relay as podssh ssh --result-file gives them. \
+     It also has error (the words of its failure), duration_ms and files. Each host's facts are its own session's, \
+     also when hosts fail at once. With --interactive, --json and --result-file are refused (64).",
+    "podssh each --interactive HOSTS opens a shell with no pty on each host, 64 hosts at most. Each line typed goes \
+     to the hosts of the selection, at first each host; the output of each comes as HOST: LINE. The terminal keeps \
+     its normal mode, so that its own line discipline edits the line. A line that starts with : is for podssh: :all, \
+     :none, :only HOST..., :list, :intr and :help. In :only, braces and @GROUP are as in HOSTS, and USER@ may be \
+     left out. :intr signals INT to each selected host, which a server may ignore; a line that starts with :: goes \
+     to the hosts with one : less. With --confirm, a line for more than one host waits for a second Enter, and \
+     another line drops it. A COMMAND, --parallel, --fail-fast and --output-dir are refused (64).",
+    "The emergency stop is Ctrl-\\ (SIGQUIT) on Unix and Ctrl-Break on Windows: at once, also while a line is half \
+     typed, no host is selected, and each byte that waits for a host is dropped; podssh says broadcast stopped; :all \
+     starts it again. On Unix, --stop-key ^X makes another control key the stop for the run, as the terminal's QUIT \
+     character. It puts the old one back at the end; a key that the terminal keeps for INTR, EOF, SUSP, ERASE, KILL \
+     or the end of a line is refused (64). So is the flag on Windows. It is armed before anything connects, and \
+     where it cannot be, podssh exits 78. Each host has a queue of 64 KiB, what its shell has not read yet: a line \
+     that does not fit does not go to that host, which leaves the selection, and podssh names it. Ctrl-C goes to no \
+     host. At the end of the input (Ctrl-D, or Ctrl-Z on Windows), each shell reads what waits for it, then its end; \
+     Ctrl-C then cuts the hosts whose shell still runs, each with 130.",
 ];

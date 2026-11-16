@@ -1,13 +1,14 @@
 //! The notes of `--turn` (T-621, the operator's rulings Q66, Q93 and Q95)
 //! for `podssh ssh`, `podssh proxy` and `podssh doctor`, and its file.
 
-pub const SSH: &str = "--turn turns:HOST[:PORT] reaches the first hop through a TURN server that you run \
-     (coturn, as a server of calls or chat often has one on 443), in place of the relay: a TCP allocation of RFC 6062. podssh opens TLS to HOST (port 443 when none is named), \
+pub const SSH: &str = "--turn turns:HOST[:PORT] reaches the first hop through a TURN server that you run, in place of \
+     the relay. Such a server is often coturn, as a server of calls or chat often has one on 443. The road is a TCP \
+     allocation of RFC 6062. podssh opens TLS to HOST (port 443 when none is named), \
      through HTTPS_PROXY when one is set, checked with podssh's trust (--ca-file); asks an allocation for TCP \
      with the credential that the server's 401 asks for; sends Connect with the target's address, which \
-     podssh resolves in its own order of resolvers; then opens a second connection to the same server, binds \
-     it to the target (ConnectionBind), and carries the session on it, while the first holds the allocation \
-     and refreshes it before its lifetime ends. Through a proxy, both are CONNECTs to HOST. turn:HOST[:PORT] \
+     podssh resolves in its own order of resolvers; then opens a second connection to the same server, binds it to the \
+     target (ConnectionBind), and carries the session on it. The first connection holds the allocation and refreshes \
+     it before its lifetime ends. Through a proxy, both are CONNECTs to HOST. turn:HOST[:PORT] \
      (port 3478) has no TLS and goes to this host alone (64). The credential comes from --turn-auth-file FILE \
      (or PODSSH_TURN_AUTH_FILE), never from the URI: see FILES. A server that offers no TCP allocation (442 or \
      508) is refused in those words (69); a credential refused twice (401) and a target that the server's \
@@ -15,8 +16,8 @@ pub const SSH: &str = "--turn turns:HOST[:PORT] reaches the first hop through a 
      reach (447) is said so (69). A proxy that re-terminates TLS stops this road. PODSSH_TURN names the \
      server where the command line names no other road; beside PODSSH_RELAY, PODSSH_FORWARDER, PODSSH_VIA, \
      PODSSH_WSTUNNEL or PODSSH_CHISEL it is refused (78). A run has one road: --relay-host, --relay-failover, \
-     --direct, --forwarder, --shadowsocks, --via, --vless, --trojan, --tuic, --hysteria, --wstunnel, --chisel, \
-     -4, -6, and a destination with a road of its own cannot go with it (64). The host key of SSH protects the \
+     --direct, --forwarder, --shadowsocks, --via, --vless, --trojan, --tuic, --hysteria, --wstunnel, --chisel, -4 and \
+     -6 cannot go with it (64). Nor can a destination with a road of its own. The host key of SSH protects the \
      session, as on each road: the server sees the target's address and SSH's encrypted bytes.";
 
 pub const PROXY: &str = "podssh proxy --turn turns:HOST[:PORT] carries the pipe through a TURN server's TCP \
@@ -24,11 +25,11 @@ pub const PROXY: &str = "podssh proxy --turn turns:HOST[:PORT] carries the pipe 
      they are on the second connection, so the end of stdin is its half-close: the target's bytes come until it \
      closes.";
 
-pub const DOCTOR: &str = "With --turn turns:HOST[:PORT] and --turn-auth-file FILE, the section turn gives a \
-     line for that TURN server, after the roads over TCP that the run names: its software where it says it, \
-     the allocation's relayed address, lifetime and time, and the time of Connect and ConnectionBind, then a \
-     session to github.com port 22 through it, whose host key must be one that GitHub publishes. Where TLS \
-     fails beside HTTPS_PROXY, the line says that a proxy that re-terminates TLS stops this road.";
+pub const DOCTOR: &str = "With --turn turns:HOST[:PORT] and --turn-auth-file FILE, the section turn gives a line for \
+     that TURN server, after the roads over TCP that the run names: its software where it says it, the allocation's \
+     relayed address, lifetime and time, and the time of Connect and ConnectionBind. Then the section opens a session \
+     through it to github.com port 22, whose host key must be one that GitHub publishes. Where TLS fails beside \
+     HTTPS_PROXY, the line says that a proxy that re-terminates TLS stops this road.";
 
 /// The file of `--turn-auth-file` in FILES.
 pub fn file() -> (Vec<String>, String) {

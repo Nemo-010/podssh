@@ -381,11 +381,11 @@ fn relay() -> Vec<Block> {
         item(
             vec![lit("Liveness")],
             format!(
-                "podssh pings the relay every {every} s. After {allowed} checks in a row with no frame from \
-                 the relay, the link is dead and the session ends, so a silent relay is found in {} to {} s. \
-                 To a node, the resumable layer also sends a record when it sent nothing for {beat} s, and the \
-                 node does the same; a link that carries nothing from the node for {dead} s is dead, and the \
-                 session goes on over a new one.",
+                "podssh pings the relay every {every} s. After {allowed} checks in a row with no frame from the \
+                 relay, the link is dead and the session ends. So a silent relay is found in {} to {} s. To a \
+                 node, the resumable layer also sends a record when it sent nothing for {beat} s, and the node \
+                 does the same; a link that carries nothing from the node for {dead} s is dead, and the session \
+                 goes on over a new one.",
                 every * u64::from(allowed),
                 every * u64::from(allowed + 1),
                 every = every,
@@ -398,14 +398,14 @@ fn relay() -> Vec<Block> {
             vec![lit("DNS")],
             format!(
                 "Through a proxy, podssh sends host names and needs no DNS. With no proxy, it finds a relay's \
-                 address in this order: an IP address in place of the name, --relay-addr and \
-                 PODSSH_RELAY_ADDR, the system resolver, an address that carried a session to the host in the \
-                 last {fresh} days ({file} in the cache), then DNS over HTTPS to {} (by address; each by its \
-                 JSON API where it has one, and by RFC 8484's wire form where it has none or the JSON does not \
-                 read), and last an older address that carried a session. An address of the cache that does not \
+                 address in this order: an IP address in place of the name, --relay-addr and PODSSH_RELAY_ADDR, \
+                 the system resolver. Next comes an address that carried a session to the host in the last {fresh} \
+                 days ({file} in the cache). Then DNS over HTTPS to {} (by address), each by its JSON API where it \
+                 has one. A server with no JSON API, or whose JSON does not read, is asked in RFC 8484's wire \
+                 form. Last comes an older address that carried a session. An address of the cache that does not \
                  connect within {wait} s hands over to the next source. TLS checks the relay's name at each \
-                 address, so a wrong one fails the handshake; an address of the cache at which a host fails \
-                 so, or as no relay would (the upgrade, another server's answer), is forgotten.",
+                 address, so a wrong one fails the handshake; an address of the cache at which a host fails so, or \
+                 as no relay would (the upgrade, another server's answer), is forgotten.",
                 doh.join(", "),
                 fresh = podssh_ws::resolve::FRESH.as_secs() / 86_400,
                 file = podssh_relay::addresses::FILE,
@@ -427,17 +427,16 @@ fn relay() -> Vec<Block> {
             vec![lit("Session limits")],
             format!(
                 "The relay ends a session after {cap} MiB, both ways together, or after {hours} hours. \
-                 podssh cp and mv count each session's bytes and age, and before {budget} MiB or {minutes} \
-                 minutes they open a new session and go on at the offset of the copy, with the host key and \
-                 the login of the first; PODSSH_SESSION_BUDGET lowers the bytes. podssh ssh, whose \
-                 connection is one, says once that a session passed {budget} MiB, and a link that the cap \
-                 cuts after the remote exit status and before the output's end exits 255; podssh sftp says so at 80 % \
-                 and at 95 % of {budget} MiB (not with -q). To a node, the resumable \
-                 layer moves the session to a new link at {moved} MiB of a link or after {move_hours} hours, \
-                 and -v prints a line for each move. A pair expires after 72 hours at most: podssh ssh \
-                 node:// and podssh operator warn {warning} minutes before, and then the relay ends each \
-                 session of the pair, unless its owner renewed it on podssh relay serve (podssh relay pair \
-                 --renew). --direct has no limit.",
+                 podssh cp and mv count each session's bytes and age. Before {budget} MiB or {minutes} minutes, \
+                 they open a new session and go on at the offset of the copy. The new session keeps the host key \
+                 and the login of the first; PODSSH_SESSION_BUDGET lowers the bytes. podssh ssh, whose connection \
+                 is one, says once that a session passed {budget} MiB. A link that the cap cuts after the remote \
+                 exit status and before the output's end exits 255; podssh sftp says so at 80 % and at 95 % of \
+                 {budget} MiB (not with -q). To a node, the resumable layer moves the session to a new link at \
+                 {moved} MiB of a link or after {move_hours} hours. -v prints a line for each move. A pair expires \
+                 after 72 hours at most: podssh ssh node:// and podssh operator warn {warning} minutes before. The \
+                 relay then ends each session of the pair, unless its owner renewed it on podssh relay serve \
+                 (podssh relay pair --renew). --direct has no limit.",
                 cap = relay::session_byte_cap() >> 20,
                 hours = relay::session_time_cap().as_secs() / 3600,
                 budget = relay::SESSION_BYTE_BUDGET >> 20,

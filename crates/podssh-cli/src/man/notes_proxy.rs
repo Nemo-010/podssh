@@ -13,47 +13,43 @@ pub const PROXY: &[&str] = &[
     "With OpenSSH, set -o ServerAliveInterval=60: the relay closes a session with no traffic (see THE \
      RELAY). Once nothing crossed for all but 30 s of the relay's idle cut, podssh proxy says so on \
      stderr, which OpenSSH shows; --idle-warn SECONDS sets that lead, and 0 turns it off.",
-    "Where a first relay host offers it in its /relays.json (podssh relay serve does), read at each run \
-     with PODSSH_RELAY_LAYER=yes, kept for a day when it is unset (see ENVIRONMENT), podssh proxy \
-     carries the session in the resumable layer, to that host alone, or to the \
-     process that its /relays.json names as forward.host, of the same deployment: the relay keeps its \
-     connection to the target while this host's link is lost, and a new link resumes the session where \
-     it was, so that an OpenSSH session outlives a drop of this host's network, for as long as the relay \
-     keeps it, 10 minutes by default. Each loss and resume is a line on stderr. The end of \
-     stdin is the end of the target's input there (the layer's END, a half-close of the relay's \
-     connection to the target), so a target that reads to the end of its input still answers, \
-     and the target's end ends the session; with a relay that takes no END, the end of stdin stops \
-     sending and keeps receiving until the target closes, as on the contract's road. OpenSSH's \
-     SIGHUP at its exit ends the session at the relay at once. A host that offers none, or that has no room for \
-     a new resumable session, takes the contract's road, with one line (for a host that offers none, \
-     with PODSSH_RELAY_LAYER=yes alone). Where podssh can run on the \
-     server's side, a roost in front of its sshd (podssh node --sshd, see podssh node) gives the same \
-     with no relay that keeps the session; this road is for an sshd where nothing else runs.",
+    "Where a first relay host offers it in its /relays.json (podssh relay serve does), podssh proxy carries the \
+     session in the resumable layer. The offer is read at each run with PODSSH_RELAY_LAYER=yes, and kept for a day \
+     when it is unset (see ENVIRONMENT). The session goes to that host alone, or to the process that its /relays.json \
+     names as forward.host, of the same deployment: the relay keeps its connection to the target while this host's \
+     link is lost. A new link resumes the session where it was. So an OpenSSH session outlives a drop of this host's \
+     network, for as long as the relay keeps it, 10 minutes by default. Each loss and resume is a line on stderr. The \
+     end of stdin is the end of the target's input there (the layer's END, a half-close of the relay's connection to \
+     the target). So a target that reads to the end of its input still answers, and the target's end ends the session; \
+     with a relay that takes no END, the end of stdin stops sending and keeps receiving until the target closes, as on \
+     the contract's road. OpenSSH's SIGHUP at its exit ends the session at the relay at once. A host that offers none, \
+     or that has no room for a new resumable session, takes the contract's road, with one line. For a host that offers \
+     none, that line comes with PODSSH_RELAY_LAYER=yes alone. Where podssh can run on the server's side, a roost in \
+     front of its sshd gives the same (podssh node --sshd, see podssh node). The roost needs no relay that keeps the \
+     session; this road is for an sshd where nothing else runs.",
     "The session ends when the target closes the connection or when stdout closes; both are a success. \
      An error is one line on stderr; the codes are in EXIT STATUS.",
     "HOST can be an IPv6 address, bare (as OpenSSH gives %h) or in brackets. In one word, the form is \
      [ADDRESS]:PORT. Through the relay, see the IPv6 note of ssh.",
     "Put -- before a HOST that a script did not write: podssh proxy -- \"$HOST\" 22. Else a HOST that \
      starts with - is read as a flag.",
-    "podssh proxy iap://PROJECT/ZONE/INSTANCE:PORT and podssh proxy eice://ENDPOINT/ADDRESS:PORT carry the \
-     pipe through a cloud's own tunnel to a VM, as podssh ssh does (see its notes), with no relay and no \
-     relay flag; the port goes in the destination, 22 when none is given, and the destination takes no \
-     user. As the ProxyCommand of OpenSSH: ssh -o \
-     ProxyCommand='podssh proxy iap://my-project/us-central1-a/%h:%p' user@my-vm. On IAP the end of stdin \
-     ends the session once its bytes went, as IAP has no half-close.",
-    "podssh proxy warp://HOST:PORT carries the pipe inside WARP's tunnel, in a build with the feature warp \
-     (each release binary), \
-     as podssh ssh does (see its notes): ssh -o ProxyCommand='podssh proxy warp://%h:%p' user@host.",
+    "podssh proxy iap://PROJECT/ZONE/INSTANCE:PORT and podssh proxy eice://ENDPOINT/ADDRESS:PORT carry the pipe \
+     through a cloud's own tunnel to a VM, as podssh ssh does (see its notes). They take no relay and no relay flag; \
+     the port goes in the destination, 22 when none is given, and the destination takes no user. As the ProxyCommand \
+     of OpenSSH: ssh -o ProxyCommand='podssh proxy iap://my-project/us-central1-a/%h:%p' user@my-vm. On IAP the end of \
+     stdin ends the session once its bytes went, as IAP has no half-close.",
+    "podssh proxy warp://HOST:PORT carries the pipe inside WARP's tunnel, as podssh ssh does (see its notes). It needs \
+     a build with the feature warp, as each release binary is: ssh -o ProxyCommand='podssh proxy warp://%h:%p' \
+     user@host.",
     "podssh proxy tor://HOST:PORT carries the pipe through the Tor network, in a build with the feature \
      tor, as podssh ssh does (see its notes): ssh -o ProxyCommand='podssh proxy tor://%h:%p' user@host.",
     "podssh proxy upterm://SESSION@HOST carries uptermd's SSH of that session, as upterm's own proxy \
      carries it, for OpenSSH's ProxyCommand: ssh -o ProxyCommand='podssh proxy upterm://ID@HOST' \
      ID@HOST. The SSH client logs in as SESSION; podssh ssh upterm://SESSION@HOST does it in one.",
-    "podssh proxy --forwarder TEMPLATES carries the pipe through other products' WebSocket forwarders and \
-     Wisp servers, in order, with no relay, as podssh ssh does (see its notes); PODSSH_FORWARDER gives them \
-     too. The end of stdin sends no Close (nor Wisp's CLOSE), as a close is no half-close: the target's \
-     bytes come until it closes. When each \
-     relay host failed, the forwarders that podssh names follow, as for podssh ssh.",
+    "podssh proxy --forwarder TEMPLATES carries the pipe through other products' WebSocket forwarders and Wisp \
+     servers, in order. It takes no relay, as podssh ssh does (see its notes); PODSSH_FORWARDER gives them too. The \
+     end of stdin sends no Close (nor Wisp's CLOSE), as a close is no half-close: the target's bytes come until it \
+     closes. When each relay host failed, the forwarders that podssh names follow, as for podssh ssh.",
     "podssh proxy --shadowsocks FILE carries the pipe through the Shadowsocks servers of FILE, in order, \
      with no relay, as podssh ssh does (see its notes). A pipe's client may speak first, so a server that \
      says nothing for 3 s is taken; one that closes, resets or answers with a chunk that does not open \
@@ -71,40 +67,39 @@ pub const PROXY: &[&str] = &[
     super::notes_turn::PROXY,
     super::notes_devtunnel::PROXY,
     super::notes_roads::PROXY_CLEARTEXT,
-    "podssh proxy node://NAME[/ROUTE] is the pipe of podssh operator NAME[/ROUTE] (see its notes): stdin to \
-     the node of the pair under the label NAME, and the bytes of its TARGET, or of its ROUTE, to stdout, with \
-     the pair stored under NAME or that of --pair-file, the end-to-end channel and its flags --client-key, \
-     --node-key and --no-e2e, --resume-deadline, --no-resume, and the same exit codes. As the ProxyCommand of OpenSSH: ssh \
-     -o ProxyCommand='podssh proxy node://NAME' user@NAME. The node names the service, so a PORT is refused \
-     (64), as are the relay's flags (--relay-host, --relay-failover), --forwarder, --shadowsocks, --via, \
-     --vless, --wstunnel, --exit and --idle-warn, each of which takes the relay's place or speaks of it; \
-     --relay-addr and --ca-file reach the pair's relay. The flags of a node with another target are refused \
-     (64). A word that starts with node: and is no node://NAME is refused with the three forms of a node's \
-     ProxyCommand: podssh proxy node://NAME, podssh operator NAME and podssh pipe - node:NAME; node:PORT stays \
-     the host node and its port. With --carrier ADDR the node is at the other end of a stream that exists \
-     already, with no relay and no pair, as podssh operator --carrier reaches it (see its notes), with its \
-     checks and codes: ssh -o ProxyCommand=\"podssh proxy --carrier 'exec:ssh -T sandbox podssh node \
-     --carrier stdio box 127.0.0.1:22' node://box\" user@box.",
-    "--ConnectTimeout SECONDS, 1 to 86400, bounds the time from the start to the session's open, on each \
-     road: the relay's answer (each host's dial, its TLS, the upgrade, and its dial of HOST), or the answer of \
-     the road in the relay's place, and for node://NAME the steps of podssh operator. Each step keeps its own \
-     limit too, and the first limit to pass ends the wait. Past the bound one line names the step that waited, \
-     as: no relay host answered within 25 s (--ConnectTimeout), and the exit is 69. The bytes after the open \
-     are never bounded: a pipe may wait. proxy takes no -o, so -o ConnectTimeout=N is refused (64); 0 is \
-     refused too. --timeout DURATION is another name of the same bound, as a duration (30s, 2m, 1h) rounded \
-     up to whole seconds, a day at most, and PODSSH_TIMEOUT gives it its default, held to a day, as for \
-     podssh operator: the line past the bound names the one that set it, and --ConnectTimeout wins when \
-     both are given.",
-    "podssh proxy --exit NAME HOST PORT carries the pipe from NAME, a node of your net that lends its egress \
-     (see podssh node --exit and podssh exit), in place of the relay: the node resolves HOST, checks each of its \
-     addresses and dials HOST PORT from its own host, over the pair kept under NAME, in the resumable layer and \
-     the end-to-end channel. A refusal of the node, or of its net's policy, is one line on stderr; no byte of \
-     stdout comes before the node reached the target. With --carrier ADDR, the exit is the node at the other \
-     end of a stream that exists already, with no relay and no pair (podssh node NAME --exit --carrier stdio): \
-     exec:CMD, a program started with no shell, or fd:N (Unix); the net's rule of the exit holds as on each \
-     road, and at the end the node hears a Close. stdio, --relay-addr and --ca-file are refused with it (64), \
-     as stdin and stdout carry the pipe's bytes and the stream has no relay. With --exit cf://HOST, the exit is \
-     the node behind that quick tunnel, over a WebSocket of the tunnel (see podssh exit); --pair-file and \
-     --carrier are refused with it (64).",
+    "podssh proxy node://NAME[/ROUTE] is the pipe of podssh operator NAME[/ROUTE] (see its notes): stdin goes to the \
+     node of the pair under the label NAME, and the bytes of its TARGET, or of its ROUTE, to stdout. It takes the pair \
+     stored under NAME or that of --pair-file, and the end-to-end channel and its flags --client-key, --node-key and \
+     --no-e2e. It takes --resume-deadline and --no-resume too, and gives the same exit codes. As the ProxyCommand of \
+     OpenSSH: ssh -o ProxyCommand='podssh proxy node://NAME' user@NAME. The node names the service, so a PORT is \
+     refused (64). So are the relay's flags (--relay-host, --relay-failover), --forwarder, --shadowsocks, --via, \
+     --vless, --wstunnel, --exit and --idle-warn: each takes the relay's place or speaks of it; --relay-addr and \
+     --ca-file reach the pair's relay. The flags of a node with another target are refused (64). A word that starts \
+     with node: and is no node://NAME is refused with the three forms of a node's ProxyCommand: podssh proxy \
+     node://NAME, podssh operator NAME and podssh pipe - node:NAME; node:PORT stays the host node and its port. With \
+     --carrier ADDR the node is at the other end of a stream that exists already, with no relay and no pair. It is \
+     reached as podssh operator --carrier reaches it (see its notes), with its checks and codes: ssh -o \
+     ProxyCommand=\"podssh proxy --carrier 'exec:ssh -T sandbox podssh node --carrier stdio box 127.0.0.1:22' \
+     node://box\" user@box.",
+    "--ConnectTimeout SECONDS, 1 to 86400, bounds the time from the start to the session's open, on each road: the \
+     relay's answer (each host's dial, its TLS, the upgrade, and its dial of HOST), or the answer of the road in the \
+     relay's place. For node://NAME it bounds the steps of podssh operator. Each step keeps its own limit too, and the \
+     first limit to pass ends the wait. Past the bound one line names the step that waited, as: no relay host answered \
+     within 25 s (--ConnectTimeout), and the exit is 69. The bytes after the open are never bounded: a pipe may wait. \
+     proxy takes no -o, so -o ConnectTimeout=N is refused (64); 0 is refused too. --timeout DURATION is another name \
+     of the same bound, as a duration (30s, 2m, 1h) rounded up to whole seconds, a day at most. PODSSH_TIMEOUT gives \
+     it its default, held to a day, as for podssh operator: the line past the bound names the one that set it, and \
+     --ConnectTimeout wins when both are given.",
+    "podssh proxy --exit NAME HOST PORT carries the pipe from NAME in place of the relay. NAME is a node of your net \
+     that lends its egress (see podssh node --exit and podssh exit): the node resolves HOST, checks each of its \
+     addresses and dials HOST PORT from its own host. The pipe goes over the pair kept under NAME, in the resumable \
+     layer and the end-to-end channel. A refusal of the node, or of its net's policy, is one line on stderr; no byte \
+     of stdout comes before the node reached the target. With --carrier ADDR, the exit is the node at the other end of \
+     a stream that exists already. That road has no relay and no pair (podssh node NAME --exit --carrier stdio): \
+     exec:CMD, a program started with no shell, or fd:N (Unix); the net's rule of the exit holds as on each road, and \
+     at the end the node hears a Close. stdio, --relay-addr and --ca-file are refused with it (64), as stdin and \
+     stdout carry the pipe's bytes and the stream has no relay. With --exit cf://HOST, the exit is the node behind \
+     that quick tunnel, over a WebSocket of the tunnel (see podssh exit); --pair-file and --carrier are refused with \
+     it (64).",
     super::notes_grant::PROXY,
 ];

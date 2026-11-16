@@ -612,7 +612,7 @@ running on the server (`docs/design.md:734-738`).
    cached token. A prompt with no terminal ends the loop
    (`docs/cli.md:6452-6454`). After the attach, send the window size again.
 7. In the same commit: `docs/cli.md`, the notes of ssh
-   (`crates/podssh-cli/src/man/notes_ssh.rs:4-498` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-160`), `docs/design.md:734-738`,
+   (`crates/podssh-cli/src/man/notes_ssh.rs:4-490` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`), `docs/design.md:734-738`,
    `docs/STATUS.md`, and tmux in the interop image
    (`scripts/interop.sh:24-25`). T-025 shares the classes of close codes;
    T-153 replaces this loop when both ends run podssh.
@@ -724,7 +724,7 @@ no listener, or that the relay ends a desktop stream after 64 MiB.
 ## Premise
 
 - Read: a byte pipe carries each TCP protocol
-  (`crates/podssh-cli/src/man/notes.rs:248-258`); a client that calls
+  (`crates/podssh-cli/src/man/notes.rs:238-248`); a client that calls
   `connect()` itself needs a listener (`docs/design.md:1191-1194`), which
   T-177 adds where a probe allows it.
 - Read: 64 MiB for each session, both directions together
@@ -844,7 +844,7 @@ The calls made where the Approach left a choice:
   (`crates/podssh-cli/src/man/examples.rs:319`). It has no
   `ServerAliveInterval`, so that its line stays within rustfmt's 120
   columns; the note of proxy asks for it
-  (`crates/podssh-cli/src/man/notes.rs:259`).
+  (`crates/podssh-cli/src/man/notes.rs:249`).
 - Form b runs with `--direct`, as `scripts/interop-pipe.sh` runs `ssh:`;
   forms a and c go through the stand-in relay.
 - The citations of `crates/podssh-cli/src/man/examples.rs` in
@@ -1778,7 +1778,7 @@ alone, so the form of `ssh:`, with its comma before the target, is found by tria
   (`crates/podssh-cli/src/pipe/address.rs:112-116`).
 - Read: the manual's example of the proxy is `podssh pipe http-listen:3128 relay:%h:%p`
   (`crates/podssh-cli/src/man/examples.rs:219`), and its notes give the forms in words
-  (`crates/podssh-cli/src/man/notes_pipe.rs:33-36`); a test parses each example with the real
+  (`crates/podssh-cli/src/man/notes_pipe.rs:31-34`); a test parses each example with the real
   parser (`crates/podssh-cli/src/man/examples.rs:423`).
 - Read: `--help` of a verb gives its options, then its notes, and the notes have nothing for `pipe`
   (`crates/podssh-cli/src/help.rs`, lines 240-263 at `1769d79`).

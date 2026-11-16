@@ -493,7 +493,7 @@ Read, at `61e55d1`: no option made podssh start a program: `ProxyCommand` is ref
    `[OPTIONS] [--] [user@]host [COMMAND...]` for `ssh` and
    `[OPTIONS] [--] HOST PORT` for `proxy`; `--help` and the synopsis of the
    manual (`crates/podssh-cli/src/man/model.rs:186-190`) read it.
-2. A note for `ssh` and `proxy` (`crates/podssh-cli/src/man/notes_ssh.rs:4-498` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-160` and `crates/podssh-cli/src/man/notes.rs:75-255`)
+2. A note for `ssh` and `proxy` (`crates/podssh-cli/src/man/notes_ssh.rs:4-490` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175` and `crates/podssh-cli/src/man/notes.rs:75-245`)
    and an example (`crates/podssh-cli/src/man/examples.rs:8-316`). Pitfall: the
    notes test reads a bare `--` as a flag that does not exist
    (`crates/podssh-cli/src/man/notes_tests.rs:56-72`); teach `flag_exists`
@@ -992,7 +992,7 @@ Read then: each value flag but `-i` and `-o` was `ArgAction::Set`.
    (`crates/podssh-cli/src/ssh/args.rs:202-269`, called at
    `crates/podssh-cli/src/tree.rs:476-480`).
 4. `docs/cli.md:953-958` and a note of the manual
-   (`crates/podssh-cli/src/man/notes_ssh_more.rs:83-85`) state the rule.
+   (`crates/podssh-cli/src/man/notes_ssh_more.rs:98-100`) state the rule.
 
 ## Prove
 
@@ -1076,7 +1076,7 @@ on argv (`crates/podssh-cli/src/keygen.rs:129-136`).
    over the file. For `-c`, write `FILE.pub` again.
 5. Same commit: the PEM message at `crates/podssh-ssh/src/keygen.rs` (lines 184-187 at `8290fe1`)
    names `podssh keygen -p`; `docs/cli.md:3328-3431`, the notes of `keygen`
-   (`crates/podssh-cli/src/man/notes_keygen.rs:4-51`), `docs/STATUS.md`.
+   (`crates/podssh-cli/src/man/notes_keygen.rs:4-48`), `docs/STATUS.md`.
 
 ## Decision
 
@@ -1648,7 +1648,7 @@ PEM key written by `encrypt_pem` (`crates/podssh-ssh/src/key_file.rs:211-235`); 
   `cert`, each `keygen_*` test file, `flag_table` and the manual passed.
 - `flags.rs`, `keygen.rs` and `man/notes.rs` of the CLI had gone over 500 lines: the flags and
   the notes of `keygen` moved to `crates/podssh-cli/src/flags/keygen.rs:1-71` and
-  `crates/podssh-cli/src/man/notes_keygen.rs:1-51`, as those of the other commands are, and the
+  `crates/podssh-cli/src/man/notes_keygen.rs:1-48`, as those of the other commands are, and the
   key loader to `keygen_convert.rs`; the manual did not change.
 
 # T-230: The help and the manual say that `-R` is refused because podssh never binds
@@ -2073,7 +2073,7 @@ and `find` takes the first match (`crates/podssh-cli/src/man/model.rs:61-67`).
 The SECTION help names `relay` (`crates/podssh-cli/src/positionals.rs` line
 37 at `02e4e1f`).
 `each_verb_and_alias_finds_its_section` passes, because the command wins
-(`crates/podssh-cli/src/man/model.rs:348-357`).
+(`crates/podssh-cli/src/man/model.rs:350-359`).
 
 ## Approach
 
@@ -2084,7 +2084,7 @@ The SECTION help names `relay` (`crates/podssh-cli/src/positionals.rs` line
    finds its own section.
 4. Change the SECTION help (`crates/podssh-cli/src/positionals.rs:112`):
    `the_section_argument_names_each_topic` requires each topic key in it
-   (`crates/podssh-cli/src/man/model.rs:415-426`). Same commit: `docs/STATUS.md`.
+   (`crates/podssh-cli/src/man/model.rs:417-428`). Same commit: `docs/STATUS.md`.
 
 ## Decision
 
@@ -3605,9 +3605,9 @@ of `job fetch`; why a file given by process substitution is refused; the direct 
   follow here" (`crates/podssh-relay/src/cache/own.rs`, lines 37-38 at `38f424c`);
   `--allow <(...)` gives such a link (`/dev/fd/63`), and the line does not say that a regular
   file works.
-- Read (L-27): `podssh proxy` has no direct road (`crates/podssh-cli/src/man/notes_ssh.rs:248`);
+- Read (L-27): `podssh proxy` has no direct road (`crates/podssh-cli/src/man/notes_ssh.rs:253`);
   `podssh pipe - tcp:%h:%p` is that road as a `ProxyCommand` (`crates/podssh-cli/src/man/notes_pipe.rs:5-14`),
-  and the notes of `proxy` do not name it (`crates/podssh-cli/src/man/notes.rs:248`).
+  and the notes of `proxy` do not name it (`crates/podssh-cli/src/man/notes.rs:238`).
 - Read (L-29): a bad line of the settings file or of an `ssh_config` file is 78, and the same
   keyword with `-o` is 64, by the decision of 2026-10-05; the row of 78 names the settings of the
   environment and the flag's 64 (`crates/podssh-cli/src/man/data.rs:108-123`), not the files.

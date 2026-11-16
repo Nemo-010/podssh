@@ -3,17 +3,15 @@
 //! others so that each file stays short.
 
 pub const PIPE: &[&str] = &[
-    "podssh pipe A B joins two byte streams, as socat does, with no listener unless one side asks for \
-     one: what A gives goes to B, \
-     and what B gives goes to A. Each address is KIND:REST: - or stdio (stdin and stdout), fd:N (a \
-     descriptor that podssh inherited, 3 or more, on Unix), or exec:CMD (a program); relay:HOST:PORT \
-     (TCP through the relay, as podssh proxy carries it), tcp:HOST:PORT (TCP from this host, through \
-     HTTPS_PROXY when it is set), ssh:[USER@]HOP[,HOP...],HOST:PORT (TCP that the last SSH hop opens, \
-     as -W asks), node:NAME (the TARGET of the node of a pair), udp:node:NAME (UDP through a node; see \
-     below), iroh:TICKET (the TARGET of a node of the iroh road), unix-connect:PATH (a local socket; \
-     @NAME in Linux's abstract namespace; on Windows a Unix socket or a named pipe, \\\\.\\pipe\\NAME), \
-     or serial:PATH[,BAUD] (a serial line, on Unix). Both are checked before anything starts, and stdio \
-     on both sides is refused.",
+    "podssh pipe A B joins two byte streams, as socat does, with no listener unless one side asks for one: what A \
+     gives goes to B, and what B gives goes to A. Each address is KIND:REST: - or stdio (stdin and stdout), fd:N (a \
+     descriptor that podssh inherited, 3 or more, on Unix), or exec:CMD (a program). relay:HOST:PORT is TCP through \
+     the relay, as podssh proxy carries it. tcp:HOST:PORT is TCP from this host, through HTTPS_PROXY when it is set. \
+     ssh:[USER@]HOP[,HOP...],HOST:PORT is TCP that the last SSH hop opens, as -W asks. node:NAME is the TARGET of the \
+     node of a pair, and udp:node:NAME is UDP through a node; see below. The others are iroh:TICKET (the TARGET of a \
+     node of the iroh road), unix-connect:PATH (a local socket; @NAME in Linux's abstract namespace; on Windows a Unix \
+     socket or a named pipe, \\\\.\\pipe\\NAME), or serial:PATH[,BAUD] (a serial line, on Unix). Both are checked \
+     before anything starts, and stdio on both sides is refused.",
     "unix-listen:PATH (by the names of unix-connect:) and tcp-listen:[ADDR:]PORT (on 127.0.0.1, or on \
      ADDR, an address of this host; port 0 asks for a free one) listen, one side at most. The bind is \
      the probe: a host that refuses it gives 77, and the line names the error. A Unix socket is made \
@@ -58,45 +56,42 @@ pub const PIPE: &[&str] = &[
      other end sends before its own Close still comes; the other end's Close ends the pipe, and a code other \
      than 1000 is on stderr with its reason (69). A refused upgrade gives its status: 77 for 401 and 403, \
      else 69.",
-    "ws-listen:[ADDR:]PORT or ws-listen:PATH is a WebSocket server, by the rules of tcp-listen: and \
-     unix-listen:, whose clients are joined to the other side as given. A client's upgrade is checked as \
-     RFC 6455 asks (GET, Upgrade, Connection, version 13, a key of 16 bytes) and refused with its status \
-     (405, 400, 426); a request with an Origin is a browser's, and is refused (403), so that no page that \
-     the user opens reaches the other side. The other side opens before the client hears 101, and 502 when \
-     it does not. podssh's frames are a server's, unmasked, and a client's unmasked frame closes the \
-     session with 1002. One client by default, the first whose upgrade is good; --keep-listening takes \
-     each in turn.",
-    "--cover DIR gives ws-listen: a page for a visit: a GET or HEAD that asks for no upgrade, as a browser's, \
-     gets the file of DIR that its path names, typed by its name, and index.html for / and for a directory, \
-     which is never listed; 404 when there is none. A path with .., a name that starts with . (.git, .env), \
-     an escape that hides a separator, or a link whose file is out of DIR gets 404, and so does a file over \
-     1 MiB or one that is not a regular file. Another method gets 405, and a request of HTTP/1.1 with no Host \
-     400. A page is no session: the connection closes after it, and the other side opens for an upgrade \
-     alone, with the refusals above. DIR must be a directory, and the flag is for ws-listen: alone (64).",
-    "--raw-upgrade lets ws-listen: answer an upgrade with no Sec-WebSocket-Key, the request of a client of \
-     WebTunnel's shape, as podssh's own: GET with a Host, Upgrade: websocket and Connection: Upgrade, and no \
-     key or version. It hears 101 with those two headers and no Sec-WebSocket-Accept, and then its bytes go \
-     both ways as tcp-listen: carries them, the ones it sent after its request first: no frames, so no close \
-     code and no Ping, and no idle bound; TCP alone finds a path that died. A request with a key is framed \
-     as above, its version and its key checked (a key that is not 16 bytes 400), and an Origin is 403 with \
-     or without a key, so no page reaches the other side. Without the flag a request with no key gets 426. \
-     What it admits: each program that sends such a GET reaches the other side, as at tcp-listen:, which \
-     has no check at all; ws-listen: has no authentication either way. There is no TLS on ws-listen:: a \
-     client of https:// needs a front that ends TLS before it. The flag is for ws-listen: alone (64).",
+    "ws-listen:[ADDR:]PORT or ws-listen:PATH is a WebSocket server, by the rules of tcp-listen: and unix-listen:, \
+     whose clients are joined to the other side as given. A client's upgrade is checked as RFC 6455 asks (GET, \
+     Upgrade, Connection, version 13, a key of 16 bytes). A bad one is refused with its status (405, 400, 426); a \
+     request with an Origin is a browser's, and is refused (403), so that no page that the user opens reaches the \
+     other side. The other side opens before the client hears 101, and 502 when it does not. podssh's frames are a \
+     server's, unmasked, and a client's unmasked frame closes the session with 1002. One client by default, the first \
+     whose upgrade is good; --keep-listening takes each in turn.",
+    "--cover DIR gives ws-listen: a page for a visit. A GET or HEAD that asks for no upgrade, as a browser's, gets the \
+     file of DIR that its path names, typed by its name. It gets index.html for / and for a directory, which is never \
+     listed; 404 when there is none. A path with .., a name that starts with a dot (.git, .env), or an escape that \
+     hides a separator gets 404. So does a link whose file is out of DIR, a file over 1 MiB, or one that is not a \
+     regular file. Another method gets 405, and a request of HTTP/1.1 with no Host 400. A page is no session: the \
+     connection closes after it, and the other side opens for an upgrade alone, with the refusals above. DIR must be a \
+     directory, and the flag is for ws-listen: alone (64).",
+    "--raw-upgrade lets ws-listen: answer an upgrade with no Sec-WebSocket-Key, the request of a client of WebTunnel's \
+     shape, as podssh's own: GET with a Host, Upgrade: websocket and Connection: Upgrade, and no key or version. It \
+     hears 101 with those two headers and no Sec-WebSocket-Accept, and then its bytes go both ways as tcp-listen: \
+     carries them, the ones it sent after its request first: no frames, so no close code and no Ping, and no idle \
+     bound; TCP alone finds a path that died. A request with a key is framed as above, its version and its key checked \
+     (a key that is not 16 bytes 400). An Origin is 403 with or without a key, so no page reaches the other side. \
+     Without the flag a request with no key gets 426. What it admits: each program that sends such a GET reaches the \
+     other side, as at tcp-listen:, which has no check at all; ws-listen: has no authentication either way. There is \
+     no TLS on ws-listen:: a client of https:// needs a front that ends TLS before it. The flag is for ws-listen: \
+     alone (64).",
     "The hops of ssh: log in as podssh ssh logs in: through the relay, or with --direct, with -i and \
      -o; an -o of a session (RequestTTY, RemoteCommand) is refused. node: takes the pair stored under \
      NAME, or the one of --pair-file. iroh: takes this client's key of --iroh-key, and the relays of \
      --iroh-relay after the ticket's.",
-    "With --carrier ADDR, node:NAME and udp:node:NAME take the node at the other end of a stream that \
-     exists already, with no relay and no pair, as podssh operator --carrier does (see its notes): exec:CMD, \
-     a program that podssh starts with no shell, or fd:N (Unix); NAME is the label under which the node's \
-     key is pinned. stdio is refused (64), as the pipe's own stdin and stdout are a side or none, and so are \
-     --pair-file and a pipe with no node side and no --exit. Each node side, and each client of a \
-     listening side, is a session of its own on the one stream, which ends with the pipe: the node hears a \
-     Close, and the program of exec: ends. The other side keeps its road, so podssh pipe tcp-listen:2222 \
-     node:box --carrier \
-     'exec:ssh -T sandbox podssh node --carrier stdio box 127.0.0.1:22' --keep-listening gives a port here \
-     for the node's sshd.",
+    "With --carrier ADDR, node:NAME and udp:node:NAME take the node at the other end of a stream that exists already. \
+     That road has no relay and no pair, as with podssh operator --carrier (see its notes): exec:CMD, a program that \
+     podssh starts with no shell, or fd:N (Unix); NAME is the label under which the node's key is pinned. stdio is \
+     refused (64), as the pipe's own stdin and stdout are a side or none. --pair-file is refused too, and so is a pipe \
+     with no node side and no --exit. Each node side, and each client of a listening side, is a session of its own on \
+     the one stream, which ends with the pipe: the node hears a Close, and the program of exec: ends. The other side \
+     keeps its road. podssh pipe tcp-listen:2222 node:box --carrier 'exec:ssh -T sandbox podssh node --carrier stdio \
+     box 127.0.0.1:22' --keep-listening gives a port here for the node's sshd.",
     "exec:CMD starts the program with no shell: its words split at blanks, with single and double \
      quotes, and no variables, globs or escapes; exec:sh -c 'CMD' names a shell. The program gets one \
      end of a socketpair as its stdin and stdout, or two pipes where a socketpair is refused and on \
@@ -112,30 +107,28 @@ pub const PIPE: &[&str] = &[
      end of input either: when the other side ends, the program gets 10 s to exit, then SIGTERM. A \
      length over 65,507 in the stream exits 65; a longer datagram of the program is counted and \
      dropped. Over the relay, datagrams wait for each other: a lost segment delays each later one.",
-    "When one side's input ends, the other side gets the end of its input, and the other direction goes \
-     on, so that a reply still comes back: tcp:, ssh: and unix-connect: pass it on as a half-close. The \
-     relay has no half-close, so relay: sends nothing at the end of input, and the target's bytes come \
-     until it closes, as a named pipe's do, whose listening side closes it at its end of input; node: \
-     and iroh: end their session. With a node: side, SIGHUP, SIGTERM and SIGINT end the node's session \
-     as an end of input does, so that the node keeps nothing of it, and the road's status is then 0 \
-     when the node took the session (see podssh operator). --no-resume ends the session of each node:, \
-     udp:node: and iroh: side with its link, as podssh operator --no-resume does, and a pipe with none of \
-     them refuses it (64). The pipe ends when both \
-     have ended, when a side's reader is gone, when a program has exited and its output has ended, or \
-     when a road has ended. podssh waits for each program, as a shell does.",
-    "A road that failed gives the exit status, as podssh proxy gives it: 69 for a road out of reach, 77 \
-     for a refusal (of the relay, a proxy, a host key or a login) and 78 for a setting that cannot be \
-     used. Else the status is the program's (B's when both are programs), 128 + N for a signal, 127 for \
-     a program that is not found and 126 for one that cannot run; with neither, 0. 65 for a stream of \
-     udp: that is not its framing.",
-    "serial:PATH[,BAUD] opens a serial device of this host, such as /dev/ttyUSB0, at BAUD (115200 when \
-     none is given; from 1200 to 4000000), with 8 data bits, no parity, 1 stop bit and no flow control, \
-     in raw mode; a PATH with a comma takes a BAUD after it. The path must be a character device that is \
-     a terminal (else 64), and one that this user may open: a refusal is 77 and says whose the device is, \
-     as podssh assumes no group; another failure is 69. podssh holds the line alone while the pipe runs, \
-     and puts its settings back at the end, also at SIGINT and SIGTERM, which then exit 130 and 143. The \
-     line has no end: the end of the other side's input leaves it open, and the pipe ends when the other \
-     side ends it, at a signal, or when the device fails (69). On Windows, serial: is refused (64).",
+    "When one side's input ends, the other side gets the end of its input. The other direction goes on, so that a \
+     reply still comes back: tcp:, ssh: and unix-connect: pass it on as a half-close. The relay has no half-close, so \
+     a relay: side sends nothing at the end of input. The target's bytes come until it closes, as a named pipe's do, \
+     whose listening side closes it at its end of input; node: and iroh: end their session. With a node: side, SIGHUP, \
+     SIGTERM and SIGINT end the node's session as an end of input does, so that the node keeps nothing of it. The \
+     road's status is then 0 when the node took the session (see podssh operator). --no-resume ends the session of \
+     each node:, udp:node: and iroh: side with its link, as podssh operator --no-resume does, and a pipe with none of \
+     them refuses it (64). The pipe ends when both have ended, or when a side's reader is gone. It also ends when a \
+     program has exited and its output has ended, or when a road has ended. podssh waits for each program, as a shell \
+     does.",
+    "A road that failed gives the exit status, as podssh proxy gives it: 69 for a road out of reach, and 77 for a \
+     refusal (of the relay, a proxy, a host key or a login). It is 78 for a setting that cannot be used. Else the \
+     status is the program's (B's when both are programs), or 128 + N for a signal. It is 127 for a program that is \
+     not found and 126 for one that cannot run; with neither, 0. 65 for a stream of udp: that is not its framing.",
+    "serial:PATH[,BAUD] opens a serial device of this host, such as /dev/ttyUSB0, at BAUD (115200 when none is given; \
+     from 1200 to 4000000), with 8 data bits, no parity, 1 stop bit and no flow control, in raw mode; a PATH with a \
+     comma takes a BAUD after it. The path must be a character device that is a terminal (else 64), and one that this \
+     user may open: a refusal is 77 and says whose the device is, as podssh assumes no group; another failure is 69. \
+     podssh holds the line alone while the pipe runs, and puts its settings back at the end. It does so at SIGINT and \
+     SIGTERM too, which then exit 130 and 143. The line has no end: the end of the other side's input leaves it open. \
+     The pipe ends when the other side ends it, at a signal, or when the device fails (69). On Windows, serial: is \
+     refused (64).",
     "--ConnectTimeout SECONDS bounds the open of a node: or relay: side as podssh operator and podssh proxy \
      bound theirs, the other side's open with it, and never the bytes after it; past it one line names the \
      step that waited, and the exit is 69. Each hop of an ssh: side takes it as its own ConnectTimeout too \
@@ -146,14 +139,14 @@ pub const PIPE: &[&str] = &[
      --ConnectTimeout wins when both are given. PODSSH_TIMEOUT gives the bound of a node: or relay: side its \
      default where no side listens; it refuses no pipe, as it bounds whole runs of other commands, and is no \
      hop's ConnectTimeout.",
-    "--exit NAME starts relay:HOST:PORT, and each relay:%h:%p of http-listen:, at NAME, a node of your net that \
-     lends its egress (see podssh node --exit and podssh exit), in place of the relay, over the pair kept under \
-     NAME: the node resolves HOST and dials it from its own host. A pipe with --exit and no relay: address is \
-     refused (64). With --carrier ADDR, the exit is the node at the other end of that stream, with no pair \
-     (podssh node NAME --exit --carrier stdio), and each relay: session is a session of the one stream; a \
-     node: side beside it is refused (64), as one node is at the other end of a stream. With --exit cf://HOST, \
-     the exit is the node behind that quick tunnel, each relay: session a WebSocket of the tunnel (see podssh \
-     exit); --pair-file and --carrier are refused with it (64).",
+    "--exit NAME starts relay:HOST:PORT, and each relay:%h:%p of http-listen:, at NAME in place of the relay. NAME is \
+     a node of your net that lends its egress (see podssh node --exit and podssh exit). It is reached over the pair \
+     kept under NAME: the node resolves HOST and dials it from its own host. A pipe with --exit and no relay: address \
+     is refused (64). With --carrier ADDR, the exit is the node at the other end of that stream, with no pair (podssh \
+     node NAME --exit --carrier stdio). Each relay: session is then a session of the one stream; a node: side beside \
+     it is refused (64), as one node is at the other end of a stream. With --exit cf://HOST, the exit is the node \
+     behind that quick tunnel, each relay: session a WebSocket of the tunnel (see podssh exit); --pair-file and \
+     --carrier are refused with it (64).",
     // A grant used once for a node: side (T-226).
     super::notes_grant::PIPE,
 ];

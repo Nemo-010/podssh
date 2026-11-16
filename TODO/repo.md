@@ -6696,6 +6696,18 @@ alone; clippy (the gate's lints, with the release's features) and rustfmt clean.
 list shrinks to none, then `assert_none`), the writers (text, roff, JSON, the help) on the crate's, `check::generated`
 for the man page and `llms.txt`, and `check::flags` against the parser.
 
+Step five, 2026-11-16, the 860 long sentences (five drafts of the session's own, one for each area: ssh 213, node 175,
+relay 149, doctor with serve, net, proxy and pipe 141, the rest 182, merged in that order): each is split where its
+clauses part, each fact kept, in about 60 files of `crates/podssh-cli/src/man/`; ssh's last two notes moved to
+`notes_ssh_more.rs` (500 lines); the ignored keywords are listed ten to a sentence; two tests that looked for a split
+phrase look for the new one (`notes_public.rs`, `tests/man_page.rs`). The list ran out, so the ratchet went:
+`each_string_keeps_the_text_rules` is `assert_none(check::texts(..))` again. `cargo test -p podssh-cli --lib man::` 69
+passed, and with every road's feature; `--test man_page --test man_json --test man_flag_parity` 21 passed; `sh
+scripts/interop-man.sh target/debug/podssh` (groff and mandoc of this host) 7 checks ok, its planted page failed;
+`cargo test -p podssh-cli` 2329 passed, 0 failed; clippy (the gate's lints) and rustfmt clean. Next: the writers (text,
+roff, JSON, the help) on the crate's, `check::generated` for the man page and `llms.txt`, and `check::flags` against the
+parser.
+
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
 

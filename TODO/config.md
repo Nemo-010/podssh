@@ -464,7 +464,7 @@ result, `Resolved` (lines 27-41 at `22c3b88`), holds the settings in effect, the
    `serveraliveinterval 60` (the relay's idle cut, `docs/relay.md:473`) and `connecttimeout 60`.
 6. It does not wait for T-043: with no file, `-G` shows the effect of `-o`. After T-043 and
    T-044, `-v` names the files that were read, on stderr.
-7. Change the `ssh` notes (`crates/podssh-cli/src/man/notes_ssh.rs:4-498` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-160`) and `docs/cli.md:48-963`
+7. Change the `ssh` notes (`crates/podssh-cli/src/man/notes_ssh.rs:4-490` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`) and `docs/cli.md:48-963`
    in the same commit.
 
 ## Decision
@@ -1594,7 +1594,7 @@ user asked for is gone with no sign, and an audit finds it.
 - Read: the 50 keywords are accepted with no effect, as they "ask for nothing podssh does
   differently, or limit algorithm lists that podssh keeps modern itself"
   (`crates/podssh-cli/src/ssh/keywords.rs:119-132`), and the manual says "Accepted and ignored,
-  because they change nothing that podssh does" (`crates/podssh-cli/src/man/model.rs:272-276`).
+  because they change nothing that podssh does" (`crates/podssh-cli/src/man/model.rs:272-278`).
 - Read: each one is a note (`crates/podssh-cli/src/ssh/options.rs:272`), "-o NAME has no effect in
   podssh" (`crates/podssh-cli/src/ssh/resolve.rs:335`), said at `-v` alone
   (`crates/podssh-cli/src/ssh/mod.rs:282-284`): "-o" also for the line of a file, with no file and
@@ -1614,7 +1614,7 @@ user asked for is gone with no sign, and an audit finds it.
   `HostbasedAcceptedAlgorithms` restricts a hostbased login, which podssh does not make, so it is
   inert here.
 - Read (L-09): `-G` prints the keywords that podssh applies (`crates/podssh-cli/src/ssh/dump.rs:1-7`),
-  as its manual says (`crates/podssh-cli/src/man/notes_ssh_more.rs:61-65`), so it has no line for
+  as its manual says (`crates/podssh-cli/src/man/notes_ssh_more.rs:76-80`), so it has no line for
   an algorithm list.
 
 ## Approach

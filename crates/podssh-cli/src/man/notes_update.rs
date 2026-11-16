@@ -7,26 +7,26 @@ pub const UPDATE: &[&str] = &[
      releases' Atom feed, through HTTPS_PROXY when it is set: a prerelease only when this binary is one, and \
      never one older than this build. --version TAG takes that release, an older one too. --check stops before \
      the binary: it names the release, checks its signature, and names the file that it would replace.",
-    "Nothing is written before two checks. The release's SHA256SUMS against the signature that its workflow \
-     made with Sigstore (SHA256SUMS.sigstore.json): the certificate that Fulcio gave the workflow release.yml \
-     of this repository at that tag, by Sigstore's roots compiled into podssh, and Rekor's record of the \
-     signature, with no other network. Then the binary's SHA-256 against its line. The new binary goes beside \
-     the old one, with its mode, and runs there once, as podssh --version with no input, for 10 s at most: \
-     when it does not start on this host, ends with another code than 0, or names another version than the \
-     release's, it is removed and refused (65), as an installed node would not start again with it. Then the \
-     old one is kept as podssh.prev beside it (a hard link, else a copy) and the new one goes over it in one \
-     rename; on Windows the running file is renamed to podssh.prev.exe first, else to podssh.exe.old, which the \
-     next run removes. A failure leaves the old binary as it was.",
-    "--rollback puts back the binary that the last update kept, with no network: once podssh.prev answers \
-     --version here, it goes over this binary in one rename, and this one is kept as podssh.prev in its \
-     place, so that a second --rollback goes forward again. A run that started before, as an installed node, \
-     goes on with its own binary until it starts again. With nothing kept the exit is 69; with a kept binary \
-     that does not run here, 65, and nothing changes; with --check or --version, 64.",
-    "THE WAY BACK is the kept file itself: mv podssh.prev podssh puts it back with no podssh (on Windows, cmd \
-     /c move /Y podssh.prev.exe podssh.exe, which PowerShell runs too), and the last line of an update names \
-     that command with its paths. --rollback is in 1.0.0-beta.4 and later: the line names it beside the move \
-     only when the binary now in place has it, as the binary of an older release, which --version can install, \
-     refuses it as an unknown flag. The line of --rollback says the same of the binary that it put back.",
+    "Nothing is written before two checks. The release's SHA256SUMS against the signature that its workflow made \
+     with Sigstore (SHA256SUMS.sigstore.json): the certificate that Fulcio gave the workflow release.yml of this \
+     repository at that tag, by Sigstore's roots compiled into podssh. It also checks Rekor's record of the \
+     signature, with no other network. Then the binary's SHA-256 against its line. The new binary goes beside the \
+     old one, with its mode. It runs there once, as podssh --version with no input, for 10 s at most: when it does \
+     not start on this host, or ends with another code than 0, it is removed and refused (65). So is one that names \
+     another version than the release's. An installed node would not start again with such a binary. Then the old \
+     one is kept as podssh.prev beside it (a hard link, else a copy). The new one goes over it in one rename; on \
+     Windows the running file is renamed to podssh.prev.exe first, else to podssh.exe.old, which the next run \
+     removes. A failure leaves the old binary as it was.",
+    "--rollback puts back the binary that the last update kept, with no network: once podssh.prev answers --version \
+     here, it goes over this binary in one rename. This one is kept as podssh.prev in its place, so that a second \
+     --rollback goes forward again. A run that started before, as an installed node, goes on with its own binary \
+     until it starts again. With nothing kept the exit is 69; with a kept binary that does not run here, 65, and \
+     nothing changes; with --check or --version, 64.",
+    "THE WAY BACK is the kept file itself: mv podssh.prev podssh puts it back with no podssh (on Windows, cmd /c \
+     move /Y podssh.prev.exe podssh.exe, which PowerShell runs too). The last line of an update names that command \
+     with its paths. --rollback is in 1.0.0-beta.4 and later: the line names it beside the move only when the binary \
+     now in place has it. The binary of an older release, which --version can install, refuses it as an unknown \
+     flag. The line of --rollback says the same of the binary that it put back.",
     // The nodes that run take the new binary with their sessions (T-668).
     super::notes_upgrade::UPDATE,
     "Exit 0 when the binary was replaced, or there was nothing to do; 69 when GitHub, the release or one of \

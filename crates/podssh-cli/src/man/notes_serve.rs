@@ -10,146 +10,135 @@ pub const SERVE: &[&str] = &[
      Nothing listens. It runs as the user that started it, with no passwd entry, setgroups or chroot. At its \
      start it gives up each capability of the process, before it reads a file; a capability that stays is \
      a refusal (78).",
-    "podssh serve NAME is the node of the pair NAME (podssh relay pair NAME) whose sessions serve answers \
-     itself, in its process: no TARGET is dialled, and nothing listens. An operator reaches it as any node, \
-     podssh ssh node://user@NAME, podssh cp or sftp to node://NAME, through the relay, with the node's \
-     end-to-end channel and resumable layer. A host with no sshd, which may not listen, gives a shell and \
-     its files this way. The keys, the host key and the other flags are those of --stdio; --stdio and NAME \
-     are one of the two (64). The node's lines say serving podssh serve, in this process.",
+    "podssh serve NAME is the node of the pair NAME (podssh relay pair NAME) whose sessions serve answers itself, in \
+     its process: no TARGET is dialled, and nothing listens. An operator reaches it as any node: podssh ssh \
+     node://user@NAME, podssh cp or sftp to node://NAME. That goes through the relay, with the node's end-to-end \
+     channel and resumable layer. A host with no sshd, which may not listen, gives a shell and its files this way. The \
+     keys, the host key and the other flags are those of --stdio; --stdio and NAME are one of the two (64). The node's \
+     lines say serving podssh serve, in this process.",
     "Only public keys log in. The keys are each --authorized-key, and the lines of each --authorized-keys \
      file; with neither, ~/.ssh/authorized_keys. A key is compared by its key alone: the login name selects \
      nothing. The options before a key are its rules (below); a line whose options serve cannot all \
      honour, and a line that is no key, are passed over, and said with their number and why. A file that \
      is a symbolic link, another user's, or one that others can change is refused (78). With no key at \
      all, the start is refused (78): no setting lets each key in.",
-    "The options of a key line are OpenSSH's (the format of the authorized_keys file in sshd(8)), read as \
-     sshd reads them: separated by commas, names in any case, a value in double quotes where a backslash before a \
-     quote is a quote. command=\"...\" runs in place of each command, shell and sftp request, as SHELL -c, \
-     with the client's command in SSH_ORIGINAL_COMMAND (not set for a shell; internal-sftp for sftp); \
-     command=\"internal-sftp\" serves SFTP alone, and refuses one with arguments. no-pty refuses a pty \
-     (OpenSSH, with -tt, ends with PTY allocation request failed). no-port-forwarding refuses each forward, \
-     and each permitopen=\"host:port\" (an IPv6 address in brackets; * for any port) lets in that target \
-     alone, the host compared as written, with no lookup. restrict turns off the pty and forwarding, and a \
-     later pty or port-forwarding turns one on again. expiry-time=\"YYYYMMDD[HHMM[SS]]\" (local time, or \
-     UTC with Z) refuses the key after it. from=\"patterns\" lets the key in from a matching address \
-     alone: addresses with * and ?, blocks such as 10.0.0.0/8, and ! to refuse; serve looks up no name, so \
-     a host name matches nothing. serve knows an address only when its stdin is a TCP socket (as from \
-     inetd): on a pipe, as from a ProxyCommand or the relay, no from= matches, and the key is refused. \
-     no-agent-forwarding, no-X11-forwarding and no-user-rc change nothing (serve offers none of them). A \
-     security key (sk-ssh-ed25519, sk-ecdsa-sha2-nistp256) logs in only with a signature whose flag of \
-     presence is set (the key was touched), as sshd checks it: no-touch-required takes one without, and \
-     verify-required also asks for the flag that the key verified the user (a PIN); restrict changes \
-     neither, and serve's stderr names the flag that was missing. environment=, permitlisten=, tunnel=, \
-     principals=, cert-authority and any option that serve does not know make the line unused, named. Of \
-     the lines of one key, the first that lets it in now holds. Each refusal by a rule goes to the client \
-     (a forward refused as administratively prohibited, a pty or a command with its line on the channel's \
-     stderr) and to serve's stderr, with the key's fingerprint and the option; a key refused at login is said \
-     there alone, as the client hears Permission denied.",
+    "The options of a key line are OpenSSH's (the format of the authorized_keys file in sshd(8)), read as sshd reads \
+     them: separated by commas, names in any case, a value in double quotes where a backslash before a quote is a \
+     quote. command=\"...\" runs in place of each command, shell and sftp request, as SHELL -c, with the client's \
+     command in SSH_ORIGINAL_COMMAND (not set for a shell; internal-sftp for sftp); command=\"internal-sftp\" serves \
+     SFTP alone, and refuses one with arguments. no-pty refuses a pty (OpenSSH, with -tt, ends with PTY allocation \
+     request failed). no-port-forwarding refuses each forward, and each permitopen=\"host:port\" (an IPv6 address in \
+     brackets; * for any port) lets in that target alone, the host compared as written, with no lookup. restrict turns \
+     off the pty and forwarding, and a later pty or port-forwarding turns one on again. \
+     expiry-time=\"YYYYMMDD[HHMM[SS]]\" (local time, or UTC with Z) refuses the key after it. from=\"patterns\" lets \
+     the key in from a matching address alone: addresses with * and ?, blocks such as 10.0.0.0/8, and ! to refuse; \
+     serve looks up no name, so a host name matches nothing. serve knows an address only when its stdin is a TCP \
+     socket (as from inetd): on a pipe, as from a ProxyCommand or the relay, no from= matches, and the key is refused. \
+     no-agent-forwarding, no-X11-forwarding and no-user-rc change nothing (serve offers none of them). A security key \
+     (sk-ssh-ed25519, sk-ecdsa-sha2-nistp256) logs in only with a signature whose flag of presence is set (the key was \
+     touched), as sshd checks it: no-touch-required takes one without, and verify-required also asks for the flag that \
+     the key verified the user (a PIN); restrict changes neither, and serve's stderr names the flag that was missing. \
+     environment=, permitlisten=, tunnel=, principals=, cert-authority and any option that serve does not know make \
+     the line unused, named. Of the lines of one key, the first that lets it in now holds. Each refusal by a rule goes \
+     to the client: a forward refused as administratively prohibited, a pty or a command with its line on the \
+     channel's stderr. It also goes to serve's stderr, with the key's fingerprint and the option; a key refused at \
+     login is said there alone, as the client hears Permission denied.",
     "The host key is --host-key FILE, else serve_host_ed25519_key in the cache (see FILES): made at the \
      first start, an Ed25519 key of mode 0600, and read at each later one, never overwritten; of two \
      starts at once, one makes it and the other reads it. Its fingerprint goes to stderr at each start, \
      with a warning when the file is in a temporary directory, which a reboot can empty: each client would \
      then meet a new host key. A key file with a passphrase is refused (78).",
-    "A command (exec) runs as SHELL -c COMMAND, and a shell request runs the shell as a login shell \
-     (its argv[0] the shell's name after a dash), as the user that runs serve, on three pipes: stdout comes as data and stderr as \
-     extended data, apart. Each child leads a session of its own (setsid), in HOME when it is a \
-     directory, else /; a signal request goes to its process group. When it ends, its pipes are read \
-     to their end, for 2 s of silence at most (30 s in all), as a job that it put in the background can \
-     hold them; then exit-status, or exit-signal with the signal's name and the core flag, always before \
-     EOF and close. X11, a Unix socket's forward and each subsystem but sftp are refused with their answer.",
-    "A pty request (OpenSSH's -t and -tt) is granted where a pty opens at that moment: serve tries \
-     /dev/ptmx, then /dev/pts/ptmx, at each request, and keeps nothing for the next one. The command or \
-     the shell then has the pty's slave as its stdin, stdout and stderr and as its controlling terminal, \
-     in a session of its own, so Ctrl-C and the job control of a shell work as under sshd; TERM is the \
-     request's (xterm-256color when it is empty), and the variable of the slave's path is set as sshd \
-     sets it. The size is the request's (80x24 when it is zero) and follows each window change; the \
-     request's terminal modes are set where termios has them, and a mode that it lacks or that the \
-     kernel refuses is passed over. On a pty, stdout and stderr come as one stream of data, and the \
-     client's EOF ends its input alone. On Linux, where neither master opens, serve makes a pty of its \
-     own: a helper process makes a user and a mount namespace, mounts a new devpts instance, and gives \
-     back its master and its slave, which has no path, so the variable of the slave's path is not set; \
-     a host that refuses unshare or mount refuses this too (podssh doctor's line pty devpts). Where no \
-     pty opens, on Linux (x86_64 and aarch64), serve gives the program a tty that it answers itself: the \
-     program's stdin, stdout and stderr are one socket, and a seccomp filter of the program's own, set \
-     before it starts, sends its tty calls (the ioctl requests of termios, the window size and the \
-     foreground group) and its opens to serve, which answers them from one termios state, and gives a \
-     copy of the socket for /dev/tty; each other call goes to the kernel. The program sees a tty: test -t \
-     0, stty, a shell's job control, vi, less and top; the keys go through a line discipline in serve that \
-     follows the state that the program set (echo, editing, Ctrl-C, Ctrl-Z and Ctrl-\\ to the foreground \
-     group, the window size with SIGWINCH). On a socket, Ctrl-D on an empty line ends the program's input \
-     for good, and a program that reads two lines quickly may get both in one read. Where the host's own \
-     filter already holds a listener, so that a second is refused, serve answers the same calls by ptrace: \
-     the program's filter stops it at each tty call and open, serve's thread answers from the same state \
-     and follows each process that the program starts, an open of /dev/tty becomes a copy of a descriptor \
-     that holds the socket, and the program and its children can then use no ptrace of their own (gdb, \
-     strace); serve says so. A host that refuses both, or the program's memory to serve, refuses this \
-     (podssh doctor's lines pty notify and pty ptrace); --pty notify takes it with no pty tried, and \
-     refuses the request where it fails. Where \
-     none of these opens (a cage with no /dev/ptmx), serve is the line discipline itself (--pty auto): \
-     the command or the shell runs on pipes, each key is echoed and edited in serve, a line goes to the \
-     program when Enter submits it, Ctrl-C and Ctrl-\\ go to the program's process group as SIGINT and \
-     SIGQUIT, and its output comes around the line under edit with each line ending CR LF. A login shell \
-     runs with no prompt of its own and a trap of SIGINT and SIGQUIT, so Ctrl-C ends the command and not \
-     the shell; serve draws the prompt $. A program that draws on a tty (vi, less, top) gets a line that \
-     says so, then runs. --pty line takes the line discipline with no pty tried; --pty no refuses such a \
-     request with its answer, and a command then runs on pipes (OpenSSH, with -tt, ends with PTY \
+    "A command (exec) runs as SHELL -c COMMAND. A shell request runs the shell as a login shell (its argv[0] the \
+     shell's name after a dash). Each runs as the user that runs serve, on three pipes: stdout comes as data and \
+     stderr as extended data, apart. Each child leads a session of its own (setsid), in HOME when it is a directory, \
+     else /; a signal request goes to its process group. When it ends, its pipes are read to their end, for 2 s of \
+     silence at most (30 s in all): a job that it put in the background can hold them. Then comes exit-status, or \
+     exit-signal with the signal's name and the core flag, always before EOF and close. X11, a Unix socket's forward \
+     and each subsystem but sftp are refused with their answer.",
+    "A pty request (OpenSSH's -t and -tt) is granted where a pty opens at that moment: serve tries /dev/ptmx, then \
+     /dev/pts/ptmx, at each request, and keeps nothing for the next one. The command or the shell then has the pty's \
+     slave as its stdin, stdout and stderr and as its controlling terminal. It runs in a session of its own, so Ctrl-C \
+     and the job control of a shell work as under sshd; TERM is the request's (xterm-256color when it is empty), and \
+     the variable of the slave's path is set as sshd sets it. The size is the request's (80x24 when it is zero) and \
+     follows each window change; the request's terminal modes are set where termios has them, and a mode that it lacks \
+     or that the kernel refuses is passed over. On a pty, stdout and stderr come as one stream of data, and the \
+     client's EOF ends its input alone. On Linux, where neither master opens, serve makes a pty of its own: a helper \
+     process makes a user and a mount namespace, mounts a new devpts instance, and gives back its master and its \
+     slave. The slave has no path, so the variable of the slave's path is not set; a host that refuses unshare or \
+     mount refuses this too (podssh doctor's line pty devpts). Where no pty opens, on Linux (x86_64 and aarch64), \
+     serve gives the program a tty that it answers itself: the program's stdin, stdout and stderr are one socket. A \
+     seccomp filter of the program's own, set before it starts, sends its tty calls and its opens to serve. The tty \
+     calls are the ioctl requests of termios, the window size and the foreground group. serve answers them from one \
+     termios state, and gives a copy of the socket for /dev/tty; each other call goes to the kernel. The program sees \
+     a tty: test -t 0, stty, a shell's job control, vi, less and top; the keys go through a line discipline in serve \
+     that follows the state that the program set. That state is echo, editing, Ctrl-C, Ctrl-Z and Ctrl-\\ to the \
+     foreground group, and the window size with SIGWINCH. On a socket, Ctrl-D on an empty line ends the program's \
+     input for good. A program that reads two lines quickly may get both in one read. Where the host's own filter \
+     already holds a listener, so that a second is refused, serve answers the same calls by ptrace: the program's \
+     filter stops it at each tty call and open, and serve's thread answers from the same state. It follows each \
+     process that the program starts, and an open of /dev/tty becomes a copy of a descriptor that holds the socket. \
+     The program and its children can then use no ptrace of their own (gdb, strace); serve says so. A host that \
+     refuses both, or the program's memory to serve, refuses this (podssh doctor's lines pty notify and pty ptrace); \
+     --pty notify takes it with no pty tried, and refuses the request where it fails. Where none of these opens (a \
+     cage with no /dev/ptmx), serve is the line discipline itself (--pty auto): the command or the shell runs on \
+     pipes, and each key is echoed and edited in serve. A line goes to the program when Enter submits it. Ctrl-C and \
+     Ctrl-\\ go to the program's process group as SIGINT and SIGQUIT. Its output comes around the line under edit, \
+     with each line ending CR LF. A login shell runs with no prompt of its own and a trap of SIGINT and SIGQUIT. So \
+     Ctrl-C ends the command and not the shell; serve draws the prompt $. A program that draws on a tty (vi, less, \
+     top) gets a line that says so, then runs. --pty line takes the line discipline with no pty tried; --pty no \
+     refuses such a request with its answer, and a command then runs on pipes (OpenSSH, with -tt, ends with PTY \
      allocation request failed); podssh doctor's lines pty, pty devpts and pty notify say which a client meets. On \
      Windows the request is refused.",
-    "The sftp subsystem is served in the process: SFTP version 3 as OpenSSH's sftp-server speaks it, so \
-     that OpenSSH's sftp, its scp (SFTP is its mode since OpenSSH 9.0) and podssh cp reach a cage that has \
-     no sftp-server, scp or rsync. The files are reached as the user that runs serve, with no chroot: what \
-     that user may read and write, a client may. A path is taken as the client gives it, and a relative \
-     one starts at HOME (/ with none). Served: open, read, write, close, stat, lstat, fstat, setstat, \
-     fsetstat, opendir, readdir, remove, rename (never over a name that exists), mkdir, rmdir, realpath, \
-     readlink and symlink, and the extensions posix-rename@openssh.com (a rename over a name), \
-     fsync@openssh.com and limits@openssh.com. A failure is its status code with the path and the \
-     system's words (no such file, permission denied, failure). Each call on the file system has 20 s: \
-     past it the reply is a failure that says so, the handle that it used is closed, and the session goes \
-     on, so a FIFO with no writer or a dead mount cannot stop it; a session that left 8 such calls ends. \
-     At most 256 handles are open in a session, a read is 255 KiB at most and a request 256 KiB. A \
-     listing names owners by number, as serve reads no passwd entry. scp in its legacy mode runs scp by \
-     exec, and exits 127 in a cage that has none. --no-shell leaves SFTP served, as it runs no program.",
-    "A client's forward (direct-tcpip: OpenSSH's -W, -L and -J) is a TCP connection that serve opens from \
-     its own host to the host and port asked, any of them, as sshd allows by default: a name is resolved \
-     there, or given to the proxy of serve's HTTPS_PROXY, and the loopback and the names of NO_PROXY go \
-     directly, as podssh's own dials go. The dial has 20 s. One that fails is refused as connect failed, \
-     with its reason in words, the system's error or the proxy's status and reason (OpenSSH: open failed: \
-     connect failed: podssh serve: could not connect to 127.0.0.1:1: Connection refused); a port of 0 or \
-     past 65535 too. The bytes go both ways, an end of one way keeps the other open, and the TCP \
-     connection ends with its channel. At most 256 forwards are open at once on one connection, and one \
-     more is refused as a resource shortage. --no-forwarding refuses each forward, administratively \
-     prohibited, with the flag named.",
-    "The environment of a child is serve's own, as the cage gave it (PATH, HTTPS_PROXY and the rest stay), \
-     without podssh's credentials (PODSSH_RELAY_TOKEN, the secrets of Cloudflare Access, and each variable \
-     of podssh whose name holds TOKEN, SECRET, PASSWORD or PASSPHRASE, but those that name a file), plus USER and LOGNAME \
-     (serve's, else the uid's number: no passwd entry is read), HOME (/ with none), SHELL and PATH (sshd's \
-     /usr/local/bin:/usr/bin:/bin with none). A client's env request (OpenSSH's SetEnv and SendEnv) is \
-     taken when its name matches an --accept-env pattern (default LANG and LC_*), never for LD_*, PATH, \
-     HOME, SHELL, ENV, BASH_ENV, IFS, USER, LOGNAME or SSH_ORIGINAL_COMMAND, whatever the pattern; \
-     --accept-env '' takes none.",
-    "The shell is found with no passwd entry and no /etc/shells: --shell PATH alone when it is given; else \
-     SHELL, then /bin/sh, /usr/bin/sh, /bin/bash, /usr/bin/bash, /bin/ash and /bin/dash. A candidate \
-     passes when it is an absolute path to a regular file that this user may execute, and when a real run \
-     of -c 'exit 0' ends with 0 within 5 s: a noexec mount, a data file with its mode bits set or a missing \
-     loader fail there. The search runs at the start and again at each session, with no cache. At the \
-     start, a candidate passed over is said with its reason (not executable (noexec mount), for one), \
-     and no shell at all refuses the start (78), as does a --shell that does not run; --no-shell skips \
-     the search, and refuses each command and shell. In a session, the same line goes to the channel's \
-     stderr, and the request fails (OpenSSH: exec request failed). podssh doctor's line shell names the \
+    "The sftp subsystem is served in the process: SFTP version 3 as OpenSSH's sftp-server speaks it. So OpenSSH's \
+     sftp, its scp (SFTP is its mode since OpenSSH 9.0) and podssh cp reach a cage that has no sftp-server, scp or \
+     rsync. The files are reached as the user that runs serve, with no chroot: what that user may read and write, a \
+     client may. A path is taken as the client gives it, and a relative one starts at HOME (/ with none). Served: \
+     open, read, write, close, stat, lstat, fstat, setstat, fsetstat, opendir, readdir, remove, and rename (never over \
+     a name that exists). Served too: mkdir, rmdir, realpath, readlink and symlink, and the extensions \
+     posix-rename@openssh.com (a rename over a name), fsync@openssh.com and limits@openssh.com. A failure is its \
+     status code with the path and the system's words (no such file, permission denied, failure). Each call on the \
+     file system has 20 s: past it the reply is a failure that says so, and the handle that it used is closed. The \
+     session goes on, so a FIFO with no writer or a dead mount cannot stop it; a session that left 8 such calls ends. \
+     At most 256 handles are open in a session, a read is 255 KiB at most and a request 256 KiB. A listing names \
+     owners by number, as serve reads no passwd entry. scp in its legacy mode runs scp by exec, and exits 127 in a \
+     cage that has none. --no-shell leaves SFTP served, as it runs no program.",
+    "A client's forward (direct-tcpip, from OpenSSH's -W, -L and -J) is a TCP connection that serve opens from its own \
+     host. It goes to the host and port asked, any of them, as sshd allows by default: a name is resolved there, or \
+     given to the proxy of serve's HTTPS_PROXY. The loopback and the names of NO_PROXY go directly, as podssh's own \
+     dials go. The dial has 20 s. One that fails is refused as connect failed, with its reason in words, the system's \
+     error or the proxy's status and reason (OpenSSH: open failed: connect failed: podssh serve: could not connect to \
+     127.0.0.1:1: Connection refused); a port of 0 or past 65535 too. The bytes go both ways, an end of one way keeps \
+     the other open, and the TCP connection ends with its channel. At most 256 forwards are open at once on one \
+     connection, and one more is refused as a resource shortage. --no-forwarding refuses each forward, \
+     administratively prohibited, with the flag named.",
+    "The environment of a child is serve's own, as the cage gave it (PATH, HTTPS_PROXY and the rest stay). It goes \
+     without podssh's credentials: PODSSH_RELAY_TOKEN, the secrets of Cloudflare Access, and each variable of podssh \
+     whose name holds TOKEN, SECRET, PASSWORD or PASSPHRASE. Of those, the ones that name a file stay. It adds USER \
+     and LOGNAME (serve's, else the uid's number: no passwd entry is read), HOME (/ with none), SHELL and PATH (sshd's \
+     /usr/local/bin:/usr/bin:/bin with none). A client's env request (OpenSSH's SetEnv and SendEnv) is taken when its \
+     name matches an --accept-env pattern (default LANG and LC_*). It is never taken for LD_*, PATH, HOME, SHELL, ENV, \
+     BASH_ENV, IFS, USER, LOGNAME or SSH_ORIGINAL_COMMAND, whatever the pattern; --accept-env '' takes none.",
+    "The shell is found with no passwd entry and no /etc/shells: --shell PATH alone when it is given; else SHELL, then \
+     /bin/sh, /usr/bin/sh, /bin/bash, /usr/bin/bash, /bin/ash and /bin/dash. A candidate passes when it is an absolute \
+     path to a regular file that this user may execute. A real run of -c 'exit 0' must also end with 0 within 5 s: a \
+     noexec mount, a data file with its mode bits set or a missing loader fail there. The search runs at the start and \
+     again at each session, with no cache. At the start, a candidate passed over is said with its reason (not \
+     executable (noexec mount), for one). No shell at all refuses the start (78), as does a --shell that does not run; \
+     --no-shell skips the search, and refuses each command and shell. In a session, the same line goes to the \
+     channel's stderr, and the request fails (OpenSSH: exec request failed). podssh doctor's line shell names the \
      shell that serve would run, and each candidate passed over.",
-    "A client that reads slowly slows the child: its output is read 32 KiB at a time, and read again only \
-     once that went out within the client's window, so a client that stops reading leaves the pipe or the \
-     pty full and the child waiting in its write, and serve's memory does not grow; the session goes on \
-     when the client reads again. The other way, each channel's window (512 KiB) opens as the child, the \
-     SFTP server or a forward's target takes the bytes, so a child that reads nothing of its stdin holds \
-     its own channel alone, never the other channels of the connection.",
-    "SIGTERM or SIGINT stops serve cleanly: it takes no new session or forward, sends the client a \
-     disconnect with the reason podssh serve is stopping (OpenSSH prints it), and hangs up the process \
-     group of each command, shell and pty child (SIGHUP, then SIGCONT, as the kernel does when a terminal \
-     goes away). A group that still runs 5 s later is killed with SIGKILL; a second SIGTERM or SIGINT \
-     kills at once. Then serve exits 0. A client that closes its channel, or a connection that ends, \
-     hangs up that channel's child the same way, so nothing of a session that is gone runs on unless it \
-     asked to (nohup).",
+    "A client that reads slowly slows the child: its output is read 32 KiB at a time, and read again only once that \
+     went out within the client's window. So a client that stops reading leaves the pipe or the pty full and the child \
+     waiting in its write. serve's memory does not grow; the session goes on when the client reads again. The other \
+     way, each channel's window (512 KiB) opens as the child, the SFTP server or a forward's target takes the bytes. \
+     So a child that reads nothing of its stdin holds its own channel alone, never the other channels of the \
+     connection.",
+    "SIGTERM or SIGINT stops serve cleanly: it takes no new session or forward, and sends the client a disconnect with \
+     the reason podssh serve is stopping (OpenSSH prints it). It hangs up the process group of each command, shell and \
+     pty child (SIGHUP, then SIGCONT, as the kernel does when a terminal goes away). A group that still runs 5 s later \
+     is killed with SIGKILL; a second SIGTERM or SIGINT kills at once. Then serve exits 0. A client that closes its \
+     channel, or a connection that ends, hangs up that channel's child the same way. So nothing of a session that is \
+     gone runs on unless it asked to (nohup).",
     "SIGHUP reads the authorized keys again: each --authorized-keys file, or ~/.ssh/authorized_keys; each \
      --authorized-key stays. Each line is read as at the start, its options its rules: a line that is \
      not used is passed over and said. The next login meets the new set; a session that logged in goes \

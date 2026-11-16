@@ -2,43 +2,42 @@
 //! each file stays short.
 
 pub const SESSION: &[&str] = &[
-    "podssh session start NAME [OPTIONS] HOST [COMMAND] starts a podssh of its own in the background, which logs \
-     in to HOST as podssh ssh does, with its connection flags and the Host blocks of ssh_config, and holds one \
-     session with a pty: the login shell, or COMMAND. start returns once the session is ready, with the path of \
-     its socket on stdout; what the session's podssh says until then comes on stderr, and its exit code is \
-     start's when it ends first (255 for a connection or a login that failed). The pty's size is that of \
-     COLUMNS and LINES, else 80 by 24. Until it is ready, the session's podssh keeps start's terminal: a \
-     password, a key's passphrase and a new host key are asked there, as podssh ssh asks them (within \
-     --timeout), and Ctrl-C reaches it; then it leaves that terminal and its session. With no terminal, they \
-     come from podssh agent or SSH_ASKPASS, and a new host key needs StrictHostKeyChecking=accept-new or a \
-     known_hosts that has it.",
+    "podssh session start NAME [OPTIONS] HOST [COMMAND] starts a podssh of its own in the background. It logs in to \
+     HOST as podssh ssh does, with its connection flags and the Host blocks of ssh_config. It holds one session with \
+     a pty: the login shell, or COMMAND. start returns once the session is ready, with the path of its socket on \
+     stdout; what the session's podssh says until then comes on stderr. Its exit code is start's when it ends first \
+     (255 for a connection or a login that failed). The pty's size is that of COLUMNS and LINES, else 80 by 24. \
+     Until it is ready, the session's podssh keeps start's terminal: a password, a key's passphrase and a new host \
+     key are asked there, as podssh ssh asks them (within --timeout), and Ctrl-C reaches it; then it leaves that \
+     terminal and its session. With no terminal, they come from podssh agent or SSH_ASKPASS, and a new host key \
+     needs StrictHostKeyChecking=accept-new or a known_hosts that has it.",
     "send NAME TEXT types TEXT and Enter (a carriage return; --no-enter leaves it out). In TEXT, \\r, \\n, \\t, \
      \\e (Escape), \\xNN (\\x03 is Ctrl-C) and \\\\ give the bytes they name; each other \\ is refused. send NAME \
      with no TEXT types stdin as it is: a password goes so, never in a command line, which each process can \
      read.",
-    "wait NAME returns when the output has stopped for --idle (2s by default), counted from the last send, so \
-     that a wait right after a send waits for what it brings; output that stops inside an escape sequence has \
-     not stopped. With --match TEXT it returns when TEXT comes in the output since the last send, with the \
-     terminal's sequences and control bytes taken out; the echo of the line that send typed counts too, so \
-     match a text that only the command's output holds. It says idle or match on stdout, and exits 75 when \
-     --timeout (60s) passes first, 69 when the session ended first.",
-    "capture NAME writes the screen as a terminal of the pty's size shows it: its rows, with no blank at their \
-     ends and no empty row at the end. --raw writes the last 64 KiB of the output as it came, from a place \
-     where a terminal can start to read it, never inside a sequence or a character. stop NAME ends the session \
-     and its podssh.",
-    "list writes a line for each session of the directories of the cache: its name, running or ended and the \
-     status, and its host, with a tab between them. A session whose podssh takes the connection and gives no \
-     answer within 2 s is listed with the state no-answer and no host, and why on stderr: it is there, busy or \
-     stuck. A socket that nobody serves any more, as after a crash, is no session, and the next start of its \
-     name takes its place. With no session, stdout stays empty and one line on stderr says so and names the \
-     directories read; a directory that cannot be read is a line on stderr with its error; -q leaves out \
-     each of these lines. --json writes one object instead: sessions (each with its name, state, host and \
-     socket; [] for none), read (the directories read) and unreadable (each with its error). The exit is 0.",
-    "The session's podssh ends at stop, a minute after its session ended (so that the last screen can still \
-     be read), after an hour with no request, or at SIGINT, SIGTERM or SIGHUP. serve NAME [OPTIONS] HOST is \
-     that podssh in the foreground, for a program that keeps it itself: it writes one line of JSON on stdout \
-     when it is ready, and its messages on stderr; with --detach it writes nothing more after that line, as \
-     start runs it.",
+    "wait NAME returns when the output has stopped for --idle (2s by default), counted from the last send. So a wait \
+     right after a send waits for what it brings; output that stops inside an escape sequence has not stopped. With \
+     --match TEXT it returns when TEXT comes in the output since the last send, with the terminal's sequences and \
+     control bytes taken out; the echo of the line that send typed counts too, so match a text that only the \
+     command's output holds. It says idle or match on stdout, and exits 75 when --timeout (60s) passes first, 69 \
+     when the session ended first.",
+    "capture NAME writes the screen as a terminal of the pty's size shows it: its rows, with no blank at their ends \
+     and no empty row at the end. --raw writes the last 64 KiB of the output as it came, from a place where a \
+     terminal can start to read it. It never starts inside a sequence or a character. stop NAME ends the session and \
+     its podssh.",
+    "list writes a line for each session of the directories of the cache: its name, running or ended and the status, \
+     and its host, with a tab between them. A session whose podssh takes the connection and gives no answer within 2 \
+     s is listed with the state no-answer and no host. stderr says why: it is there, busy or stuck. A socket that \
+     nobody serves any more, as after a crash, is no session, and the next start of its name takes its place. With \
+     no session, stdout stays empty and one line on stderr says so and names the directories read; a directory that \
+     cannot be read is a line on stderr with its error; -q leaves out each of these lines. --json writes one object \
+     instead: sessions (each with its name, state, host and socket; [] for none), read (the directories read) and \
+     unreadable (each with its error). The exit is 0.",
+    "The session's podssh ends at stop, or a minute after its session ended (so that the last screen can still be \
+     read). It also ends after an hour with no request, or at SIGINT, SIGTERM or SIGHUP. serve NAME [OPTIONS] HOST \
+     is that podssh in the foreground, for a program that keeps it itself: it writes one line of JSON on stdout when \
+     it is ready, and its messages on stderr; with --detach it writes nothing more after that line, as start runs \
+     it.",
     "THE SOCKET: start and serve listen on a socket of this user's: NAME.sock in the directory sessions of the \
      cache (see FILES), made mode 0700, the socket mode 0600; on Windows a Unix-domain socket there, whose \
      clients must run as this user. --socket PATH names another, also \\\\.\\pipe\\NAME on Windows, and @NAME \

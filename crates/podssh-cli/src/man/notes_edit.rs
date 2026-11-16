@@ -2,11 +2,11 @@
 //! file stays short.
 
 pub const EDIT: &[&str] = &[
-    "podssh edit [user@]host:path fetches one file of a server as podssh cp copies one down: over SFTP, or \
-     by exec when the server has no SFTP, through the relay or with --direct, with the connection flags of \
-     podssh ssh and -P for the port. The copy goes into a new directory of mode 0700 in the cache (see FILES), \
-     as a file of mode 0600 with the far file's name, so that the editor knows its kind. Then the connection \
-     closes, and the editor runs here, with no time limit: no relay session waits while a person edits.",
+    "podssh edit [user@]host:path fetches one file of a server as podssh cp copies one down: over SFTP, or by exec \
+     when the server has no SFTP, through the relay or with --direct. It takes the connection flags of podssh ssh, \
+     and -P for the port. The copy goes into a new directory of mode 0700 in the cache (see FILES). It is a file of \
+     mode 0600 with the far file's name, so that the editor knows its kind. Then the connection closes, and the \
+     editor runs here, with no time limit: no relay session waits while a person edits.",
     "The editor is VISUAL, else EDITOR, else vi when PATH has it; with none, podssh edit exits 78 and names \
      EDITOR. A value is a program and its words, split at blanks with no shell, or one program whose path has \
      a blank. podssh edit needs a terminal on stdin and stdout (else 64, and the refusal names --no-terminal). \

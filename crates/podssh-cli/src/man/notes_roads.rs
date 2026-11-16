@@ -11,17 +11,19 @@ use super::notes_ssh::SSH as OWN;
 pub const SSH: &[&str] = &join::<{ OWN.len() + ROADS.len() }>(OWN, ROADS);
 
 const ROADS: &[&str] = &[
-    "--exit NAME starts the road to the first hop (the destination, or the first host of -J) at NAME, a node of \
-     your net that lends its egress (see podssh node --exit), in place of the relay, as a Tailscale exit node \
-     carries a device's traffic: the node dials the host from its own, on each of its roads that answers, raced as \
-     for node://NAME, and the session resumes on any of them. The host travels in the end-to-end channel, so the \
-     relay sees neither the host nor a byte; the node resolves it, checks each address (a public one, or one of \
-     its ranges, as its net's policy lets this client) and dials those addresses alone. The host key is the \
+    "--exit NAME starts the road to the first hop (the destination, or the first host of -J) at NAME, in place of the \
+     relay. NAME is a node of your net that lends its egress (see podssh node --exit). It works as a Tailscale exit \
+     node carries a device's traffic: the node dials the host from its own, on each of its roads that answers, raced \
+     as for \
+     node://NAME. The session resumes on any of them. The host travels in the end-to-end channel, so the \
+     relay sees neither the host nor a byte; the node resolves it and checks each address: a public one, or one of its \
+     ranges, as its net's policy lets this client. It dials those addresses alone. The host key is the \
      host's, under its own name, as on the relay. NAME is a member of the net, whose key the channel checks, and \
      the label of its pair here. A refusal of the node or of its net's policy says why, and ssh exits \
-     255. --exit goes with no node://, iroh:, derp:, cf://, iap:// or eice:// destination, no --direct, no -4 \
-     or -6, no --no-e2e and no road of another server (64). With --carrier ADDR, the exit is the node at the \
-     other end of that stream, its one road, with no relay and no pair (see --carrier). podssh cp, scp and \
+     255. --exit goes with no node://, iroh:, derp:, cf://, iap:// or eice:// destination (64). It goes with no \
+     --direct, no -4 or -6, no --no-e2e and no road of another server (64). With --carrier ADDR, the exit is the node \
+     at the other end \
+     of that stream. The stream is its one road, with no relay and no pair (see --carrier). podssh cp, scp and \
      sftp take it too.",
     "node://NAME and --exit NAME refuse --relay-host and --relay-failover (64), and PODSSH_RELAY (78), as \
      podssh proxy node://NAME does: the pair names its relay. A RelayHost of the settings file is ignored \
@@ -30,9 +32,9 @@ const ROADS: &[&str] = &[
     H2,
     CHISEL,
     "--wstunnel wss://HOST[:PORT] reaches the first hop through a server of erebe/wstunnel that you run \
-     (wstunnel server wss://[::]:443), in place of the relay: podssh opens the WebSocket to it, through \
-     HTTPS_PROXY when one is set, checked for HOST with podssh's trust (--ca-file), and its token names the \
-     first hop as wstunnel's own client names it; the server dials it and carries the bytes. podssh speaks \
+     (wstunnel server wss://[::]:443), in place of the relay: podssh opens the WebSocket to it, through HTTPS_PROXY \
+     when one is set, checked for HOST with podssh's trust (--ca-file). Its token names the first hop as wstunnel's \
+     own client names it; the server dials it and carries the bytes. podssh speaks \
      the protocol of wstunnel 9.1 to 11 over its WebSocket, which each server serves beside its HTTP/2 on \
      one port: https:// and wts:// are refused (64), and ws:// has no TLS. What the server checks of a \
      client comes from --wstunnel-secret-file FILE (or PODSSH_WSTUNNEL_SECRET_FILE), a file of yours that \
@@ -40,8 +42,8 @@ const ROADS: &[&str] = &[
      credentials USER[:PASSWORD] or authorization VALUE, the Authorization that its restrictions match; or \
      one line, the prefix alone. With no file, podssh is the client of wstunnel's defaults, the prefix v1. \
      Over ws:// a secret goes to this host alone (64). The server refuses a tunnel with a 400 that names \
-     no cause: podssh says it in the words of the version that sent it (a path prefix or an Authorization \
-     that it does not take, a target that it does not allow, or one that it could not reach; its log names \
+     no cause: podssh says it in the words of the version that sent it (a path prefix or an Authorization that it does \
+     not take; a target that it does not allow; or one that it could not reach; its log names \
      which), and exits 77. An answer that is not wstunnel's is said so (69). Each frame is masked with a \
      key of zero, which the server reads the same whether it applies masks or not. PODSSH_WSTUNNEL names \
      the server where the command line names no other road; beside PODSSH_RELAY, PODSSH_FORWARDER or \
@@ -52,56 +54,60 @@ const ROADS: &[&str] = &[
 
 /// The cleartext road on the relay's port (T-326, the operator's ruling Q45).
 const CLEARTEXT: &str =
-    "When each relay host failed, and the TLS of one failed on the way (a certificate that is not the relay's, \
-     as a proxy that intercepts TLS presents its own; a reset or a close in the handshake; or its bound), \
-     podssh tries the cleartext road, the relay's last, before the direct road and the forwarders: a host of \
-     each deployment once, on its own port, through HTTPS_PROXY as each road dials, asked with no TLS for a \
-     token of one session (POST /v1/mint?once=1, signed by this client's key where the relay asks), then the \
-     upgrade with it, with no TLS either. Each hop reads the target and that token, which lives minutes and which one \
+    "podssh may try the cleartext road, the relay's last, before the direct road and the forwarders. It does so when \
+     each relay host failed, and the TLS of one failed on the way. That TLS failure is a certificate that is not the \
+     relay's, as a proxy that intercepts TLS presents its own. It can also be a reset or a close in the handshake, or \
+     its bound. The road goes to a host of each deployment once, on its own port, through HTTPS_PROXY as each road \
+     dials. podssh asks it with no TLS for a token of one session (POST /v1/mint?once=1, signed by this client's key \
+     where the relay asks). Then the upgrade goes with that token, with no TLS either. Each hop reads the target and \
+     that token, which lives minutes and which one \
      upgrade spends; SSH inside stays end to end, its host key checked as on each road. No other token goes \
      there, a token of PODSSH_RELAY_TOKEN or of the cache among them; the token is never cached, and a relay \
      whose answer does not say \"once\": true, with an end within 10 minutes, gets no upgrade. A line says \
      what goes, and another which host carries the session; -v says that the session runs in cleartext. \
      podssh relay serve serves the road (see podssh relay); the default relay's edge serves TLS alone on its \
-     port, and refuses it. After the forwarders that podssh names, their ws:// form, where a probe with no TLS \
-     of their host's port 80 passed, one probe at a time, 5 s each: no relay token goes to a forwarder. \
+     port, and refuses it. After the forwarders that podssh names, the road tries their ws:// form, where a probe with \
+     no TLS of their host's port 80 passed. The probes go one at a time, 5 s each: no relay token goes to a forwarder. \
      PODSSH_CLEARTEXT=no turns both off. podssh proxy, podssh pipe and each command that reaches its server \
      as podssh ssh does take the road too.";
 
 /// The WebSocket over HTTP/2 to a relay host of the user's (T-321).
 const H2: &str =
-    "To a relay host that you named (--relay-host, PODSSH_RELAY or RelayHost), the sessions of one run are streams \
-     of one HTTP/2 connection where the host offers RFC 8441's extended CONNECT, as podssh relay serve does: the \
-     hosts of podssh each, and each other session of the run to that relay host, cost no TLS handshake past the \
-     first, and -v names the road of each session (see THE RELAY, The WebSocket over HTTP/2). Where the host's \
-     TLS chooses http/1.1, the upgrade goes as before; where its HTTP/2 offers no extended CONNECT, the upgrade \
-     goes on a new connection, and the run asks that host for no HTTP/2 for 10 minutes. PODSSH_H2=no keeps each \
+    "To a relay host that you named (--relay-host, PODSSH_RELAY or RelayHost), the sessions of one run can share one \
+     connection. They are streams of one HTTP/2 connection where the host offers RFC 8441's extended CONNECT, as \
+     podssh relay serve does: the hosts of podssh each, and each other session of the run to that relay host, cost no \
+     TLS handshake past the first. -v names the road of each session (see THE RELAY, The WebSocket over HTTP/2). Where \
+     the host's \
+     TLS chooses http/1.1, the upgrade goes as before; where its HTTP/2 offers no extended CONNECT, the upgrade goes \
+     on a new connection. The run then asks that host for no HTTP/2 for 10 minutes. PODSSH_H2=no keeps each \
      session on its own connection; yes offers the road to the default relay too.";
 
 /// The road through a chisel server of the user's (T-490).
 const CHISEL: &str =
-    "--chisel https://HOST[:PORT][/PATH] reaches the first hop through a server of jpillora/chisel that you run \
-     (chisel server on port 443 with a user and a password), in place of the relay: podssh opens its WebSocket, \
+    "--chisel https://HOST[:PORT][/PATH] reaches the first hop in place of the relay. It goes through a server of \
+     jpillora/chisel that you run (chisel server on port 443 with a user and a password): podssh opens its WebSocket, \
      through HTTPS_PROXY when one is set, checked for HOST with podssh's trust (--ca-file), with the subprotocol \
-     chisel-v3; then SSH inside it as chisel's client speaks it (chisel 1.8 and later), its configuration of one \
-     remote, and a channel to the first hop, which the server dials. The sessions of one run are channels of one \
+     chisel-v3; then SSH inside it as chisel's client speaks it (chisel 1.8 and later). SSH carries its configuration \
+     of one remote, and a channel to the first hop, which the server dials. The sessions of one run are channels of \
+     one \
      connection. What the server takes and shows comes from --chisel-auth-file FILE (or PODSSH_CHISEL_AUTH_FILE), a \
      file of yours that others cannot read: auth USER:PASSWORD, as chisel's own auth option and its authfile's keys; \
      fingerprint BASE64, the fingerprint that chisel server prints, which podssh then checks before it logs in. With \
      no fingerprint, -v says that the server's key is not checked: TLS names the server, and the first hop's own host \
      key protects the session. http:// goes to this host alone (64), as the password would cross the network in the \
-     clear. A wrong password, a key that is not the file's fingerprint, and a target that the server's authfile does \
-     not allow are refused with their words (77); an answer that is not chisel's is said so (69), its 404 Not found \
-     named as the words of a chisel server that did not take the upgrade. PODSSH_CHISEL names the server where the \
+     clear. A wrong password and a key that is not the file's fingerprint are refused with their words (77). So is a \
+     target that the server's authfile does not allow; an answer that is not chisel's is said so (69). Its 404 Not \
+     found is named as the words of a chisel server that did not take the upgrade. PODSSH_CHISEL names the server \
+     where the \
      command line names no other road; beside PODSSH_RELAY, PODSSH_FORWARDER, PODSSH_VIA or PODSSH_WSTUNNEL it is \
      refused (78). A run has one road: --relay-host, --relay-failover, --direct, --forwarder, --shadowsocks, --via, \
      --vless, --wstunnel, -4, -6, and a destination with a road of its own cannot go with it (64).";
 
 /// The note of `podssh proxy --chisel`.
 pub const PROXY_CHISEL: &str =
-    "podssh proxy --chisel https://HOST[:PORT] carries the pipe through a chisel server that you run, with no \
-     relay, as podssh ssh does (see its notes), and as chisel client URL stdio:HOST:PORT serves it; PODSSH_CHISEL \
-     names it too. The end of stdin ends the channel's way up alone: the target's bytes come until it closes.";
+    "podssh proxy --chisel https://HOST[:PORT] carries the pipe through a chisel server that you run, with no relay, \
+     as podssh ssh does (see its notes). It serves it as chisel client URL stdio:HOST:PORT does; PODSSH_CHISEL names \
+     it too. The end of stdin ends the channel's way up alone: the target's bytes come until it closes.";
 
 /// The FILES entry of `--chisel-auth-file`, as `data` is full.
 pub fn chisel_file() -> (Vec<String>, String) {
@@ -119,8 +125,8 @@ pub fn chisel_file() -> (Vec<String>, String) {
 
 /// The note of `podssh proxy` on the cleartext road.
 pub const PROXY_CLEARTEXT: &str =
-    "podssh proxy tries the cleartext road last too, as podssh ssh does (see its notes), when each relay host \
-     failed and the TLS of one failed on the way; PODSSH_CLEARTEXT=no turns it off.";
+    "podssh proxy tries the cleartext road last too, as podssh ssh does (see its notes). It does so when each relay \
+     host failed and the TLS of one failed on the way; PODSSH_CLEARTEXT=no turns it off.";
 
 /// The note of `podssh proxy --wstunnel`.
 pub const PROXY_WSTUNNEL: &str =

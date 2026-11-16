@@ -5,26 +5,27 @@
 //! on a channel of its own.
 
 /// The note of `podssh node`, after the onion road's.
-pub(super) const NODE: &str = "A node of the pair's road with the resumable layer and the end-to-end channel \
-     (no --plain, no --no-e2e) and a TCP TARGET also waits for the pair's operators at smee.io's server, the \
-     last fallback after the onion road, for a proxy that refuses the WebSocket \
-     upgrade: the server of podssh's list of services (none while it names none), or the one of PODSSH_SMEE \
-     (https://HOST[:PORT][/PREFIX], smee.io's server of your own), over HTTPS by name on 443 through \
-     HTTPS_PROXY, with no account and no upgrade. It reads its door, a channel whose name comes from the \
-     pair's name and connect token, as a stream of server-sent events; a client's hello there names a link, \
-     and each end then posts its way, one numbered frame of base64 in JSON at a time, to a channel of that \
-     way, and reads the other's. While a link runs the door waits, so the node holds two connections at \
-     most. Its line names the server, and for the listed one says that it carries the sessions of this \
-     road and that anyone who knows a channel's name sees the times and the sizes; the channel keeps the \
-     bytes. PODSSH_SMEE=no or PODSSH_LAST_RESORT=no (for the listed server) turns the road off.";
+pub(super) const NODE: &str = "A node of the pair's road with a TCP TARGET also waits for the pair's operators \
+     at smee.io's server. It does so only with the resumable layer and the end-to-end channel (no --plain, no \
+     --no-e2e). This is the last fallback after the onion road, for a proxy that refuses the WebSocket upgrade. \
+     Its server is podssh's listed one (none while the list names none), or the one of PODSSH_SMEE \
+     (https://HOST[:PORT][/PREFIX], smee.io's server of your own). It is reached over HTTPS by name on 443 \
+     through HTTPS_PROXY, with no account and no upgrade. It reads its door, a channel whose name comes from the \
+     pair's name and connect token, as a stream of server-sent events; a client's hello there names a link. Each \
+     end then posts its way to a channel of that way, one numbered frame of base64 in JSON at a time. Each reads \
+     the other's. While a link runs the door waits, so the node holds two connections at \
+     most. Its line names the server. For the listed one, it says that the server carries the sessions of this \
+     road. It says too that anyone who knows a channel's name sees the times and the sizes; the channel keeps \
+     the bytes. PODSSH_SMEE=no or PODSSH_LAST_RESORT=no (for the listed server) turns the road off.";
 
 /// The note of `podssh ssh`, after the onion road's.
-pub(super) const SSH: &str = "node://NAME also races the smee.io road of its pair, only once each \
-     road before it failed, after the onion road and before the Serveo road, the last fallback: a stream of server-sent events of its way down at smee.io's server on 443 (the \
-     listed one, or the one of PODSSH_SMEE), a hello at the node's door posted again each 3 s until the node's mark \
-     comes, 20 s at most, then a POST for each frame up, each one after the answer to the one before. A \
-     stream that gives no event within 15 s, as through a proxy that holds an answer until its end, ends the \
-     road for the run. Before its first link through the listed server, a line says that the server carries \
+pub(super) const SSH: &str = "node://NAME also races the smee.io road of its pair, only once each road before it \
+     failed. It comes after the onion road and before the Serveo road, the last fallback: a stream of server-sent \
+     events of its way down at smee.io's server on 443 (the listed one, or the one of PODSSH_SMEE). A hello at the \
+     node's door is posted again each 3 s until the node's mark comes, 20 s at most. Then a POST goes for each frame \
+     up, each one after the answer to the one before. A stream that \
+     gives no event within 15 s ends the road for the run. That happens through a proxy that holds an answer until its \
+     end. Before its first link through the listed server, a line says that the server carries \
      the session. PODSSH_SMEE=no or PODSSH_LAST_RESORT=no (for the listed server) turns it off, and \
      --no-e2e leaves it out. podssh ping node://NAME does not measure it.";
 

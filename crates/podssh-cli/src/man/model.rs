@@ -262,9 +262,9 @@ fn keyword_blocks() -> Vec<Block> {
         blocks.push(Block::Item { term: vec![lit(*name)], text: format!("refused: {why}") });
     }
     blocks.push(para(
-        "Accepted and not applied, with one note at the default level for a value that you gave, on the \
-         command line or in your own ssh_config (none for the system's file, which says it at -v, and \
-         none with -q):",
+        "Accepted and not applied. podssh gives one note at the default level for a value that you gave, on the \
+         command line or in your own ssh_config. It gives none for the system's file, which says it at -v, and none \
+         with -q:",
     ));
     for (name, why) in keywords::NOTED {
         blocks.push(Block::Item { term: vec![lit(*name)], text: format!("not applied: {why}") });
@@ -272,7 +272,9 @@ fn keyword_blocks() -> Vec<Block> {
     blocks.push(para(format!(
         "Accepted with no effect, because they change nothing that podssh does; -v names the place of \
          each: {}.",
-        keywords::IGNORED.join(", ")
+        // Groups of ten, each ended by a semicolon, so that no sentence of
+        // the list passes the limit of words of the text rules.
+        keywords::IGNORED.chunks(10).map(|names| names.join(", ")).collect::<Vec<_>>().join("; ")
     )));
     blocks
 }

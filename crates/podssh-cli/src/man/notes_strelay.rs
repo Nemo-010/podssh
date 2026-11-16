@@ -5,28 +5,27 @@
 //! `strelay` has it.
 
 /// The note of `podssh node`, after HyperDHT's road's.
-pub(super) const NODE: &str = "In a build with the feature strelay, a node of the pair's road with the \
-     resumable layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP TARGET also waits for \
-     the pair's operators on a relay of Syncthing's pool, the last fallback \
-     after HyperDHT's road: the relay on 443 that the SHA-256 of the pair's name picks among those that \
-     podssh's list of services names (none while it names none), or the relay of PODSSH_SYNCTHING_RELAY \
-     (a relay:// URL in the pool's form, with the relay's device ID: Syncthing's strelaysrv of your own), by \
-     one TLS connection through \
-     HTTPS_PROXY. Its certificate, whose SHA-256 is its device ID, comes from the pair's name and connect \
-     token, so its operators find it with no word between the two ends; each session is a TCP connection \
-     of its own to the relay, served with the resumable layer under the keeper of its other roads. It \
-     joins again, after 1 s, doubled to 32 s, when its connection goes. Its line names the relay, and for \
-     one of the pool says that it carries the sessions of this road and sees the two ends' certificates, \
-     the times and the sizes; the channel keeps the bytes from it. PODSSH_SYNCTHING_RELAY=no turns the road \
-     off, and PODSSH_LAST_RESORT=no turns off the pool's relays.";
+pub(super) const NODE: &str = "In a build with the feature strelay, a node of the pair's road also waits for the \
+     pair's operators on a relay of Syncthing's pool. It does so only with a TCP TARGET, the resumable layer and \
+     the end-to-end channel (no --plain, no --no-e2e). This is the last fallback after HyperDHT's road. The \
+     relay is the one on 443 that the SHA-256 of the pair's name picks among those that podssh's list of \
+     services names. There is none while the list names none. Or it is the relay of PODSSH_SYNCTHING_RELAY (a \
+     relay:// URL in the pool's form, with the relay's device ID: Syncthing's strelaysrv of your own). The node \
+     reaches it by one TLS connection through HTTPS_PROXY. Its certificate, whose SHA-256 is its device ID, \
+     comes from the pair's name and connect token. Its operators thus find it with no word between the two ends; \
+     each session is a TCP connection of its own to the relay, served with the resumable layer under the keeper \
+     of its other roads. It joins again, after 1 s, doubled to 32 s, when its connection goes. Its line names \
+     the relay. For one of the pool, it says that the relay carries the sessions of this road. That relay sees \
+     the two ends' certificates, the times and the sizes; the channel keeps the bytes from it. \
+     PODSSH_SYNCTHING_RELAY=no turns the road off, and PODSSH_LAST_RESORT=no turns off the pool's relays.";
 
 /// The note of `podssh ssh`, after HyperDHT's road's.
-pub(super) const SSH: &str = "In a build with the feature strelay, node://NAME also races Syncthing's \
-     relay road of its pair, only once each road before it failed, after HyperDHT's road and before \
-     the onion road, the last fallback: a request with a fresh certificate to \
-     the pair's relay (the one on 443 that the SHA-256 of its name picks among the pool's relays of \
-     podssh's list of services, or the relay of PODSSH_SYNCTHING_RELAY) for the node's device ID, which both \
-     ends make of the pair's connect token, then the session's own TCP connection to the relay. It waits \
+pub(super) const SSH: &str = "In a build with the feature strelay, node://NAME also races Syncthing's relay road of \
+     its pair, only once each road before it failed. It comes after HyperDHT's road and before the onion road, the \
+     last fallback: a request with a fresh certificate to the pair's relay for the node's device ID, which both ends \
+     make of the pair's connect token. The pair's relay is the one on 443 that the SHA-256 of its name picks among the \
+     pool's relays of podssh's list of services. Or it is the relay of PODSSH_SYNCTHING_RELAY. Then the session has \
+     its own TCP connection to the relay. It waits \
      30 s at most. Before its first link through a relay of the pool, a line says that the relay carries the \
      session. PODSSH_SYNCTHING_RELAY=no or PODSSH_LAST_RESORT=no (for the pool's relays) turns it off, and \
      --no-e2e leaves it out. podssh ping node://NAME does not measure it.";

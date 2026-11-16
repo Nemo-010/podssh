@@ -26,20 +26,19 @@ pub(super) const VARIABLES: &[(&[&str], &str)] = &[
     ),
     (
         &["PODSSH_IROH_QUIC"],
-        "The QUIC settings of the iroh road, at each end, and for a measurement of one arm against another: \
-          tuned (rtt, window and streams; the default), iroh (iroh's own), or words separated by commas: rtt (an \
-          initial round trip of 100 ms, for 333 ms), window (an initial window of 32 packets, for 10), streams \
-          (receive windows of 8 MiB a stream and 16 MiB a connection), and one of cubic (iroh's own), bbr or \
-          newreno. -v, and a node's lines, say an arm that is not iroh's own. A bad value is a configuration \
-          error (78).",
+        "The QUIC settings of the iroh road, at each end, and for a measurement of one arm against another: tuned \
+          (rtt, window and streams; the default), iroh (iroh's own), or words separated by commas: rtt (an initial \
+          round trip of 100 ms, for 333 ms); window (an initial window of 32 packets, for 10); streams (receive \
+          windows of 8 MiB a stream and 16 MiB a connection); and one of cubic (iroh's own), bbr or newreno. -v, and \
+          a node's lines, say an arm that is not iroh's own. A bad value is a configuration error (78).",
     ),
     (
         &["PODSSH_IROH_PKARR"],
         "The server of pkarr where a node keeps the record of its roads, and where a client asks for it: \
-          https://HOST[:PORT][/PATH], or off for none. Unset or empty, it is n0's when the iroh relays are \
-          n0's, and none else; a node with no iroh road (--quick-tunnel, the DERP road alone) keeps its \
-          record at n0's too, unless this names another or off (see iroh record in THE RELAY). A bad value is \
-          a configuration error (78).",
+          https://HOST[:PORT][/PATH], or off for none. Unset or empty, it is n0's when the iroh relays are n0's, and \
+          none else; a node with no iroh road (--quick-tunnel, the DERP road alone) keeps its record at n0's too. It \
+          does so unless this names another or off (see iroh record in THE RELAY). A bad value is a configuration \
+          error (78).",
     ),
 ];
 
@@ -84,24 +83,25 @@ fn record() -> Block {
         vec![lit("iroh record")],
         format!(
             "A node of the iroh road keeps a record of its roads, signed with its key, at a server of pkarr: \
-             {n0} when its relays are n0's, else the one of {env}, and none with {env}=off. The record names \
-             its home relay in iroh's own _iroh names, which iroh's tools read, and, in podssh's _podssh names, \
-             which they pass by, its DERP home (its ticket, with --derp), its quick tunnel, its Pinggy tunnel \
-             (NAME#PIN, with --pinggy) and its OpenTunnel name (with --opentunnel, once its tunnel is ready); no \
-             address of the host. The node puts it through the proxy at its start, \
-             again when a road comes or moves (a Pinggy tunnel's name changes each hour), and each {minutes} \
-             minutes. A node of --quick-tunnel, of the DERP road alone, of --pinggy or of --opentunnel, keeps the record of its \
-             road at {n0} too, unless {env} names another server or off. A client whose ticket's relay does not reach the node within \
-             {after} s (at once, when that relay does not answer /ping) asks for the record, {limit} s at most, \
-             and dials the relay that it names too; podssh ssh then says the node's ticket at that relay. \
-             podssh ssh node://NAME of a member of the net, whose key the net names, asks it once each road with \
-             a ticket failed, and races each road that it names and no ticket gave: the iroh road, the DERP road, \
-             the quick tunnel, and the OpenTunnel road where no OpenTunnel name is given or kept; and the \
-             Pinggy road, last, with the record's address where --pinggy-name gave none, as the record's \
-             signature makes its pin the node's word. A record that the node's key did not \
-             sign is refused; of a record, a DERP ticket of another key, a quick tunnel that is not one name under \
-             trycloudflare.com, a Pinggy address that is not NAME#PIN, or an OpenTunnel name that is not \
-             ROUTE.ID.DOMAIN of {opentunnel} bytes at most, is set aside; and the end-to-end channel checks the node's key on each road either way.",
+             {n0} when its relays are n0's, else the one of {env}, and none with {env}=off. The record names its \
+             home relay in iroh's own _iroh names, which iroh's tools read. In podssh's _podssh names, which they \
+             pass by, it names its DERP home (its ticket, with --derp) and its quick tunnel. It names its Pinggy \
+             tunnel (NAME#PIN, with --pinggy) and its OpenTunnel name (with --opentunnel, once its tunnel is \
+             ready) there too; no address of the host. The node puts it through the proxy at its start, again when \
+             a road comes or moves, and each {minutes} minutes. A Pinggy tunnel's name changes each hour. A node \
+             of --quick-tunnel, of the DERP road alone, of --pinggy or of --opentunnel keeps the record of its \
+             road at {n0} too. It does not where {env} names another server or off. A client whose ticket's relay \
+             does not reach the node within {after} s asks for the record, {limit} s at most. It asks at once when \
+             that relay does not answer /ping. It dials the relay that the record names too; podssh ssh then says \
+             the node's ticket at that relay. podssh ssh node://NAME of a member of the net, whose key the net \
+             names, asks it once each road with a ticket failed. It then races each road that the record names and \
+             no ticket gave: the iroh road, the DERP road, the quick tunnel, and the OpenTunnel road where no \
+             OpenTunnel name is given or kept; and the Pinggy road, last, with the record's address where \
+             --pinggy-name gave none, as the record's signature makes its pin the node's word. A record that the \
+             node's key did not sign is refused; of a record, a DERP ticket of another key is set aside, and so is \
+             a quick tunnel that is not one name under trycloudflare.com. So is a Pinggy address that is not \
+             NAME#PIN, or an OpenTunnel name that is not ROUTE.ID.DOMAIN of {opentunnel} bytes at most; and the \
+             end-to-end channel checks the node's key on each road either way.",
             n0 = pkarr::n0_url(),
             env = pkarr::ENV,
             minutes = pkarr::REPUBLISH.as_secs() / 60,

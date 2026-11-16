@@ -5018,7 +5018,7 @@ of podssh's.
 ## Premise
 
 - `crates/podssh-cli/src/man/notes_pair.rs:172` says "Tailscale's free servers for tailcat", and
-  `crates/podssh-cli/src/man/notes_ssh.rs:235` says "Four words name public forwarders".
+  `crates/podssh-cli/src/man/notes_ssh.rs:241` says "Four words name public forwarders".
 - `docs/carriers.md` (the forward road, item 7 and its "Ruled out"; the reverse road, item 2):
   Tailscale's main fleet serves Tailscale's clients; the public Wisp lists come from web proxies
   that serve a network's users against that network's own filter, with no operator, terms or
@@ -11098,7 +11098,7 @@ through a relay. A feature of the mesh (Q63; Q77, the fallbacks that exist).
 - Read: `pipe` does not refuse a terminal on stdin (no such check in `crates/podssh-cli/src/pipe/`
   at `3bb42ea`); the issue's "as `pipe` does" is not this code's.
 - Read: the exit lends its egress on the node's roads
-  (`crates/podssh-cli/src/man/notes_pair.rs:296-306`); a carrier is one more road for it (T-596).
+  (`crates/podssh-cli/src/man/notes_pair.rs:297-307`); a carrier is one more road for it (T-596).
 
 ## Approach
 
@@ -11452,7 +11452,7 @@ roads, and a carrier must be one of them.
 ## Premise
 
 - Read: the exit goes on the pair's, the iroh, the DERP, the transit and the Piping Server roads
-  (`crates/podssh-cli/src/man/notes_pair.rs:305-306`), and needs the net's role exit, signed by
+  (`crates/podssh-cli/src/man/notes_pair.rs:306-307`), and needs the net's role exit, signed by
   its owner (`:303-304`).
 - Read: `podssh exit NAME --listen` gives SOCKS5, SOCKS4a and HTTP CONNECT on a loopback address
   (`docs/STATUS.md:172`).

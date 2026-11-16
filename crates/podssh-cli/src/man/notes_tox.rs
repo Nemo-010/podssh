@@ -4,27 +4,28 @@
 //! client that reaches it there. Only a build with the feature `tox` has it.
 
 /// The note of `podssh node`, after ZeroTier's road's.
-pub(super) const NODE: &str = "In a build with the feature tox, a node of the pair's road with the \
-     resumable layer and the end-to-end channel (no --plain, no --no-e2e) and a TCP TARGET also waits for \
-     the pair's operators on a TCP relay of the Tox project's public nodes, the last fallback after ZeroTier's: the relay that the SHA-256 of the pair's name picks among those \
-     that podssh's list of services names (none while it names none), or the relay of PODSSH_TOX \
-     (IP:PORT=KEY, c-toxcore's tox-bootstrapd of your own with its TCP relay), by one TCP connection \
-     through HTTPS_PROXY. The node's key on the relay comes from the pair's name and connect token, so its \
-     operators know it with no word between the two ends; each session has a connection with a fresh key \
-     of its own, offered to the client out of band, so that one session's pace never holds another's. The \
-     node serves each with the resumable layer under the keeper of its other roads, and dials the relay \
-     again, after 1 s, doubled to 32 s, when it goes. Its line names the relay, and for a public one says \
-     that it carries the sessions of this road and sees the two ends' keys, the times and the sizes; the \
+pub(super) const NODE: &str = "In a build with the feature tox, a node of the pair's road also waits on a TCP \
+     relay of the Tox project's public nodes. There it waits for the pair's operators, the last fallback after \
+     ZeroTier's. It does so only with a TCP TARGET, the resumable layer and the end-to-end channel (no --plain, \
+     no --no-e2e). The relay is the one that the SHA-256 of the pair's name picks among those that podssh's list \
+     of services names. There is none while the list names none. Or it is the relay of PODSSH_TOX (IP:PORT=KEY, \
+     c-toxcore's tox-bootstrapd of your own with its TCP relay). The node reaches it by one TCP connection \
+     through HTTPS_PROXY. The node's key on the relay comes from the pair's name and connect token. Its \
+     operators thus know it with no word between the two ends; each session has a connection with a fresh key of \
+     its own, offered to the client out of band. This way one session's pace never holds another's. The node \
+     serves each with the resumable layer under the keeper of its other roads. It dials the relay again, after 1 \
+     s, doubled to 32 s, when it goes. Its line names the relay. For a public one, it says that the relay \
+     carries the sessions of this road. That relay sees the two ends' keys, the times and the sizes; the \
      channel keeps the bytes from it. PODSSH_TOX=no turns the road off, and PODSSH_LAST_RESORT=no turns \
      off the public relays.";
 
 /// The note of `podssh ssh`, after ZeroTier's road's.
-pub(super) const SSH: &str = "In a build with the feature tox, node://NAME also races Tox's relay road of \
-     its pair, only once each road before it failed, after ZeroTier's road and before the Serveo \
-     road, the last fallback: a connection with a fresh key to the relay of the \
-     pair (the one that the SHA-256 of its name picks among the Tox project's public relays of podssh's \
-     list of services, or the relay of PODSSH_TOX), a hello to the node's key, which both ends make of the \
-     pair's connect token, again each 2 s, and a routed connection to the key that the node offers. It \
+pub(super) const SSH: &str = "In a build with the feature tox, node://NAME also races Tox's relay road of its pair, \
+     only once each road before it failed. It comes after ZeroTier's road and before the Serveo road, the last \
+     fallback: a connection with a fresh key to the relay of the pair. That relay is the one that the SHA-256 of its \
+     name picks among the Tox project's public relays of podssh's list of services. Or it is the relay of PODSSH_TOX. \
+     Then a hello goes to the node's key, which both ends make of the pair's connect token, again each 2 s. Last comes \
+     a routed connection to the key that the node offers. It \
      waits 30 s at most for the node's answer. The relay passes no more than a short queue, so the stream \
      keeps its own order, window (32 KiB) and resends inside the relay's packets. Before its first link \
      through a public relay, a line says that the Tox project's relay carries the session. PODSSH_TOX=no or \

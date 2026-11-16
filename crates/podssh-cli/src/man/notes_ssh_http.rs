@@ -6,59 +6,60 @@
 
 /// The note of `podssh node NAME TARGET --localhost-run`.
 pub(super) const NODE: &str = "With --localhost-run, the node serves TARGET over the localhost.run road: a \
-     tunnel of HTTP made by ssh -R with no account, at localhost.run where podssh's list of services names it, \
-     or at the server of PODSSH_LOCALHOST_RUN (HOST[:PORT]); with neither, --localhost-run is a configuration \
-     error (78). The node's leg is SSH to the server on port 22, directly or through HTTPS_PROXY's CONNECT, as \
-     the user nokey, with the remote forward of port 80, as ssh -R 80:localhost:PORT nokey@localhost.run asks \
-     it; the server's line that says tunneled names the tunnel's HTTPS name, which the node says in its line \
-     tunnel https://NAME with the command of a client, keeps under NAME in the cache and puts in its record. \
-     The service ends each visitor's TLS and sends its HTTP down the tunnel: a WebSocket at / is a link of the \
-     resumable layer, under the end-to-end channel, which keeps the bytes from the service; it sees the name, \
-     the times and the sizes. A free name changes after a few hours: the node says each new one, and puts it \
-     in the record and the cache in the place of the last. With --relay, the relay's forward and reverse roads \
-     are served behind the tunnel too, as behind a quick tunnel, and TARGET may be left out; each other path \
-     gets 404. Its host key is checked against the one that podssh's list of services names, where it names \
-     one; else any key passes, and the line says so. Anyone may visit the name, so the road needs the \
-     end-to-end channel and a door: --allow, or the members of the net held here when the node's key is one; \
-     never --plain, --no-e2e, --exit, a udp: TARGET, or --opentunnel, --pinggy, --serveo, --ssh-j, \
-     --localtunnel, --bore, --iroh, --derp, --quick-tunnel or --frp (64). A tunnel that ends is opened again, with a wait that doubles from 1 \
-     s to 60 s, and the sessions that the layer keeps go on over the next. The road is served alone: a pair of \
-     NAME is not served beside it, and a line says so. A node that would serve the ssh-j road unasked serves \
-     this one, before the localtunnel and bore roads, when it reached no service, or when it is turned off, and its lines say so and name the third party, which nobody vouches for. PODSSH_LOCALHOST_RUN=no \
-     turns the road off, and so does PODSSH_LAST_RESORT=no, the switch of each last fallback. With \
-     --sandhole, the node serves the same road at Sandhole's public server (demo.sandhole.com.br where podssh's \
-     list of services names it, or the server of PODSSH_SANDHOLE): its leg is SSH on port 443, then 22, as the \
-     user tunnel with a key made for the login alone, never the node's; the server's line that says Starting \
-     HTTPS names a random name under its own, new at each connection. A node that would serve the localhost.run \
-     road unasked serves this one after it when it reached no server; PODSSH_SANDHOLE=no turns it off. With \
-     --srv-us, the node serves the same road at srv.us (where podssh's list of services names it, or the \
-     server of PODSSH_SRV_US): its leg is SSH on port 22 as the user nomatch, logged in with the node's own \
-     key, so srv.us sees that public key, and the remote forward of port 1; srv.us names the tunnel by that \
-     key and port, the same at each connection, and the node says when the name it gave is not the one that a \
-     client derives. With --tunnl-gg, the node serves it at tunnl.gg (where podssh's list of services names \
-     it, or the server of PODSSH_TUNNL_GG): SSH on port 22 with no key, the forward of port 80 and the \
-     command output=json, whose first line names a random name, new at each connection. A node that would \
-     serve the Sandhole road unasked serves srv.us's after it, then tunnl.gg's; PODSSH_SRV_US=no and \
-     PODSSH_TUNNL_GG=no turn them off.";
+     tunnel of HTTP made by ssh -R with no account. It is at localhost.run where podssh's list of services names \
+     it, or at the server of PODSSH_LOCALHOST_RUN (HOST[:PORT]); with neither, --localhost-run is a \
+     configuration error (78). The node's leg is SSH to the server on port 22, directly or through HTTPS_PROXY's \
+     CONNECT, as the user nokey. It asks the remote forward of port 80, as ssh -R 80:localhost:PORT \
+     nokey@localhost.run asks it; the server's line that says tunneled names the tunnel's HTTPS name. The node \
+     says it in its line tunnel https://NAME with the command of a client. It keeps the name under NAME in the \
+     cache and puts it in its record. The service ends each visitor's TLS and sends its HTTP down the tunnel: a \
+     WebSocket at / is a link of the resumable layer, under the end-to-end channel, which keeps the bytes from \
+     the service; it sees the name, the times and the sizes. A free name changes after a few hours: the node \
+     says each new one, and puts it in the record and the cache in the place of the last. With --relay, the \
+     relay's forward and reverse roads are served behind the tunnel too, as behind a quick tunnel, and TARGET \
+     may be left out; each other path gets 404. Its host key is checked against the one that podssh's list of \
+     services names, where it names one; else any key passes, and the line says so. Anyone may visit the name, \
+     so the road needs the end-to-end channel and a door: --allow, or the members of the net held here when the \
+     node's key is one; never --plain, --no-e2e, --exit, a udp: TARGET, or --opentunnel, --pinggy, --serveo, \
+     --ssh-j, --localtunnel, --bore, --iroh, --derp, --quick-tunnel or --frp (64). A tunnel that ends is opened \
+     again, with a wait that doubles from 1 s to 60 s. The sessions that the layer keeps go on over the next. \
+     The road is served alone: a pair of NAME is not served beside it, and a line says so. A node that would \
+     serve the ssh-j road unasked serves this one, before the localtunnel and bore roads. It does so when the \
+     ssh-j road reached no service, or when it is turned off. Its lines say so and name the third party, which \
+     nobody vouches for. PODSSH_LOCALHOST_RUN=no turns the road off, and so does PODSSH_LAST_RESORT=no, the \
+     switch of each last fallback. With --sandhole, the node serves the same road at Sandhole's public server \
+     (demo.sandhole.com.br where podssh's list of services names it, or the server of PODSSH_SANDHOLE): its leg \
+     is SSH on port 443, then 22, as the user tunnel with a key made for the login alone, never the node's; the \
+     server's line that says Starting HTTPS names a random name under its own, new at each connection. A node \
+     that would serve the localhost.run road unasked serves this one after it when it reached no server; \
+     PODSSH_SANDHOLE=no turns it off. With --srv-us, the node serves the same road at srv.us (where podssh's \
+     list of services names it, or the server of PODSSH_SRV_US): its leg is SSH on port 22 as the user nomatch, \
+     with the remote forward of port 1. It logs in with the node's own key, so srv.us sees that public key; \
+     srv.us names the tunnel by that key and port, the same at each connection. The node says when the name it \
+     gave is not the one that a client derives. With --tunnl-gg, the node serves it at tunnl.gg (where podssh's \
+     list of services names it, or the server of PODSSH_TUNNL_GG): SSH on port 22 with no key, the forward of \
+     port 80 and the command output=json. The command's first line names a random name, new at each connection. \
+     A node that would serve the Sandhole road unasked serves srv.us's after it, then tunnl.gg's; \
+     PODSSH_SRV_US=no and PODSSH_TUNNL_GG=no turn them off.";
 
 /// The note of `podssh ssh node://NAME` on the localhost.run road.
 pub(super) const SSH: &str = "node://NAME with --tunnel-url https://HOST races the localhost.run road too, \
-     250 ms after the road before it: a WebSocket at / of HOST, the name that the node prints, on port 443 \
-     through HTTPS_PROXY, whose TLS this host's roots verify, under the resumable layer and the end-to-end \
-     channel, which checks the node's key, so --no-e2e leaves the road out (64 with --tunnel-url). The name is \
-     kept under NAME in the cache; a later run that gives none dials it, or the name of the node's record for a \
-     member that the net names by its key, last, once each road before it failed, the ssh-j road's too, and \
-     before the localtunnel and bore roads. \
-     Before its first link, a line says that localhost.run, a third party that nobody vouches for, carries the \
-     session over HTTPS that it ends, and that the end-to-end channel keeps its bytes. A free name changes \
+     250 ms after the road before it: a WebSocket at / of HOST, the name that the node prints, on port 443 through \
+     HTTPS_PROXY, whose TLS this host's roots verify. It runs under the resumable layer and the end-to-end channel, \
+     which checks the node's key. So --no-e2e leaves the road out (64 with --tunnel-url). The name is \
+     kept under NAME in the cache; a later run that gives none dials it, or the name of the node's record for a member \
+     that the net names by its key. It dials it last, once each road before it failed, the ssh-j road's too. That \
+     comes before the localtunnel and bore roads. \
+     Before its first link, a line says that localhost.run, a third party that nobody vouches for, carries the session \
+     over HTTPS that it ends. The line adds that the end-to-end channel keeps its bytes. A free name changes \
      after a few hours. podssh ping measures it only with --tunnel-url. PODSSH_LOCALHOST_RUN=no or \
      PODSSH_LAST_RESORT=no turns the road off. A name under Sandhole's tunnels' zone is the Sandhole road's: \
      its line names Sandhole, and PODSSH_SANDHOLE=no turns it off; so for srv.us's (PODSSH_SRV_US) and \
-     tunnl.gg's (PODSSH_TUNNL_GG). With no name at all, the srv.us road derives the node's name there from \
-     its whole key (--node-key, the net's, or the pins of NAME), as srv.us does, and races it last, after the \
-     names given, kept or recorded; a fingerprint alone derives none. Last of all, once each road before it \
-     failed, the Bare hop reaches the same name through a Bare v3 node (the one of podssh's list of services, \
-     or of PODSSH_BARE), so that a proxy sees the node's name alone; its line names the node, which sees the \
+     tunnl.gg's (PODSSH_TUNNL_GG). With no name at all, the srv.us road derives the node's name there from its whole \
+     key, as srv.us does. That key is --node-key, the net's, or the pins of NAME. It races that name last, after the \
+     names given, kept or recorded; a fingerprint alone derives none. Last of all, once each road before it failed, \
+     the Bare hop reaches the same name through a Bare v3 node. That node is the one of podssh's list of services, or \
+     of PODSSH_BARE. So a proxy sees the node's name alone; its line names the node, which sees the \
      tunnel's name and which nobody vouches for. PODSSH_BARE=no turns it off.";
 
 #[cfg(test)]

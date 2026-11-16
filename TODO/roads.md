@@ -373,7 +373,7 @@ sandbox can block what iroh needs, so the fallback is necessary
 6. With `-v`, print the road that won and its time.
 7. Each resume of T-153 runs the same race.
 8. Docs: the rule of the race in `docs/design.md` section 2, and the notes of
-   `ssh` in the manual (`crates/podssh-cli/src/man/notes_ssh.rs:4-498` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-160`).
+   `ssh` in the manual (`crates/podssh-cli/src/man/notes_ssh.rs:4-490` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`).
 
 ## Decision
 
@@ -513,7 +513,7 @@ in iroh's source at the pinned version.
    relay.
 7. Add the variable to `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-273`),
    the flag to the flag table, and the default to the relay section of the
-   manual (`crates/podssh-cli/src/man/facts.rs:301-456`). The tests compare
+   manual (`crates/podssh-cli/src/man/facts.rs:301-455`). The tests compare
    `VARIABLES` with the source in both directions
    (`crates/podssh-cli/src/man/facts.rs:44-45`), so a variable that only the
    feature reads is in the manual only with the feature.
@@ -8514,7 +8514,7 @@ puts the fallback in its `ok` column without a probe.
   measure (`crates/podssh-cli/src/doctor/report.rs:107-109`).
 - Read: the operator's rulings Q56 and Q65 (`docs/decisions.md`) let the binary try the forwarders,
   and the Wisp demo server last, "when each relay host fails", unasked (T-370, T-438); since T-438
-  there are four: mudlet, ssheasy, mudix and wisp (`crates/podssh-cli/src/man/notes_ssh.rs:242-253`).
+  there are four: mudlet, ssheasy, mudix and wisp (`crates/podssh-cli/src/man/notes_ssh.rs:247-259`).
   A default of off is a change of that ruling.
 - Not measured here: #106's times. Inferred from the code: with the direct road's dial refused at
   once by the tester's proxy, the 20.8 s are the forwarders' own dials of a dead address.

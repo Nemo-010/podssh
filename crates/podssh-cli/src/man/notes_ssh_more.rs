@@ -2,10 +2,25 @@
 //! that file.
 
 pub(super) const MORE: &[&str] = &[
+    "-R [BIND:]PORT:HOST:HOSTPORT asks the server to listen; each connection that it takes reaches \
+     HOST:HOSTPORT from this host, as one more outbound connection, through HTTPS_PROXY when it is set, \
+     within 20 s. A port of 0 lets the server choose, and podssh prints it. A forward that the server \
+     refuses is a warning; with -o ExitOnForwardFailure=yes it ends the run (exit 255). -R takes \
+     OpenSSH's other forms too: a socket path on the server (-R SERVERPATH:HOST:HOSTPORT), a socket \
+     on this host as the target (-R [BIND:]PORT:LOCALPATH, -R SERVERPATH:LOCALPATH; on Unix), and a SOCKS proxy that \
+     the server listens for and podssh serves (-R [BIND:]PORT, or -R SERVERPATH alone). Its targets are dialed from \
+     this host, the answer after the dial.",
+    "--persist -N keeps the forwards: no tmux runs, and after a loss, the server's own close too, podssh \
+     connects again and asks for each -R again; -L and -D keep their listeners. A forward refused after a loss is \
+     asked again for 2 minutes, as the server may hold its port for the old connection. Then it is refused as on the \
+     first connection (see ExitOnForwardFailure); a port that the server chose may \
+     change, and the new one is printed. The logins after the first ask nothing, unless \
+     SSH_ASKPASS_REQUIRE is force and SSH_ASKPASS names a program to ask. With no forward, or \
+     --persist-name, -N with --persist is refused (exit 64).",
     "~C, in a session with a pty, opens the command line of OpenSSH, ssh>, on the terminal. -L, -D or -R \
-     with a spec of the command line adds that forward to the running session: the listeners of -L and \
-     -D are made as those of the command line are (the probe, -g, PODSSH_LISTEN), and -R asks the server \
-     and waits 20 s at most for its answer. -KL, -KD or -KR with [BIND:]PORT, or a socket path for -KL \
+     with a spec of the command line adds that forward to the running session: the listeners of -L and -D are made as \
+     those of the command line are (the probe, -g, PODSSH_LISTEN). -R asks the server and waits 20 s at most for its \
+     answer. -KL, -KD or -KR with [BIND:]PORT, or a socket path for -KL \
      and -KD, stops one: a closed listener takes no new connection, and the connections that it took go \
      on; the server lets the port of -R go, and a channel for that port is refused from then on. help or \
      ? lists the commands; an empty line, Ctrl-C and Ctrl-D do nothing, and a line that starts with ! \
@@ -13,35 +28,35 @@ pub(super) const MORE: &[&str] = &[
      forwards that ~C adds last as long as the connection, and those that it stops stay stopped: a new \
      connection of --persist asks only for the forwards of the command line that ~C did not stop. A \
      session through a control master has no ~C, as with OpenSSH: the key goes to the server as typed.",
-    "--attach NAME DEST joins the shell that the far end keeps as NAME, and --attach DEST with no other \
-     word lists the shells kept there, one on each line, then exits 0. A far end that keeps shells says \
+    "--attach NAME DEST joins the shell that the far end keeps as NAME. --attach DEST with no other word lists the \
+     shells kept there, one on each line, then exits 0. A far end that keeps shells says \
      so in the resumable layer of node://NAME; a podssh node in front of an SSH server keeps none, and \
-     then --attach ends with 255 before a session opens. In a session with a pty there, ~d asks the far \
-     end to keep the shell, prints the name that it keeps it as, and exits 0; elsewhere ~d is sent as \
+     then --attach ends with 255 before a session opens. In a session with a pty there, ~d asks the far end to keep \
+     the shell. It prints the name that it keeps it as, and exits 0; elsewhere ~d is sent as \
      typed. The far end gives a shell to one client at a time: --take takes it from the client that has \
      it, whose session ends. It refuses an attach from inside the shell itself: it puts PODSSH_SHELL_ID \
      in each shell's environment, and podssh sends that value. A refusal of the far end comes as its \
      words on stderr and its exit status. Another destination, a command, -N, -W, -s, -T or --persist \
      with --attach is refused (exit 64). Against a standard sshd, --persist keeps the shell in tmux.",
-    "Where a first relay host offers it in its /relays.json (podssh relay serve does), read at each run \
-     with PODSSH_RELAY_LAYER=yes, kept for a day when it is unset (see ENVIRONMENT), podssh ssh \
-     carries the session to a standard sshd in the resumable layer at the relay \
-    : the relay keeps its connection to the server while this host's link is lost, and a new link \
-     to the same relay, or to the process that its /relays.json names as forward.host, resumes the \
-     session where it was, for as long as the relay keeps it, 10 minutes by default; one line tells of \
-     each loss and each resume, and SSH's keepalives are off unless ServerAliveInterval is given, as the \
-     layer's heartbeat finds a dead link. -4 and -6 hold for each link. A host that offers none, that has \
-     no room for a new resumable session, or whose first link fails for a reason that another host may \
-     not share, takes the contract's road with one line, as podssh proxy does (for a host that offers \
-     none, with PODSSH_RELAY_LAYER=yes alone); so does --no-resume. The \
+    "A first relay host may offer the resumable layer in its /relays.json, as podssh relay serve does. podssh reads \
+     that offer at each run with PODSSH_RELAY_LAYER=yes, and keeps it for a day when it is unset (see ENVIRONMENT). \
+     Where it is offered, podssh ssh carries the session to a standard sshd in the resumable layer at the relay: the \
+     relay keeps its connection to the server while this host's link is lost. A new link resumes the session where it \
+     was, for as long as the relay keeps it, 10 minutes by default. The new link goes to the same relay, or to the \
+     process that its /relays.json names as forward.host; one line tells of each loss and \
+     each resume. SSH's keepalives are off unless ServerAliveInterval is given, as the layer's heartbeat finds a dead \
+     link. -4 and -6 hold for each link. A host that offers none takes the contract's road, as podssh proxy does, with \
+     one line under PODSSH_RELAY_LAYER=yes alone. So does a host that has no room for a new resumable session, with \
+     one line. So does a host whose first link fails for a reason that another host may not share; so does \
+     --no-resume. The \
      copies, run, each and job log in the same way.",
     "-A forwards the agent, off by default as in OpenSSH; -a turns it off, and the last of the two wins, \
-     over the keyword ForwardAgent. podssh asks for it on the session, never on a jump host, and joins each \
-     agent channel that the server opens to the agent that podssh logs in with (IdentityAgent, else \
-     SSH_AUTH_SOCK); ForwardAgent with a path or $NAME names another agent. While the session lasts, the \
-     server, and root on it, can use each key of the agent, though it cannot read one. podssh binds the \
-     agent to the server's host key first, as OpenSSH does (session-bind@openssh.com), so an OpenSSH agent \
-     keeps from the server each key that ssh-add limits to other hosts; an agent that refuses the bind \
+     over the keyword ForwardAgent. podssh asks for it on the session, never on a jump host. It joins each agent \
+     channel that the server opens to the agent that podssh logs in with (IdentityAgent, else SSH_AUTH_SOCK); \
+     ForwardAgent with a path or $NAME names another agent. While the session lasts, the \
+     server, and root on it, can use each key of the agent, though it cannot read one. podssh binds the agent to the \
+     server's host key first, as OpenSSH does (session-bind@openssh.com). So an OpenSSH agent keeps from the server \
+     each key that ssh-add limits to other hosts; an agent that refuses the bind \
      serves unbound. An agent channel that a server opens with no -A is refused, with a warning.",
     "-X and -Y forward X11 to the display of DISPLAY; -x turns it off, and the last of the three wins. The \
      server is given a spoofed cookie, and podssh puts the real one in each X11 channel's first packet. -Y \
@@ -69,10 +84,10 @@ pub(super) const MORE: &[&str] = &[
      adds to it, with - takes from it, and with ^ puts its names first. A name that podssh does not speak \
      is left out, and -v says so; a list that leaves nothing is refused before anything connects (exit 64, \
      or 78 for a line of a file). The host key algorithms that known_hosts records for the host go first \
-     within the list. RequiredRSASize is the least RSA key: a smaller key of the user is not offered, and a \
-     smaller host key, or key of the CA of a host certificate, ends the connection (exit 255). The other \
-     keywords of a restriction, which podssh does not apply, such as VerifyHostKeyDNS and BindAddress, get \
-     one note when you give them, none for the system's ssh_config and none with -q; the keywords that \
+     within the list. RequiredRSASize is the least RSA key: a smaller key of the user is not offered. A smaller host \
+     key, or key of the CA of a host certificate, ends the connection (exit 255). The other keywords of a restriction, \
+     which podssh does not apply, such as VerifyHostKeyDNS and BindAddress, get one note when you give them. They get \
+     none for the system's ssh_config and none with -q; the keywords that \
      change nothing get a note at -v that names their place.",
     "Paths in -i and in the IdentityFile, UserKnownHostsFile, GlobalKnownHostsFile, IdentityAgent and \
      ForwardAgent keywords take the tokens of OpenSSH: %% %C %d %h %i %j %k %L %l %n %p %r %u, with \
@@ -89,16 +104,16 @@ pub(super) const MORE: &[&str] = &[
      on a console of Windows too. A handshake that does not finish names what came: no byte, a line of \
      another service, or the server's version line and the last message of the key exchange each way; \
      through a node, also the bytes that its resumable layer and its end-to-end channel carried each way. \
-     10 s in (through a node, 10 s after its layer opened), a handshake that has not finished says where it \
-     is, once, and waits on; a question that nobody can see says that it waits, and its remedy.",
+     10 s in (through a node, 10 s after its layer opened), a handshake that has not finished says where it is. It \
+     says so once, and waits on; a question that nobody can see says that it waits, and its remedy.",
     "The version line that podssh sends is SSH-2.0-podssh_VERSION, each dash of the version written as an \
      underscore, as RFC 4253 allows none there: podssh names its own software, as each client does. A \
      server or a filter that lets in only the version lines of OpenSSH refuses it. podssh does not send \
-     OpenSSH's line: a server reads the line to choose the quirks that it expects of a client (OpenSSH's \
-     own server so treats its older versions), and podssh is not OpenSSH.",
+     OpenSSH's line: a server reads the line to choose the quirks that it expects of a client (OpenSSH's own server so \
+     treats its older versions). podssh is not OpenSSH.",
     "Each later hop of -J is reached on a direct-tcpip channel of the hop before it, whose open has that \
-     hop's ConnectTimeout. A hop that never answers the open, and a channel on which no byte of an SSH \
-     server came within it, or that closed with none, are named so: the hop, and the target of its \
+     hop's ConnectTimeout. A hop that never answers the open is named so. A channel on which no byte of an SSH server \
+     came within it, or that closed with none, is named so too: the hop, and the target of its \
      channel, never a handshake of the destination. With -v, podssh says the open, and each 10 s while \
      nothing came.",
     "podssh sends keepalives (ServerAliveInterval), so the relay does not close an idle session. To a \
@@ -106,14 +121,14 @@ pub(super) const MORE: &[&str] = &[
      ServerAliveInterval is set: a keepalive with no answer would end a session that the layer carries \
      onto a new link. Through the relay a session carries 64 MiB at most, both ways together: once it \
      has carried 60 MiB (less under a relay's smaller limits, or PODSSH_SESSION_BUDGET), podssh says so \
-     once (with -q, nothing); podssh cp copies more on new sessions. With keepalives off, or slower than \
-     the relay's idle cut (180 s with no payload), podssh warns once 30 s before the cut, in the window's \
-     title where the notice of a silent far end shows, else as a line on stderr, and again only after a \
-     payload crossed; --idle-warn SECONDS sets the lead, and 0, or -q, turns it off. The warning sends \
+     once (with -q, nothing); podssh cp copies more on new sessions. With keepalives off, or slower than the relay's \
+     idle cut (180 s with no payload), podssh warns once 30 s before the cut. The warning shows in the window's title \
+     where the notice of a silent far end shows, else as a line on stderr. It comes again only after a payload \
+     crossed; --idle-warn SECONDS sets the lead, and 0, or -q, turns it off. The warning sends \
      nothing. With --persist each run that crosses the relay warns too, and adds that --persist attaches \
      again after the cut; --upgrade warns while its session crosses the relay.",
-    "podssh reads options before and after the host, as OpenSSH does, so a host that a script did not \
-     write can be read as a flag. Put -- before it: podssh ssh -- \"$HOST\" uptime. A host, or a \
+    "podssh reads options before and after the host, as OpenSSH does. So a host that a script did not write can be \
+     read as a flag. Put -- before it: podssh ssh -- \"$HOST\" uptime. A host, or a \
      -o HostName=VALUE, that starts with - is refused (exit 64), as OpenSSH refuses it.",
     "An IPv6 address needs brackets only before a port: user@2001:db8::1 is port 22, and \
      user@[2001:db8::1]:2222 or -p 2222 gives another port. -4 or -6 with an address of the other family \
@@ -122,69 +137,69 @@ pub(super) const MORE: &[&str] = &[
      sending anything). podssh then tries the direct road once, as after a relay that failed, also under \
      -6, whose dial takes the name's IPv6 addresses alone; with a relay named, or PODSSH_DIRECT=no, it \
      ends, and the note names the roads that carry IPv6: a relay of yours on a host with IPv6 (podssh \
-     relay serve, then --relay-host), a node with IPv6 egress (-J node://NAME), or warp://[ADDR]. podssh \
-     relay serve dials an IPv6 target where its host routes IPv6 out, and refuses it before the upgrade \
-     where it does not (502, this relay's host has no IPv6 route out), so that the next relay host is \
-     tried at once. --direct needs no relay.",
+     relay serve, then --relay-host), a node with IPv6 egress (-J node://NAME), or warp://[ADDR]. podssh relay serve \
+     dials an IPv6 target where its host routes IPv6 out. Where it does not, it refuses the target before the upgrade \
+     (502, this relay's host has no IPv6 route out). So the next relay host is tried at once. --direct needs no \
+     relay.",
     "--result-file FILE writes one JSON object to FILE at the end of each run, also of one that failed \
-     before it connected: schema, exit (the code that podssh exits with), status (the remote exit status, \
-     or null), signal (its name and core_dumped, or null), end (status, signal, no-status, lost, escaped, \
-     terminated, detached, interrupted (Ctrl-C with no pty, and no end of the command), failed, or shared \
-     through a control master, which tells the exit code alone; null with no \
-     session, as with -W), failure (connect, host-key, auth, forward, relay, session, usage, config or \
-     not-built, or null), bytes (stdin, stdout and stderr, as they passed; null through a control master, \
+     before it connected: schema; exit (the code that podssh exits with); status (the remote exit status, or null); \
+     signal (its name and core_dumped, or null); end (status, signal, no-status, lost, escaped, terminated, detached, \
+     interrupted, failed or shared; interrupted is Ctrl-C with no pty and no end of the command; shared is a run \
+     through a control master, which tells the exit code alone; null with no session, as with -W); failure (connect, \
+     host-key, auth, forward, relay, session, usage, config or not-built, or null); bytes (stdin, stdout and stderr, \
+     as they passed; null through a control master, \
      which carries them), duration_ms, and relay (its host, close_code and reason, or null with no relay). \
      A link lost after the remote exit status and before the end of the output ends lost, with exit 255 \
      and the status kept. stdout and stderr stay as they are; the command's output never goes into the \
      file. A new file is made \
-     for its owner alone; - is refused (exit 64). No file is written after a flag that podssh does not know, \
-     which ends it before it reads the others, nor when a signal kills podssh: only a session on a terminal \
-     ends at SIGTERM or SIGHUP, as terminated, and one with no pty at Ctrl-C, by the command's end or as \
+     for its owner alone; - is refused (exit 64). No file is written after a flag that podssh does not know, which \
+     ends it before it reads the others. Nor is one written when a signal kills podssh: only a session on a terminal \
+     ends at SIGTERM or SIGHUP, as terminated. One with no pty ends at Ctrl-C, by the command's end or as \
      interrupted.",
-    "--install NAME, with -N, --persist and a forward, makes the tunnel a service of this user, which \
-     starts it again whenever it ends, as podssh node --install makes a node's, by the same ways: a user \
+    "--install NAME, with -N, --persist and a forward, makes the tunnel a service of this user. The service starts it \
+     again whenever it ends, as podssh node --install makes a node's, by the same ways: a user \
      unit of systemd (podssh-ssh-NAME.service), a LaunchAgent (dev.podssh.ssh.NAME), two lines of the \
      crontab, or a task of Windows. A server that only the tunnel reaches is locked out while it is down. \
-     The service runs this program with the words of this command line but --install NAME, in this \
-     directory, so that each relative path means what it meant; after ssh come BatchMode=yes, \
-     ForkAfterAuthentication=no, ControlPath=none and ExitOnForwardFailure=yes, each after -o, which win \
-     over the rest and over ssh_config, as nobody answers a prompt there, a run in the background or \
-     through a master would leave the service, and a refused forward serves nothing until a new start; \
-     then --env-file with ssh-NAME.env, the private file of the variables that it reads, with no token, \
-     and --persist-forever, so that an outage of the relay never ends the tunnel between two starts. \
+     The service runs this program with the words of this command line but --install NAME. It runs in this directory, \
+     so that each relative path means what it meant; after ssh come BatchMode=yes, ForkAfterAuthentication=no, \
+     ControlPath=none and ExitOnForwardFailure=yes, each after -o. They win over the rest and over ssh_config. Nobody \
+     answers a prompt there, and a run in the background or through a master would leave the service. A refused \
+     forward serves nothing until a new start; \
+     then --env-file with ssh-NAME.env, the private file of the variables that it reads, with no token. Last comes \
+     --persist-forever, so that an outage of the relay never ends the tunnel between two starts. \
      The login needs a key with no passphrase, and the host key in known_hosts: run the same command \
      once in the foreground first. The command line is resolved first: a shell, a command, -W, -f, -G, \
      -O, --attach, --upgrade or --snippet is refused (64). So is a tunnel without --persist, or with no \
      forward. --uninstall NAME removes what --install NAME wrote, and nothing else. --env-file FILE \
      sets the variables of FILE first and holds FILE.lock while the run lasts, as for podssh node: a \
      second start of the same service ends at once with 0.",
-    "A key's echo while a download runs: for 2 s after a key on a session with a pty, podssh grants each \
-     channel of the connection (the session's own, a forward of -L, -R or -D, SFTP, a command, the \
-     agent's) a window of what the path moves in its least round trip and 40 ms more, and a third more, \
-     as it tops a window up once a quarter of it is used; 16 KiB at the least, so that a key waits \
+    "A key's echo while a download runs: for 2 s after a key on a session with a pty, podssh grants each channel of \
+     the connection a small window. The channels are the session's own, a forward of -L, -R or -D, SFTP, a command, \
+     and the agent's. The window is what the path moves in its least round trip and 40 ms more. A third more is added, \
+     as podssh tops a window up once a quarter of it is used; 16 KiB at the least, so that a key waits \
      behind little of the download; idle, 200 ms more. Each channel takes messages of 8 KiB at most \
-     from the server, so that a slow path's window holds a few of them. podssh measures the rate and the \
-     round trip on the connection itself, end to end, through any relay or proxy and against any sshd, \
-     and lets the windows drain at the first key and each 10 s of a download, until a round trip is \
-     timed across an empty queue (10 s at most), to time the path and not its queue. Until it has \
+     from the server, so that a slow path's window holds a few of them. podssh measures the rate and the round trip on \
+     the connection itself, end to end, through any relay or proxy and against any sshd. To time the path and not its \
+     queue, it lets the windows drain at the first key and each 10 s of a download. They drain until a round trip is \
+     timed across an empty queue (10 s at most). Until it has \
      measured them, a channel has the window of before, 512 KiB, topped up once half of it is used. \
-     Where nobody types, a window grows by the same rule, up to the cap of its road, as a window is \
-     what a road may hold for a slow reader: 16 MiB with --direct, on \
-     the iroh road and at podssh's relay role (podssh relay serve), 1.5 MiB through the default relay, \
-     768 KiB on a node's pair road, 512 KiB on each other; the channels that carry bulk share it, each \
+     Where nobody types, a window grows by the same rule, up to the cap of its road. A window is what a road may hold \
+     for a slow reader: 16 MiB with --direct, on the iroh road and at podssh's relay role (podssh relay serve); 1.5 \
+     MiB through the default relay; 768 KiB on a node's pair road; 512 KiB on each other; the channels that carry bulk \
+     share it, each \
      with 512 KiB at least, and the requests in flight of cp, scp and sftp follow it. podssh's own \
      uploads (cp, sftp, and the local side of each forward) wait while a key waits for its echo, a \
      second at most. Each TCP socket that podssh dials keeps 16 KiB unsent at most, where the system \
      takes that option (Linux and macOS).",
     "upterm://SESSION@HOST[:PORT] reaches a session of upterm's host (owenthereal/upterm) as its guests \
-     reach it: a WebSocket to the uptermd at HOST, port 443 by default, through HTTPS_PROXY when one is \
-     set, its TLS checked with podssh's trust, then SSH inside it as the user SESSION, the session's ID \
-     that its host shows, with your keys, which uptermd checks against the host's list. uptermd's host key \
+     reach it: a WebSocket to the uptermd at HOST, port 443 by default, through HTTPS_PROXY when one is set, its TLS \
+     checked with podssh's trust. Then SSH runs inside it as the user SESSION, the session's ID that its host shows. \
+     It logs in with your keys, which uptermd checks against the host's list. uptermd's host key \
      is a certificate: known_hosts checks it under the @cert-authority line that upterm gives for its \
      server, for the name [HOST]:443, as upterm's own client keys it. As the destination it is the \
-     session, the host's shared terminal. As the first hop of -J it carries the next hop in a direct-tcpip \
-     channel to the host's loopback, where upterm host lets a guest forward there (its forwarding allowed \
-     to loopback), so that the host's own sshd checks you end to end: podssh ssh -J \
+     session, the host's shared terminal. As the first hop of -J it carries the next hop in a direct-tcpip channel to \
+     the host's loopback. upterm host lets a guest forward there (its forwarding allowed to loopback). So the host's \
+     own sshd checks you end to end: podssh ssh -J \
      upterm://SESSION@HOST user@127.0.0.1. A session that uptermd knows not is refused in its words (ssh's \
      exit 255, as for any first hop not reached; podssh proxy's 77), and a host that lets no forward refuses \
      the channel in its own. podssh names no uptermd: give \

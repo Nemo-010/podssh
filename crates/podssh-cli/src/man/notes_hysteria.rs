@@ -2,17 +2,17 @@
 //! ssh`, `podssh proxy` and `podssh doctor`, and its file in FILES.
 
 pub const SSH: &str = "--hysteria FILE reaches the first hop through Hysteria 2 servers that you run \
-     (apernet/hysteria), in place of the relay, where UDP passes: a server of \
-     QUIC that takes a credential in one HTTP/3 request, dials the target named on a stream of its own, and \
-     to one who has no credential is a web server. FILE must be yours and closed to others (chmod 600), as a \
-     pair file is: each line is a share link as Hysteria's clients give it, hysteria2://AUTH@HOST[:PORT]/ or \
-     hy2:// (443 when no port), then ?sni=, pinSHA256=, insecure=, obfs=salamander and obfs-password=, joined \
-     by &, and #NAME; # starts a comment. AUTH is the server's password, or USER:PASSWORD for its userpass. \
-     TLS 1.3 is checked for sni (else HOST) with podssh's trust (--ca-file), or, with pinSHA256 (64 hex \
-     digits, as Hysteria prints them), the server's own certificate alone passes, by the SHA-256 of its DER. \
-     obfs=salamander wraps each datagram in Salamander, with its password of 4 bytes or more. insecure=1 with \
-     no pinSHA256, several ports (port hopping), obfs=gecko, ech and a realm (hysteria2+realm://) are refused \
-     by their names (78), and so is a line that cannot be read, by its number and never its text. No HTTP \
+     (apernet/hysteria), in place of the relay, where UDP passes: a server of QUIC that takes a credential in one \
+     HTTP/3 request and dials the target named on a stream of its own. To one who has no credential it is a web \
+     server. FILE must be yours and closed to others (chmod 600), as a \
+     pair file is: each line is a share link as Hysteria's clients give it, hysteria2://AUTH@HOST[:PORT]/ or hy2:// \
+     (443 when no port). Then come ?sni=, pinSHA256=, insecure=, obfs=salamander and obfs-password=, joined by &, and \
+     #NAME; # starts a comment. AUTH is the server's password, or USER:PASSWORD for its userpass. \
+     TLS 1.3 is checked for sni (else HOST) with podssh's trust (--ca-file). With pinSHA256 (64 hex digits, as \
+     Hysteria prints them), the server's own certificate alone passes, by the SHA-256 of its DER. \
+     obfs=salamander wraps each datagram in Salamander, with its password of 4 bytes or more. insecure=1 with no \
+     pinSHA256, several ports (port hopping), obfs=gecko, ech and a realm (hysteria2+realm://) are refused by their \
+     names (78). So is a line that cannot be read, by its number and never its text. No HTTP \
      proxy carries UDP: a server whose host has a proxy of HTTPS_PROXY is not tried (69), and NO_PROXY with \
      its host lets UDP go straight to it. The servers are tried in the order of the file, each after a probe: one QUIC packet of a reserved version to the server's port, sent three times \
      within 1.5 s, which a server of QUIC answers at once. With no answer, the road ends with a line that \
@@ -21,21 +21,21 @@ pub const SSH: &str = "--hysteria FILE reaches the first hop through Hysteria 2 
      does not reach); one that could not reach the target says so in its words; each gives way to the next. \
      The session's QUIC keeps a keepalive each 10 s and ends after 30 s of silence. The host key of SSH \
      protects the session, as on each road: the server sees the target's name and SSH's encrypted bytes. A \
-     run has one road: --relay-host, --relay-failover, --direct, --forwarder, --shadowsocks, --via, --vless, \
-     --trojan, --wstunnel, --chisel, -4, -6, and a destination with a road of its own cannot go with it (64).";
+     run has one road: --relay-host, --relay-failover, --direct, --forwarder, --shadowsocks, --via, --vless, --trojan, \
+     --wstunnel, --chisel, -4 and -6 cannot go with it (64). Nor can a destination with a road of its own.";
 
-pub const PROXY: &str = "podssh proxy --hysteria FILE carries the pipe through the Hysteria 2 servers of FILE, \
-     in order, with no relay, where UDP passes, as podssh ssh does (see its notes); the flag wins over \
-     PODSSH_CHISEL, PODSSH_WSTUNNEL and PODSSH_VIA. The server answers once it reached the target, so a pipe \
-     whose client speaks first waits for no silence. The end of stdin closes the stream's way up, which the \
-     server passes on to the target.";
+pub const PROXY: &str = "podssh proxy --hysteria FILE carries the pipe through the Hysteria 2 servers of FILE, in \
+     order, where UDP passes. It takes no relay, as podssh ssh does (see its notes); the flag wins over PODSSH_CHISEL, \
+     PODSSH_WSTUNNEL and PODSSH_VIA. The server answers once it reached the target, so a pipe whose client speaks \
+     first waits for no silence. The end of stdin closes the stream's way up, which the server passes on to the \
+     target.";
 
-pub const DOCTOR: &str = "With --hysteria FILE, the section hysteria gives a line for each server of FILE, \
-     after the roads over TCP that the run names: whether UDP reaches its port, the address that answered \
-     the probe and its round trip, and the time of the session through it, then a session to github.com \
-     port 22 through it, whose host key must be one that GitHub publishes. Where the probe gets no answer, \
-     the line says that UDP does not pass here, with no wait for QUIC; a server whose host has a proxy of \
-     HTTPS_PROXY, which carries no UDP, is not tried, and its line says so.";
+pub const DOCTOR: &str = "With --hysteria FILE, the section hysteria gives a line for each server of FILE, after the \
+     roads over TCP that the run names: whether UDP reaches its port, the address that answered the probe and its \
+     round trip, and the time of the session through it. Then the section opens a session through it to github.com \
+     port 22, whose host key must be one that GitHub publishes. Where the probe gets no answer, the line says that UDP \
+     does not pass here, with no wait for QUIC; a server whose host has a proxy of HTTPS_PROXY, which carries no UDP, \
+     is not tried, and its line says so.";
 
 /// The file of `--hysteria` in FILES.
 pub fn file() -> (Vec<String>, String) {

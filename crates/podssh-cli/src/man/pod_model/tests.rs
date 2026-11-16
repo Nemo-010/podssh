@@ -56,37 +56,11 @@ fn the_model_keeps_its_own_rules() {
     assert_none(check::model(&manual()));
 }
 
-/// The sentences over 25 words that the manual still has, as the rule of
-/// `pod-manual` counts them, under any set of features: a ratchet while they
-/// are rewritten. A long sentence not on the list fails, and so does each
-/// other finding (a work id, a fault of a character). Take a sentence off
-/// the list as it is rewritten; at none, assert none.
-const LONG_SENTENCES: &str = include_str!("long_sentences.txt");
-
-/// The sentence that a finding of length quotes.
-fn quoted(what: &str) -> &str {
-    let start = what.find(": \"").map_or(0, |at| at + 3);
-    what[start..].strip_suffix('"').unwrap_or(&what[start..])
-}
-
+/// Each string of the manual and the help keeps the text rules: no
+/// sentence over 25 words, no work id, no fault of a character.
 #[test]
 fn each_string_keeps_the_text_rules() {
-    let known: std::collections::HashSet<&str> = LONG_SENTENCES.lines().collect();
-    let (long, other): (Vec<_>, Vec<_>) =
-        check::texts(&manual()).into_iter().partition(|f| f.what.contains("words (at most 25)"));
-    assert_none(other);
-    let new: Vec<String> = long.iter().filter(|f| !known.contains(quoted(&f.what))).map(ToString::to_string).collect();
-    assert!(new.is_empty(), "long sentences that are not on the list of those left:\n{}", new.join("\n"));
-}
-
-/// The ratchet reads what a finding quotes, so a list that never matched
-/// would let each long sentence through.
-#[test]
-fn the_list_of_long_sentences_matches_the_findings() {
-    let known: std::collections::HashSet<&str> = LONG_SENTENCES.lines().collect();
-    let long: Vec<_> = check::texts(&manual()).into_iter().filter(|f| f.what.contains("words (at most 25)")).collect();
-    assert!(long.iter().any(|f| known.contains(quoted(&f.what))), "no finding is on the list");
-    assert_eq!(quoted("a sentence of 26 words (at most 25): \"a b.\""), "a b.");
+    assert_none(check::texts(&manual()));
 }
 
 #[test]

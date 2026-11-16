@@ -6,41 +6,42 @@
 
 /// The note of `podssh node NAME [TARGET] --localtunnel`.
 pub(super) const NODE: &str = "With --localtunnel, the node serves TARGET over the localtunnel road: \
-     localtunnel's public server, with no account, where podssh's list of services names it, or the server of \
+     localtunnel's public server, with no account, where podssh's list of services names it. Or the server of \
      PODSSH_LOCALTUNNEL (an https:// URL, or http:// on this host's loopback); with neither, --localtunnel is a \
      configuration error (78). The node asks the server over HTTPS, through HTTPS_PROXY, for a tunnel under a \
-     name that its key gives (podssh-, then 16 hex digits), then keeps the TCP connections that the server \
-     names, up to 10, to a port that the server's system chose, directly or through HTTPS_PROXY's CONNECT: a \
-     proxy that lets CONNECT reach port 443 alone refuses that port, so the node needs an egress that reaches \
-     it, while its clients need port 443 alone. A connection that ends is opened again at once; three refused \
-     dials in a row mean the server forgot the tunnel, and the node asks for it again, with a wait that doubles \
-     from 1 s to 60 s. The tunnel's URL is the one line on stdout. Each visitor's WebSocket is a link of the \
-     resumable layer, with the end-to-end channel above it; with --relay, the relay role of podssh relay serve \
-     answers its own paths on the same connections, as behind --quick-tunnel, minting for the node's door unless \
-     --mint says otherwise, and TARGET may be left out; its relay host is the URL. The server ends the visitors' \
-     TLS: it sees the times, the sizes and the layer's bytes, which the end-to-end channel keeps from it; and \
-     nothing proves who connects to a tunnel's port there, so a stranger may serve its visitors, whom the \
-     channel refuses. Where a stranger holds the name first, the server gives another, which the node says; a \
-     client that derives the name then reaches the stranger, and is refused. The road needs the end-to-end \
-     channel and a door: --allow, or the members of the net held here when the node's key is one; never \
-     --plain, --no-e2e, --exit, a udp: TARGET, or another road's flag (64). The road is served alone: a pair of \
-     NAME is not served beside it, and a line says so. A node that would serve the OpenTunnel road, the Pinggy \
-     road, the Serveo road, the ssh-j road or the localhost.run road unasked serves this one, before the bore road, \
-     when none of them reached a service, or when each is off or has no server, and its lines say so and \
-     name the third party, which nobody vouches for. PODSSH_LOCALTUNNEL=no turns the road off, and so does \
+     name that its key gives (podssh-, then 16 hex digits). Then it keeps the TCP connections that the server \
+     names, up to 10, to a port that the server's system chose. It dials them directly or through HTTPS_PROXY's \
+     CONNECT. A proxy that lets CONNECT reach port 443 alone refuses that port. The node then needs an egress \
+     that reaches it, while its clients need port 443 alone. A connection that ends is opened again at once; \
+     three refused dials in a row mean the server forgot the tunnel. The node then asks for it again, with a \
+     wait that doubles from 1 s to 60 s. The tunnel's URL is the one line on stdout. Each visitor's WebSocket is \
+     a link of the resumable layer, with the end-to-end channel above it; with --relay, the relay role of podssh \
+     relay serve answers its own paths on the same connections, as behind --quick-tunnel. It mints for the \
+     node's door unless --mint says otherwise, and TARGET may be left out; its relay host is the URL. The server \
+     ends the visitors' TLS: it sees the times, the sizes and the layer's bytes, which the end-to-end channel \
+     keeps from it; and nothing proves who connects to a tunnel's port there, so a stranger may serve its \
+     visitors, whom the channel refuses. Where a stranger holds the name first, the server gives another, which \
+     the node says; a client that derives the name then reaches the stranger, and is refused. The road needs the \
+     end-to-end channel and a door: --allow, or the members of the net held here when the node's key is one; \
+     never --plain, --no-e2e, --exit, a udp: TARGET, or another road's flag (64). The road is served alone: a \
+     pair of NAME is not served beside it, and a line says so. A node that would serve the OpenTunnel, Pinggy, \
+     Serveo, ssh-j or localhost.run road unasked serves this one, before the bore road. It does so when none of \
+     them reached a service, or when each is off or has no server. Its lines say so and name the third party, \
+     which nobody vouches for. PODSSH_LOCALTUNNEL=no turns the road off, and so does \
      PODSSH_LAST_RESORT=no, the switch of each last fallback.";
 
 /// The note of `podssh ssh node://NAME` on the localtunnel road.
-pub(super) const SSH: &str = "node://NAME races the localtunnel road too, last, before the bore road, once each road before \
-     it failed, the ssh-j road's and the localhost.run road's too, where the road has a server (localtunnel's where podssh's list of services \
-     names it, or PODSSH_LOCALTUNNEL) and podssh holds the node's key: --node-key, else the key that the net \
+pub(super) const SSH: &str = "node://NAME races the localtunnel road too, last, before the bore road. It goes once \
+     each road before it failed, the ssh-j road's and the localhost.run road's too. It goes only where the road has a \
+     server (localtunnel's where podssh's list of services names it, or PODSSH_LOCALTUNNEL). podssh must also hold the \
+     node's key: --node-key, else the key that the net \
      names for NAME, else the key that the pins of NAME hold from an earlier session. The node's name there \
-     comes from that key, as the node derives it. Each link is TLS to that name on port 443 through \
-     HTTPS_PROXY, checked by this host's roots for the hosted server, then a WebSocket with the header \
-     Bypass-Tunnel-Reminder, which passes the server's page for browsers (a 511, which the line names), under \
-     the resumable layer and the end-to-end channel, which checks the node's key, so --no-e2e leaves the road \
-     out. Before its first link, a line says that the server, a third party that nobody vouches for, carries \
-     the session and ends its TLS, and that the end-to-end channel keeps its bytes. A node that serves the relay \
+     comes from that key, as the node derives it. Each link is TLS to that name on port 443 through HTTPS_PROXY, \
+     checked by this host's roots for the hosted server. Then comes a WebSocket with the header \
+     Bypass-Tunnel-Reminder, which passes the server's page for browsers (a 511, which the line names). The link runs \
+     under the resumable layer and the end-to-end channel, which checks the node's key. So --no-e2e leaves the road \
+     out. Before its first link, a line says that the server, a third party that nobody vouches for, carries the \
+     session and ends its TLS. The line adds that the end-to-end channel keeps its bytes. A node that serves the relay \
      role there is a relay host too: --relay-host with its URL. podssh ping never measures the road. PODSSH_LOCALTUNNEL=no or \
      PODSSH_LAST_RESORT=no turns it off.";
 
