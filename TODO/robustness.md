@@ -2573,6 +2573,18 @@ lines.
 Here, on podcrates `v0.56.0` with each of the 4 cores held busy by a loop of the shell, `cargo test -p podssh-cli --test
 m6_exit -- --ignored --exact the_layer_survives_a_new_address` passed 12 runs in 12 (about 30 s each). It waits for its
 next failure in the gate.
+A sixth time, on 2026-11-16, at `f5b4f43` (podcrates `v0.60.0`, run 43823925587, job `gate (m6)`):
+`the_layer_survives_a_stopped_relay_host` did not end within 600 s. With `-v` the client said: "the link ended with no
+word from the far end; resuming the session", "no new link yet (the new link ended before the far end greeted);
+trying again in 1.1 s", "the session resumed after 1.2 s, 65536 bytes sent again", and nothing after: no loss of
+the new link in 600 s, so its heartbeat was answered, and no session byte moved. The node's lines: its link to the
+relay ended with no Close, it connected again at once and was "online again"; no line of the session. The other ten
+tests passed (1,269 s). Two findings: the client's replay was 64 KiB, far below the pair's window of 768 KiB, so the
+window is not the common factor of the fifth shape; and each of the six is one shape seen from the client, a resume
+that it calls done after which the session never moves while the link lives. The code of the resume is
+`pod-session`'s (`resume.rs`'s `resume_loop`, `keep.rs`'s `run_resumed` and `take`, the pump), which podcrates owns
+(Rule Q3): podssh gives podcrates the six shapes by COORD-091 (#283), and asks for a line of the far end at each resume
+(its number, the offsets of both ends, the bytes sent again), so that the next failure says which end holds.
 
 
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes
