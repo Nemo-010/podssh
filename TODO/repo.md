@@ -6710,6 +6710,20 @@ profiles, and a script of the lane in `scripts/`, then the release
 steps that name the run. The network classes (`proxy-only` and the others of COORD-081) wait for podnet's data in
 `pod-lab` (podcrates T-716).
 
+2026-11-16, the network labs of `pod-lab` `v0.60.0` (podcrates T-716, COORD-119; `podlab` from its release asset,
+checked against its `SHA256SUMS`), with `target/debug/podssh` of `cbef76d`: `podlab run PROFILE -- podssh doctor
+--quick`, its exit code read in the lab. In `proxy-only`, `proxy-tls-reterminate`, `proxy-per-name` and
+`ws-upgrade-refused` doctor exited 1 with 37 ok and 4 FAIL: it named the lab's proxy (with its credential, not shown,
+in `proxy-only`), asked it to CONNECT by name, trusted the lab's CA alone (2 anchors where the proxy re-terminates
+TLS), and each relay host's `/health` "did not answer with JSON". In `sni-allowlist` and `no-proxy-no-dns` it exited 1
+with 33 ok and 5 FAIL: no proxy, each name unresolved by the system and by DNS over HTTPS. `ipv6-only` does not hold on
+this kernel (podlab 125). Each FAIL is the class's own: the stand-in behind the proxy answers each CONNECT, for each
+host and port (a CONNECT to a listener of the command's own on the lab's loopback got 200, and the listener no byte),
+and it is not a relay. So the steps that tell these classes apart for podssh (the WebSocket upgrade, a re-terminated
+certificate on the relay's name, the filter of SNI) are never reached, and commands 2 to 6 of the lane cannot run in
+them: podssh asks podcrates (COORD-090) for a lab's proxy that reaches a server that the command runs, so that podssh's
+own relay role (`podssh relay serve --listen 127.0.0.1:PORT`) and an sshd stand behind the class (podcrates T-751).
+
 # T-792: The state of each GitHub issue written from the record by podcrates' workflow
 
 **Source:** the owner's ruling "Issues", relayed in COORD-110 (PodUtils/podcrates#183), `docs/decisions.md` (2026-11-15).
