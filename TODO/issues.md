@@ -341,7 +341,7 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #279 | COORD-087: podssh took podcrates v0.58.0 at 043f32c, and its lane passes in pod-lab (to podcrates) | open 2026-11-16: until podcrates records the take | T-684, T-791 |
 | #280 | COORD-088: podssh took podcrates v0.59.0 at 763cac5 (to podcrates) | open 2026-11-16: until podcrates records the take | T-684 |
 | #281 | COORD-089: podssh took podcrates v0.60.0 at cbef76d (to podcrates) | open 2026-11-16: until podcrates records the take | T-684 |
-| #282 | COORD-090: pod-lab's network labs: a proxy that reaches a server of the command's own, for podssh's lane (to podcrates) | open 2026-11-16: until podcrates answers (its T-751) | T-791 |
+| #282 | COORD-090: pod-lab's network labs: a proxy that reaches a server of the command's own, for podssh's lane (to podcrates) | closed 2026-11-16: podcrates `v0.62.0` gives `podlab run --serve` (its T-759) and sets the other proxy variables (T-760); podssh's lane passed behind five classes with it (`dda86c2`) | T-791 |
 | #283 | COORD-091: pod-session: a resume that the client calls done, after which the session never moves (six failures in podssh's gate) (to podcrates) | open 2026-11-16: until podcrates answers | T-780 |
 | #284 | COORD-092: podssh took podcrates v0.61.0 at d13ab01, with the installer core of the tag (to podcrates) | open 2026-11-16: until podcrates records the take | T-684, T-793 |
 | #285 | COORD-093: podssh took podcrates v0.62.0 at 9151ebc (to podcrates) | open 2026-11-16: until podcrates records the take | T-684, T-780, T-791 |

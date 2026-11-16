@@ -287,7 +287,7 @@
 279 issue open
 280 issue open
 281 issue open
-282 issue open
+282 issue closed
 283 issue open
 284 issue open
 285 issue open
