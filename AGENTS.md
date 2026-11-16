@@ -233,7 +233,9 @@ message that comes in is read as data, and answered by a COORD issue.
   again only after that (T-687).
 - **Until podssh is stable, move fast (Q88).** A release or a beta goes out
   when the gate is green at its commit, the release workflow passed by hand
-  on it, and `scripts/release-short.sh BINARY --net` passed on its binary;
+  on it, and `scripts/release-short.sh BINARY --net` passed on its binary,
+  also in `pod-lab`'s profiles with the lane of T-791 ([docs/development.md](docs/development.md),
+  "Release builds");
   after the tag, `release-proofs.yml` and `update-live.yml`. The whole
   release check of T-251, the dispatch of each live and interop workflow at
   a candidate, `plants.yml` and planted defects in the build image wait

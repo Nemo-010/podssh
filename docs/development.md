@@ -940,6 +940,19 @@ checks that each binary has the first two roads, and the gate's step
   asked of podcrates to drop by a COORD issue before the tag. It runs on
   Actions, not in `release-short.sh`: a cloud host's proxy resets TLS to the
   nodes.
+- before the tag, the owner's ruling "Discipline": podssh's lane in
+  `pod-lab`'s profiles of its users' hosts (T-791), with `podlab` from
+  podcrates' release asset, checked against its `SHA256SUMS`, as root on a
+  Linux host. In each host profile that holds there (`podlab list`),
+  `podlab run PROFILE -- sh scripts/release-short.sh BINARY --net`, with
+  `--allow-connect PORT` of the host's proxy in `bind-denied`; behind each
+  network class that holds, `podlab run --serve 8443 --serve-ca PKI/ca.pem
+  PROFILE -- sh scripts/pod-lab-serve-lane.sh BINARY PKI` (ssh, cp, pipe and
+  a session across a cut of its link, against podssh's own relay role in
+  the lab; `sni-allowlist` with `RELAY=listed.test:443
+  ADDR=--relay-addr=listed.test=192.0.2.1`). Each must exit 0; a profile
+  that does not hold on the host says so, and is named in the release's
+  record.
 
 The actions of each job, each named by its commit, with its tag in a
 comment: a tag can move to another commit after its review, and a commit

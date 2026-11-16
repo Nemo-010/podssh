@@ -458,7 +458,7 @@ Read:
 3. On a run by hand, make the list of the commits since the last tag as an
    artifact, so that it can be read before a tag.
 4. Link each "Fixes #N" of a commit to its issue in the list.
-5. docs/development.md, "Release builds" (`docs/development.md:880-1014`): the
+5. docs/development.md, "Release builds" (`docs/development.md:880-1027`): the
    body is the notes file and the generated list.
 
 No new shell script: each step is a step of the workflow.
@@ -6824,6 +6824,11 @@ the class refuses the resumable layer, so the cut ended the session (255). Plant
 `proxy-only` made command 6 fail (exit 1, 4 lines of 12, "the connection between podssh and the relay broke").
 `cargo test -p podssh-cli --lib` 1168 passed; clippy (the gate's lints) and rustfmt clean. Next: the classes with no proxy once a lab gives them a way out, and the release steps that name the run. The resume
 over the HTTP road of `ws-upgrade-refused` is T-798 (COORD-095, #287).
+
+Step 2 of the Approach, the same day: `docs/development.md` ("Release builds") names the run before each tag (each host
+profile with `release-short.sh --net`, each network class with `pod-lab-serve-lane.sh`), and `AGENTS.md` ("Releases")
+asks for it beside `release-short.sh`. What stays: the run on `v1.1.0-beta.4`'s candidate, and the classes with no proxy
+(`no-proxy-no-dns`, and `ipv6-only` on a kernel that holds it).
 
 # T-792: The state of each GitHub issue written from the record by podcrates' workflow
 
