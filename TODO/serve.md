@@ -52,7 +52,7 @@ core: the handshake, a host key that does not change, and key authentication.
    compares `key_data()`; the login name selects nothing.
 5. The verb: rows in `crates/podssh-cli/src/flags.rs:379-453` and
    `crates/podssh-cli/src/positionals.rs:8-281`, an arm beside
-   `crates/podssh-cli/src/dispatch.rs:352-426`, the manual, `docs/cli.md`,
+   `crates/podssh-cli/src/dispatch.rs:353-427`, the manual, `docs/cli.md`,
    `docs/STATUS.md`. The first source is `--stdio`, as `sshd -i`: OpenSSH
    then tests serve in the gate through `ProxyCommand`, with no listener.
    `podssh serve NAME` follows on the node runner of T-079. Windows: exit 70.
@@ -2983,7 +2983,7 @@ tested; the two entries waited on each other, so the call now lives in T-107 alo
 **Milestone:** M10
 **Priority:** P1
 **Effort:** M
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -2994,7 +2994,7 @@ without a user manager gets a cron line. The unit has no hardening.
 ## Premise
 
 - Read: the ways are a user unit, a LaunchAgent, cron and a Windows task
-  (`crates/podssh-cli/src/node_install/mod.rs:116-125`); the probe is `systemctl --user show-environment`
+  (`crates/podssh-cli/src/node_install/mod.rs:151-160`); the probe is `systemctl --user show-environment`
   (`crates/podssh-cli/src/node_install/unix.rs:19-27`); the units go to `~/.config/systemd/user`
   (`unix.rs:29-36`).
 - Read: the unit has `Restart=always` and no `User=`, `NoNewPrivileges` or `ProtectSystem`
@@ -3022,6 +3022,68 @@ without a user manager gets a cron line. The unit has no hardening.
 5. Later, on `pod-unit` (PodUtils/podcrates T-102): when it is released and taken, the text of the unit moves
    there and this entry's command stays. Until then podssh writes the text itself.
 
+## Decision
+
+2026-11-16, made with the draft:
+
+- **The file of the variables of a system unit is `/var/lib/podssh-node-NAME/node-NAME.env`**, in the unit's
+  `StateDirectory=` (mode 0700, made USER's at the install), of mode 0600 and USER's. root writes it as a new file
+  (`O_EXCL`, `O_NOFOLLOW`), gives it to USER by its descriptor (`fchown`) and renames it into place: the directory's
+  parent is root's, so no link of USER's can lead root's write elsewhere, and the lock of `--env-file` beside it
+  is writable under `ProtectSystem=strict`. Lost:
+  - USER's cache, beside the pair, as the Approach said: root would write in a tree that USER owns, where a link
+    swapped into `~/.cache` leads the write anywhere (the hole of T-593's kind); writing there safely needs a walk
+    of `openat` with no link followed, or a helper that drops to USER (rule 3);
+  - `/etc/podssh/node-NAME.env`: the file must be USER's for `read_private`, and its lock beside it would fall on a
+    read-only `/etc`;
+  - systemd's `EnvironmentFile=`: its quoting differs from `--env-file`'s, and podssh's refusal of a token in the
+    file would be lost.
+- **root reads none of USER's files.** The pair and the keys stay in USER's cache, which the unit names
+  (`HOME`, `XDG_CACHE_HOME`, `XDG_CONFIG_HOME` of USER's passwd entry, as T-593 requires) and binds in through
+  `ProtectHome=tmpfs` (`BindPaths=` of `HOME/.cache/podssh`, `BindReadOnlyPaths=-` of `HOME/.config/podssh`). The
+  install probes that this cache exists and is USER's (else 69, with `podssh relay pair NAME` run as USER as the
+  remedy), as `BindPaths=` of a missing directory fails each start. The installer's own `XDG_CACHE_HOME`,
+  `XDG_CONFIG_HOME` and `PODSSH_CACHE_DIR` are not carried into the file, with a note. Lost: a copy of root's pair
+  into USER's cache (a secret moved by root across users), and reading the pair as root (root's `closed` check
+  refuses another user's private file, and it is USER's run that must read it).
+- **The probes and their codes**, in the Approach's order: not root, 77 (`EX_NOPERM`); no `/run/systemd/system`
+  (`sd_booted`'s test), 69; no line of USER in `/etc/passwd`, read as a file as T-500 and T-593 read it (a static
+  binary has no NSS), 69; no cache of USER's, 69. `--run-as` of uid 0, or a name that `User=` cannot hold, 64; a
+  home with a character that a unit's list of paths cannot hold (a blank, `:`, `%`, a quote), 78. A unit of that
+  name that podssh did not write (no `# Written by podssh` first line) is not replaced (73). `--print-unit` probes
+  the passwd entry alone, as it writes nothing. The probes are a struct of functions (`system::Probes`), so that the
+  tests give each one.
+- **The flags.** `--system` and `--run-as USER` go together for `--install` and `--print-unit`; `--uninstall
+  --system` needs no user. `--print-unit` goes with neither `--install` nor `--uninstall`, nor `--detach`,
+  `--env-file`, `--carrier` or `--ask`. serve takes `--print-unit`, `--system` and `--run-as` alone, no
+  `--install`: the Approach asks for its printed unit only, and serve's sessions are a login, which an
+  administrator puts in place on purpose. serve's unit runs `serve NAME` (a node of a pair; `--stdio` is refused, as
+  one ProxyCommand's connection is no service) and names no file of variables: serve has no `--env-file`.
+- **The hardening** is the Approach's list with what `systemd-analyze security` also scores and a node does not
+  use: `RestrictSUIDSGID`, `ProtectKernelLogs`, `ProtectControlGroups`, `ProtectClock`, `ProtectHostname`,
+  `ProtectProc=invisible`, `RestrictNamespaces`, `RestrictRealtime`, `SystemCallArchitectures=native`,
+  `SystemCallErrorNumber=EPERM` (a call that the filter misses fails, and kills nothing) and `UMask=0077`. Left
+  out: `PrivateUsers` (the cache's owner check of T-593 would read root's `/home` as `nobody`'s and pass the cache
+  over), `RemoveIPC` (it removes each IPC object of USER at each stop, also those of USER's other programs),
+  `ProcSubset=pid` (a resolver or iroh's netwatch may read `/proc/net`), and `IPAddressDeny` (each TARGET may be
+  on loopback).
+- **The relaxed lines.** `--exit`, `--routes` and `--iroh` add `AF_NETLINK` to `RestrictAddressFamilies`, with a
+  comment: an exit reads the host's own addresses (`getifaddrs`, which asks the kernel by netlink on Linux) to keep
+  them out of a wide range, and the iroh road watches the interfaces. A roost (`--sshd`) dials an sshd of this
+  host, which no line limits: its comment says that none is relaxed. serve's unit leaves out each line that would
+  change what a session may do, as sshd's sessions have them (sudo, the home, `/tmp`, devices, any program, any
+  socket), each named in a comment with its reason; it keeps `ProtectKernel*`, `ProtectClock`, `ProtectHostname`,
+  `ProtectControlGroups` and `RestrictRealtime`. The directory of each file that a flag names is let through:
+  bound in where `ProtectHome` hides it, read-only unless the run makes the file there (`--key`, `--iroh-key`,
+  `--host-key`), and `ReadWritePaths=-` outside the homes where it does.
+- **The user unit keeps no hardening.** Its text and the tests of T-121 and T-393 stay as they were: a user
+  manager gives the sandbox's namespaces only where unprivileged user namespaces are allowed, and a unit whose
+  namespaces cannot be made fails at each start, which would break each install that works now. Lost: the
+  seccomp lines alone in the user unit (each implies `NoNewPrivileges`; no host measured them in a user unit).
+- **The steps of systemctl** are the user unit's: `daemon-reload`, `enable`, `restart` (not `enable --now`, which
+  leaves a running node on its old unit), each bound by `PROGRAM_LIMIT`; a step that fails removes the unit again.
+  `WantedBy=multi-user.target`, `Wants=` and `After=network-online.target`.
+
 ## Prove
 
 ```sh
@@ -3038,6 +3100,50 @@ where the box has no systemd.
 ## Start condition
 
 Items 1 to 4 start now. Item 5 waits for podcrates T-102 (`pod-unit`) and its release.
+
+## Done
+
+Partial, 2026-11-16, drafted on the branch `draft-t709` (DRAFT T-709); items 1 to 4 are written, item 5 waits for
+podcrates T-102. The Premise holds at the cited lines (`mod.rs:116-126`, `unix.rs:19-37`, `text.rs:134-168`,
+`env.rs:36`).
+
+- `crates/podssh-cli/src/node_install/print.rs`: `podssh node ... --print-unit` and `podssh serve NAME ...
+  --print-unit` (the unit on stdout, nothing written; `env::planned` names the file that `--install` would write).
+- `crates/podssh-cli/src/node_install/system.rs`: the flags (`system::flags`), the account of `--run-as`
+  (`account_in`, read from `/etc/passwd`), the probes (`Probes`, `check`); `system_install.rs` (Unix): the file of
+  the variables in the state directory, the unit, `systemctl`, and `--uninstall --system`;
+  `system_text.rs`: the unit's text, its hardening, the relaxed lines and the paths let through.
+- `mod.rs`: `Kind::Serve`, `Kind::removal`, `Target`, `prepare` for a printed or a system unit, the dispatch;
+  `env.rs`: `HOME_BOUND`, `body_for_system`, `without`, `planned`; `text.rs`: the user unit's first line by
+  `Kind::removal` (the same words for node and ssh). `NodeArgs` and `ServeArgs` take `print_unit`, `system`,
+  `run_as`; `--print-unit` is refused with `--carrier` and `--ask`; `dispatch.rs` sends `serve --print-unit` to
+  `print::serve`.
+- The flag rows (`flags/node.rs`, `flags/serve.rs`), the manual's notes (`man/notes_unit.rs`, a paragraph of
+  node's and one of serve's), and `docs/cli.md` ("A unit read before it is installed, and a system unit of a named
+  user"). The citations of each changed file (among them T-709's own Premise, `docs/cli.md` and
+  `node_install/mod.rs`) move by `cargo todo remap FILE` at the merge.
+- Tests: `crates/podssh-cli/src/node_install/system_tests.rs` (the unit's `User=`, places, each hardening line,
+  no name of `env::SECRET` in either unit, the relaxed lines of `--exit`, `--routes`, `--iroh`, a roost and serve,
+  the paths let through, each probe's refusal with the probes given, the flags, the passwd reader, the
+  installer's places left out, and a printed unit that writes no file); `crates/podssh-cli/tests/node_install.rs`
+  (as a process: the printed units of node and serve on stdout with no file written, the flags refused with 64,
+  77 with no root, 69 for a user with no passwd entry).
+
+Results:
+
+- `cargo test -p podssh-cli --lib node_install::`: 24 passed (2026-11-16, at the merge); `--lib` whole: 1197 passed.
+  Planted, `NoNewPrivileges` taken out of the hardening: three tests fail (the system unit's, the relaxed lines', serve's).
+- `cargo test -p podssh-cli --test node_install`: 5 passed; `--test node --test node_detach`: 9 and 8 passed.
+- `cargo test -p podssh-cli --test serve_install` (the user unit's text of T-121 and T-393, unchanged): 18 passed.
+- `cargo test -p podssh-cli --lib man` and `--test man_page --test man_flag_parity --test man_json` (the new flags
+  and notes, sentences of 25 words or fewer): passed (`man::pod_model`'s text rules among them), and `--test flag_table`.
+- Clippy on `x86_64-unknown-linux-gnu` and `-musl`, and `cargo check --target x86_64-pc-windows-gnu -p
+  podssh-cli --all-targets` (the stubs of `system.rs` off Unix): clippy on `x86_64-unknown-linux-gnu` clean, rustfmt
+  clean; the musl and Windows builds are the gate's (its `release` and `windows` jobs).
+
+Waits: a run in the build image with systemd as PID 1 (`scripts/test_in_box.sh`): `--install --system --run-as`
+of a real user, the node online, and `systemd-analyze security podssh-node-NAME.service` under 3.0 (T-251's image
+checks); item 5 (podcrates T-102, `pod-unit`).
 
 # T-774: `podssh serve` checks the user-presence flag of a security key's signature, as sshd does by default
 

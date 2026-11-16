@@ -145,6 +145,8 @@ pub const SERVE: &[&str] = &[
      on, under the rules it logged in with. A file that is gone or cannot be read, or no key at all, \
      keeps the set before, and one line on stderr says why; a reload that took says how many lines are \
      used now. The other settings are the command line's, and a restart changes them.",
+    // A unit of systemd that runs serve NAME (T-709).
+    super::notes_unit::SERVE,
     "The connection ends when the client leaves: exit 0, else 255 when it failed; a stop exits 0. Without \
      --stdio the run is a usage error (64), and so are --shell with --no-shell; on Windows it exits 70.",
 ];

@@ -30,13 +30,20 @@ mod env;
 #[cfg(unix)]
 mod launchd;
 pub(crate) mod lock;
+pub(crate) mod print;
 pub(crate) mod ssh;
+pub(crate) mod system;
+#[cfg(unix)]
+mod system_install;
+mod system_text;
 mod text;
 #[cfg(unix)]
 mod unix;
 #[cfg(windows)]
 mod windows;
 
+#[cfg(test)]
+mod system_tests;
 #[cfg(test)]
 mod tests;
 
@@ -50,6 +57,8 @@ const PROGRAM_LIMIT: Duration = Duration::from_secs(10);
 pub(crate) enum Kind {
     Node,
     Ssh,
+    /// `podssh serve NAME`, whose unit is printed alone (`--print-unit`).
+    Serve,
 }
 
 impl Kind {
@@ -57,6 +66,7 @@ impl Kind {
         match self {
             Kind::Node => "node",
             Kind::Ssh => "ssh",
+            Kind::Serve => "serve",
         }
     }
 
@@ -65,6 +75,7 @@ impl Kind {
         match self {
             Kind::Node => format!("node {name} --install"),
             Kind::Ssh => format!("ssh --install {name}"),
+            Kind::Serve => format!("serve {name} --print-unit"),
         }
     }
 
@@ -73,6 +84,23 @@ impl Kind {
         match self {
             Kind::Node => format!("node {name} --uninstall"),
             Kind::Ssh => format!("ssh --uninstall {name}"),
+            // serve's unit is printed, never installed: no word of podssh
+            // removes it, and [`Kind::removal`] names systemctl's.
+            Kind::Serve => format!("serve {name} --print-unit"),
+        }
+    }
+
+    /// How the unit's first line says to remove it: `podssh` for what
+    /// `--install` wrote, systemctl for serve's printed unit.
+    pub fn removal(self, name: &str, system: bool) -> String {
+        let unit = format!("podssh-{}.service", self.stem(name));
+        match (self, system) {
+            (Kind::Serve, true) => format!("systemctl disable --now {unit}, then the removal of this file, undo it"),
+            (Kind::Serve, false) => {
+                format!("systemctl --user disable --now {unit}, then the removal of this file, undo it")
+            }
+            (_, true) => format!("podssh {} --system removes it", self.uninstall_words(name)),
+            (_, false) => format!("podssh {} removes it", self.uninstall_words(name)),
         }
     }
 
@@ -95,6 +123,13 @@ pub(crate) struct Spec {
     /// The file of `--env-file`, beside which a LaunchAgent's log goes.
     #[cfg_attr(not(unix), allow(dead_code))]
     pub env_file: PathBuf,
+}
+
+/// Whose service it is: this user's, or a system unit that runs as the
+/// account of `--run-as` (T-709).
+pub(crate) enum Target {
+    User,
+    System(system::Account),
 }
 
 /// What one way of making a service came to.
@@ -142,8 +177,12 @@ pub fn dispatch(args: &NodeArgs, out: &mut dyn Write, err: &mut dyn Write) -> i3
     if let Err(refusal) = crate::node_ask::check(args) {
         return refusal.report("node", err);
     }
+    let (installing, removing, printing) = (args.install, args.uninstall, args.print_unit);
+    if let Err(refusal) = system::flags(installing, removing, printing, args.system, args.run_as.as_deref()) {
+        return refusal.report("node", err);
+    }
     if let Some(file) = &args.env_file {
-        if args.install || args.uninstall {
+        if installing || removing || printing {
             let why = "--env-file is the file that --install writes for the service: give it to the node alone";
             return Refusal::usage(why).report("node", err);
         }
@@ -159,17 +198,23 @@ pub fn dispatch(args: &NodeArgs, out: &mut dyn Write, err: &mut dyn Write) -> i3
             }
         }
     }
-    if args.detach && (args.install || args.uninstall || args.temporary.is_some()) {
-        let why = "--detach sends this run into the background: it goes with no --install, --uninstall or --temporary";
+    if args.detach && (installing || removing || printing || args.temporary.is_some()) {
+        let why = "--detach sends this run into the background: it goes with no --install, --uninstall, --print-unit \
+                   or --temporary";
         return Refusal::usage(why).report("node", err);
     }
-    match (args.install, args.uninstall) {
+    if printing {
+        return print::node(args, out, err);
+    }
+    match (installing, removing) {
         (true, true) => Refusal::usage("--install and --uninstall: give one").report("node", err),
-        (true, false) => match prepare(args) {
+        (true, false) if args.system => system::install_node(args, err),
+        (true, false) => match prepare(args, &Target::User, false) {
             Ok((spec, notes)) => install(&spec, &notes, out, err),
             Err(refusal) => refusal.report("node", err),
         },
         (false, true) => match label(args, "--uninstall") {
+            Ok(name) if args.system => system::uninstall(Kind::Node, &name, &system::Probes::host(), err),
             Ok(name) => uninstall(Kind::Node, &name, err),
             Err(refusal) => refusal.report("node", err),
         },
@@ -196,14 +241,7 @@ pub(crate) fn this_binary() -> Result<PathBuf, Refusal> {
 /// and the notes on what it carries.
 pub(crate) fn env_file(kind: Kind, name: &str, notes: &mut Vec<String>) -> Result<PathBuf, Refusal> {
     let (body, left) = env::body();
-    for variable in left {
-        // A retired name says what replaced it (T-634); else it is a token.
-        let why = match crate::retired::named(crate::retired::RETIRED, &variable) {
-            Some(row) => row.refusal(),
-            None => "a service keeps no token of the environment".to_string(),
-        };
-        notes.push(format!("{variable} is set and is not carried: {why}"));
-    }
+    note_left(left, notes);
     let file = podssh_relay::cache::store_file(&env::file_name(kind, name), body.as_bytes())
         .map_err(|e| Refusal::config(format!("the file of the service's variables: {e}")))?;
     notes.push(format!(
@@ -213,10 +251,25 @@ pub(crate) fn env_file(kind: Kind, name: &str, notes: &mut Vec<String>) -> Resul
     Ok(file)
 }
 
-/// The service's command and the notes on what it carries. The file of the
-/// node's variables is written here.
-fn prepare(args: &NodeArgs) -> Result<(Spec, Vec<String>), Refusal> {
-    let name = label(args, "--install")?;
+/// The note of each variable that is set and left out of the file.
+pub(super) fn note_left(left: Vec<String>, notes: &mut Vec<String>) {
+    for variable in left {
+        // A retired name says what replaced it (T-634); else it is a token.
+        let why = match crate::retired::named(crate::retired::RETIRED, &variable) {
+            Some(row) => row.refusal(),
+            None => "a service keeps no token of the environment".to_string(),
+        };
+        notes.push(format!("{variable} is set and is not carried: {why}"));
+    }
+}
+
+/// The service's command and the notes on what it carries. The file of a
+/// user's service is written here, unless the unit is only printed; a
+/// system unit's is written by `system`, once its unit is known to be
+/// sound.
+fn prepare(args: &NodeArgs, target: &Target, print: bool) -> Result<(Spec, Vec<String>), Refusal> {
+    let flag = if print { "--print-unit" } else { "--install" };
+    let name = label(args, flag)?;
     let refused = [
         (args.temporary.is_some(), "--temporary", "the node of podssh ssh --upgrade ends with its last session"),
         (
@@ -226,17 +279,23 @@ fn prepare(args: &NodeArgs) -> Result<(Spec, Vec<String>), Refusal> {
         ),
         (args.iroh_ephemeral, "--iroh-ephemeral", "each start of the service would bring a new key and a new ticket"),
     ];
-    if let Some((_, flag, why)) = refused.iter().find(|(given, ..)| *given) {
-        return Err(Refusal::usage(format!("--install with {flag}: {why}")));
+    if let Some((_, named, why)) = refused.iter().find(|(given, ..)| *given) {
+        return Err(Refusal::usage(format!("{flag} with {named}: {why}")));
     }
     let mut notes = Vec::new();
+    if let Target::System(account) = target {
+        // root does not read the user's pair: the service does, as the user.
+        let (cache, user) = (account.cache_dir(), &account.user);
+        notes.push(format!("it reads the pair {name} and its keys from {}, the cache of {user}", cache.display()));
+    }
     // A pair that is missing or has expired makes a service that fails at
-    // each start: it is read now.
+    // each start: it is read now, for this user's own service.
     // The iroh road, the DERP road, OpenTunnel's, Pinggy's, Serveo's and
     // ssh-j's, localhost.run's, localtunnel's and bore's serve with no pair
     // (T-379, T-531, T-548, T-549, T-570, T-565, T-568, T-569).
     let tunnel = args.tunnel_asked();
-    let pair = match (&args.pair_file, args.iroh || args.derp || tunnel) {
+    let own = matches!(target, Target::User) && !print;
+    let pair = match (&args.pair_file, args.iroh || args.derp || tunnel || !own) {
         (_, true) => None,
         (Some(file), false) => Some(crate::pairs::from_file(file)?),
         (None, false) => Some(crate::pairs::stored(&name)?),
@@ -249,7 +308,11 @@ fn prepare(args: &NodeArgs) -> Result<(Spec, Vec<String>), Refusal> {
         ));
     }
     let exe = this_binary()?;
-    let env_file = env_file(Kind::Node, &name, &mut notes)?;
+    let env_file = match target {
+        Target::System(_) => system_text::env_path(Kind::Node, &name),
+        Target::User if print => env::planned(Kind::Node, &name)?,
+        Target::User => env_file(Kind::Node, &name, &mut notes)?,
+    };
     let words = text::service_args(args, &name, &env_file)?;
     Ok((Spec { kind: Kind::Node, name, exe, args: words, dir: None, env_file }, notes))
 }

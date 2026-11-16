@@ -68,6 +68,7 @@ pub(crate) fn check(args: &NodeArgs) -> Result<(), Refusal> {
         (args.temporary.is_some(), "--temporary"),
         (args.install, "--install"),
         (args.uninstall, "--uninstall"),
+        (args.print_unit, "--print-unit"),
         (args.detach, "--detach"),
         (args.restart, "--restart"),
         (args.detach_name.is_some(), "--detach-name"),

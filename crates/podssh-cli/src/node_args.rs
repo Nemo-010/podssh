@@ -104,6 +104,12 @@ pub struct NodeArgs {
     pub install: bool,
     /// `--uninstall`: remove the service that `--install` made.
     pub uninstall: bool,
+    /// `--print-unit`: the unit that `--install` would write, printed (T-709).
+    pub print_unit: bool,
+    /// `--system`: a system unit of systemd, which runs as `--run-as USER`.
+    pub system: bool,
+    /// `--run-as USER`: the user of the system unit.
+    pub run_as: Option<String>,
     /// `--env-file FILE`: the variables of the node, read before anything
     /// else; what `--install` writes for the service.
     pub env_file: Option<String>,
@@ -203,6 +209,9 @@ impl NodeArgs {
             detach_name: get("detach-name"),
             install: matches.get_flag("install"),
             uninstall: matches.get_flag("uninstall"),
+            print_unit: matches.get_flag("print-unit"),
+            system: matches.get_flag("system"),
+            run_as: get("run-as"),
             env_file: get("env-file"),
             resume_deadline: get("resume-deadline"),
             spares: get("spares"),

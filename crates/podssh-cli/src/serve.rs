@@ -37,6 +37,11 @@ pub struct ServeArgs {
     pub no_shell: bool,
     pub no_forwarding: bool,
     pub pty: Option<String>,
+    /// `--print-unit`, `--system` and `--run-as USER`: a unit of systemd
+    /// that runs serve NAME, printed (T-709).
+    pub print_unit: bool,
+    pub system: bool,
+    pub run_as: Option<String>,
     pub refused: Vec<(String, &'static str, &'static str)>,
 }
 
@@ -54,6 +59,9 @@ impl ServeArgs {
             no_shell: matches.get_flag("no-shell"),
             no_forwarding: matches.get_flag("no-forwarding"),
             pty: matches.get_one::<String>("pty").cloned(),
+            print_unit: matches.get_flag("print-unit"),
+            system: matches.get_flag("system"),
+            run_as: matches.get_one::<String>("run-as").cloned(),
             refused,
         }
     }

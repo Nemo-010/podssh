@@ -74,6 +74,7 @@ pub fn flags(args: &NodeArgs) -> Result<(), Refusal> {
         (args.detach, "--detach", "a node in the background has no terminal to ask at"),
         (args.install, "--install", "a service has no terminal to ask at"),
         (args.uninstall, "--uninstall", "it serves nothing to ask of"),
+        (args.print_unit, "--print-unit", "a service has no terminal to ask at"),
         (args.temporary.is_some(), "--temporary", "nobody is at the far end of an upgrade to answer"),
         (args.no_e2e, "--no-e2e", "the person is asked of each operator key, which the end-to-end channel proves"),
         (stdio, "--carrier stdio", "stdin is then the stream, where the answers would come"),

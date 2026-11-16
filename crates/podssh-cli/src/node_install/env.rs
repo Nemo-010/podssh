@@ -121,6 +121,45 @@ pub(super) fn parse_in(text: &str, retired: &[Retired]) -> Result<Vec<(String, S
     Ok(vars)
 }
 
+/// The variables that name places of the user who runs the install. A
+/// system unit runs as another user, and names that user's places itself.
+#[cfg_attr(not(unix), allow(dead_code))]
+pub(super) const HOME_BOUND: &[&str] = &["XDG_CACHE_HOME", "XDG_CONFIG_HOME", "PODSSH_CACHE_DIR"];
+
+/// [`body`] for a system unit: the text, the secrets left out, and the
+/// variables of [`HOME_BOUND`] left out.
+#[cfg_attr(not(unix), allow(dead_code))]
+pub(super) fn body_for_system() -> (String, Vec<String>, Vec<String>) {
+    let (text, left) = body();
+    let (kept, dropped) = without(&text, HOME_BOUND);
+    (kept, left, dropped)
+}
+
+/// The lines of a file's `text` but those that set one of `names`, and the
+/// names left out.
+#[cfg_attr(not(unix), allow(dead_code))]
+pub(super) fn without(text: &str, names: &[&str]) -> (String, Vec<String>) {
+    let mut dropped = Vec::new();
+    let mut kept = String::new();
+    for line in text.lines() {
+        match line.split_once('=').map(|(name, _)| name) {
+            Some(name) if names.contains(&name) => dropped.push(name.to_string()),
+            _ => kept.push_str(&format!("{line}\n")),
+        }
+    }
+    (kept, dropped)
+}
+
+/// Where `--install` would write the file of `label`'s variables: the first
+/// directory of the cache. `--print-unit` names it, and writes nothing.
+pub(super) fn planned(kind: Kind, label: &str) -> Result<PathBuf, Refusal> {
+    let dirs = podssh_relay::cache::candidate_dirs();
+    match dirs.first() {
+        Some(dir) => Ok(dir.join(file_name(kind, label))),
+        None => Err(Refusal::config("PODSSH_CACHE_DIR is none: a service needs a file of its variables")),
+    }
+}
+
 /// Read FILE, a private file, and set each of its variables in this process.
 pub(super) fn apply(path: &Path) -> Result<(), Refusal> {
     let text = podssh_relay::cache::read_private(path).map_err(|e| Refusal::config(format!("--env-file: {e}")))?;

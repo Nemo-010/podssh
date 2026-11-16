@@ -1,6 +1,7 @@
 //! The flag rows of `serve` (T-107): podssh's own SSH server, over stdin
 //! and stdout, its host key, and the keys that may log in; what a session
-//! runs (T-108) and its shell (T-222); whether a client may forward (T-109).
+//! runs (T-108) and its shell (T-222); whether a client may forward (T-109);
+//! a unit of systemd that runs it (T-709).
 
 use super::{row, FlagKind, FlagRow};
 
@@ -25,4 +26,11 @@ pub const SERVE_FLAGS: &[FlagRow] = &[
         "what a pty request meets where no pty opens: auto, a devpts instance of serve's own, then a tty whose calls serve answers (Linux); then serve as the line discipline on pipes (echo, editing, Ctrl-C to the command); notify, the tty that serve answers with no pty tried, else the request refused; line, the line discipline with no pty tried; no, the request refused (default: auto)", None),
     row(None, "no-forwarding", None, FlagKind::Supported,
         "open no forward: each direct-tcpip channel that a client opens is refused (default: each forward dials its host and port from this host)", None),
+    // A unit of systemd that runs serve NAME, printed (T-709).
+    row(None, "print-unit", None, FlagKind::Supported,
+        "with NAME: print a unit of systemd that runs serve NAME with these flags, on stdout, and write nothing: a user unit, or with --system --run-as USER a system unit", None),
+    row(None, "system", None, FlagKind::Supported,
+        "with --print-unit: a system unit, /etc/systemd/system/podssh-serve-NAME.service, that runs as the user of --run-as, with the hardening that leaves its sessions as sshd's", None),
+    row(None, "run-as", Some("USER"), FlagKind::Supported,
+        "with --system: the user that serve runs as, a user of /etc/passwd other than root; the unit names its HOME and its login shell", None),
 ];

@@ -243,6 +243,8 @@ pub(super) const NODE: &[&str] = &[
     super::notes_legs::NODE,
     // The sessions that its relay readies ahead (T-650).
     super::notes_spares::NODE,
+    // The unit printed, and a system unit of a named user (T-709).
+    super::notes_unit::NODE,
     // A node's upgrade in place, its sessions with it (T-668).
     super::notes_upgrade::NODE,
     // The dialect of the reverse road (T-643).

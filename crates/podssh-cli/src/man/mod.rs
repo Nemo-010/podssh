@@ -102,6 +102,8 @@ mod notes_ssh;
 mod notes_ssh_more;
 // The notes of --tuic (T-581).
 mod notes_tuic;
+// A unit read before it is installed, and a system unit (T-709).
+mod notes_unit;
 mod notes_update;
 // A node's upgrade in place (T-668).
 mod notes_upgrade;

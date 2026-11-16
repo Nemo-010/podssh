@@ -143,7 +143,7 @@ pub(super) fn unit(spec: &Spec) -> String {
     // `-`: a directory that went away is no reason to stay down.
     let dir = dir_text(spec).map_or_else(String::new, |d| format!("WorkingDirectory=-{}\n", d.replace('%', "%%")));
     format!(
-        "{UNIT_MARK}{}; podssh {} removes it.\n\
+        "{UNIT_MARK}{}; {}.\n\
          [Unit]\n\
          Description=podssh {} {name}\n\
          # No limit of starts: a tunnel that stays down locks its server out.\n\
@@ -161,7 +161,7 @@ pub(super) fn unit(spec: &Spec) -> String {
          [Install]\n\
          WantedBy=default.target\n",
         kind.install_words(name),
-        kind.uninstall_words(name),
+        kind.removal(name, false),
         kind.verb(),
         words.join(" ")
     )

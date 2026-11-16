@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**755 entries: 43 open, 34 partial, 12 blocked, 666 done.**
+**755 entries: 42 open, 35 partial, 12 blocked, 666 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 3 | 8 | 3 | 80 | 94 |
+| P1 | 2 | 9 | 3 | 80 | 94 |
 | P2 | 6 | 20 | 3 | 282 | 311 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 43 | 34 | 12 | 666 | 755 |
+| **All** | 42 | 35 | 12 | 666 | 755 |
 
 ## Entries
 
@@ -739,7 +739,7 @@ repository and CI).
 | [T-706](cli.md) | P3 | M | M5 | feature | done | `podssh doctor --tier`: one verdict of the host's capabilities and what each closes |
 | [T-707](roads.md) | P3 | L | backlog | feature | done | A road of the GSRN relay network, by a shared secret |
 | [T-708](multi.md) | P1 | M | M10 | feature | done | `each`, `run` and `job` reach a node, a net name, an `iroh:` or a `derp:` destination |
-| [T-709](serve.md) | P1 | M | M10 | feature | open | A node as a hardened system service of a named user: `--print-unit`, `--install --system --run-as` |
+| [T-709](serve.md) | P1 | M | M10 | feature | partial | A node as a hardened system service of a named user: `--print-unit`, `--install --system --run-as` |
 | [T-710](reverse.md) | P1 | M | M10 | measurement | open | A node stays reachable for months: pair renewal and legs by key, proven over 90 days and in a beta |
 | [T-711](mesh.md) | P1 | M | M10 | feature | blocked | One switch `PODSSH_PUBLIC` over each third-party service, and `status --json` gives the set |
 | [T-712](reverse.md) | P2 | M | M10 | feature | open | Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s |

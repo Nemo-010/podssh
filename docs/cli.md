@@ -3816,6 +3816,44 @@ commands. The rules behind them:
   its line names the task at boot that only an administrator can make.
   A new `--install` removes what an earlier one made by another way, so
   that two ways never start the same service.
+- **A unit read before it is installed, and a system unit of a named user
+  (T-709).** `node NAME ... --print-unit` prints the unit that `--install`
+  would write and writes nothing, on any system; `serve NAME ...
+  --print-unit` prints one that runs serve NAME (serve installs nothing).
+  `--install --system --run-as USER` writes
+  `/etc/systemd/system/podssh-node-NAME.service` and runs `systemctl
+  daemon-reload`, `enable` and `restart`. It probes first: root (77),
+  `/run/systemd/system` (69), USER's line of `/etc/passwd` (69, read as a
+  file: a static binary has no NSS), and USER's cache of podssh (69); USER
+  root is refused (64). The unit has `User=USER` and `HOME`,
+  `XDG_CACHE_HOME` and `XDG_CONFIG_HOME` of USER's home, so the node reads
+  the pair and keys that USER's own runs keep; root reads none of them.
+  The file of the variables goes to `/var/lib/podssh-node-NAME/`, the
+  unit's `StateDirectory`: root makes the directory USER's, then writes a
+  new file of mode 0600 with no link followed, gives it to USER by its
+  descriptor and renames it into place, so no link of USER's leads a write
+  of root's elsewhere; root never writes in USER's home. The installer's
+  own places (`XDG_CACHE_HOME`, `XDG_CONFIG_HOME`, `PODSSH_CACHE_DIR`) are
+  not carried. The unit holds no secret, as each user may read it. Its
+  hardening: `NoNewPrivileges`, an empty `CapabilityBoundingSet`,
+  `RestrictSUIDSGID`, `ProtectSystem=strict`, `ProtectHome=tmpfs` with
+  USER's cache bound in (and its settings, read-only), `PrivateTmp`,
+  `PrivateDevices`, `ProtectKernelTunables`, `-Modules` and `-Logs`,
+  `ProtectControlGroups`, `ProtectClock`, `ProtectHostname`,
+  `ProtectProc=invisible`, `RestrictNamespaces`, `RestrictRealtime`,
+  `LockPersonality`, `MemoryDenyWriteExecute`,
+  `SystemCallArchitectures=native`, `SystemCallFilter=@system-service` with
+  `EPERM`, `RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX` and
+  `UMask=0077`. The directory of each file that a flag names is bound in
+  where `ProtectHome` hides it, or made writable where the run makes the
+  file (`--key`). `--exit`, `--routes` and `--iroh` add `AF_NETLINK`, as the
+  host's own addresses come by netlink, and the unit's comment says so; a
+  roost (`--sshd`) dials an sshd of this host and relaxes nothing. serve's
+  system unit leaves out each line that would change what a session may do
+  (sudo, its home, any program), each named in a comment. The user unit
+  keeps no hardening: a user manager may have no namespaces to give.
+  `--uninstall --system` (root) removes the unit, stopped first, and the
+  file of the variables, its lock and their directory.
 - **The journal's priorities (T-640, T-674, GitHub #138).** systemd files each
   line of a unit's stderr at one priority, `info`, so `journalctl -p
   warning -u UNIT` showed nothing that the node said. Where stderr is the
