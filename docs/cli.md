@@ -3240,6 +3240,21 @@ GitHub #23): the time of each step, the round trip, and the throughput.
   `PODSSH_OFFLINE`. With a destination: the code of `podssh ssh` when it
   cannot be reached or logged in to, the status of a remote program that
   failed, and 255 for a measure that broke.
+- A list of nodes (T-717): `--nodes NAME,NAME,...` (or `node://NAME`),
+  or `--net`, each member of the net held with the role `node`, in place
+  of a destination. Each node is measured as `ping node://NAME` measures
+  one, at most `--parallel` (8, at most 64) at once, each within
+  `--timeout` (else `PODSSH_TIMEOUT`, else 60 s, at most 600 s), the run
+  within its 600 s. A node that does not answer delays no other past its
+  bound. `--json` gives `schema`, `podssh`, `nodes` and `exit`; each node
+  has the fields of `node` of one node (`name`, `roads`, `won`, `won_ms`),
+  then `code` (0, 69 when no road answered, 75 past its bound, or its
+  refusal's code) and `error`. The exit is 0 when each node answered, 1
+  when some did not, 69 when none did. A destination, `--size`,
+  `--count`, `--target`, `--under-load` and `--connect-runs` are refused
+  with a list (64), as are `--parallel` and `--timeout` without one; `--net`
+  with no net held, or no member with the role `node`, is 78
+  (`crates/podssh-cli/src/ping/nodes.rs`).
 
 ## `podssh health`
 

@@ -4,7 +4,8 @@
 //! bytes or why it failed, and the one that answered first. Each road that
 //! starts opens its one connection, as a race of `ssh` opens it; no session
 //! goes above the roads, so the node dials nothing at its TARGET, and nothing
-//! logs in (`crate::ssh::roads::probe`). Any other run is `super::run`'s.
+//! logs in (`crate::ssh::roads::probe`). A list of nodes is `super::nodes`'s;
+//! any other run is `super::run`'s.
 
 use std::io::Write;
 use std::sync::Arc;
@@ -24,6 +25,13 @@ use crate::ssh::roads::probe::{Measured, Measures};
 /// with `PODSSH_OFFLINE`; 64 for a flag of a host's measures, before
 /// anything connects; else the refusal of the node's resolution.
 pub fn run(args: &PingArgs, out: &mut dyn Write, err: &mut dyn Write) -> i32 {
+    // A list of nodes, each measured as one is here (`super::nodes`).
+    if args.nodes.is_some() || args.net {
+        return super::nodes::run(args, out, err);
+    }
+    if let Some(flag) = super::nodes::stray(args) {
+        return Refusal::usage(format!("{flag} is for a list of nodes: --nodes or --net")).report("ping", err);
+    }
     let Some(text) = args.ssh.destination.as_deref() else { return super::run(args, out, err) };
     let env = Env::from_process();
     // What a user feels (T-660) logs in, through the road that `podssh ssh`
@@ -128,7 +136,7 @@ fn road_line(shown: &str, measured: &Measured) -> String {
 
 /// The lines of the measure: one for each road, in the order of the race,
 /// then the road that answered first, or that none did.
-fn lines(measures: &Measures) -> Vec<String> {
+pub(super) fn lines(measures: &Measures) -> Vec<String> {
     let shown = &measures.shown;
     let mut lines: Vec<String> = measures.roads.iter().map(|measured| road_line(shown, measured)).collect();
     lines.push(match winner(measures) {
@@ -141,6 +149,19 @@ fn lines(measures: &Measures) -> Vec<String> {
 /// One JSON object, in the shape of the other runs of `ping --json`, with
 /// `node` in place of the relay legs and the destination's measures.
 fn json_of(measures: &Measures, code: i32) -> Value {
+    json!({
+        "schema": 1,
+        "podssh": crate::help::version(),
+        "relays": [],
+        "destination": null,
+        "node": node_value(measures),
+        "exit": code,
+    })
+}
+
+/// The object of one node: each road with its times, and the one that won;
+/// `ping --nodes` gives the same for each node of its list.
+pub(super) fn node_value(measures: &Measures) -> Value {
     let ms = |time: Duration| (time.as_secs_f64() * 1_000_000.0).round() / 1000.0;
     let road = |measured: &Measured| match &measured.timed {
         None => json!({
@@ -162,17 +183,10 @@ fn json_of(measures: &Measures, code: i32) -> Value {
     };
     let won = winner(measures);
     json!({
-        "schema": 1,
-        "podssh": crate::help::version(),
-        "relays": [],
-        "destination": null,
-        "node": {
-            "name": measures.shown,
-            "roads": measures.roads.iter().map(road).collect::<Vec<_>>(),
-            "won": won.map(|(road, _)| road),
-            "won_ms": won.map(|(_, took)| ms(took)),
-        },
-        "exit": code,
+        "name": measures.shown,
+        "roads": measures.roads.iter().map(road).collect::<Vec<_>>(),
+        "won": won.map(|(road, _)| road),
+        "won_ms": won.map(|(_, took)| ms(took)),
     })
 }
 

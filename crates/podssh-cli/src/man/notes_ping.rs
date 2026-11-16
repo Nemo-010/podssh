@@ -29,6 +29,17 @@ pub const PING: &[&str] = &[
      answered, or the race that found none, is what podssh status --net says of the node. With --under-load or \
      --connect-runs, a node is measured as a host is, through the road that podssh ssh takes to it, and logged in \
      to.",
+    "A list of nodes. --nodes NAME,NAME,... measures the roads of each node of the list, and --net those of each \
+     member of the net held with the role node. Each node is measured as podssh ping node://NAME measures it, so a \
+     monitor of a fleet reads one shape. At most --parallel nodes are measured at once, 8 by default and 64 at most. \
+     Each node has the bound of --timeout, else PODSSH_TIMEOUT, else 60 s; the whole run has its own limit. A node \
+     that does not answer delays no other node past its bound. The lines of each node come in the order of the \
+     list, then how many nodes answered. With --json, one object holds schema, podssh, nodes and exit. Each node \
+     has name, roads, won and won_ms, as node of a single node, then code and error. The code of a node is 0 when \
+     a road answered, 69 when none did, and 75 past its bound; a refusal of the node keeps its own code. The exit \
+     is 0 when each node answered, 1 when some did not, and 69 when none did. A destination, --size, --count, \
+     --target, --under-load and --connect-runs are refused with a list (64). So are --parallel and --timeout with \
+     no list. --net with no net held, or with no member of the role node, is refused (78).",
     "What a user feels. --under-load measures the echo of keys typed as a user types them, 40 keys 150 ms apart. \
      Each key is sent at its time whether or not the one before came back, through cat: first idle, then beside head \
      -c 62914560 /dev/zero, a download of 60 MiB on a second channel of the same connection. The keys under load \

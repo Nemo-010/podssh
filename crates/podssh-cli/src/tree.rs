@@ -330,6 +330,10 @@ pub fn parse_verb(verb: &'static Verb, rest: &[std::ffi::OsString]) -> Parsed {
             json: matches.get_flag("json"),
             under_load: matches.get_flag("under-load"),
             connect_runs: matches.get_one::<String>("connect-runs").cloned(),
+            nodes: matches.get_one::<String>("nodes").cloned(),
+            net: matches.get_flag("net"),
+            parallel: matches.get_one::<String>("parallel").cloned(),
+            timeout: matches.get_one::<String>("timeout").cloned(),
             refused,
         }));
     }

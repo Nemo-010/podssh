@@ -42,6 +42,11 @@ pub struct PingArgs {
     /// `--under-load` and `--connect-runs` (T-660).
     pub under_load: bool,
     pub connect_runs: Option<String>,
+    /// `--nodes NAME,...` or `--net`, with `--parallel` and `--timeout`.
+    pub nodes: Option<String>,
+    pub net: bool,
+    pub parallel: Option<String>,
+    pub timeout: Option<String>,
     pub refused: Vec<(String, &'static str, &'static str)>,
 }
 
@@ -377,6 +382,8 @@ fn json(report: &Report, size: u64, count: usize) -> serde_json::Value {
 // A node's roads, each with its time, and the one that answered first
 // (T-435); dispatch enters `ping` there.
 pub(crate) mod node;
+// The roads of each node of a list, as one object.
+mod nodes;
 
 // What a user feels (T-660): cold connects, and keys on a beat, idle and
 // beside a download on the same connection.

@@ -1408,7 +1408,7 @@ reach, as `tailscale status`, `ping` and `netcheck` show.
 - **`ping` is entered at `crates/podssh-cli/src/ping/node.rs`**, which hands each destination that
   is no node to `ping::run`; a destination is a node when `podssh ssh` would read it as one
   (`node://NAME`, a member's name with the role node, a group of one of them). Lost: a branch
-  inside `ping::run`, whose lines entries cite (`crates/podssh-cli/src/ping/mod.rs:167-172`).
+  inside `ping::run`, whose lines entries cite (`crates/podssh-cli/src/ping/mod.rs:172-177`).
 - **The record of the roads is the client's**, `net-roads.json` in the cache, by the node's label:
   each race's winner writes it (`road_link::winner`, so each resume of `ssh` too), and so do
   `ping`, the pair's road alone in `crates/podssh-cli/src/ssh/node.rs` (`ssh` and the copies take
@@ -13798,7 +13798,7 @@ the owner's check fails the last test.
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -13809,7 +13809,7 @@ reached each and measures nothing.
 ## Premise
 
 - Read: `ping NAME` races the roads of a member and gives each its time and the winner
-  (T-435; `crates/podssh-cli/src/ping/node.rs:79-164`); `--json` exists (`crates/podssh-cli/src/flags/ping.rs:50`).
+  (T-435; `crates/podssh-cli/src/ping/node.rs:87-185`); `--json` exists (`crates/podssh-cli/src/flags/ping.rs:51`).
 - Read: `ping` takes one destination (`crates/podssh-cli/src/flags/ping.rs`, the positional).
 - Read: `status --net` measures no road (`crates/podssh-cli/src/status.rs:29`).
 - Read: each probe drops its link before `OPEN` (`TODO/mesh.md`, T-435 Decision), so no session starts.
@@ -13826,6 +13826,34 @@ reached each and measures nothing.
    than the relay's and the pair's own status.
 5. No credential in the output.
 
+## Decision
+
+- **One runtime of one thread, `buffer_unordered(--parallel)`**, in place of a task or a thread per node. Each
+  measure already runs on a current-thread runtime; on one thread each node's record of its road
+  (`net-roads.json`, written by `road_probe`) is written whole before the next one's, so a list loses no
+  record of `status --net`. Lost: a `JoinSet` of `Send` tasks (the measure's future is not known to be `Send`,
+  and the writes of the record could interleave); a process per node (the cost the ask names).
+- **Each node's bound is `--timeout`, else `PODSSH_TIMEOUT`, else 60 s** (the measure's own bound of 45 s, and
+  time for its links to close), at most the run's 600 s; a node past it has `code` 75 (`EX_TEMPFAIL`, the code of
+  a `--timeout` that passed). The whole run keeps `ping`'s limit of 600 s: a node that starts after it is not
+  measured and says so. Lost: `--timeout` as the bound of the whole run (then the stopped node of the Prove
+  could still hold the others when the list is longer than `--parallel`).
+- **The node's object is `ping node://NAME --json`'s `node`** (`name`, `roads` with `road`, `started`,
+  `started_ms`, `ms`, `answered`, `error`, then `won`, `won_ms`), from one function (`node::node_value`), with
+  `code` and `error` added; `name` is `node://NAME`, as one node's. A node that fails before its race has
+  `roads` empty. Lost: a second shape with the fields of the Approach alone (two shapes would drift).
+- **A node's `code`**: 0 when a road answered, 69 when none did, 75 past its bound, else the code of its
+  refusal (64, 78, the resolution's); the run's exit is 0, 1 or 69 by the Approach. Lost: 69 for a node past its
+  bound (it would hide the bound from a monitor that retries).
+- **`--nodes` takes `NAME` or `node://NAME`**, each once in the order given, at most 256 (the most members of a
+  net); an empty name is 64. `--net` with no net held, or with no member of the role `node`, is 78 (the setting
+  of the host, not the command line). Lost: an empty object with 69 for an empty net (a monitor would read a
+  net with no nodes as a fleet that is down).
+- **Without `--json`**, each node's lines of `ping node://NAME` in the order of the list, a line `node://NAME:
+  WHY` for a node that failed before its race, then `N of M nodes answered`.
+- **Rule 2**: no connection beside the roads of each node's race; with `--parallel N`, at most N races at
+  once, each as `ping node://NAME` opens it.
+
 ## Prove
 
 ```sh
@@ -13837,6 +13865,42 @@ cargo test -p podssh-cli --test ping_nodes
 New test: three stand-in nodes (one stopped, one with the pair's road alone, one with two roads): the object
 has three entries with the right winners and `code`, the exit is 1, and the stopped node does not delay the
 others past `--timeout`.
+
+## Correction
+
+The Premise holds in substance; its lines moved. One node's measure is `crates/podssh-cli/src/ping/node.rs`'s
+`run`, which calls `crate::ssh::node_roads::measure` and gives the object of `node`; `--json` is the row at
+`crates/podssh-cli/src/flags/ping.rs:50`; `status --net` reads `crate::net::state::status_value` and measures
+nothing (`crates/podssh-cli/src/status.rs:33`-`34`, `:109`). `--timeout` takes a duration (`20s`, a bare
+`20` is 20 s), as every other `--timeout` of podssh does, and `PODSSH_TIMEOUT` is its default, as the manual's
+fact of that variable says of each command with the flag.
+
+## Done
+
+Partial, 2026-11-16. Drafted by a drafting agent, unbuilt (`draft-t717`, DRAFT T-717). Written:
+
+- `crates/podssh-cli/src/ping/nodes.rs` (new): the plan of the flags, the names of `--nodes` and of `--net`,
+  the measure of each node with its bound on one runtime, the exit, the lines and the JSON; its unit tests are
+  `crates/podssh-cli/src/ping/nodes_tests.rs` (the list, the flags refused, the bound, the exit, the JSON).
+- `crates/podssh-cli/src/ping/node.rs`: `run` hands a list to `nodes`, and refuses `--parallel` and
+  `--timeout` with no list; `lines` and the new `node_value` are shared.
+- `crates/podssh-cli/src/ping/mod.rs` (`PingArgs`: `nodes`, `net`, `parallel`, `timeout`),
+  `crates/podssh-cli/src/tree.rs`, `crates/podssh-cli/src/flags/ping.rs` (four rows, `--timeout` optional),
+  the summary of `ping` in `crates/podssh-cli/src/flags.rs`, the manual's note
+  (`crates/podssh-cli/src/man/notes_ping.rs`) and `docs/cli.md` (section `podssh ping`).
+- `crates/podssh-cli/tests/ping_nodes.rs` (new): podssh's relay role on the loopback, pairs `one`, `two` and
+  `gone`, the nodes of `one` and `two` online, a DERP ticket kept under `two` whose server drops each
+  connection; `ping --nodes one,node://two,gone --parallel 3 --timeout 20s --json` gives the three in their
+  order, the pair's road as the winner of `one` and `two`, two roads for `two`, a code and an error for
+  `gone`, exit 1, within the bound and 15 s, and no token of a pair in the output; the lines end with `2 of 3
+  nodes answered`; the refusals (a host's flag, `--parallel` alone, `--parallel 65`, both lists: 64; `--net`
+  with no net: 78).
+
+Merged 2026-11-16: `cargo test -p podssh-cli --lib ping::` 19 passed (`--lib` whole 1202); `--test ping_nodes` 3
+passed (the DERP road of `two` raced and did not answer, as written); `--test ping` 16 passed; the manual's tests
+(`man_page`, `man_json`, `man_flag_parity`, `flag_table`, the text rules) passed; clippy (the gate's lints) and rustfmt
+clean; the citations moved by `cargo todo remap`. Planted: the exit of a partial answer made 0 fails
+`the_exit_is_0_1_or_69` and `the_json_has_each_node_with_its_code`. Done.
 
 # T-720: `podssh relay serve` serves the iroh relay protocol and DERP on its one 443 listener
 

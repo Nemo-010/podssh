@@ -1,9 +1,10 @@
 //! The flag rows of `ping` (T-053): the relay's flags, the flags that a
 //! login needs, with the ids of `ssh` so that its arguments are read the
 //! same way, the size, the count and the JSON of the measures, and the
-//! measures of what a user feels (T-660).
+//! measures of what a user feels (T-660), and the list of nodes whose roads
+//! are measured at once.
 
-use super::{row, FlagKind, FlagRow};
+use super::{optional, row, FlagKind, FlagRow};
 
 /// **`ping`.** With no destination, the relay leg; with one, the SSH
 /// measures too.
@@ -49,4 +50,13 @@ pub const PING_FLAGS: &[FlagRow] = &[
         "with a host, first: N cold connects, each timed from its own connection to the exit of true (at most 20)", None),
     row(None, "json", None, FlagKind::Supported,
         "the measures as one JSON object on stdout", None),
+    // A monitor of a fleet reads each node's roads in one object.
+    row(None, "nodes", Some("NAMES"), FlagKind::Supported,
+        "in place of a destination, the roads of each node of NAME[,NAME...], each as ping node://NAME measures it", None),
+    row(None, "net", None, FlagKind::Supported,
+        "in place of a destination, the roads of each member of the net held with the role node", None),
+    row(None, "parallel", Some("N"), FlagKind::Supported,
+        "with --nodes or --net, the most nodes measured at once (default 8, at most 64)", None),
+    optional(row(None, "timeout", Some("DURATION"), FlagKind::Supported,
+        "with --nodes or --net, the bound of each node, as a duration (30s, 2m), 10m at most; never required (default: env PODSSH_TIMEOUT, else 60s)", None)),
 ];

@@ -435,7 +435,7 @@ pub const VERBS: &[Verb] = &[
     Verb { name: "agent", aliases: &["agent", "ssh-agent"], flags: AGENT_FLAGS,
         about: "an SSH agent inside podssh, and add, list, remove and lock its keys" },
     Verb { name: "ping", aliases: &["ping"], flags: PING_FLAGS,
-        about: "a short check of the path: each step to the relay, pings, and with a host the echo and throughput; with node://NAME, each of its roads and the one that answered first" },
+        about: "a short check of the path: each step to the relay, pings, and with a host the echo and throughput; with node://NAME, each of its roads and the one that answered first; with --nodes or --net, those of each node" },
     Verb { name: "health", aliases: &["health"], flags: HEALTH_FLAGS,
         about: "the far host's load, CPUs, memory, uptime, network, disks and processes, read over one exec" },
     Verb { name: "play", aliases: &["play"], flags: PLAY_FLAGS,
