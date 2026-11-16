@@ -40,7 +40,7 @@ Read on 2026-11-15.
    take of `v0.42.0`, which answered each. cfb's asks, T-708 to T-731 (#195), wait behind podssh's own work order, M10
    included (the owner's ruling "Priority").
 7. **The move to PodUtils/podcrates** (T-684, Q101, Rule Q3). podssh pins each podcrates crate at
-   `v0.58.0` (COORD-116, PodUtils/podcrates#200; podssh's answer is COORD-087). Taken, so worked on in
+   `v0.59.0` (COORD-118, PodUtils/podcrates#204; podssh's answer is COORD-088). Taken, so worked on in
    PodUtils/podcrates: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`,
    `pod-proxy`, `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`
    and `pod-relay` (2026-11-12), `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue), and
@@ -52,7 +52,7 @@ Read on 2026-11-15.
    `acme/mod.rs` of `podssh-cli`). Nothing is frozen now (2026-11-15). Next, as podcrates names
    them: `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
    `pod-relay-serve` last.
-8. **Drafts.** In work: none. Merged on 2026-11-15: T-790's sentences of the manual at 25 words or fewer. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
+8. **Drafts.** In work: T-791's lane script (the file pod-lab-lane.sh of scripts/) on the branch `draft/t791-lane` (pushed to GitHub, one commit "WIP T-791"; commands 2, 3 and 5 of the lane, 5 UNVERIFIED; not built into the gate). Merged on 2026-11-15: T-790's sentences of the manual at 25 words or fewer. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
    T-118's, T-117's, T-114's, T-112's,
    T-110's, T-109's, T-108's with T-222, T-107's, T-771's, T-773's, T-738's second and third, T-321's
    CLI test of `podssh each`, T-319's item 2, and the takes of podcrates v0.36.0 to v0.39.0 and
@@ -74,21 +74,31 @@ tag at once; `v1.1.0-beta.4` waits for the move, then goes out with its testers'
 it, while podcrates builds: the GSRN road's live test (done), the cell of an outage (T-786), the netem lab of T-625,
 T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 
-**Hand-off of 2026-11-15 (the session ended at the operator's word).** Pushed and green up to `a99de1d`'s gate; the
-commits after it are pushed with this note. For the next session, in order:
-1. Read the gate of the last push; repair a failure first.
-2. T-684: podcrates `v0.50.0` (step 1), `v0.51.0` and `v0.52.0` (step 2: all of pod-egress) are taken (2026-11-15,
-   COORD-076, COORD-077 and COORD-079). Next, the crates that podcrates names after them (`pod-tor`, `pod-iroh`,
-   `pod-cloudflare`, `pod-ts`, then `pod-relay-serve`), each tag taken at once; `v0.53.0` also brings COORD-078's
-   fix (T-789).
-3. COORD-075 (#253, T-787): done with `v0.51.0`, `quic_socket_fails.rs` runs and passes.
-4. The netem labs: T-665 and T-625 are done (2026-11-15, runs 43691396393 and 43691399331: `tuned` is the iroh
-   road's default; the Wisp road holds the demo server's bound each way). T-786 is done (run 43709370293): the
-   resumable layer outlives a cut of 15 s that osewa does not, but comes back about 12.5 s after it; T-789 (P2,
-   blocked) found why: a spare rides the pooled HTTP/2 connection of the silent link; podcrates is asked (COORD-078,
-   #262), and the cell runs again on its tag.
-5. T-780 and T-788 wait for their next failure; then `v1.1.0-beta.4` after T-684 and after its run in `pod-lab`'s
-   profiles (T-791, the owner's ruling "Discipline"), and update the testers' guide #249.
+**Hand-off of 2026-11-16 (the session ended at the operator's word).** Every change is pushed to `main`; the one
+draft is the branch `draft/t791-lane` (below). No run of Actions has passed since `d00ca78` (run 43766309151: green but
+`gate (m6)`, T-780). This session's GitHub account starts no workflow: each run is asked by a new issue
+`[gh action] requested` with one `sh` block, for the owner's local agent (PodUtils/podvm#387 has the form). For the next
+session, in order:
+1. **#276 waits for the owner's agent**: the gate of `build.yml`, the first dry run of `issue-sync.yml`
+   (`dry_run=true`), and `release.yml` by hand with no tag (it runs T-793's new step of the installer). Its block names
+   `bde7f17f`; move `SHA` to the newest commit of `main` before it runs (amend the body, with a `state:` line), or
+   close it and ask anew. Read each run when it ends (`watch.py` shows it): a red gate first; the dry run of the sync
+   before any real run of it (the sync then closes and opens issues from the record: read what it would change).
+2. **T-780** (P1, partial): m6's session hangs after a resume at random in the gate, five shapes so far, none made
+   here (12 of 12 under load). Both of m6's clients run with `-v` now; read the next failure's lines.
+3. **T-791** (partial): podssh's lane in `pod-lab` passes commands 1 to 4 (doctor, `release-short.sh --net`, ssh and
+   cp of 200 MiB through a node, `scripts/m5-in-sandbox.sh` with serve, vi, less and Ctrl-C) in the nine held profiles
+   and in `bind-denied` with `podlab run --allow-connect PROXY_PORT` (podlab `v0.58.0`'s release asset). Next:
+   command 5 (`pipe`) and 6 (a session after a kill of its relay link), and the lane as a script of `scripts/`: the
+   draft `draft/t791-lane` holds the session's script of commands 2, 3 and 5 (UNVERIFIED for 5). The network classes
+   wait for podnet's data (podcrates T-716).
+4. **T-793** (partial): `scripts/install/podssh.sh` on podcrates' installer core (`get-core.sh` pins it at `v0.58.0`);
+   `release.yml` stamps it. UNVERIFIED: the release's run of the step (#276), then a published beta's installer.
+5. **T-790** (partial): no work id and no sentence over 25 words in the manual, the help and the lines of a run. Next:
+   the manual on `pod-manual`'s model, with its checks (`check::texts`, `check::variables`, `check::exit_codes`).
+6. **T-684**: podcrates `v0.59.0` is taken (3837 passed). COORD-088 tells podcrates; the open COORD issues of the take
+   (#274, #277, #279) close when podcrates records each. Each next tag is taken at once.
+7. `v1.1.0-beta.4` after T-684 and T-791, with the testers' guide (#249).
 
 The lead session's queue for the night of 2026-11-13, in order. "Live" needs a run of GitHub
 Actions; "offline" needs none. A test that fails at random, or a red gate, goes before the next

@@ -5884,6 +5884,11 @@ changes are in `pod-manual` and `pod-lab`, which no crate of podssh depends on. 
 tag, so the call stays at `v0.57.0`. `cargo clippy --workspace --all-targets` clean; `cargo test --workspace
 --no-fail-fast` 3837 passed, 0 failed, 82 ignored.
 
+2026-11-16, podcrates `v0.59.0` (`0e782114`, COORD-118, PodUtils/podcrates#204), a bump of the tag with no patch for
+podssh: `pod-enter`'s volumes, podnet's two defects and a row of `pod-lab`; its one breaking change is in `pod-enter`,
+which podssh does not use. `issue-sync.yml` calls podcrates' workflow at `v0.59.0`. `cargo clippy --workspace
+--all-targets` clean; `cargo test --workspace --no-fail-fast` 3837 passed, 0 failed, 82 ignored.
+
 Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
 `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
