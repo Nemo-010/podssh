@@ -20,7 +20,7 @@ use tokio::net::TcpStream;
 pub use pod_proxy::env::{is_loopback, no_proxy_entry, no_proxy_matches, NO_PROXY_VARS, PROXY_VARS};
 pub use pod_proxy::host::{authority, check_name, split_host_port};
 pub use pod_proxy::http::parse_status_line;
-pub use pod_proxy::{interleave, DialError, HttpProxy, Multipath, Proxy, ProxyKind, ATTEMPT_DELAY};
+pub use pod_proxy::{interleave, Carrier, DialError, HttpProxy, Multipath, Proxy, ProxyKind, ATTEMPT_DELAY};
 // The stage of a [`DialError::Timeout`]: the proxy, the connection, the
 // resolution.
 pub use pod_core::Stage;

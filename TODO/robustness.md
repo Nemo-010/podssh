@@ -2886,4 +2886,13 @@ on the commit runs each target.
 Partial, 2026-11-16. `scripts/fuzz-seeds.py` counts the IRC lines and the messages of Cap'n Proto that it writes, and no
 longer writes `ws_frame`'s seeds; its head names the targets that moved. `python3 -I scripts/fuzz-seeds.py`: "51 IRC
 lines, 23 messages of Cap'n Proto", exit 0; the code before it, run the same way here: exit 1, `NameError: name 'hosts'
-is not defined`. UNVERIFIED: `fuzz.yml` by hand on the push, each target run.
+is not defined`. `fuzz.yml` by hand at `7c20f2e` (run 43880857817): the seeds were written ("51 IRC lines, 23 messages
+of Cap'n Proto") and each of the 16 targets ran its 120 s, 15 of them with no failure. `proxy_url` failed on its first
+crash in two weeks of no fuzzing: `http+unix:/s+unix:/`, which `pod-proxy` parses as an HTTP proxy on a Unix socket
+(host empty, port 0) and shows as its socket, `unix:/s+unix:/`, while the target held that each proxy shows its host and
+port (an empty host and port 0). The parser was right and the target stale, written before `pod-proxy` took proxies on a socket or at a
+command: it now wants the host and port of a proxy over TCP alone, and of the others an address that is not one
+(`crates/podssh-ws/src/dial.rs` gives `Carrier` beside `Proxy`); the round trip of the URL stays. Checked by the
+target's property on `http+unix:/s+unix:/`, `http://user:pw@proxy.example:3128` (shown as `proxy.example:3128`) and
+`socks5h+unix:/run/p.sock`, each passed, and `cargo check --manifest-path fuzz/Cargo.toml --bin proxy_url`.
+UNVERIFIED: `fuzz.yml` again on the push, each target with no failure.
