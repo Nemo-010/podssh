@@ -6816,5 +6816,9 @@ offline bundle; a temporary file of a run that a KILL cut removed by the next ru
 `noexec-tmp`, `noexec-home`, `inherited-fds`, `no-proc`, `no-passwd-entry` and `ro-etc-ssl` (podlab `v0.58.0`) a
 first and a second run, and under `noexec-home` the default prefix refused with its reason; `shellcheck -x
 --shell=sh` clean on the tree's files and on the stamped one; `pins.py check` passes; the release step itself on a
-copy of `dist` with two stand-ins. Not here: `busybox sh` (no busybox on this host). UNVERIFIED: the release's run of
-the step, and the installer of a published release, which the next beta gives.
+copy of `dist` with two stand-ins. Not here: `busybox sh` (no busybox on this host). The release's run of
+the step, 2026-11-16, `release.yml` by hand at `71ebc9d` (run 43815141894, each job green): `get-core.sh` checked
+`core.sh` and `pins.py` at their pin, `SHA256SUMS` of 8 files, the installer stamped with the pins of `1.1.0-beta.3`,
+the bundle of 9 files, then `sh dist/podssh-install.sh --prefix PREFIX --offline` installed the x86_64 binary by its
+SHA-256 and its self-check (`podssh man --json`) passed. UNVERIFIED: the installer of a published release, which the
+next beta gives.
