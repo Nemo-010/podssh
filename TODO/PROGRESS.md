@@ -76,6 +76,12 @@ tag at once; `v1.1.0-beta.4` waits for the move, then goes out with its testers'
 it, while podcrates builds: the GSRN road's live test (done), the cell of an outage (T-786), the netem lab of T-625,
 T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 
+**The session of 2026-11-16, later (cloud):** #276's three red jobs repaired (`71ebc9d`: the gate and `release.yml` green);
+podcrates `v0.60.0` taken (`cbef76d`, COORD-089, #281); T-792 done; T-793's release step verified; the network labs
+of `pod-lab` run with doctor (T-791), and the lane behind them asked of podcrates (COORD-090, #282). This account
+starts runs by a push and by `gh workflow run`. Next, in order: T-780; T-791's commands 5 and 6 with the draft
+`draft/t791-lane` (live: a pair on the live relay and a throwaway sshd); T-790; each next tag of podcrates.
+
 **Hand-off of 2026-11-16 (the session ended at the operator's word).** Every change is pushed to `main`; the one
 draft is the branch `draft/t791-lane` (below). No run of Actions has passed since `d00ca78` (run 43766309151: green but
 `gate (m6)`, T-780). This session's GitHub account starts no workflow: each run is asked by a new issue
