@@ -2593,6 +2593,17 @@ client's proxy logged a CONNECT before the RST and one after it; the node's prox
 alone, its link to the relay ("online again"), and none for the session. So the node opened no new connection for the
 resumed session, and yet the client heard the far end's greeting and proof: the question for podcrates is which way
 carried the node's half of that resume (COORD-091, amended).
+A seventh time, on 2026-11-16, at `5340fbb` (podcrates `v0.63.0`, run 43870922795, job `gate (m6)`):
+`the_layer_survives_a_stall_of_3_minutes`, now with the far end's line of each resume (podcrates `v0.62.0`, its
+T-767). The client: a spare link timed out, "nothing came from the far end for 30 s; resuming the session", five
+tries whose TLS handshakes timed out after 20 s, then "the session resumed after 150.0 s, 687745 bytes sent again"
+(inside the stall of 180 s), and nothing after for 450 s. The node: "resume 1 on relay session 186f0a64...: the client
+has 5040486 bytes of this side, and this side sends 0 bytes again; this side has 7814432 bytes of the client (7814432
+in its ACCEPT), 0 of them not yet written to the target; no link carried the session". The test echoes, so the target
+had answered more than the 5,040,486 bytes that the node sent; as the node sends 0 again, about 2.77 MB of the answer
+never left the target or the node's read of it, and never moved after the resume. So the session holds at the node,
+in the half that reads the target and writes to the link, after the resume of a session that no link carried. COORD-091
+(#283), amended, gives podcrates the line and asks for a look at that half, or a line of its room and wait.
 
 
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes
