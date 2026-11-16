@@ -8,7 +8,8 @@ this page keeps no history (git does).
 
 Read on 2026-11-15.
 
-1. **The gate.** Green at `71ebc9d` (2026-11-16, run 43814811221, by its push; `release.yml` by hand there, run
+1. **The gate.** Green at `f5b4f43` (2026-11-16, run 43823925587, the take of `v0.60.0`; its `gate (m6)` failed once,
+   T-780's sixth, and passed on attempt 2). Green at `71ebc9d` (run 43814811221, by its push; `release.yml` by hand there, run
    43815141894, green). This session's account starts runs by a push and by hand. #276's runs at `bde7f17`
    (2026-11-16): `build.yml` red in `gate (lint)` and `gate (iroh)`, `release.yml` red in its aarch64 musl build,
    `issue-sync.yml`'s dry run green; the three are repaired on 2026-11-16 (`docs/STATUS.md`, "Where things stand"). This session's GitHub account starts no workflow, by a push or by hand: each run is asked of the
@@ -79,7 +80,7 @@ T-665 and T-463, and `feel-netem.yml` again on osewa v0.1.5.
 **The session of 2026-11-16, later (cloud):** #276's three red jobs repaired (`71ebc9d`: the gate and `release.yml` green);
 podcrates `v0.60.0` taken (`cbef76d`, COORD-089, #281); T-792 done; T-793's release step verified; the network labs
 of `pod-lab` run with doctor (T-791), and the lane behind them asked of podcrates (COORD-090, #282). This account
-starts runs by a push and by `gh workflow run`. Next, in order: T-780; T-791's commands 5 and 6 with the draft
+starts runs by a push and by `gh workflow run`. Next, in order: T-780 (fails here 1 run in 15 now; COORD-091, #283, asks podcrates); T-791's commands 5 and 6 with the draft
 `draft/t791-lane` (live: a pair on the live relay and a throwaway sshd); T-790; each next tag of podcrates.
 
 **Hand-off of 2026-11-16 (the session ended at the operator's word).** Every change is pushed to `main`; the one

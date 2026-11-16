@@ -6,7 +6,7 @@ each entry's `## Done` is its own record. Where this page and an entry disagree,
 
 ## The state of `main`
 
-- The gate is green at `71ebc9d` (2026-11-16, run 43814811221), and `release.yml` by hand there (run 43815141894).
+- The gate is green at `f5b4f43` (2026-11-16, run 43823925587, attempt 2 for T-780's m6) and at `71ebc9d` (run 43814811221), and `release.yml` by hand there (run 43815141894).
 - The record agrees (`cargo todo check`), and `python scripts/check-repo.py` passes.
 - No draft waits for its merge ("Drafts" in `TODO/PROGRESS.md`).
 

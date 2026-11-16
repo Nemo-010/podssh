@@ -20,7 +20,8 @@ Read on 2026-11-13; the rows below are the measurements.
   HTTP/2 roads in part (T-319, T-321), the quick tunnel, and the public carriers and last fallbacks of M10 (Piping Server,
   Wisp, OpenTunnel, croc, Serveo, ssh-j, localhost.run, localtunnel, bore and others), and ZeroTier's
   road, live through ZeroTier Inc.'s roots and relay and in the release's features on Unix (T-733).
-- **The gate.** Green at `71ebc9d` (2026-11-16, run 43814811221, each job, `gate (m6)` among them). Red at `bde7f17` (2026-11-16, run 43804352372):
+- **The gate.** Green at `f5b4f43` (2026-11-16, run 43823925587, podcrates `v0.60.0`; `gate (m6)` on its second attempt,
+  T-780) and at `71ebc9d` (run 43814811221, each job on its first). Red at `bde7f17` (2026-11-16, run 43804352372):
   `gate (lint)` (rustfmt of `crates/podssh-relay/src/filehost/carrier_tests.rs`) and `gate (iroh)` (`pinggy_record` still
   read a work id that T-790 took out of the line), both repaired on 2026-11-16 (`cargo test -p podssh-cli --features
   podssh-cli/iroh-test --test pinggy_road`: 8 passed); the release's aarch64 build there with them (T-777's row).
