@@ -863,7 +863,7 @@ roff source and not a renderer, so CI stayed green.
 ## Approach
 
 1. The roff writer uses only standard man(7) requests and defines no macro
-   (`crates/podssh-cli/src/man/roff.rs:1-13`). A flag is a `.TP` term in bold.
+   (`crates/podssh-cli/src/man/roff.rs:1-10`). A flag is a `.TP` term in bold.
 2. The gate renders the page with groff and mandoc, and finds each flag
    spelling of `--help` in both (`scripts/interop-man.sh`). A planted page
    must fail (`scripts/interop-man.sh:114-125`).
@@ -877,8 +877,8 @@ cargo test -p podssh-cli --test man_page -- a_real_renderer_shows_each_flag_name
 sh scripts/dev.sh check
 ```
 
-The first checks the requests (`crates/podssh-cli/src/man/roff.rs:157`) and
-the `.TP` term of each flag (`crates/podssh-cli/src/man/roff.rs:183`). The
+The first checks the requests (`crates/podssh-cli/src/man/roff.rs:77`) and
+the `.TP` term of each flag (`crates/podssh-cli/src/man/roff.rs:103`). The
 second renders the page when the host has groff or mandoc, and says so when
 it has neither. The gate runs `scripts/interop-man.sh` with both renderers,
 `groff -ww`, `mandoc -Tlint -W error` and the planted page.

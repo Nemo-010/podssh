@@ -6708,6 +6708,38 @@ scripts/interop-man.sh target/debug/podssh` (groff and mandoc of this host) 7 ch
 roff, JSON, the help) on the crate's, `check::generated` for the man page and `llms.txt`, and `check::flags` against the
 parser.
 
+Step six, 2026-11-16 (a draft, `draft-t790-writers`), the first writer on the crate's, and `check::flags`. `podssh man
+--roff` and `--roff SECTION` are `pod_manual::roff` over `pod_model::manual()` (`crates/podssh-cli/src/man/roff.rs`,
+podssh's roff writer gone): a section is found by podssh's own names, so each form takes and refuses the same names, and
+the page of `ssh` carries the topic `keywords`, that of `environment` the topic `retired-variables`, as the text does.
+The flag of the model is the sentence that `--help` prints (`help::help_text`, its kind in its words) and the crate's
+kind `Wired`: the crate's words for a kind ("Accepted and ignored: WHY", "Refused. Use X") would be a second sentence
+that `--help` does not print, and an empty WHY left "Accepted and ignored:". Measured by a program of the draft's own
+with the rule of `pod_manual::rules`: the 27 rows of another kind than supported, with their suffix, have no sentence
+over 25 words. `check::flags` runs against the parser: the root's options as `tree::parse` answers them and its verbs as
+`flags::verb_for` selects them, each verb's flags from `tree::verb_command` (a verb that does not work here: `--help`
+alone, as its help and the manual show), with a control that plants a flag in the model, takes one out and drops a
+value, each found. No man page and no `llms.txt` is kept in the repository, so `check::generated` has no file to check.
+Kept on podssh's writers, each with the reason in `man/mod.rs`: the text (the crate's layout, headings `podssh ssh`
+under COMMANDS, notes before the usage, the options before a command as items of SYNOPSIS and examples with `$ `, is
+not the one that the parity gate `tests/man_flag_parity.rs` and `scripts/interop-man.sh` read, and the crate adds a stop
+to each flag's sentence, so the text and `--help` move together, as one step); the JSON (the crate's form is the model,
+also `schema` 1, with no availability of a command, no kind of a flag but wired, ignored and refused, the keywords as
+blocks of a topic and a prose topic served with exit 0, where `docs/cli.md`, the tool `man` of `podssh mcp` and GitHub
+#10 read podssh's shape); and `--help` (`OPTIONS:` and `SUBCOMMANDS:` blocks, read by `scripts/interop-man.sh` and the
+parity gate). Asks of podcrates: an empty WHY or INSTEAD adds only "Accepted and ignored." or "Refused."; a kind "not
+in this release"; the availability of a command; and a way
+to keep a topic inside a command's section (the keywords of `ssh`). Docs: `docs/cli.md` ("Roff second") names the
+crate's writer; the citations of `man/roff.rs` and `man/mod.rs` in `TODO/cli.md` and `TODO/machine.md` moved by hand.
+Merged the same day: the crate's page escapes the hyphen of its title (`.TH PODSSH\-PROXY`, as man(7) asks), so the two
+tests that pinned podssh's own `.TH PODSSH-PROXY` take the crate's form; clippy's two auto-derefs mended. `cargo test -p
+podssh-cli --lib` 1180 passed (`man::` 73, `each_command_and_flag_is_the_parser_s` and
+`a_planted_drift_of_a_flag_is_found` among them); `--test man_page --test man_json --test man_flag_parity` 21 passed;
+`sh scripts/interop-man.sh target/debug/podssh` 7 checks ok (groff `-ww`, mandoc's lint, the planted page failed);
+clippy (the gate's lints) and rustfmt clean. Next: the text and `--help` on the crate's together, with the parity gate's
+readers; the JSON keeps podssh's shape, which `docs/cli.md`, `podssh mcp`'s `man` and GitHub #10 read, until the crate's
+model carries a command's availability and the kinds of flag (the asks above, a COORD issue to podcrates).
+
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
 

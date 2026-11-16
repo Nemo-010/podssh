@@ -1,191 +1,130 @@
 //! The manual as a man(7) page: what `podssh man --roff` writes, for
-//! `man -l` or a man directory. It uses only man(7) macros and requests that
-//! groff and mandoc both render, and it defines no macro of its own: a
-//! macro defined in the page is roff that one renderer reads differently from
-//! another (an `Fl` macro that used `\$*` printed blank flag names under
-//! groff).
+//! `man -l` or a man directory. The page is pod-manual's writer over
+//! [`super::pod_model::manual`], so podssh writes no roff of its own: the
+//! crate keeps to the man(7) macros that groff and mandoc both render, and
+//! defines none (an `Fl` macro that used `\$*` once printed blank flag names
+//! under groff).
+//!
+//! A section is found by podssh's own names ([`super::model::Manual::find`]),
+//! so each form of `podssh man` takes the same names and refuses the same
+//! way.
 
-use std::fmt::Write as _;
+use pod_manual as pm;
+use pod_manual::sections::{find, sections, Section};
 
-use super::model::{Block, Manual, Section, Span};
+/// The topics of the crate's model that podssh's own manual shows inside a
+/// section, as the section's key and the topic's key: the `-o` keywords in
+/// `ssh`, the retired names in ENVIRONMENT. A page of one section carries
+/// them, so that `--roff SECTION` says what the text says.
+const INSIDE: &[(&str, &str)] = &[("ssh", "keywords"), ("environment", "retired-variables")];
 
-/// Each request the page may contain.
-pub const MACROS: &[&str] = &[".TH", ".SH", ".SS", ".PP", ".TP", ".RS", ".RE", ".nf", ".fi", ".nh", ".ad"];
-
-/// Text made safe for roff: a backslash is `\e`, a hyphen is `\-` (the
-/// hyphen-minus that a user types), and a line that starts with `.` or `'`
-/// starts with the zero-width `\&`, so no text can become a request.
-pub fn escape(s: &str) -> String {
-    let mut out = String::with_capacity(s.len() + 8);
-    let mut line_start = true;
-    for c in s.chars() {
-        match c {
-            '\\' => out.push_str("\\e"),
-            '-' => out.push_str("\\-"),
-            '\n' => {
-                out.push('\n');
-                line_start = true;
-                continue;
-            }
-            '.' | '\'' if line_start => {
-                out.push_str("\\&");
-                out.push(c);
-            }
-            _ => out.push(c),
-        }
-        line_start = false;
-    }
-    out
+/// The whole page.
+pub fn page() -> String {
+    pm::roff::render(&super::pod_model::manual())
 }
 
-/// A term: what a user types in bold, a value to replace in italics.
-fn spans(list: &[Span]) -> String {
-    let mut out = String::new();
-    for s in list {
-        match s {
-            Span::Lit(t) => {
-                let _ = write!(out, "\\fB{}\\fR", escape(t));
-            }
-            Span::Var(t) => {
-                let _ = write!(out, "\\fI{}\\fR", escape(t));
-            }
-            Span::Plain(t) => out.push_str(&escape(t)),
+/// The page of the section with podssh's key `key`, or `None` when the
+/// crate's model has no section of that key.
+pub fn section(key: &str) -> Option<String> {
+    let manual = super::pod_model::manual();
+    let all = sections(&manual);
+    let mut one: Section = find(&manual, &all, key)?.clone();
+    for (_, topic) in INSIDE.iter().filter(|(k, _)| *k == key) {
+        if let Some(t) = all.iter().find(|s| s.command.is_none() && s.key == *topic) {
+            one.blocks.push(pm::Block::Sub { text: t.heading.clone() });
+            one.blocks.extend(t.blocks.iter().cloned());
         }
     }
-    // A term that starts with a space or a period must not start a request.
-    if out.starts_with(['.', '\'']) {
-        out.insert_str(0, "\\&");
-    }
-    out
-}
-
-/// `title` is `PODSSH` or `PODSSH-` and a section key: letters and hyphens,
-/// which a header shows as they are.
-fn header(out: &mut String, title: &str) {
-    debug_assert!(title.chars().all(|c| c.is_ascii_uppercase() || c == '-'), "{title}");
-    let _ = writeln!(out, ".TH {title} 1 \"\" \"podssh {}\" \"podssh manual\"", escape(&crate::help::version()));
-    // No hyphenation, and a ragged right margin: a flag broken at a line
-    // end, or spread with extra spaces, cannot be copied.
-    out.push_str(".nh\n.ad l\n");
-}
-
-pub fn render(manual: &Manual) -> String {
-    let mut out = String::new();
-    header(&mut out, "PODSSH");
-    out.push_str(".SH NAME\n");
-    let _ = writeln!(out, "podssh \\- {}", escape(crate::flags::ABOUT));
-    out.push_str(".SH SYNOPSIS\n");
-    out.push_str("\\fBpodssh\\fR \\fICOMMAND\\fR [\\fIOPTIONS\\fR]\n");
-    out.push_str(".SH DESCRIPTION\n");
-    blocks(&mut out, &manual.intro);
-    let mut commands = false;
-    for s in &manual.sections {
-        if s.command {
-            if !commands {
-                out.push_str(".SH COMMANDS\n");
-                commands = true;
-            }
-            let _ = writeln!(out, ".SS {}", escape(s.key));
-        } else {
-            let _ = writeln!(out, ".SH \"{}\"", escape(&s.heading));
-        }
-        blocks(&mut out, &s.blocks);
-    }
-    out
-}
-
-/// One section, as `podssh man --roff SECTION` writes it.
-pub fn render_section(s: &Section) -> String {
-    let mut out = String::new();
-    header(&mut out, &format!("PODSSH-{}", s.key.to_ascii_uppercase()));
-    let _ = writeln!(out, ".SH \"{}\"", escape(&s.heading));
-    blocks(&mut out, &s.blocks);
-    out
-}
-
-/// The blocks after a heading. A heading starts a paragraph itself, so the
-/// first block needs no `.PP` (mandoc warns about one).
-fn blocks(out: &mut String, list: &[Block]) {
-    for (i, b) in list.iter().enumerate() {
-        let pp = if i == 0 { "" } else { ".PP\n" };
-        match b {
-            Block::Para(t) => {
-                let _ = writeln!(out, "{pp}{}", escape(t));
-            }
-            Block::Line(s) => {
-                let _ = writeln!(out, "{pp}{}", spans(s));
-            }
-            Block::Sub(t) => {
-                let _ = writeln!(out, "{pp}\\fB{}:\\fR", escape(t));
-            }
-            Block::Item { term, text } => item(out, term, text),
-            Block::Table(rows) => {
-                for (term, text) in rows {
-                    item(out, term, text);
-                }
-            }
-            Block::Example { text, command } => {
-                let _ = writeln!(out, "{pp}{}\n.RS 4\n.nf\n{}\n.fi\n.RE", escape(text), escape(command));
-            }
-        }
-    }
-}
-
-fn item(out: &mut String, term: &[Span], text: &str) {
-    let _ = writeln!(out, ".TP\n{}", spans(term));
-    if !text.is_empty() {
-        let _ = writeln!(out, "{}", escape(text));
-    }
+    Some(pm::roff::render_section(&manual, &one))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::man::model::{flag_term, manual, plain};
+    use crate::man::model;
+
+    fn requests(page: &str) -> Vec<String> {
+        let first = |l: &str| l.split_whitespace().next().unwrap_or_default().to_string();
+        page.lines().filter(|l| l.starts_with(['.', '\''])).map(first).collect()
+    }
 
     #[test]
     fn the_first_line_is_th_and_the_name_follows() {
-        let page = render(&manual());
+        let page = page();
         let first = page.lines().next().unwrap();
         assert!(first.starts_with(".TH PODSSH 1 "), "{first}");
         assert!(page.contains(".SH NAME\npodssh \\- "), "no NAME section");
     }
 
-    /// Each request line of the page is one of [`MACROS`]: no text became a
-    /// request, and no macro is defined.
+    /// Each section that podssh's names select has its page, under its own
+    /// title; the sections that show a topic inside them carry it.
+    #[test]
+    fn each_section_of_podssh_has_its_page() {
+        for key in model::manual().keys() {
+            let page = section(key).unwrap_or_else(|| panic!("no page for {key}"));
+            let title = format!(".TH {} 1 ", pm::roff::escape(&format!("PODSSH-{}", key.to_ascii_uppercase())));
+            assert!(page.starts_with(&title), "{key}: {}", page.lines().next().unwrap_or(""));
+        }
+        let ssh = section("ssh").unwrap();
+        let honoured = &crate::ssh::keywords::HONOURED[0];
+        assert!(ssh.contains(&pm::roff::escape(honoured.name)), "the keywords are not in ssh's page");
+        assert!(section("nonsense").is_none());
+    }
+
+    /// Each request line of each page is one of the crate's macros: no text
+    /// became a request, and no macro is defined.
     #[test]
     fn the_page_uses_only_the_listed_requests() {
-        let m = manual();
-        let mut pages = vec![render(&m)];
-        pages.extend(m.sections.iter().map(render_section));
+        let mut pages = vec![page()];
+        pages.extend(model::manual().keys().into_iter().filter_map(section));
         for page in pages {
-            for line in page.lines().filter(|l| l.starts_with(['.', '\''])) {
-                let request = line.split_whitespace().next().unwrap();
-                assert!(MACROS.contains(&request), "unlisted request {request:?} in {line:?}");
+            for request in requests(&page) {
+                assert!(pm::roff::MACROS.contains(&request.as_str()), "unlisted request {request:?}");
             }
         }
     }
 
-    /// A planted text that tries to start a request, change a font or end a
-    /// macro argument stays text.
+    /// The control of the test above: a planted note that tries to start a
+    /// request stays text, and a page with a request of its own is found.
     #[test]
-    fn text_cannot_become_a_request() {
-        let planted = ".SH INJECTED\n'br\n\\fBbold\\fR -flag";
-        assert_eq!(escape(planted), "\\&.SH INJECTED\n\\&'br\n\\efBbold\\efR \\-flag");
-        let mut out = String::new();
-        item(&mut out, &[Span::Lit(".x".into())], planted);
-        let requests: Vec<&str> = out.lines().filter(|l| l.starts_with(['.', '\''])).collect();
-        assert_eq!(requests, vec![".TP"], "{out}");
+    fn a_planted_request_stays_text() {
+        let mut m = crate::man::pod_model::manual();
+        let ssh = m.commands.iter_mut().find(|c| c.path == ["ssh"]).expect("ssh");
+        ssh.notes.push(".SH INJECTED\n'br\n\\fBbold\\fR -flag".into());
+        let page = pm::roff::render(&m);
+        assert!(requests(&page).iter().all(|r| pm::roff::MACROS.contains(&r.as_str())), "a note became a request");
+        let planted = format!("{page}.de Fl\n");
+        assert!(requests(&planted).iter().any(|r| !pm::roff::MACROS.contains(&r.as_str())));
     }
 
-    /// Each flag of `ssh` is a `.TP` term with its spelling in bold.
+    /// Each flag of `ssh` is a `.TP` term with its spellings in bold and its
+    /// value in italics.
     #[test]
     fn each_flag_is_a_tagged_paragraph_in_bold() {
-        let page = render(&manual());
+        let page = page();
+        let bold = |t: &str| format!("\\fB{}\\fR", pm::roff::escape(t));
         for row in crate::flags::SSH_FLAGS {
-            let term = spans(&flag_term(row));
-            assert!(page.contains(&format!(".TP\n{term}\n")), "{}: no .TP for {term}", plain(&flag_term(row)));
-            assert!(term.contains(&format!("\\fB\\-\\-{}\\fR", escape(row.long))), "{term}");
+            let mut term = bold(&format!("--{}", row.long));
+            if let Some(c) = row.short {
+                term = format!("{}, {term}", bold(&format!("-{c}")));
+            }
+            if let Some(a) = row.arg {
+                term = format!("{term} \\fI{}\\fR", pm::roff::escape(a));
+            }
+            assert!(page.contains(&format!(".TP\n{term}\n")), "no .TP for {term}");
         }
+    }
+
+    /// The text of a flag is the sentence that `--help` prints, its kind
+    /// included, and nothing that `--help` does not print.
+    #[test]
+    fn the_text_of_a_flag_is_the_one_help_prints() {
+        let page = page();
+        let scp = crate::flags::verb_for("scp").expect("scp");
+        let accepted = scp.flags.iter().find(|r| r.kind == crate::flags::FlagKind::Accepted).expect("a row");
+        let squeeze = |t: &str| t.split_whitespace().collect::<Vec<_>>().join(" ");
+        let want = pm::roff::escape(&crate::help::help_text(accepted));
+        assert!(squeeze(&page).contains(&squeeze(&want)), "{want}");
+        assert!(!page.contains("Accepted and ignored"), "a second sentence of a kind");
     }
 }

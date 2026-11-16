@@ -146,7 +146,7 @@ manual do not keep the kind and the `instead` of a flag.
    (`crates/podssh-cli/src/man/mod.rs` lines 73-78 at `332ee58`).
 5. The JSON is the same on each host: no path from `HOME` (`docs/cli.md:41-42`).
 6. Add the row to `MAN_FLAGS` (`crates/podssh-cli/src/flags.rs:396-403`), the field to
-   `man::Request` (`crates/podssh-cli/src/man/mod.rs:118-125`), and the parse
+   `man::Request` (`crates/podssh-cli/src/man/mod.rs:123-130`), and the parse
    (`crates/podssh-cli/src/tree.rs:248-256`). JSON for `--help` stays with T-010.
 
 ## Prove
@@ -2024,7 +2024,7 @@ An agent that meets podssh finds no `llms.txt`. `podssh man --json` gives the ta
 
 - No `llms.txt` or `llms-full.txt` in the repository root or `docs/` (checked, 2026-11-09). The relay role
   serves `/llms-full.txt` (`crates/podssh-relay/src/serve/docs.rs:4`) for its own contract only.
-- `crates/podssh-cli/src/man/mod.rs:13`, `man/json.rs`: `podssh man --json` writes the commands, flags,
+- `crates/podssh-cli/src/man/mod.rs:14`, `man/json.rs`: `podssh man --json` writes the commands, flags,
   keywords, variables and exit codes (T-050).
 - `crates/podssh-cli/src/help.rs`: the help text is made from the same tables; no `--json` flag.
 

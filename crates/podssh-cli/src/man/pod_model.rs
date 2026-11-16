@@ -5,9 +5,10 @@
 //! it is typed again; where podssh's manual holds only rendered blocks, they
 //! are read back from [`super::model::manual`].
 //!
-//! The writers of `podssh man` still walk podssh's own model. This one is what
-//! the tests give to `pod_manual::check`, so that a drift between the code
-//! and the manual fails a test by the same rules as in each other program.
+//! `podssh man --roff` is pod-manual's writer over this model; the text, the
+//! JSON and `--help` still walk podssh's own. The tests give this model to
+//! `pod_manual::check`, so that a drift between the code, the parser and the
+//! manual fails a test by the same rules as in each other program.
 //!
 //! What the crate's model has no place for, and how it is held here:
 //! - the heading "Conventions" of the start of the manual: its paragraphs are
@@ -21,6 +22,10 @@
 //!   the names joined;
 //! - the row `N` of EXIT STATUS, which also names `128 + N` of a signal: one
 //!   payload row, as its text is one;
+//! - the kind of a flag (accepted and ignored, refused, not in this
+//!   release): each flag is wired, and its help is the sentence that
+//!   `--help` prints, the kind in its words; the crate's own words for a kind
+//!   would be a second sentence that `--help` does not print;
 //! - the bound `--timeout` that is never required (`FlagRow::optional`): no
 //!   field, as it changes the parser, not the text;
 //! - the subcommands of a command (`relay pair`, `job start`): podssh parses
@@ -30,7 +35,7 @@
 use pod_manual as pm;
 
 use super::model::{self as own, Block, Span};
-use crate::flags::{self, Availability, FlagKind, FlagRow, Verb, VERBS};
+use crate::flags::{self, Availability, FlagRow, Verb, VERBS};
 
 /// The topics of podssh's manual that the crate's model holds as typed facts
 /// or as its own parts, so they are not copied as topics.
@@ -70,15 +75,6 @@ fn example(b: &Block) -> Option<pm::Example> {
 /// One row of the flag table. `parser` is the command that `tree.rs` builds
 /// from the same rows: it says which flag may be given more than once.
 pub fn flag(row: &FlagRow, parser: &clap::Command) -> pm::Flag {
-    let kind = match row.kind {
-        FlagKind::Supported => pm::FlagKind::Wired,
-        // The help of such a row already says why; a second copy would drift.
-        FlagKind::Accepted => pm::FlagKind::Ignored { why: String::new() },
-        // The same words as `help::help_text` when a row names nothing.
-        FlagKind::Refused | FlagKind::NotInFirstRelease => {
-            pm::FlagKind::Refused { instead: row.instead.unwrap_or("a supported flag").to_string() }
-        }
-    };
     let repeatable = parser
         .get_arguments()
         .find(|a| a.get_id().as_str() == row.long)
@@ -87,8 +83,9 @@ pub fn flag(row: &FlagRow, parser: &clap::Command) -> pm::Flag {
         short: row.short,
         long: Some(row.long.to_string()),
         value: row.arg.map(str::to_string),
-        help: row.help.to_string(),
-        kind,
+        // One sentence for --help and the man page: the kind is in its words.
+        help: crate::help::help_text(row),
+        kind: pm::FlagKind::Wired,
         repeatable,
         ..pm::Flag::default()
     }

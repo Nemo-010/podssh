@@ -9,9 +9,14 @@
 //!
 //! - `podssh man` pages the text on a terminal, else writes it to stdout.
 //! - `--no-pager` writes it to stdout, also on a terminal.
-//! - `--roff` writes a man(7) page instead, for `man -l` or a man directory.
+//! - `--roff` writes a man(7) page instead, for `man -l` or a man directory:
+//!   pod-manual's writer over [`pod_model`].
 //! - `--json` writes the tables as one JSON object, for a program.
 //! - `podssh man SECTION` writes one section: a command, or a topic.
+//!
+//! The text and the JSON still walk podssh's own model: the crate's text
+//! has another layout than the one the parity gate of `--help` reads, and
+//! the crate's JSON another shape than the one that programs read today.
 
 pub mod data;
 pub mod examples;
@@ -131,7 +136,7 @@ pub fn page() -> String {
 
 /// The whole manual as a man(7) page, as `podssh man --roff` writes it.
 pub fn roff_page() -> String {
-    roff::render(&model::manual())
+    roff::page()
 }
 
 /// The bytes for `req`, or the refusal for a section that does not exist.
@@ -147,13 +152,15 @@ pub fn body(req: &Request<'_>) -> Result<String, String> {
         return Ok(serde_json::to_string_pretty(&doc).unwrap_or_default() + "\n");
     }
     let manual = model::manual();
+    let unknown = |name: &str| crate::refuse::unknown_man_section(name, &manual.keys());
     match req.section {
-        None if req.roff => Ok(roff::render(&manual)),
+        None if req.roff => Ok(roff::page()),
         None => Ok(text::render(&manual)),
         Some(name) => match manual.find(name) {
-            Some(s) if req.roff => Ok(roff::render_section(s)),
+            // podssh's name selects the section; the crate's model has each.
+            Some(s) if req.roff => roff::section(s.key).ok_or_else(|| unknown(name)),
             Some(s) => Ok(text::render_section(s)),
-            None => Err(crate::refuse::unknown_man_section(name, &manual.keys())),
+            None => Err(unknown(name)),
         },
     }
 }
@@ -227,7 +234,8 @@ mod tests {
         }
         let (rc, out, _) = run_with(Request { section: Some("proxy"), roff: true, ..Default::default() }, Tty::none());
         assert_eq!(rc, 0);
-        assert!(out.starts_with(".TH PODSSH-PROXY 1 "), "{out}");
+        // The crate's writer escapes the hyphen, as man(7) asks.
+        assert!(out.starts_with(".TH PODSSH\\-PROXY 1 "), "{out}");
     }
 
     /// An unknown section is a usage error that lists the real sections, and

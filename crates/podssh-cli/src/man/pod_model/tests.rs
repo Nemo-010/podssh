@@ -1,6 +1,7 @@
 //! The checks of `pod_manual::check` over podssh's manual: the rules of the
-//! model, the text rules, the variables against the source and the exit
-//! codes against the constants that the commands return. Each check has a
+//! model, the text rules, the variables against the source, the exit codes
+//! against the constants that the commands return, and the commands and
+//! flags against the parser. Each check has a
 //! control that plants a drift and finds it.
 
 use super::*;
@@ -143,7 +144,8 @@ fn the_model_holds_each_part_of_the_manual() {
         if flags::availability(verb) == Availability::Works {
             for row in verb.flags {
                 let f = c.flag(&format!("--{}", row.long)).unwrap_or_else(|| panic!("{} --{}", verb.name, row.long));
-                assert_eq!((f.short, f.value.as_deref(), f.help.as_str()), (row.short, row.arg, row.help));
+                let help = crate::help::help_text(row);
+                assert_eq!((f.short, f.value.as_deref(), f.help.as_str()), (row.short, row.arg, help.as_str()));
             }
         }
         for alias in verb.aliases.iter().filter(|a| **a != verb.name) {
@@ -174,4 +176,78 @@ fn the_model_holds_each_part_of_the_manual() {
         assert!(!ssh.notes.contains(p), "{p}");
     }
     assert!(m.commands.iter().any(|c| c.flags.iter().any(|f| f.repeatable)), "no flag may be repeated");
+}
+
+/// What the parser knows of the command at `path`. The root: each option
+/// before a command that `tree::parse` answers, and each verb that it
+/// selects. A verb: the flags of the clap command that `tree.rs` builds.
+/// A verb that does not work here exits 70 before it reads a flag, and its
+/// help and the manual show `--help` alone: so does its row here.
+fn parser(path: &[String]) -> Option<check::ParserCommand> {
+    use crate::tree::Parsed;
+    match path {
+        [] => {
+            let answered = |w: &str| matches!(crate::tree::parse([w]), Parsed::Help(_) | Parsed::Version);
+            let rows = flags::TOP_OPTIONS
+                .iter()
+                .filter(|(short, long, _)| answered(short) && answered(long))
+                .map(|(short, long, _)| check::ParserFlag {
+                    spellings: vec![short.to_string(), long.to_string()],
+                    takes_value: false,
+                })
+                .collect();
+            let subcommands = VERBS
+                .iter()
+                .filter(|v| flags::verb_for(v.name).is_some_and(|f| f.name == v.name))
+                .map(|v| v.name.to_string())
+                .collect();
+            Some(check::ParserCommand { flags: rows, subcommands })
+        }
+        [name] => {
+            let verb = flags::verb_for(name).filter(|v| v.name == name.as_str())?;
+            let works = flags::availability(verb) == Availability::Works;
+            let command = crate::tree::verb_command(verb);
+            let rows = command
+                .get_arguments()
+                .filter(|a| !a.is_positional() && !a.is_hide_set())
+                .filter(|a| works || a.get_id().as_str() == flags::HELP_FLAG.long)
+                .map(|a| {
+                    let mut spellings: Vec<String> = a.get_short().map(|c| format!("-{c}")).into_iter().collect();
+                    spellings.extend(a.get_long().map(|l| format!("--{l}")));
+                    check::ParserFlag { spellings, takes_value: a.get_action().takes_values() }
+                })
+                .collect();
+            Some(check::ParserCommand { flags: rows, subcommands: Vec::new() })
+        }
+        _ => None,
+    }
+}
+
+#[test]
+fn each_command_and_flag_is_the_parser_s() {
+    assert_none(check::flags(&manual(), parser));
+}
+
+/// The controls of the check of the flags: the parser is read (the root
+/// and `ssh` have their rows), and a flag in the model that the parser
+/// lacks, a flag of the parser that the model lacks and a value that the
+/// two read differently are each found.
+#[test]
+fn a_planted_drift_of_a_flag_is_found() {
+    let root = parser(&[]).expect("the root");
+    assert_eq!(root.flags.len(), flags::TOP_OPTIONS.len(), "{root:?}");
+    assert_eq!(root.subcommands.len(), VERBS.len());
+    let ssh = parser(&["ssh".to_string()]).expect("ssh");
+    assert!(ssh.flags.iter().any(|f| f.spellings == ["-p", "--port"] && f.takes_value), "{ssh:?}");
+
+    let mut m = manual();
+    let c = m.commands.iter_mut().find(|c| c.path == ["ssh"]).expect("ssh");
+    c.flags.push(pm::Flag::long("planted-flag", "A planted flag."));
+    let port = c.flags.iter_mut().find(|f| f.long.as_deref() == Some("port")).expect("--port");
+    port.value = None;
+    c.flags.retain(|f| f.long.as_deref() != Some("verbose"));
+    let found = check::flags(&m, parser);
+    for want in ["--planted-flag", "-p, --port takes a value", "--verbose"] {
+        assert!(found.iter().any(|f| f.at == "podssh ssh" && f.what.contains(want)), "{want}: {found:?}");
+    }
 }

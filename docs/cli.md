@@ -26,10 +26,10 @@ scripts. The facts about OpenSSH on this page were measured with OpenSSH
   has it and `TERM` names a terminal (not on Windows), else its own pager.
   `--no-pager` writes to stdout; with no terminal there is no pager.
 - **Roff second.** `podssh man --roff` writes a man(7) page with standard
-  macros only. A macro defined in the page is read differently by different
-  renderers: an `Fl` macro that used `\$*` printed blank flag names under
-  groff and mandoc. The gate renders the page with both
-  (`scripts/interop-man.sh`).
+  macros only, by pod-manual's writer over the manual's model. A macro
+  defined in the page is read differently by different renderers: an `Fl`
+  macro with `\$*` printed blank flag names under groff and mandoc. The
+  gate renders the page with both (`scripts/interop-man.sh`).
 - **Data third.** `podssh man --json` writes the tables as one JSON object
   for a program (GitHub #10): the commands with their availability,
   arguments and flags, each flag with its kind and what to type instead;
