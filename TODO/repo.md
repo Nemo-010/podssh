@@ -430,7 +430,7 @@ previous release, so a change that the notes forget is invisible to a user.
 Read:
 
 - The job `publish` reads the notes from `docs/releases/`, and fails without
-  them (`.github/workflows/release.yml:634-638`).
+  them (`.github/workflows/release.yml:658-662`).
   No notes file exists yet; T-250 writes the first. The notes drafted for a
   beta that the operator dropped are in git:
   `git show b1b111b:docs/releases/v0.1.0-beta.1.md`.
@@ -670,9 +670,9 @@ Measured: `target/debug/podssh.exe --version` prints `podssh 0.1.0`, exit 0.
 Read:
 
 - The jobs `linux` and `windows` build the binaries, and `publish` adds
-  `SHA256SUMS` and publishes them (`.github/workflows/release.yml:58-653`).
+  `SHA256SUMS` and publishes them (`.github/workflows/release.yml:58-677`).
   The workflow has `contents: read` (`:45-46`); `publish` adds
-  `contents: write` (`:531-532`).
+  `contents: write` (`:555-556`).
 - The KTM tester could not tell from an artifact which commit made it, and
   moved the checkout one commit ahead (the KTM report, section 1a; read in
   the report).
@@ -753,7 +753,7 @@ github.com when the workflow is written). The Approach names `actions/attest-bui
   `actions/attest` v4.2.2 (commit `1e69f48acb82d1966a394da916b4c1698aa569d6`), pinned by that commit,
   as item 1 asks. (The wrapper is at commit `4d101475d8b20a2381f78447822ac1eab6504dd8`.)
 - Permissions for a binary (GitHub documentation): `id-token: write`, `contents: read` and
-  `attestations: write`. `publish` has `contents: write` today (`.github/workflows/release.yml:532`
+  `attestations: write`. `publish` has `contents: write` today (`.github/workflows/release.yml:556`
   says "contents: write"), which includes the read. The README of `actions/attest` also lists
   `artifact-metadata: write`, "necessary to create the artifact storage record"; that record needs
   `push-to-registry: true`, which is for images, so a file subject does not need it (Inferred): add
@@ -868,7 +868,7 @@ the release workflow of podssh.
 
 Read:
 
-- `.github/workflows/release.yml:552-557` writes `SHA256SUMS` with
+- `.github/workflows/release.yml:576-581` writes `SHA256SUMS` with
   `sha256sum`, and the job published it with the binaries (lines 370-382 at
   `cdf9308`). No signature was published.
 - The notes drafted for the dropped beta told the user that `SHA256SUMS`
@@ -4271,7 +4271,7 @@ two jobs of the release run an image of Docker Hub by the tag `latest`, with no 
 
 ## Premise
 
-- Read: `README.md:90-93` says "the release workflow also proves where each binary comes from".
+- Read: `README.md:105-108` says "the release workflow also proves where each binary comes from".
 - Read: the job `publish` needs each build job (`.github/workflows/release.yml` at `1a3e7b6`, lines 393-394) and holds
   `contents: write`, `id-token: write` and `attestations: write` (lines 396-399). After it downloads
   the binaries (line 405), it runs `taiki-e/install-action@v2` for cargo-about (lines 412-414), then
@@ -4307,7 +4307,7 @@ two jobs of the release run an image of Docker Hub by the tag `latest`, with no 
 ## Approach
 
 1. Each `uses:` of each workflow names a commit of 40 hexadecimal digits, with its tag in a
-   comment, as `actions/attest` is pinned (`.github/workflows/release.yml:565`): the commits of
+   comment, as `actions/attest` is pinned (`.github/workflows/release.yml:589`): the commits of
    T-210's list, read again at each release's API on the day of the change.
 2. A check in `scripts/check-repo.py`: each `uses:` under `.github/workflows/` names a commit. A
    copy with a planted `@v7` fails it, and its floor fails on an empty tree.
@@ -4542,7 +4542,7 @@ Each can stop a release, or the gate, for a reason outside podssh.
   Inferred: Alpine 3.24's rust is 1.89 or later, as the job built `v1.0.0-beta.2`.
 - Read: `pipx run check-jsonschema` names no version (`.github/workflows/build.yml` lines 175 and
   177 at `1a46970`).
-- Read: the signatures use Sigstore's public instance (`.github/workflows/release.yml:595-620`).
+- Read: the signatures use Sigstore's public instance (`.github/workflows/release.yml:619-644`).
   Inferred (the audit): an outage delays a release, and a run again repairs it.
 
 ## Approach
@@ -6737,7 +6737,7 @@ PodUtils/podcrates (COORD-110, its T-703): the reusable workflow and `pod-todo`'
 **Milestone:** M10
 **Priority:** P1
 **Effort:** S
-**Status:** blocked
+**Status:** partial
 
 ## Problem
 
@@ -6747,7 +6747,7 @@ manager and no compiler, changes nothing on a second run, leaves no half install
 
 ## Premise
 
-- `README.md:72` gives the commands of a download by hand; COORD-082 (#269) gave podcrates podssh's targets and
+- `README.md:87` gives the commands of a download by hand; COORD-082 (#269) gave podcrates podssh's targets and
   setup (none after the binary).
 
 ## Approach
@@ -6762,7 +6762,23 @@ manager and no compiler, changes nothing on a second run, leaves no half install
 The core's test of the installer: `dash`, `busybox sh` and `bash --posix`, `shellcheck --shell=sh`, a first run, a
 second that changes nothing, a cut run, each within its time, in each profile of COORD-081 that `pod-lab` holds.
 
-## Blocker
+## Done
 
-PodUtils/podcrates (COORD-109, its T-702): the shared POSIX core of the installers in a tag.
+Partial, 2026-11-16. podcrates `v0.58.0` holds the core (COORD-116). `scripts/install/podssh.sh` is podssh's installer
+on it: its name, `PODSSH_INSTALL_*` for the knobs, the releases of PodUtils/podssh, the version line `podssh X.Y.Z
+(COMMIT)`, and a self-check with no network (`podssh man --json`); the default hook of the files fits the names of
+podssh's assets (`podssh-TARGET`, `.exe` on Windows), and the core maps each of podssh's targets.
+`scripts/install/get-core.sh` gets `core.sh` and `pins.py` at their pinned commit, each checked by its SHA-256, beside
+it (git ignores both). The release workflow stamps `podssh-install.sh` with the pins of each binary, makes
+`podssh-VERSION.tar.gz`, installs from it twice (the second changes nothing), and `SHA256SUMS` names both; `README.md`
+gives the one command first, and the commands by hand after it.
 
+Measured here, with a stand-in binary of `sh` (its `--version` and `man --json`), stamped by `pins.py`: under `dash`,
+`bash --posix` and `sh`, against a mirror on the loopback, a first run, a second that downloads nothing ("already
+installed"), a dry run that writes nothing, a changed file replaced, a corrupt file refused with no file left, and the
+offline bundle; a temporary file of a run that a KILL cut removed by the next run; in `pod-lab`'s `small-tmp`,
+`noexec-tmp`, `noexec-home`, `inherited-fds`, `no-proc`, `no-passwd-entry` and `ro-etc-ssl` (podlab `v0.58.0`) a
+first and a second run, and under `noexec-home` the default prefix refused with its reason; `shellcheck -x
+--shell=sh` clean on the tree's files and on the stamped one; `pins.py check` passes; the release step itself on a
+copy of `dist` with two stand-ins. Not here: `busybox sh` (no busybox on this host). UNVERIFIED: the release's run of
+the step, and the installer of a published release, which the next beta gives.

@@ -30,3 +30,7 @@ __pycache__/
 # overrides. .claude/settings.json is shared and committed.
 /.claude/worktrees/
 /.claude/settings.local.json
+
+# The installer core and pins.py of podcrates, got by scripts/install/get-core.sh.
+/scripts/install/core.sh
+/scripts/install/pins.py

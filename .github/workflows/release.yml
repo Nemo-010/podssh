@@ -525,6 +525,30 @@ jobs:
           cp "$RUNNER_TEMP/notes/THIRD-PARTY-LICENSES.md" dist/THIRD-PARTY-LICENSES.md
           test -s dist/THIRD-PARTY-LICENSES.md
           test -s "$RUNNER_TEMP/notes/changes.md"
+      # The installer (the owner's ruling "Installer", T-793): podcrates'
+      # core and pins.py at their pinned commit, each checked by its SHA-256;
+      # podssh-install.sh with the pins of each binary, and the offline
+      # bundle. Then an install from the bundle, twice: the second changes
+      # nothing. The checksums after it name both.
+      - name: the installer
+        run: |
+          set -eu
+          version=$(sed -n '/^\[workspace.package\]/,/^\[/s/^version = "\(.*\)"$/\1/p' Cargo.toml)
+          sh scripts/install/get-core.sh
+          bins=$(cd dist && ls podssh-* | grep -v -e '-install\.sh$' -e '\.tar\.gz$')
+          # shellcheck disable=SC2086 # one word for each binary
+          python3 -I scripts/install/pins.py sums dist $bins
+          python3 -I scripts/install/pins.py stamp scripts/install/podssh.sh --version "$version" --assets dist --out dist/podssh-install.sh
+          files=$(for b in $bins; do printf 'dist/%s ' "$b"; done)
+          # shellcheck disable=SC2086
+          SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) python3 -I scripts/install/pins.py bundle "dist/podssh-$version.tar.gz" "podssh-$version" dist/podssh-install.sh $files
+          rm dist/SHA256SUMS
+          prefix="$RUNNER_TEMP/installed"
+          sh dist/podssh-install.sh --prefix "$prefix" --offline "dist/podssh-$version.tar.gz"
+          again=$(sh dist/podssh-install.sh --prefix "$prefix" --offline "dist/podssh-$version.tar.gz")
+          echo "$again"
+          echo "$again" | grep -q 'already installed'
+          "$prefix/podssh" --version
       - name: checksums
         run: |
           set -eu

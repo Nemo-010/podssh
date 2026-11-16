@@ -66,8 +66,23 @@ podssh --TLS 1.3 + WebSocket, port 443--> relay --TCP--> sshd (or another TCP se
 1. Get a static binary for the host: a release from the
    [releases page](https://github.com/PodUtils/podssh/releases) (`v1.0.N`
    is stable; each `v1.1.0-beta.N` is a prerelease of the next), or build
-   one (see "Build"). Check it
-   against `SHA256SUMS`, and make it executable:
+   one (see "Build").
+
+   From the release after `v1.1.0-beta.3` on, one command installs it for
+   this user, with no root. `podssh-install.sh` finds the host's file,
+   checks it against the SHA-256 that it holds, and puts it in
+   `~/.local/bin` (or `--prefix DIR`). A second run downloads nothing.
+   `--offline podssh-VERSION.tar.gz` installs from the release's bundle,
+   with no network:
+
+   ```sh
+   T=v1.1.0-beta.4   # the release's tag
+   curl -fsSLO "https://github.com/PodUtils/podssh/releases/download/$T/podssh-install.sh"
+   sh podssh-install.sh
+   ```
+
+   By hand, or for a release before it: check the binary against
+   `SHA256SUMS`, and make it executable:
 
    ```sh
    T=v1.0.1; B=podssh-x86_64-unknown-linux-musl   # or podssh-aarch64-unknown-linux-musl

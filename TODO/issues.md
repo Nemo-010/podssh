@@ -338,6 +338,7 @@ and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12.
 | #276 | [gh action] requested: the gate after the take of v0.56.0, and the dry run of issue-sync | open 2026-11-15: asks the gate at `0363272` and the first dry run of the sync | T-684 |
 | #277 | COORD-085: podssh took podcrates v0.56.0 at 0363272, with the sync of the issues on (to podcrates) | open 2026-11-15: until podcrates records the take | T-684 |
 | #278 | COORD-086: pod-lab: podssh's row of bind-denied asks for commands that its refused TCP connect cannot run (to podcrates) | closed 2026-11-16: `--allow-connect` in podcrates `v0.58.0`; podssh's lane passed in `bind-denied` with the proxy's port | T-791 |
+| #279 | COORD-087: podssh took podcrates v0.58.0 at 043f32c, and its lane passes in pod-lab (to podcrates) | open 2026-11-16: until podcrates records the take | T-684, T-791 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |

@@ -3592,7 +3592,7 @@ of `job fetch`; why a file given by process substitution is refused; the direct 
   (`crates/podssh-ssh/src/run_config.rs:70-71`), as RFC 4253 allows, and no part of the manual says
   it. Inferred: a line shaped as OpenSSH's would make OpenSSH's server apply the quirks of its own
   client's versions to podssh, so the line stays podssh's. Against the report: the README says
-  that podssh has "the options of OpenSSH" (`README.md:137`), not that it is OpenSSH.
+  that podssh has "the options of OpenSSH" (`README.md:152`), not that it is OpenSSH.
 - Read (L-14): the side file of a broken copy is in FILES (`crates/podssh-cli/src/man/data.rs:228-229`)
   and in the notes (`crates/podssh-cli/src/man/notes.rs:168`), and in no row of `cp --help`
   (`crates/podssh-cli/src/flags/copy.rs:20-64`).
