@@ -84,9 +84,9 @@ pub(crate) fn plan_with(args: &NodeArgs, file: &Defaults) -> Result<Option<Plan>
 /// The owner of `--net-owner KEY`: its OpenSSH key, by the fingerprint
 /// that a document's owner has, or that fingerprint itself.
 pub(crate) fn owner_of(text: &str) -> Result<KeyName, String> {
-    super::owner_key_name(text).or_else(|| KeyName::parse(text.trim())).ok_or_else(|| {
-        format!("--net-owner {text:?}: not a key's fingerprint (SHA256:...) nor an OpenSSH public key")
-    })
+    super::owner_key_name(text)
+        .or_else(|| KeyName::parse(text.trim()))
+        .ok_or_else(|| format!("--net-owner {text:?}: not a key's fingerprint (SHA256:...) nor an OpenSSH public key"))
 }
 
 /// A URL of a net's document: `https://` alone, as an `http://` one would

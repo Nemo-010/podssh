@@ -238,7 +238,10 @@ async fn get(url: &Url, trust: &Trust, most: usize, redirects: usize) -> Result<
             200 => return Ok(answer.body),
             // Each redirect is one GET more: a net's document follows none (Q105).
             301 | 302 | 303 | 307 | 308 if hop == redirects => {
-                return Err(format!("HTTP {} {}, a redirect that this fetch does not follow", answer.status, answer.reason))
+                return Err(format!(
+                    "HTTP {} {}, a redirect that this fetch does not follow",
+                    answer.status, answer.reason
+                ))
             }
             301 | 302 | 303 | 307 | 308 => {
                 let to = answer.header("location").ok_or("a redirect with no Location")?;
