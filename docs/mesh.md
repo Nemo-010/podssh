@@ -244,6 +244,24 @@ of deployments"):
   relay member: its host, then its list taken with its serial, or why not,
   and when it was asked (`--json`: `members`).
 
+What T-715 drafted (2026-11-17, unverified; cfb's ask A-S-08, Q105):
+
+- `podssh node --net-url URL --net-owner KEY [--net-ttl SECS] [--net-stale
+  SECS]`, or `NetUrl` and `NetOwner` of the settings file: the node takes
+  its net from the signed document at an `https://` URL, so that a change of
+  a fleet needs no copy of a file to each node. TLS alone is not the trust:
+  each document is checked against `--net-owner`, then taken by the rule of
+  `podssh net take` where each door reads the net
+  (`crates/podssh-cli/src/net/remote.rs`).
+- One fetch before the node goes online (78 when it fails and no copy from
+  the URL is held), then one each TTL (300 s, never under 60 s), one at a
+  time, one GET through the proxy with no redirect, 64 KiB at most: the
+  ninth exception of rule 2. Past the TTL and the stale window (3600 s) the
+  net lets nobody in until a fetch works; sessions that live go on.
+- `podssh status --net` shows the URL by its host alone, the serial, the
+  copy's age, and whether it is stale or closed (`net-url.json` in the
+  cache).
+
 ## 4. The relay as a role of podssh
 
 `podssh relay serve` (T-169, T-427) serves the relay's contract, version

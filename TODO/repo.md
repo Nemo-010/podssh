@@ -7173,7 +7173,7 @@ hold (`Commit::Durable`, `InstalledUnconfirmed`, `InPlace`), and changes nothing
   with `O_NOFOLLOW` and `create_new` and given `mode` whatever the umask; `Err` leaves the path as it was and no
   temporary file. pod-core's own cache write calls it with `0o600, false` and takes any `Ok` as written.
 - podssh's writes of a whole private file through a temporary one and a rename (five, not two):
-  - `crates/podssh-cli/src/net/store.rs:110` `fn replace` (the file of `PODSSH_NET`): `let tmp =
+  - `crates/podssh-cli/src/net/store.rs:115` `fn replace` (the file of `PODSSH_NET`): `let tmp =
     path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));` ... `std::fs::rename(&tmp, path)` (line 121).
   - `crates/podssh-cli/src/share/file.rs:305` `fn replace` (a node's share file): the same body, the rename at line
     315.

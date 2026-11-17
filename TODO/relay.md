@@ -3481,7 +3481,7 @@ times the hosts that it tries, and throws the times away.
   for a list that the user named, whose order is a preference (`docs/relay.md:147-148`).
 - Read: T-563's Done: the fault checks of the interop lean on the list's order, so each takes an
   empty record of its own.
-- Read: the relay's keys of the settings file (`crates/podssh-cli/src/settings.rs:32-34`).
+- Read: the relay's keys of the settings file (`crates/podssh-cli/src/settings.rs:33-35`).
 - Read: T-606 keeps the rank in `relay-rank.json`, with the egress that measured it.
 
 ## Approach

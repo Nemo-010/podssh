@@ -217,6 +217,15 @@ pub const NODE_FLAGS: &[FlagRow] = &[
         "with --publish-tls: end each session's TLS at this node with a certificate for NAME, the published name, from an ACME CA (Let's Encrypt by default); it is proven by TLS-ALPN-01, whose validation the relay that publishes NAME sends here too; asked once the node is online, kept in the cache and renewed while the node runs", None),
     row(None, "acme-directory", Some("URL"), FlagKind::Supported,
         "with --acme: the directory of another ACME CA, reached with the trust of --ca-file", None),
+    // The net's document at a URL, read again each TTL (T-715, Q105).
+    row(None, "net-url", Some("URL"), FlagKind::Supported,
+        "take the net that each door reads from the signed document at URL, an https:// URL; it is fetched through the proxy with the trust of --ca-file; it needs --net-owner (default: NetUrl of the settings file)", None),
+    row(None, "net-owner", Some("KEY"), FlagKind::Supported,
+        "with --net-url: the owner that each document must have, its fingerprint SHA256:... or its public key; another is refused (default: NetOwner of the settings file)", None),
+    row(None, "net-ttl", Some("SECONDS"), FlagKind::Supported,
+        "with --net-url: fetch the document again each SECONDS, 60 to 86400 (default 300)", None),
+    row(None, "net-stale", Some("SECONDS"), FlagKind::Supported,
+        "with --net-url: read the copy for SECONDS more past --net-ttl while its server fails, 0 to 604800 (default 3600); past that, the net lets nobody in", None),
 ];
 
 /// **`net`** (T-429): the net of a user's own nodes, a list of their names

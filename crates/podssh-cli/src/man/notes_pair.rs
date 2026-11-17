@@ -247,6 +247,8 @@ pub(super) const NODE: &[&str] = &[
     super::notes_unit::NODE,
     // A route to a Unix socket, and the caller's line (T-714).
     super::notes_unix_route::NODE,
+    // A node's net from a signed document at a URL (T-715).
+    super::notes_net_url::NODE,
     // A node's upgrade in place, its sessions with it (T-668).
     super::notes_upgrade::NODE,
     // The dialect of the reverse road (T-643).

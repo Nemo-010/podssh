@@ -37,6 +37,11 @@ fn a_file_gives_each_setting_and_the_first_value_wins_but_for_relay_addr() {
     assert_eq!(keys, ["f:1", "f:2"]);
     // Encrypted Client Hello (T-642): the first value wins.
     assert_eq!(read("ECH strict\nech yes\n").ech.unwrap().text, "strict");
+    // A node's net at a URL (T-715): the URL and its owner.
+    let owner = format!("SHA256:{}", "A".repeat(43));
+    let d = read(&format!("NetUrl https://net.example/fleet.doc\nNetOwner {owner}\n"));
+    assert_eq!(d.net_url.unwrap().text, "https://net.example/fleet.doc");
+    assert_eq!(d.net_owner.unwrap().text, owner);
 }
 
 #[test]
@@ -82,6 +87,8 @@ fn a_bad_value_of_the_file_names_its_line() {
         ("DoctorJobs all\n", "f:1: DoctorJobs \"all\": a number of sections from 1 to 64"),
         ("RelayKeys SHA256:short\n", "f:1: RelayKeys \"SHA256:short\" is not a key"),
         ("ECH maybe\n", "f:1: ECH \"maybe\": give yes, no or strict"),
+        ("NetUrl http://net.example/doc\n", "f:1: NetUrl: a net's document is fetched over TLS alone"),
+        ("NetOwner nobody\n", "f:1: NetOwner: --net-owner \"nobody\": not a key's fingerprint"),
     ] {
         let err = parse(text, "f", None).unwrap_err();
         assert!(err.starts_with(says), "{text:?}: {err}");

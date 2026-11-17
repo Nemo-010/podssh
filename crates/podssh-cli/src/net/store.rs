@@ -60,8 +60,13 @@ pub struct Held {
 
 /// The document held: `Ok(None)` when there is none, or the net is off.
 pub fn held() -> Result<Option<Held>, String> {
-    let place = place()?;
-    let Some((path, text)) = read(&place)? else { return Ok(None) };
+    held_at(&place()?)
+}
+
+/// The document held at `place`: a node that reads its net from a URL
+/// (`super::remote`) names its place once, and a test names its own.
+pub fn held_at(place: &Place) -> Result<Option<Held>, String> {
+    let Some((path, text)) = read(place)? else { return Ok(None) };
     let signed = sign::verify_signed(text.as_bytes()).map_err(|why| format!("{}: {why}", path.display()))?;
     Ok(Some(Held { signed, path }))
 }
@@ -164,14 +169,23 @@ impl std::fmt::Display for NotTaken {
 /// the one held (or, for the first, of `--owner` when named), a higher
 /// serial, an end still to come. `now` is in seconds since 1970.
 pub fn take(signed: &Signed, owner: Option<&podssh_relay::identity::KeyName>, now: i64) -> Result<Taken, NotTaken> {
-    let place = place().map_err(NotTaken::Bad)?;
+    take_at(&place().map_err(NotTaken::Bad)?, signed, owner, now)
+}
+
+/// [`take`] at `place`.
+pub fn take_at(
+    place: &Place,
+    signed: &Signed,
+    owner: Option<&podssh_relay::identity::KeyName>,
+    now: i64,
+) -> Result<Taken, NotTaken> {
     let _one = WRITING.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     let offered = &signed.doc;
     if offered.expires <= now {
         return Err(NotTaken::Expired(offered.expires));
     }
     let shown = sign::owner_fingerprint(&offered.owner);
-    let held = held().map_err(NotTaken::Bad)?;
+    let held = held_at(place).map_err(NotTaken::Bad)?;
     let before = match &held {
         Some(held) => {
             let mine = &held.signed;
@@ -193,7 +207,7 @@ pub fn take(signed: &Signed, owner: Option<&podssh_relay::identity::KeyName>, no
             None
         }
     };
-    let (path, note) = write(&place, signed).map_err(NotTaken::Bad)?;
+    let (path, note) = write(place, signed).map_err(NotTaken::Bad)?;
     Ok(Taken::Kept { path, before, note })
 }
 

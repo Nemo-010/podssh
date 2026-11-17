@@ -106,6 +106,8 @@ mod notes_tuic;
 mod notes_unit;
 // A node's route to a Unix socket, and the caller's line (T-714).
 mod notes_unix_route;
+// A node's net from a signed document at a URL (T-715).
+mod notes_net_url;
 mod notes_update;
 // A node's upgrade in place (T-668).
 mod notes_upgrade;

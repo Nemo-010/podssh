@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**762 entries: 38 open, 38 partial, 11 blocked, 675 done.**
+**762 entries: 37 open, 38 partial, 11 blocked, 676 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 2 | 8 | 3 | 81 | 94 |
-| P2 | 1 | 24 | 2 | 287 | 314 |
+| P2 | 0 | 24 | 2 | 288 | 314 |
 | P3 | 35 | 6 | 6 | 306 | 353 |
-| **All** | 38 | 38 | 11 | 675 | 762 |
+| **All** | 37 | 38 | 11 | 676 | 762 |
 
 ## Entries
 
@@ -745,7 +745,7 @@ repository and CI).
 | [T-712](reverse.md) | P2 | M | M10 | feature | partial | Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s |
 | [T-713](relay.md) | P2 | M | M10 | feature | done | `podssh relay conform --relay-host HOST [--reverse] --json` |
 | [T-714](reverse.md) | P2 | M | M10 | feature | partial | A node route to a Unix socket, with a first line that names the caller's key and route |
-| [T-715](mesh.md) | P2 | M | M10 | feature | open | A node's door from a signed net document at an HTTPS URL, with a TTL and a stale limit |
+| [T-715](mesh.md) | P2 | M | M10 | feature | done | A node's door from a signed net document at an HTTPS URL, with a TTL and a stale limit |
 | [T-716](machine.md) | P2 | S | M10 | feature | partial | The public parts of each key of this host as JSON, offline: `podssh status --keys` |
 | [T-717](mesh.md) | P2 | M | M10 | feature | done | Probe each road to a list of nodes as JSON: `podssh ping --nodes` |
 | [T-718](roads.md) | P2 | M | M10 | feature | partial | Access service-token headers from files on each WebSocket road |

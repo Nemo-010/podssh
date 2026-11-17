@@ -13,7 +13,8 @@
 //! where the owner gave this node the role `exit`, and the policy lets it
 //! reach the node's egress, for a public address, or the address's range.
 //! A node of the DERP road with no `--allow` has the members alone for its
-//! door (T-452), as any key reaches it.
+//! door (T-452), as any key reaches it. A node whose net comes from a URL
+//! (T-715, `super::remote`) closes the net's door when its copy is too old.
 
 use std::net::IpAddr;
 use std::path::PathBuf;
@@ -70,6 +71,10 @@ impl<'a> Asks<'a> {
 pub fn verdict(me: &PublicKey, peer: &PublicKey, asks: Asks<'_>) -> Verdict {
     if !store::on() {
         return Verdict::Outside;
+    }
+    // A net of --net-url whose copy is too old lets nobody in (T-715).
+    if let Some(why) = super::remote::door_closed() {
+        return Verdict::Refused(why);
     }
     let held = match store::held() {
         Ok(Some(held)) => held,

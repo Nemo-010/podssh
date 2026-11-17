@@ -2,7 +2,8 @@
 //! tailnet, read with no connection: the document held, its name, serial,
 //! owner, end, file and count of members; with `--net`, each member, its
 //! roles, key, tickets and routes, and the road that last reached it from
-//! this host (`super::reached`), or the race that last found none.
+//! this host (`super::reached`), or the race that last found none. A node's
+//! net of a URL shows its last fetch (`super::remote`).
 
 use serde_json::{json, Value};
 
@@ -28,6 +29,8 @@ pub fn status_value(members: bool) -> Value {
         "ended": doc.expires <= now(),
         "file": held.path.display().to_string(),
         "count": doc.members.len(),
+        // The net of a node's --net-url, its last fetch (T-715).
+        "url": super::remote::status_value(crate::pairs::now_ms()),
     });
     if members {
         let (records, now_ms) = (reached::load(), crate::pairs::now_ms());

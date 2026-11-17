@@ -149,6 +149,12 @@ pub struct NodeArgs {
     /// `--caller-line ROUTES`: the routes to a Unix socket whose sessions
     /// start with the caller's line (T-714), unparsed.
     pub caller_line: Option<String>,
+    /// `--net-url URL`, `--net-owner KEY`, `--net-ttl SECS` and `--net-stale
+    /// SECS`: the net's document at a URL, fetched again each TTL (T-715).
+    pub net_url: Option<String>,
+    pub net_owner: Option<String>,
+    pub net_ttl: Option<String>,
+    pub net_stale: Option<String>,
     pub refused: Vec<(String, &'static str, &'static str)>,
 }
 
@@ -231,6 +237,10 @@ impl NodeArgs {
             acme: get("acme"),
             acme_directory: get("acme-directory"),
             caller_line: get("caller-line"),
+            net_url: get("net-url"),
+            net_owner: get("net-owner"),
+            net_ttl: get("net-ttl"),
+            net_stale: get("net-stale"),
             refused,
         }
     }

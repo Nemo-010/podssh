@@ -44,6 +44,11 @@ pub(super) fn service_args(args: &NodeArgs, name: &str, env_file: &Path) -> Resu
         ("--spares", &args.spares),
         // The caller's line on a route to a Unix socket (T-714).
         ("--caller-line", &args.caller_line),
+        // The net's document at a URL (T-715).
+        ("--net-url", &args.net_url),
+        ("--net-owner", &args.net_owner),
+        ("--net-ttl", &args.net_ttl),
+        ("--net-stale", &args.net_stale),
     ];
     for (flag, value) in values {
         if let Some(value) = value {

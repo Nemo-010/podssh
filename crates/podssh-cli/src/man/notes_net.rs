@@ -119,7 +119,10 @@ pub const STATUS_NET: &str = "The line's net is the net that this host holds, re
      podssh ssh -v, with ms from the start of the race and ago_s; missed, why the last race found no road, with \
      ago_s; and last, reached or missed, whichever came last, or null when no race to it was kept. Each race of \
      podssh ssh, of the copies and of podssh ping to node://NAME, and the pair's road alone, keeps its end. It goes \
-     in net-roads.json in the cache (see FILES), at most 256 nodes.";
+     in net-roads.json in the cache (see FILES), at most 256 nodes. Where a node takes its net from a URL (see podssh \
+     node), net also holds url: the URL by its host alone, serial, age_s, ttl_s and stale_s of its last fetch. It \
+     holds stale, true past the time between two fetches, and closed, true past the stale window too, when the net \
+     lets nobody in. It holds error, the fault of the last fetch, else null; url is null with no fetch kept.";
 
 /// The note of `podssh doctor`'s sections of the net and of the public
 /// carriers (T-435), as `tailscale netcheck` says what a host reaches.

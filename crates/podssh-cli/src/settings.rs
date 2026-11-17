@@ -3,8 +3,9 @@
 //! file has `Keyword value` lines, `#` comments and `Keyword=value` too, as
 //! an `ssh_config` has: `RelayHost`, `RelayAddr` (which adds up), `RelayFailover`
 //! and `CaFile`, `SessionLog` (T-056), `Direct` (T-363), `Forwarder` (T-369), `ForwarderFallback`
-//! (T-370), `DoctorJobs` (T-511), `RelayKeys` (T-346, which adds up), `ECH` (T-642), and
-//! `AccessHost` (which adds up), `AccessClientIdFile` and `AccessClientSecretFile` (T-718). It
+//! (T-370), `DoctorJobs` (T-511), `RelayKeys` (T-346, which adds up), `ECH` (T-642),
+//! `AccessHost` (which adds up), `AccessClientIdFile` and `AccessClientSecretFile` (T-718), and
+//! `NetUrl` and `NetOwner`, a node's net at a URL (T-715). It
 //! is found once for the process: the file that
 //! `PODSSH_SETTINGS` names (`none` names none), else the first that exists
 //! of `$XDG_CONFIG_HOME/podssh/settings` (`~/.config/podssh/settings`, and
@@ -44,6 +45,8 @@ pub const KEYWORDS: &[(&str, &str)] = &[
     ("AccessHost", "HOST[,...]: hosts that get the credentials of Cloudflare Access, as --access-host; each line adds to the others"),
     ("AccessClientIdFile", "FILE: the id of a service token of Cloudflare Access, as PODSSH_CF_ACCESS_CLIENT_ID_FILE; ~ is the home"),
     ("AccessClientSecretFile", "FILE: its secret, as PODSSH_CF_ACCESS_CLIENT_SECRET_FILE; ~ is the home"),
+    ("NetUrl", "URL: the https:// URL of the signed net document that podssh node reads, as --net-url"),
+    ("NetOwner", "KEY: the owner that the document of NetUrl must have, as --net-owner"),
 ];
 /// The largest file read.
 const MAX_FILE: u64 = 1 << 20;
@@ -87,6 +90,9 @@ pub struct Defaults {
     pub access_host: Vec<Value>,
     pub access_client_id_file: Option<Value>,
     pub access_client_secret_file: Option<Value>,
+    /// `NetUrl` and `NetOwner`: a node's net at a URL (T-715).
+    pub net_url: Option<Value>,
+    pub net_owner: Option<Value>,
     /// The `[groups]` table (T-184): each group's name and its hosts.
     pub groups: crate::hosts::Groups,
     /// The `[snippets]` table (T-187): each snippet's name and its command.
@@ -329,6 +335,14 @@ pub fn parse(text: &str, file: &str, home: Option<&Path>) -> Result<Defaults, St
                     _ => &mut d.access_client_secret_file,
                 };
                 slot.get_or_insert(Value { text, ..value });
+            }
+            "neturl" => {
+                crate::net::remote::check_url(text).map_err(|why| format!("{at}: NetUrl: {why}"))?;
+                d.net_url.get_or_insert(value);
+            }
+            "netowner" => {
+                crate::net::remote::owner_of(text).map_err(|why| format!("{at}: NetOwner: {why}"))?;
+                d.net_owner.get_or_insert(value);
             }
             _ => {
                 let names: Vec<&str> = KEYWORDS.iter().map(|(k, _)| *k).collect();

@@ -62,7 +62,9 @@ pub fn run_node(args: &NodeArgs, err: &mut dyn Write) -> i32 {
     // How long it keeps a lost session (T-306), those readied ahead (T-650); its exit (T-431);
     // its routes to a Unix socket (T-714), which each road then finds.
     let checked = crate::node_flags::sessions(args).and_then(|()| crate::node_exit::check(args));
-    if let Err(refusal) = checked.and_then(|()| crate::node_unix::check(args)) {
+    // Its net from a signed document at a URL, before each road's door (T-715).
+    let checked = checked.and_then(|()| crate::node_unix::check(args));
+    if let Err(refusal) = checked.and_then(|()| crate::net::remote::start(args)) {
         return refusal.report("node", err);
     }
     // A site that podssh's relay role publishes by its name, before any other road (T-649).

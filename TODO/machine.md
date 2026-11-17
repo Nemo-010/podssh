@@ -146,7 +146,7 @@ manual do not keep the kind and the `instead` of a flag.
    (`crates/podssh-cli/src/man/mod.rs` lines 73-78 at `332ee58`).
 5. The JSON is the same on each host: no path from `HOME` (`docs/cli.md:57-58`).
 6. Add the row to `MAN_FLAGS` (`crates/podssh-cli/src/flags.rs:396-403`), the field to
-   `man::Request` (`crates/podssh-cli/src/man/mod.rs:126-133`), and the parse
+   `man::Request` (`crates/podssh-cli/src/man/mod.rs:128-135`), and the parse
    (`crates/podssh-cli/src/tree.rs:254-263`). JSON for `--help` stays with T-010.
 
 ## Prove
@@ -909,7 +909,7 @@ its session at `crates/podssh-cli/src/proxy.rs:448-455`; the bytes of the
 pump at `crates/podssh-cli/src/pipe/pump.rs:120` and
 `crates/podssh-cli/src/pipe/pump.rs:130-158`, and the relay's close at
 `crates/podssh-cli/src/pipe/relay.rs:239`. `SessionLog` at
-`crates/podssh-cli/src/settings.rs:278-281`, and `podssh status` at
+`crates/podssh-cli/src/settings.rs:284-287`, and `podssh status` at
 `crates/podssh-cli/src/status.rs:148-159`. The variable in VARIABLES, the
 two files in FILES, and `docs/cli.md`.
 

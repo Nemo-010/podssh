@@ -206,7 +206,7 @@ No glob code exists in podssh. `known_hosts::wildcard`
    stands, and `Match final all` applies after the last line and fills only unset values, as
    measured. Each other `Match` stays refused by name until T-045.
 6. Check each included file as T-043 checks the user file: its owner and its mode.
-7. Change `docs/cli.md:6639-6760`, FILES (`crates/podssh-cli/src/man/data.rs:162-497`) and the
+7. Change `docs/cli.md:6639-6760`, FILES (`crates/podssh-cli/src/man/data.rs:162-498`) and the
    `ssh` notes in the same commit.
 
 ## Prove
@@ -753,15 +753,15 @@ the file before the variable; the precedence test fails.
 
 ## Done
 
-2026-10-12. The settings file in `crates/podssh-cli/src/settings.rs:1-361`:
-its places at `crates/podssh-cli/src/settings.rs:141-164`, its checks at
-`crates/podssh-cli/src/settings.rs:187-211`, its lines at
-`crates/podssh-cli/src/settings.rs:213-345`; the relay hosts and the
+2026-10-12. The settings file in `crates/podssh-cli/src/settings.rs:1-375`:
+its places at `crates/podssh-cli/src/settings.rs:147-170`, its checks at
+`crates/podssh-cli/src/settings.rs:193-217`, its lines at
+`crates/podssh-cli/src/settings.rs:219-359`; the relay hosts and the
 failover below the flag and the variable at
 `crates/podssh-cli/src/relay_settings.rs:73-88` and
 `crates/podssh-cli/src/relay_settings.rs:129-139`, the pins and the refusal
 of a bad file at `crates/podssh-cli/src/pins.rs:13-40`, the CA file at
-`crates/podssh-cli/src/settings.rs:347-357` and, for `podssh ssh`,
+`crates/podssh-cli/src/settings.rs:361-371` and, for `podssh ssh`,
 `crates/podssh-cli/src/ssh/resolve.rs:95-99`; `status` at
 `crates/podssh-cli/src/status.rs:75` and
 `crates/podssh-cli/src/status.rs:91`, `doctor` at

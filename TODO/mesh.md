@@ -11102,7 +11102,7 @@ through a relay. A feature of the mesh (Q63; Q77, the fallbacks that exist).
 - Read: `pipe` does not refuse a terminal on stdin (no such check in `crates/podssh-cli/src/pipe/`
   at `3bb42ea`); the issue's "as `pipe` does" is not this code's.
 - Read: the exit lends its egress on the node's roads
-  (`crates/podssh-cli/src/man/notes_pair.rs:301-311`); a carrier is one more road for it (T-596).
+  (`crates/podssh-cli/src/man/notes_pair.rs:303-313`); a carrier is one more road for it (T-596).
 
 ## Approach
 
@@ -11456,8 +11456,8 @@ roads, and a carrier must be one of them.
 ## Premise
 
 - Read: the exit goes on the pair's, the iroh, the DERP, the transit and the Piping Server roads
-  (`crates/podssh-cli/src/man/notes_pair.rs:310-311`), and needs the net's role exit, signed by
-  its owner (`:307-308`).
+  (`crates/podssh-cli/src/man/notes_pair.rs:312-313`), and needs the net's role exit, signed by
+  its owner (`:309-310`).
 - Read: `podssh exit NAME --listen` gives SOCKS5, SOCKS4a and HTTP CONNECT on a loopback address
   (`docs/STATUS.md:172`).
 - In the issue's case the end with egress starts the channel (`ssh -T sandbox CMD`), so the node
@@ -11520,7 +11520,7 @@ Read at `b02d8c4` (2026-11-03), for the draft:
 - The Premise holds at each cited line; the citation of the manual takes the sentence of the
   carrier that this change adds to it.
 - The rule of the exit is checked at the node by code that each road shares: the net's verdict
-  (`crates/podssh-cli/src/net/admit.rs:70`) at the channel's admission and again for each address
+  (`crates/podssh-cli/src/net/admit.rs:71`) at the channel's admission and again for each address
   of the dial (`crates/podssh-cli/src/node_exit.rs`). So the node of a carrier needed none of its
   own: T-595 refused `--exit` beside `--carrier` (`node_carrier::check`), and the node's part is
   to lift it and say the exit's line as each road does. The plant of the Prove, "the exit's rule
@@ -13145,7 +13145,7 @@ Read at `2042200`:
 - The admission is a function of a key and its ask
   (`PodUtils/podssh:crates/podssh-relay/src/e2e/ends.rs:47`), read again for each session
   (`PodUtils/podssh:crates/podssh-relay/src/identity/allow.rs:102-106`); the doors are made in
-  `crates/podssh-cli/src/net/admit.rs:114`, `crates/podssh-cli/src/net/admit.rs:225` and
+  `crates/podssh-cli/src/net/admit.rs:119`, `crates/podssh-cli/src/net/admit.rs:230` and
   `crates/podssh-cli/src/channel.rs:354`.
 - The verdict: a grant decides first (`PodUtils/podssh:crates/podssh-relay/src/e2e/ends.rs:162` says "A grant decides
   alone"), and else the door (`PodUtils/podssh:crates/podssh-relay/src/e2e/ends.rs:174`).
@@ -13742,7 +13742,7 @@ JSON) must be released and taken. podssh may not keep a list of other parties' s
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -13756,7 +13756,7 @@ that a person copies (`net join`, `net invite`).
   (`crates/podssh-cli/src/flags/node.rs:137`, `crates/podssh-cli/src/node_members.rs:1-10`,
   `crates/podssh-cli/src/net/store.rs:62`).
 - Read: `store::take(signed, owner, now)` verifies a document against its owner's key and its end
-  (`crates/podssh-cli/src/net/store.rs:166`); the document is signed (`crates/podssh-cli/src/net/sign.rs`).
+  (`crates/podssh-cli/src/net/store.rs:171`); the document is signed (`crates/podssh-cli/src/net/sign.rs`).
 - Read: the relay role reads a list from a file or an `https://` URL with `--list-ttl` and `--list-stale`
   (T-646, `TODO/relay.md`): a copy older than TTL plus stale limit lets no one in. The source is a trait with
   a file and a URL behind it. Reuse it.
@@ -13782,6 +13782,43 @@ that a person copies (`net join`, `net invite`).
 4. The copy goes to the cache with its fetch time (`crates/podssh-relay/src/cache.rs`).
 5. `status --net` shows the URL, the serial, the age and whether it is stale.
 
+## Decision
+
+2026-11-17 (the drafting agent of T-715).
+
+- **The document goes where each door reads the net** (`store::take_at`, the place of `PODSSH_NET` or the
+  cache's `net.doc`), so that each road's door, the end-to-end channel's documents and `net ls` follow it
+  with no second path. Lost: a copy in memory that the doors read first (a second source of the net, which
+  `status` in another process could not see).
+- **`--net-owner` is checked for each document, before the store's rule**, which checks it again for the
+  first (`Some(owner)`): two checks, as rule 7 prefers. Lost: the store's check alone (it names `--owner`,
+  and only for the first document).
+- **No redirect.** Each redirect is one GET more, and Q105 allows one GET each TTL; a redirect is a fault of
+  the fetch, which names its status. Lost: T-646's three redirects.
+- **The fetch reuses T-646's URL and HTTPS fetch** (`relay_serve/keys_url.rs`: `Url`, `Https` with a cap
+  and a count of redirects, the `Fetch` trait of `podssh_relay::serve::keys::list`), not its copy
+  (`list::Fetched`), which holds an allowlist and empties it on any answer: a document that does not verify
+  must leave the copy held. Lost: a generic `Fetched<T>` in podssh-relay (a change of the role's code for
+  no gain of the role's).
+- **The keeper is a thread of its own with a current-thread runtime**, started once the first fetch is
+  done, so that one loop does each fetch after the one before, whichever road runs (the pair's, DERP,
+  a carrier...). Lost: a task of each road's runtime (some roads have none at the start, and a node of
+  two roads would fetch twice).
+- **Stale and closed**: a copy past `--net-ttl` is `stale` and still read; past `--net-ttl` plus
+  `--net-stale` the net's verdict is refused for each new session (`admit::verdict`), so the keys of
+  `--allow` still come in, and a door of members alone (DERP with no `--allow`) lets nobody in. The line
+  is said once until a fetch works.
+- **A copy of an earlier run counts** only when the record `net-url.json` names the same URL (its
+  SHA-256, never its path), the same owner, and the serial held: its age goes on from its fetch. A net that
+  `net take` or `net join` put there has no fetch time, so a first fetch that fails is 78. Lost: any net
+  held counting as the copy (its age would be unknown, and the stale limit void).
+- **The settings keywords are `NetUrl` and `NetOwner`**; `--net-ttl` and `--net-stale` have none (their
+  defaults serve a service; `--install` writes the flags). `--temporary` refuses `--net-url` (its door is
+  one client key). A detached node's first process checks the words, and its child fetches.
+- **The record** `net-url.json` holds the URL by its host alone, the URL's digest, the owner's fingerprint,
+  the serial, the fetch time, the TTL, the stale window and the last fault; mode 0600 in the cache, as
+  each file of it. It is described in the node's note, not in FILES (`man/data.rs` is at 497 lines).
+
 ## Prove
 
 ```sh
@@ -13794,6 +13831,53 @@ New test: a stand-in HTTPS server serves a document; a node admits its member; t
 document that drops the member and the door follows within the TTL (paused clock); the server stops, and past
 TTL plus stale the door is closed; a document signed by another key is refused. Planted: a fetch that skips
 the owner's check fails the last test.
+
+## Correction
+
+2026-11-17: the Premise holds in substance. `store::take` (`crates/podssh-cli/src/net/store.rs`) now calls
+`take_at(place, ...)`, and `held` calls `held_at(place)`, so that a test names its own place. The relay
+role's list (T-646) is an enum of a file and a URL's copy (`podssh_relay::serve::keys::list::List`), its fetch
+the trait `Fetch`; the URL and the HTTPS fetch are `crates/podssh-cli/src/relay_serve/keys_url.rs`'s, not
+`shadowsocks/subscription.rs`'s. The cache is `podssh_relay::cache`'s `store_file_in_first` and
+`load_file_from`. The node's flags live in `crates/podssh-cli/src/flags/node.rs` (`NODE_FLAGS`), its words
+in `crates/podssh-cli/src/node_args.rs`. The Prove's "a node admits its member" through a session is
+covered by the door's state (the paused clock's tests) and by `net ls` after the node's fetch; a session
+through the stand-in relay is not drafted.
+
+## Done
+
+2026-11-17. Drafted by a drafting agent (`draft-t715`, DRAFT T-715), merged and tested by the main session.
+
+- `crates/podssh-cli/src/net/remote.rs` (new): the plan of the flags and of `NetUrl`/`NetOwner`, the
+  fetch's check of the owner, the take by the store's rule, the record, the keeper, the closed door and
+  `status --net`'s field `url`. `net/remote_tests.rs` (new) runs on tokio's paused clock with a stand-in
+  server: the door follows a new document within the TTL, and closes past the TTL and the stale window.
+  It opens again, and it refuses another owner, another key's signature, an older serial and 64 KiB + 1.
+- `net/store.rs` (`held_at`, `take_at`, beside the note of T-805's private write), `net/admit.rs` (the
+  verdict of a closed door), `net/state.rs` (`url`), `net/mod.rs`; `relay_serve/keys_url.rs`; `node.rs`,
+  `node_args.rs`, `flags/node.rs`, `node_install/text.rs`; `settings.rs` and `settings_tests.rs` (`NetUrl`,
+  `NetOwner`, beside T-718's `AccessHost` and its files); the manual (`man/notes_net_url.rs`, new) and
+  `docs/mesh.md`.
+- `crates/podssh-cli/tests/node_net_url.rs` (new): a server of the test's over TLS; 78 with no copy, the
+  document taken (`net ls`, `status --net`), a newer serial in place, the copy read while the server fails,
+  another owner refused (78), a redirect refused with one GET.
+
+At the merge: the settings test's owner `SHA256:` + 43 `B`s is no canonical fingerprint (its last
+character carries bits that 32 bytes do not have), so `NetOwner` refused it; the test now uses `A`s. The
+manual's sentence of the settings file grew to 27 words with `NetUrl`, and is split.
+
+Prove, 2026-11-17: `cargo test -p podssh-cli --lib -- net:: settings access man::` 135 passed;
+`cargo test -p podssh-cli --test node_net_url` 1 passed; `cargo clippy -p podssh-cli --all-targets`
+finds nothing in T-715's files (this machine's clippy 1.99.1 names three `collapsible_if` of
+`crates/podssh-ws`, which the gate's clippy passes). `llms.txt` and `llms-full.txt` regenerated.
+Planted: `owner_is` always `Ok` fails
+`a_document_of_another_owner_or_key_an_older_serial_or_a_large_answer_is_refused`
+(`remote_tests.rs:203`) and `a_node_takes_its_net_from_a_url_by_its_owner_alone`
+(`node_net_url.rs:298`); the code was restored.
+
+What waits: a session of a member through a stand-in relay that the door admits and then refuses past
+the TTL. The door's state is held by the paused clock's tests.
+
 
 # T-717: Probe each road to a list of nodes as JSON: `podssh ping --nodes`
 

@@ -9,7 +9,9 @@
 //! and `--list-stale SECS` (3600) lets no key mint
 //! (`podssh_relay::serve::keys::list`). Its trust is TLS alone: `--mint net`,
 //! whose document its owner signs, is the stronger way. The URL's path and
-//! query may hold a secret of its server: a line names its host alone.
+//! query may hold a secret of its server: a line names its host alone. A
+//! node's net at a URL (`crate::net::remote`, T-715) takes the same URL and
+//! fetch, with its own cap and no redirect.
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -87,7 +89,7 @@ pub(crate) fn list_of(rest: &str, lists: &Lists) -> Result<List, Refusal> {
         return Ok(List::File(rest.into()));
     }
     let url = Url::parse(rest).map_err(|why| Refusal::usage(format!("--mint keys: {why}")))?;
-    let from = Https { url, trust: lists.trust.clone() };
+    let from = Https::new(url, lists.trust.clone(), LIST_MOST, REDIRECTS);
     Ok(List::Fetched(Arc::new(Fetched::new(Box::new(from), lists.ttl, lists.stale))))
 }
 
@@ -131,7 +133,7 @@ pub(crate) fn start(mint: &Mint, say: Say) {
 }
 
 /// A list's URL: `https://HOST[:PORT]/PATH?QUERY`.
-struct Url {
+pub(crate) struct Url {
     host: String,
     port: u16,
     /// The path and its query, as the request line carries them: they may
@@ -140,24 +142,24 @@ struct Url {
 }
 
 impl Url {
-    fn parse(url: &str) -> Result<Url, String> {
-        let rest = url.get(8..).ok_or("a list's URL is https://HOST/PATH")?;
+    pub(crate) fn parse(url: &str) -> Result<Url, String> {
+        let rest = url.get(8..).ok_or("the URL is https://HOST/PATH")?;
         let end = rest.find(['/', '?', '#']).unwrap_or(rest.len());
         let (authority, tail) = rest.split_at(end);
         if authority.contains('@') {
-            return Err("a list's URL takes no user and no password".into());
+            return Err("the URL takes no user and no password".into());
         }
         let (host, port) = host_port(authority)?;
         let tail = tail.split('#').next().unwrap_or_default();
         let target = if tail.starts_with('/') { tail.to_string() } else { format!("/{tail}") };
         if target.bytes().any(|b| b <= b' ' || b >= 0x7f) {
-            return Err("a list's URL holds a space, a control character or a byte past ASCII; write it %XX".into());
+            return Err("the URL holds a space, a control character or a byte past ASCII; write it %XX".into());
         }
         Ok(Url { host, port, target: Zeroizing::new(target) })
     }
 
     /// `https://HOST/...`: its host alone.
-    fn shown(&self) -> String {
+    pub(crate) fn shown(&self) -> String {
         let host = if self.host.contains(':') { format!("[{}]", self.host) } else { self.host.clone() };
         match self.port {
             443 => format!("https://{host}/..."),
@@ -170,10 +172,10 @@ impl Url {
 fn host_port(authority: &str) -> Result<(String, u16), String> {
     let (host, port) = match authority.strip_prefix('[') {
         Some(rest) => {
-            let (host, after) = rest.split_once(']').ok_or("a list's host has a [ and no ]")?;
+            let (host, after) = rest.split_once(']').ok_or("the URL's host has a [ and no ]")?;
             match after {
                 "" => (host, None),
-                _ => (host, Some(after.strip_prefix(':').ok_or("a list's URL has text after ]")?)),
+                _ => (host, Some(after.strip_prefix(':').ok_or("the URL has text after ]")?)),
             }
         }
         None => match authority.split_once(':') {
@@ -181,23 +183,32 @@ fn host_port(authority: &str) -> Result<(String, u16), String> {
             None => (authority, None),
         },
     };
-    podssh_ws::names::check_target(host).map_err(|why| format!("a list's host: {why}"))?;
+    podssh_ws::names::check_target(host).map_err(|why| format!("the URL's host: {why}"))?;
     let port = match port {
         None => 443,
-        Some(text) => text.parse::<u16>().ok().filter(|p| *p != 0).ok_or("a list's port is not a port")?,
+        Some(text) => text.parse::<u16>().ok().filter(|p| *p != 0).ok_or("the URL's port is not a port")?,
     };
     Ok((host.to_string(), port))
 }
 
-/// A list's server, through the host's proxy, with the role's trust.
-struct Https {
+/// A list's server, through the host's proxy, with the role's trust: an
+/// answer of `most` bytes at most, after at most `redirects` redirects.
+pub(crate) struct Https {
     url: Url,
     trust: Trust,
+    most: usize,
+    redirects: usize,
+}
+
+impl Https {
+    pub(crate) fn new(url: Url, trust: Trust, most: usize, redirects: usize) -> Https {
+        Https { url, trust, most, redirects }
+    }
 }
 
 impl Fetch for Https {
     fn fetch(&self) -> Fetching<'_> {
-        Box::pin(get(&self.url, &self.trust))
+        Box::pin(get(&self.url, &self.trust, self.most, self.redirects))
     }
 
     fn shown(&self) -> String {
@@ -205,18 +216,18 @@ impl Fetch for Https {
     }
 }
 
-/// The body at `url`, after at most [`REDIRECTS`] redirects, each to
-/// `https://`; `Err` names the host, never the path.
-async fn get(url: &Url, trust: &Trust) -> Result<Vec<u8>, String> {
+/// The body at `url`, `most` bytes at most, after at most `redirects`
+/// redirects, each to `https://`; `Err` names the host, never the path.
+async fn get(url: &Url, trust: &Trust, most: usize, redirects: usize) -> Result<Vec<u8>, String> {
     let mut at = Url { host: url.host.clone(), port: url.port, target: url.target.clone() };
-    for _ in 0..=REDIRECTS {
+    for hop in 0..=redirects {
         let proxy = ProxyChoice::FromEnvironment;
         let answer = podssh_ws::client::https_get_accepting(
             &at.host,
             at.port,
             &at.target,
             "text/plain, */*",
-            LIST_MOST,
+            most,
             trust,
             &proxy,
             FETCH_TIMEOUT,
@@ -225,6 +236,10 @@ async fn get(url: &Url, trust: &Trust) -> Result<Vec<u8>, String> {
         .map_err(|e| failed(&e, &at.host))?;
         match answer.status {
             200 => return Ok(answer.body),
+            // Each redirect is one GET more: a net's document follows none (Q105).
+            301 | 302 | 303 | 307 | 308 if hop == redirects => {
+                return Err(format!("HTTP {} {}, a redirect that this fetch does not follow", answer.status, answer.reason))
+            }
             301 | 302 | 303 | 307 | 308 => {
                 let to = answer.header("location").ok_or("a redirect with no Location")?;
                 at = match to.strip_prefix('/') {
@@ -238,7 +253,7 @@ async fn get(url: &Url, trust: &Trust) -> Result<Vec<u8>, String> {
             status => return Err(format!("HTTP {status} {}", answer.reason)),
         }
     }
-    Err(format!("more than {REDIRECTS} redirects"))
+    Err(format!("more than {redirects} redirects"))
 }
 
 /// A fetch's failure, its host named and never its path.
