@@ -142,19 +142,6 @@ pub fn not_implemented(what: &str) -> String {
     format!("podssh: '{what}' is not implemented yet; nothing was done.")
 }
 
-/// The refusal for `podssh man SECTION` when there is no such section. It
-/// exits 64 and lists the sections, because the list is what the user can
-/// type next; `podssh man` with no section writes the whole manual.
-pub fn unknown_man_section(token: &str, sections: &[&str]) -> String {
-    let mut m = format!("podssh man: there is no '{token}' section.\n");
-    m.push_str("Sections:\n");
-    for name in sections {
-        m.push_str(&format!("  {name}\n"));
-    }
-    m.push_str("Run 'podssh man' for the whole manual.");
-    m
-}
-
 /// The message for `podssh` with no arguments at all. Never an implicit
 /// `ssh` — `docs/decisions.md`, "Product" (2026-10-01).
 pub fn no_arguments() -> String {

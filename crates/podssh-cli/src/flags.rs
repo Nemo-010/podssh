@@ -336,7 +336,7 @@ mod update;
 mod via;
 mod vless;
 pub use agent::AGENT_FLAGS;
-pub use availability::{availability, Availability, VERB_OWNER};
+pub use availability::{availability, needed_feature, Availability, VERB_OWNER};
 pub use chat::CHAT_FLAGS;
 pub use config::CONFIG_FLAGS;
 pub use containers::CONTAINERS_FLAGS;

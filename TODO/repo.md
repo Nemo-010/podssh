@@ -4975,7 +4975,7 @@ of GitHub #69 to #72 corrected these; nothing finds the next.
 - Read, by `grep -w yet` over `docs/`, `README.md`, `AGENTS.md` and `SECURITY.md` on 2026-10-31,
   after the corrections: 19 lines with no date and no id on them. Most are true today, as of the
   work that the operator holds (Q32); some state nothing of podssh, as "not whole yet"
-  (`docs/cli.md:2187`) and "did not act on yet" (`docs/cli.md:1814`).
+  (`docs/cli.md:2205`) and "did not act on yet" (`docs/cli.md:1832`).
 - Read: the checker reads the ids of these documents and the citations of `TODO/` alone
   (`PodUtils/podssh:crates/podssh-todo/src/refs.rs:22-35`); it reads no sentence of a document.
 - Read: the fifth statement of GitHub #71, the comment of the facts file that the relay's frame
@@ -6632,7 +6632,7 @@ with `BOX_PTRACE=refused`; the gate's box job requires 22 properties (`.github/w
 **Milestone:** M10
 **Priority:** P1
 **Effort:** M
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -6652,6 +6652,15 @@ that no help text is written by hand in a second place and a test fails on any d
    facts, and its writers become the crate's.
 2. The checks of the ruling: the variables and the exit codes as one typed table; a test that fails when the man page
    or `llms.txt` differs from the model, or when the code reads a variable or gives an exit code with no fact.
+
+## Decision
+
+2026-11-17, the move of the text, `--help` and the JSON (step seven). The owner's ruling "Discipline" asks one model
+and no second text, so the JSON takes the crate's shape, not podssh's own: `name` and `version` in the place of
+`podssh`, commands with `path` and `args`, a flag's `kind` as an object, the facts under `facts`, the `-o` keywords as
+the topic `keywords` of `ssh`, and `--json` of a prose section exits 0. Lost: podssh's own shape beside the crate's,
+which would be the second text that the ruling forbids. Its readers (`docs/cli.md`, `podssh mcp`'s `man`, GitHub #10's)
+read the crate's shape, and the release's notes name the change. The help fills 79 columns, not 100.
 
 ## Prove
 
@@ -6770,6 +6779,65 @@ model carries a command's availability and the kinds of flag (the asks above: CO
 `FlagKind::NotInRelease`, `Command::availability`, `Command::topics`), taken. Next: the text, `--help` and the JSON
 on the crate's writers.
 
+Step seven, 2026-11-17 (a draft, `draft-t790b`), the text, `--help` and the JSON on the crate's writers. The model
+(`crates/podssh-cli/src/man/pod_model.rs`) no longer reads podssh's own manual: it is built from the tables
+themselves. Each flag is the row's help and its kind (supported is `Wired`, accepted `Ignored` with an empty `why`,
+refused `Refused` with its `instead`, "no flag" giving an empty one, and not in the first release `NotInRelease` with
+64); `help::help_text` is `pod_manual::sections::flag_text` of that flag, so each writer prints "HELP. Accepted and
+ignored." where podssh printed "HELP (accepted and ignored)". `ts` has `Availability::Feature` (`ts`, why, 70) in each
+build (`flags::needed_feature`), and in a build without it no option but `--help`, no argument and no note. ssh's
+`topics` is `keywords`, so the roff writer's `INSIDE` workaround is gone: `man keywords` selects ssh, in each form. The
+retired variables stay a topic of their own (`man retired-variables`, heading RETIRED VARIABLES): ENVIRONMENT no
+longer shows them, as the crate's model has no place for a rule beside a group of variables that nothing reads. The
+notes of `--help` (`help/notes.rs`) are notes of the model now, one paragraph each (a line break keeps a command line
+whole), so the manual shows them too; the root has one note that `--help` alone shows. Forms: `podssh man`,
+`--no-pager` and `man SECTION` are `pod_manual::body` (text), paged by podssh's own pager, whose probe and variables are
+facts of this manual; `--roff` and `--roff SECTION` the crate's roff; `--json` and `--json SECTION` the crate's JSON;
+`podssh --help` and `podssh COMMAND --help` are `pod_manual::help::render`. Gone: `man/text.rs`, `man/json.rs`, the
+own model's `Manual`, sections and tests (`man/model.rs` keeps the blocks that the facts, notes and examples are written
+in, the description and the keywords), the roff writer's `section`, the help's columns (`flag_column`, `flag_line`,
+`wrap`, `availability_sentence`), and `refuse::unknown_man_section` (the crate's refusal lists the sections).
+
+What a reader sees change, said for the readers outside podssh (GitHub #10, the testers): the text's headings are
+SYNOPSIS (the commands by purpose and the options before a command), DESCRIPTION, COMMANDS with a section `podssh
+COMMAND` each (was COMMAND REFERENCE and `SSH`), the topics, then ENVIRONMENT, FILES, EXIT STATUS, EXAMPLES (each
+command line after `$ `) and SEE ALSO; a command's name selects its section in its own case only (`man SSH` is
+refused). `--help` is the command's section: about, notes, usage, arguments, `Options:` with each term on a line of its
+own and its sentence below, then the keywords for ssh and the examples, filled to 79 columns (was 100, `USAGE:`,
+`OPTIONS:` and `SUBCOMMANDS:` blocks); the root lists the commands by purpose with no alias beside them (each
+command's help says "Other names"). The JSON keeps its meaning in the crate's shape, `schema` 1: `name` and `version`
+(was `podssh`); `commands` with `path` (was `name`), `aliases`, `usage` without the program's name, `args` (was
+`arguments`, each with `required` and `values`), `flags` (`short` a character, `long` without dashes, `value`, `help`,
+`kind` an object `{"kind": "wired" | "ignored" | "refused" | "not-in-release", ...}` with `instead` or `code`; was a
+word and a separate `instead`), and `availability` only for a command behind a feature (was a word on each); the root
+command's `flags` are the options before a command (was `options`); the keywords are the topic `keywords` (was
+`ssh_keywords` with `honoured`, `noted`, `ignored`, `refused`; a keyword's default is in its help, no field of its own);
+`facts.variables[].vars[].names` (was `variables[].names`), `facts.files[].path` (the names joined), `facts.exits[]`
+with `code` `{"form": "value", "value": N}` or `{"form": "payload"}` (was `exit_codes` with `N`). `--json SECTION` of a
+prose topic gives its blocks with exit 0 (was 64). `pod_manual::json::read` reads it back as the model.
+
+Readers changed: `tests/man_extract/mod.rs` reads the crate's `Options:` list (`options`, `flag_map`, `descriptions`,
+`man_regions` by SYNOPSIS and `podssh COMMAND`, `sentences`); `tests/man_flag_parity.rs` the same checks on it, the
+column test replaced by one that the options are the rows in order then `--help`, each term a line of its own;
+`tests/man_json.rs` reads the binary's JSON with the crate's reader and checks each flag's kind against its row, the
+keywords' topic, the variables and the exit codes, and each kind of section; `tests/man_page.rs` the new headings;
+`scripts/interop-man.sh` the verbs from the root's tables and the flags from each `Options:` list; `podssh mcp`'s
+`man` tool says the model's shape; `docs/cli.md` ("The manual") the one model, `--help` as the section and the JSON's
+shape; the tests of `help.rs`, `help/notes.rs`, `man/mod.rs`, `man/roff.rs`, and new ones in
+`man/pod_model/tests.rs` (each kind, the availability, each name selects its section, the argument SECTION names each
+topic, the text fits 79 columns in ASCII). Merged the same day: `cargo test -p podssh-cli` 2384 passed, 0 failed
+(`--lib` with `man::` 66, `man_page`, `man_json`, `man_flag_parity`, `chat_cli`, `job`, `edit_args`,
+`binary_streams` among them); `sh scripts/interop-man.sh target/debug/podssh` 7 checks ok, 334 flag spellings, its
+planted page failed; clippy (the gate's lints) and rustfmt clean; the citations moved by `cargo todo remap`. One test
+of the draft's own failed: the text's 79 columns met command lines that a wrap would break (an example of a
+command's lead, a topic's example, a line that the model keeps as it is); the test exempted the manual's own examples
+alone, and now exempts each such command line, which is what it meant.
+
+Done, 2026-11-17. The help and the manual come from `pod-manual`, one model, each writer the crate's (text, roff,
+JSON, the help), and the checks of the ruling in the tests: `check::model`, `check::texts`, `check::variables`,
+`check::exit_codes` and `check::flags` against the parser, each with a planted drift that fails it. `check::generated`
+has no file to hold: podssh keeps no man page and no `llms.txt` in the repository (`podssh man --roff` and the JSON
+are made at the run); a kept one takes it then.
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes
 

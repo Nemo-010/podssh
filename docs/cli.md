@@ -21,29 +21,47 @@ scripts. The facts about OpenSSH on this page were measured with OpenSSH
   the manual does not name (or the reverse), a default that `resolve` does
   not use, an `-o` keyword that the parser handles differently, an example
   that the parser refuses, or a note that names a flag that is gone.
+- **One model, the writers of `pod-manual`.** podssh fills the model of
+  `pod-manual` (PodUtils/podcrates) from these tables
+  (`crates/podssh-cli/src/man/pod_model.rs`), and each form is the crate's
+  writer over it: the text, the man page, the JSON and `--help`. So no two
+  forms can differ, and the tests run the crate's checks on the model.
 - **Text first.** `podssh man` writes plain text, so it needs no `man`,
   groff or pager. On a terminal it pages: `PAGER`, else `less` when `PATH`
   has it and `TERM` names a terminal (not on Windows), else its own pager.
-  `--no-pager` writes to stdout; with no terminal there is no pager.
+  `--no-pager` writes to stdout; with no terminal there is no pager. The
+  page is SYNOPSIS (with the commands by purpose and the options before a
+  command), DESCRIPTION, COMMANDS (a section `podssh COMMAND` each), the
+  topics, ENVIRONMENT, FILES, EXIT STATUS, EXAMPLES and SEE ALSO.
+- **`--help` is the section.** `podssh COMMAND --help` prints the section of
+  the command in the manual: its notes, usage, arguments, options (a term on
+  a line of its own, then its sentence), the `-o` keywords for `ssh`, and
+  its examples. A flag's sentence ends with what its kind adds: "Accepted
+  and ignored.", "Refused. Use X.", or "Not in this release.".
 - **Roff second.** `podssh man --roff` writes a man(7) page with standard
-  macros only, by pod-manual's writer over the manual's model. A macro
-  defined in the page is read differently by different renderers: an `Fl`
-  macro with `\$*` printed blank flag names under groff and mandoc. The
-  gate renders the page with both (`scripts/interop-man.sh`).
-- **Data third.** `podssh man --json` writes the tables as one JSON object
-  for a program (GitHub #10): the commands with their availability,
-  arguments and flags, each flag with its kind and what to type instead;
-  the `-o` keywords; the variables; the files; the exit codes. It reads the
-  tables, not the text, so it keeps what the text drops. `--json SECTION`
-  gives one command, or the table of `environment`, `files` or
-  `exit-status`; a prose topic has no JSON form (exit 64), and neither has
-  `--json --roff`.
+  macros only. A macro defined in the page is read differently by different
+  renderers: an `Fl` macro with `\$*` printed blank flag names under groff
+  and mandoc. The gate renders the page with both
+  (`scripts/interop-man.sh`).
+- **Data third.** `podssh man --json` writes the model as one JSON object
+  for a program (GitHub #10), `schema` 1, which `pod_manual::json::read`
+  reads back: `commands` (each with its `path`, `aliases`, `usage`, `args`,
+  `flags` and `availability` when a build may lack it; each flag with its
+  `kind`: `wired`, `ignored`, `refused` with `instead`, or
+  `not-in-release` with its `code`), `topics` (the `-o` keywords are the
+  topic `keywords`, which `ssh`'s `topics` names), and `facts`
+  (`variables`, `exits`, `files`). It keeps what the text drops.
+  `--json SECTION` gives one command (with its topics), the table of
+  `environment`, `files` or `exit-status`, or a topic's blocks;
+  `--json --roff` is refused (exit 64).
 - **No setting of the host.** The manual is the same bytes in each
   environment. It never shows a token or a credential.
-- **A command that does not work says so.** `--help` and the manual mark a
-  command that is not implemented, or not in this build. Its own `--help`
-  and its section of the manual give the same sentence, and no option but
-  `--help`: the options of a command that does nothing cannot be used.
+- **A command that does not work says so.** The list of commands marks a
+  command that is not implemented, or not in this build. A command behind
+  a cargo feature (`ts`) says so in each build, with the code that a build
+  without it gives (70). In a build without it, its section and its
+  `--help` show no option but `--help`: the options of a command that does
+  nothing cannot be used.
 
 ## Options of `podssh ssh`
 

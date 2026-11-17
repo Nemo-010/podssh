@@ -26,8 +26,15 @@ pub enum Availability {
     NotInBuild,
 }
 
+/// The cargo feature that a verb needs, when it needs one. Each build keeps
+/// the verb in its help and its manual; a build without the feature exits
+/// 70 when it runs.
+pub fn needed_feature(verb: &Verb) -> Option<&'static str> {
+    (verb.name == "ts").then_some("ts")
+}
+
 pub fn availability(verb: &Verb) -> Availability {
-    if verb.name == "ts" && !cfg!(feature = "ts") {
+    if needed_feature(verb).is_some() && !cfg!(feature = "ts") {
         Availability::NotInBuild
     } else if VERB_OWNER.iter().any(|(name, _)| *name == verb.name) {
         Availability::NotYet

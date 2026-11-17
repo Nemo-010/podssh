@@ -92,10 +92,11 @@ pub fn list(settings: &Settings) -> Vec<Value> {
     tools.push(json!({
         "name": "man",
         "title": "The manual of podssh",
-        "description": "podssh man --json: the commands, flags, ssh_config keywords, variables, files and exit codes \
-             of this build as JSON, or one section of them.",
+        "description": "podssh man --json: the manual of this build as pod-manual's model (schema 1): the commands \
+             with their flags and the kind of each, the ssh_config keywords, the variables, files and exit codes; \
+             or one section of it.",
         "inputSchema": object(json!({
-            "section": { "type": "string", "description": "a command (ssh, cp, ...), or environment, files, relay-facts, exit-status, examples or see-also" },
+            "section": { "type": "string", "description": "a command (ssh, cp, ...), or relay-facts, retired-variables, environment, files, exit-status, examples or see-also" },
         })),
         "annotations": { "readOnlyHint": true, "openWorldHint": false },
     }));

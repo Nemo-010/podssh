@@ -56,7 +56,7 @@ unknown flag (exit 64), and `Cargo.lock` has no iroh crate.
 5. `doctor`, with the feature: a UDP line, and the `/ping` of the home relay
    through the proxy (`crates/podssh-cli/src/doctor/host.rs:12-28`).
 6. `availability()` knows `ts` as the only build feature
-   (`crates/podssh-cli/src/flags/availability.rs:29-37`): extend it. With no feature, an
+   (`crates/podssh-cli/src/flags/availability.rs:36-44`): extend it. With no feature, an
    iroh destination refuses before it connects and names `--features iroh`,
    as `crates/podssh-cli/tests/ts_not_built.rs:1-4` shows for `ts`.
 7. Docs: the "Outbound only" item of `README.md`, "Nothing listens" in
@@ -4412,7 +4412,7 @@ allows podssh as a client of Cloudflare (`docs/decisions.md:80`).
   (`crates/podssh-cli/src/ssh/hop.rs:58-60`); `jump_hop` refuses a node only (`:68-74`).
 - Read: a `cf://` destination refuses `-J`:
   `crates/podssh-cli/src/ssh/cloudflare.rs:75` says "a Cloudflare tunnel cannot be reached
-  through a -J hop yet", and `docs/cli.md:202-203` says so too.
+  through a -J hop yet", and `docs/cli.md:220-221` says so too.
 - Read: the road of a run is chosen for the first hop's host
   (`crates/podssh-cli/src/ssh/resolve.rs:256`), and each later hop runs in a `direct-tcpip`
   channel of the session before it (`crates/podssh-ssh/src/run.rs:161-173`;

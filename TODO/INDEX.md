@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**759 entries: 42 open, 36 partial, 11 blocked, 670 done.**
+**759 entries: 42 open, 35 partial, 11 blocked, 671 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 2 | 9 | 3 | 80 | 94 |
+| P1 | 2 | 8 | 3 | 81 | 94 |
 | P2 | 5 | 21 | 2 | 286 | 314 |
 | P3 | 35 | 6 | 6 | 303 | 350 |
-| **All** | 42 | 36 | 11 | 670 | 759 |
+| **All** | 42 | 35 | 11 | 671 | 759 |
 
 ## Entries
 
@@ -820,7 +820,7 @@ repository and CI).
 | [T-787](machine.md) | P3 | S | M10 | defect | done | A QUIC socket whose reads keep failing must not spin a core |
 | [T-788](robustness.md) | P1 | S | M10 | defect | partial | On macOS, `node_cut`'s strict stand-in sent no 1003 once |
 | [T-789](resume.md) | P2 | S | M10 | defect | done | The resumable layer comes back about 12.5 s after a cut of 15 s ends, where TCP alone can in under 1 s |
-| [T-790](repo.md) | P1 | M | M10 | chore | partial | The help and the manual from `pod-manual`, mechanically free of drift |
+| [T-790](repo.md) | P1 | M | M10 | chore | done | The help and the manual from `pod-manual`, mechanically free of drift |
 | [T-791](repo.md) | P1 | M | M10 | chore | partial | Each release run first in `pod-lab`'s profiles of podssh's host classes |
 | [T-792](repo.md) | P1 | S | M10 | chore | done | The state of each GitHub issue written from the record by podcrates' workflow |
 | [T-793](repo.md) | P1 | S | M10 | feature | partial | One POSIX installer for podssh, hermetic, idempotent and fast, on podcrates' shared core |

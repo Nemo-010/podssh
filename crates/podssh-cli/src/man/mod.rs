@@ -4,27 +4,26 @@
 //! no groff, no pager, no network, no documents. So it is plain text that
 //! podssh writes itself, and it covers each command, argument, flag, `-o`
 //! keyword, variable, file, relay fact and exit code. Nothing in it is typed
-//! twice: [`model`] builds it from the tables that the parser and the
-//! commands use, and the tests in each module check it against them.
+//! twice: [`pod_model`] builds pod-manual's model from the tables that the
+//! parser and the commands use, and the tests check it against them.
 //!
+//! Each form is pod-manual's writer over that one model, so no two forms
+//! can differ, and `--help` shows a command's section:
 //! - `podssh man` pages the text on a terminal, else writes it to stdout.
 //! - `--no-pager` writes it to stdout, also on a terminal.
-//! - `--roff` writes a man(7) page instead, for `man -l` or a man directory:
-//!   pod-manual's writer over [`pod_model`].
-//! - `--json` writes the tables as one JSON object, for a program.
+//! - `--roff` writes a man(7) page instead, for `man -l` or a man directory.
+//! - `--json` writes the model as one JSON object, for a program.
 //! - `podssh man SECTION` writes one section: a command, or a topic.
 //!
-//! The text and the JSON still walk podssh's own model: the crate's text
-//! has another layout than the one the parity gate of `--help` reads, and
-//! the crate's JSON another shape than the one that programs read today.
+//! The pager stays podssh's own ([`crate::pager`]): its probe and its
+//! variables are the facts of this manual.
 
 pub mod data;
 pub mod examples;
 pub mod facts;
-pub mod json;
 pub mod model;
 pub mod notes;
-// The same manual as the model of pod-manual, whose checks the tests run.
+// The manual as the model of pod-manual, whose writers make each form.
 pub mod pod_model;
 // A node's person, asked after its door (T-638).
 mod notes_ask;
@@ -120,7 +119,6 @@ mod notes_devtunnel;
 // The notes of the GSRN road, gsocket's relay by a shared secret (T-707).
 mod notes_gsr;
 pub mod roff;
-pub mod text;
 
 use std::io::{BufRead, Write};
 
@@ -135,7 +133,7 @@ pub struct Request<'a> {
 
 /// The whole manual as text, as `podssh man --no-pager` writes it.
 pub fn page() -> String {
-    text::render(&model::manual())
+    pod_manual::text::render(&pod_model::manual())
 }
 
 /// The whole manual as a man(7) page, as `podssh man --roff` writes it.
@@ -143,30 +141,21 @@ pub fn roff_page() -> String {
     roff::page()
 }
 
-/// The bytes for `req`, or the refusal for a section that does not exist.
+/// The whole manual as one JSON object, as `podssh man --json` writes it.
+pub fn json_page() -> String {
+    pod_manual::json::text(&pod_manual::json::document(&pod_model::manual()))
+}
+
+/// The bytes for `req`, or the refusal: an unknown section (with the list
+/// of the sections), or two forms at once.
 pub fn body(req: &Request<'_>) -> Result<String, String> {
-    if req.json {
-        if req.roff {
-            return Err("podssh man: --json and --roff are two forms of the manual; give one".into());
-        }
-        let doc = match req.section {
-            None => json::document(),
-            Some(name) => json::section(name)?,
-        };
-        return Ok(serde_json::to_string_pretty(&doc).unwrap_or_default() + "\n");
-    }
-    let manual = model::manual();
-    let unknown = |name: &str| crate::refuse::unknown_man_section(name, &manual.keys());
-    match req.section {
-        None if req.roff => Ok(roff::page()),
-        None => Ok(text::render(&manual)),
-        Some(name) => match manual.find(name) {
-            // podssh's name selects the section; the crate's model has each.
-            Some(s) if req.roff => roff::section(s.key).ok_or_else(|| unknown(name)),
-            Some(s) => Ok(text::render_section(s)),
-            None => Err(unknown(name)),
-        },
-    }
+    let ask = pod_manual::Request {
+        section: req.section.map(str::to_string),
+        no_pager: req.no_pager,
+        roff: req.roff,
+        json: req.json,
+    };
+    pod_manual::body(&pod_model::manual(), &ask)
 }
 
 /// Run `podssh man`; returns the exit code. The manual goes to stdout, the
@@ -228,10 +217,23 @@ mod tests {
     }
 
     #[test]
+    fn json_writes_at_once_and_reads_back_as_the_model() {
+        let tty = Tty { stdin: true, stdout: true };
+        let (rc, out, _) = run_with(Request { json: true, ..Default::default() }, tty);
+        assert_eq!((rc, out.as_str()), (0, json_page().as_str()));
+        assert_eq!(pod_manual::json::read(&out), Ok(pod_model::manual()));
+    }
+
+    #[test]
     fn a_section_is_found_by_its_name_or_an_alias() {
-        for (name, heading) in
-            [("ssh", "SSH\n"), ("connect", "SSH\n"), ("env", "ENVIRONMENT\n"), ("EXIT-STATUS", "EXIT STATUS\n")]
-        {
+        for (name, heading) in [
+            ("ssh", "podssh ssh\n"),
+            ("connect", "podssh ssh\n"),
+            ("keywords", "podssh ssh\n"),
+            ("env", "ENVIRONMENT\n"),
+            ("EXIT-STATUS", "EXIT STATUS\n"),
+            ("retired-variables", "RETIRED VARIABLES\n"),
+        ] {
             let (rc, out, _) = run_with(Request { section: Some(name), ..Default::default() }, Tty::none());
             assert_eq!(rc, 0, "{name}");
             assert!(out.starts_with(heading), "{name}: {out}");
@@ -250,8 +252,11 @@ mod tests {
         assert_eq!(rc, crate::exit_codes::EXIT_USAGE);
         assert!(out.is_empty(), "{out}");
         assert!(err.contains("nonsense"), "{err}");
-        for key in model::manual().keys() {
-            assert!(err.contains(key), "the refusal does not list {key}: {err}");
+        for s in pod_manual::sections::sections(&pod_model::manual()) {
+            assert!(err.contains(&s.key), "the refusal does not list {}: {err}", s.key);
         }
+        // Two forms at once are refused the same way.
+        let (rc, out, _) = run_with(Request { json: true, roff: true, ..Default::default() }, Tty::none());
+        assert_eq!((rc, out.as_str()), (crate::exit_codes::EXIT_USAGE, ""));
     }
 }

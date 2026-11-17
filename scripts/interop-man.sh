@@ -32,10 +32,10 @@ ok man.roff "podssh man --roff exited 0"
 # The flags that --help shows for each command that works: one spelling per
 # line, "-x, --long" or "--long".
 "$B" --help >"$W/help.txt"
-# A verb's line has four spaces before its name; a group's name has two
-# (T-013), and an alias line more than four.
-verbs=$(sed -n '/^SUBCOMMANDS:/,/^$/p' "$W/help.txt" | grep -v '(not ' |
-    awk '/^    [a-z]/ { print $1 }')
+# pod-manual's layout: a row of a table of commands has four spaces before
+# the verb; a group's title has two, a wrapped line more than four. The
+# rows of "Start here" begin with podssh, and an option with a dash.
+verbs=$(awk '/^    [a-z]/ && $1 != "podssh" && !/\(not / { print $1 }' "$W/help.txt" | sort -u)
 : >"$W/flags.raw"
 # The verbs come from the binary, not a literal list, so no id names one; a
 # failed --help counts against man.flags.
@@ -45,8 +45,9 @@ for v in $verbs; do
         broken="$broken $v"
         continue
     fi
-    sed -n '/^OPTIONS:/,/^$/p' "$W/verb.txt" |
-        grep -oE '^ +(-[A-Za-z0-9], )?--[A-Za-z0-9][A-Za-z0-9-]*' |
+    # The list of options: a term four spaces in, its sentence eight in.
+    sed -n '/^  Options:$/,/^$/p' "$W/verb.txt" |
+        grep -oE '^    (-[A-Za-z0-9], )?--[A-Za-z0-9][A-Za-z0-9-]*' |
         sed 's/^ *//' >>"$W/flags.raw"
 done
 sort -u "$W/flags.raw" >"$W/flags.txt"

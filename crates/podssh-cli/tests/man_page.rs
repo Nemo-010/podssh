@@ -38,7 +38,8 @@ fn no_pager_writes_the_whole_manual() {
     assert_eq!(out, podssh_cli::man::page(), "the binary's manual is not the library's");
     let first = out.lines().next().unwrap();
     assert!(first.starts_with("podssh "), "{first}");
-    for heading in ["COMMAND REFERENCE", "ENVIRONMENT", "FILES", "THE RELAY", "EXIT STATUS", "EXAMPLES"] {
+    let headings = ["SYNOPSIS", "DESCRIPTION", "COMMANDS", "ENVIRONMENT", "FILES", "THE RELAY", "EXIT STATUS"];
+    for heading in headings.into_iter().chain(["EXAMPLES", "RETIRED VARIABLES"]) {
         assert!(out.lines().any(|l| l == heading), "no {heading}");
     }
 }
@@ -127,7 +128,7 @@ fn an_unknown_section_exits_64_and_lists_the_sections() {
 
     let (rc, out, _) = podssh(&["man", "keygen"], None);
     assert_eq!(rc, 0);
-    assert!(out.starts_with("KEYGEN\n"), "{out}");
+    assert!(out.starts_with("podssh keygen\n"), "{out}");
 }
 
 /// With no terminal, `PAGER` is not started: a pager that leaves a mark

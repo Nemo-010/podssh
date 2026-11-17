@@ -109,7 +109,7 @@ pub fn add(cmd: Command, name: &str) -> Command {
         "man" => cmd.arg(
             Arg::new("section")
                 .value_name("SECTION")
-                .help("one section only: a command, or environment, files, relay-facts, exit-status, examples or see-also"),
+                .help("one section only: a command, or relay-facts, retired-variables, environment, files, exit-status, examples or see-also; keywords selects ssh"),
         ),
         "agent" => cmd
             .arg(

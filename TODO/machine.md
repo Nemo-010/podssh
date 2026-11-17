@@ -124,7 +124,7 @@ and prints the text help, so it drops `--json` silently (T-010).
 Read: the data is in tables already. Commands and flags: `VERBS`
 (`crates/podssh-cli/src/flags.rs:383-453`), each row with its kind and `instead` (lines 19-47 at `22c3b88`),
 and the availability (lines 443-451 at `22c3b88`). Arguments: the parser
-(`crates/podssh-cli/src/man/model.rs:204-208`). Keywords:
+(`PodUtils/podssh:crates/podssh-cli/src/man/model.rs:204-208`). Keywords:
 `crates/podssh-cli/src/ssh/keywords.rs:25-143`, with the stated defaults (lines 99-104 at `22c3b88`).
 Variables: `crates/podssh-cli/src/man/facts.rs:46-273`. The files and the exit codes were text
 blocks only (`crates/podssh-cli/src/man/facts.rs` lines 100-145 and 231-271 at `332ee58`), and the blocks of the
@@ -144,9 +144,9 @@ manual do not keep the kind and the `instead` of a flag.
 4. `podssh man --json` writes all; `podssh man --json SECTION` writes one command; `--json` with
    `--roff` is a usage error (64). No pager for JSON
    (`crates/podssh-cli/src/man/mod.rs` lines 73-78 at `332ee58`).
-5. The JSON is the same on each host: no path from `HOME` (`docs/cli.md:41-42`).
+5. The JSON is the same on each host: no path from `HOME` (`docs/cli.md:57-58`).
 6. Add the row to `MAN_FLAGS` (`crates/podssh-cli/src/flags.rs:396-403`), the field to
-   `man::Request` (`crates/podssh-cli/src/man/mod.rs:127-134`), and the parse
+   `man::Request` (`crates/podssh-cli/src/man/mod.rs:125-132`), and the parse
    (`crates/podssh-cli/src/tree.rs:248-256`). JSON for `--help` stays with T-010.
 
 ## Prove
@@ -169,7 +169,7 @@ rows; the test fails.
 
 2026-10-09, in the commit "podssh man --json".
 
-- `crates/podssh-cli/src/man/json.rs` (new) walks the tables: `schema` 1, `podssh`, `options`,
+- `PodUtils/podssh:crates/podssh-cli/src/man/json.rs` (new) walks the tables: `schema` 1, `podssh`, `options`,
   `commands` (name, aliases, about, `availability` works, not-implemented or not-in-build, usage,
   `arguments` from the parser, and `flags` with short, long, value, `kind` supported, accepted,
   refused or not-in-this-release, help and `instead`), `ssh_keywords` (honoured with value, help
@@ -674,7 +674,7 @@ stdin and stdout gives typed tools, with no shell quoting.
 
 Measured: `podssh mcp` exits 64 (unknown subcommand).
 
-Read: a prompt goes to the controlling terminal or to `SSH_ASKPASS` (`docs/cli.md:6510-6540`),
+Read: a prompt goes to the controlling terminal or to `SSH_ASKPASS` (`docs/cli.md:6528-6558`),
 and the terminal of an agent can be the user's own. The session output goes straight to the
 process's stdout (`crates/podssh-ssh/src/io/msg.rs:78-95`), which an MCP server over stdio uses for
 its protocol. podssh never listens (`docs/architecture.md:284-301`), and stdio needs no listener.
@@ -774,10 +774,10 @@ call at `crates/podssh-cli/src/mcp/mod.rs:313-345`. The messages in
 `crates/podssh-cli/src/mcp/protocol.rs:113-168` and
 `crates/podssh-cli/src/mcp/protocol.rs:188-220`, the answers at
 `crates/podssh-cli/src/mcp/protocol.rs:232-245`. The tools at
-`crates/podssh-cli/src/mcp/tools.rs:55-155`, the command line of a call at
-`crates/podssh-cli/src/mcp/tools.rs:214-284`, with the options of each
-session at `crates/podssh-cli/src/mcp/tools.rs:184-202`, and its result at
-`crates/podssh-cli/src/mcp/tools.rs:329-371`. The child of a call at
+`crates/podssh-cli/src/mcp/tools.rs:55-156`, the command line of a call at
+`crates/podssh-cli/src/mcp/tools.rs:215-285`, with the options of each
+session at `crates/podssh-cli/src/mcp/tools.rs:185-203`, and its result at
+`crates/podssh-cli/src/mcp/tools.rs:330-372`. The child of a call at
 `crates/podssh-cli/src/mcp/child.rs:63-122`, its streams at
 `crates/podssh-cli/src/mcp/child.rs:125-157`. The patterns of
 `--allow-host` at `crates/podssh-cli/src/mcp/allow.rs:36-124`. The flags in
@@ -1139,7 +1139,7 @@ Read, at `1769d79`, before this entry's work:
 - Read: the tools are `ssh_exec` (only when a host is allowed), `status`, `doctor` and `man`
   (`crates/podssh-cli/src/mcp/tools.rs`, lines 35-73 at `1769d79`); each call runs this binary
   again as a child (`crates/podssh-cli/src/mcp/mod.rs`, lines 6-11 at `1769d79`), whose command
-  line `plan` makes (`crates/podssh-cli/src/mcp/tools.rs:211-263`).
+  line `plan` makes (`crates/podssh-cli/src/mcp/tools.rs:212-264`).
 - Read: `ssh_exec` checks its destination against `--allow-host`
   (`crates/podssh-cli/src/mcp/tools.rs`, lines 170-173 at `1769d79`), and forces no prompt, a
   known host key, no forwarding and no shared connection, before the user's `-F`
@@ -1858,7 +1858,7 @@ both from the schema alone.
   stream section. `crates/podssh-cli/src/man/notes_doctor.rs:17-22` (`DOCTOR_QUICK`) lists what
   `--quick` leaves out and names no probe of `--full`.
 - `crates/podssh-cli/src/mcp/tools.rs:86` repeats the QUIC handshake. Line 79 offers `quick`.
-  `crates/podssh-cli/src/mcp/tools.rs:231-240` builds `--full --quick` when both are true.
+  `crates/podssh-cli/src/mcp/tools.rs:232-241` builds `--full --quick` when both are true.
 - `crates/podssh-cli/src/doctor/sections.rs:324-329` already names the quick tunnel's edge among the
   sections that `--quick` leaves out.
 - T-511's Decision (`TODO/machine.md:1368-1373`) records that `--quick` leaves the edge out.
@@ -2128,7 +2128,7 @@ and the `session_` tools change state. There is no read-only mode and no list of
 
 - `crates/podssh-cli/src/flags/mcp.rs:9`-`15`: the flags are `allow-host`, `allow-dir`, `allow-session` and
   the session settings. No `--read-only`, no `--allow-command`.
-- `crates/podssh-cli/src/mcp/tools.rs:97`-`110`: `ssh_exec` takes `command`, "the command line that the
+- `crates/podssh-cli/src/mcp/tools.rs:98`-`110`: `ssh_exec` takes `command`, "the command line that the
   remote user's shell runs".
 - `crates/podssh-cli/src/mcp/verbs.rs:44`-`81`: `readOnlyHint` is set for some job tools; `job_start` and
   `job_stop` change state. `crates/podssh-cli/src/mcp/copy.rs:41`: `cp_put` writes to a host.

@@ -72,7 +72,7 @@ succeeded. `podssh ssh` takes one destination, as OpenSSH does.
 ## Decision
 
 Recommendation: a new verb, because `podssh ssh` keeps the command line and
-the exit codes of OpenSSH for one host (`docs/cli.md:6392-6395`), and a list
+the exit codes of OpenSSH for one host (`docs/cli.md:6410-6413`), and a list
 of hosts changes both. The alternative, `podssh ssh --hosts LIST`, lost: one
 flag would change what the exit status means.
 
@@ -184,7 +184,7 @@ is not a shell. A set of hosts has no name.
   (`crates/podssh-cli/src/ssh/hop.rs:30-78`,
   `crates/podssh-ws/src/names.rs:10-32`).
 - Read: the `Host` lines of ssh_config are patterns, not lists
-  (`docs/cli.md:6608-6717`); they cannot define a group.
+  (`docs/cli.md:6626-6735`); they cannot define a group.
 
 ## Approach
 
@@ -208,7 +208,7 @@ is not a shell. A set of hosts has no name.
 
 Recommendation: the braces of bash, because users know them and csshw uses
 them. The alternative, ranges in brackets as in pdsh and bssh (`web[1-3]`),
-lost: brackets already mean an IPv6 literal (`docs/cli.md:159-162`, T-007).
+lost: brackets already mean an IPv6 literal (`docs/cli.md:177-180`, T-007).
 
 ## Prove
 
@@ -1547,7 +1547,7 @@ of the command.
    quoted for a POSIX shell (T-187). When the copy used most of the 64 MiB
    (`docs/relay.md:470`), run the exec on a new session (T-137).
 4. The exit status: the command's, with the rules of `podssh ssh`
-   (`docs/cli.md:6392-6395`). A failed copy exits 255 and runs nothing.
+   (`docs/cli.md:6410-6413`). A failed copy exits 255 and runs nothing.
 5. In the same commit: the rows, the notes, an example, `docs/cli.md`,
    `docs/STATUS.md`. This entry depends on T-134 and T-143.
 
@@ -1814,7 +1814,7 @@ a ticket, or a tool that asks an AI.
   (`crates/podssh-ssh/src/log.rs:123-143`). The exit code leaves through
   `crates/podssh-cli/src/dispatch.rs:449-493`.
 - Read: for `podssh ssh`, an exit that is not 0 can be the remote command's
-  status (`docs/cli.md:6392-6395`), which is not a failure of podssh.
+  status (`docs/cli.md:6410-6413`), which is not a failure of podssh.
 
 ## Approach
 
@@ -3123,7 +3123,7 @@ the two failures at once fails.
 
 - The Decision's `stdout_base64` and `stderr_base64` are not `ssh_exec`'s form: `ssh_exec` gives
   `stdout` with `stdout_encoding` (`utf-8` or `base64`), and `stderr` with `stderr_encoding`
-  (`crates/podssh-cli/src/mcp/tools.rs:351`). The record takes that form, which a client of
+  (`crates/podssh-cli/src/mcp/tools.rs:352`). The record takes that form, which a client of
   `podssh mcp` reads already.
 - The Prove's `exit 3` on one host and `exit 0` on another: the test's server runs one command
   on each host, and its hosts differ by their users alone, so `cat` gives 0, and 127 for a user
