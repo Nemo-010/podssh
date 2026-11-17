@@ -15,7 +15,9 @@
 # ADDR=--relay-addr=listed.test=192.0.2.1) say how the class reaches the
 # role. Throwaway keys, in a directory of this run alone. Exit 0 when ssh, a
 # copy of 20 MiB with equal SHA-256, pipe (command 5) and a session across a
-# cut of its link (command 6) pass.
+# cut of its link (command 6) pass, and so does each error row: a dead relay,
+# a refused connect, an unreachable target, a name with no answer and a node
+# that is not online each end in time, with their code and one line.
 set -u
 B=$1
 # The relay host as the class reaches the served port, and its address where
@@ -23,7 +25,10 @@ B=$1
 RELAY=${RELAY:-listed.test:8443}
 ADDR=${ADDR:-}
 W=$(mktemp -d)
-trap 'kill $(jobs -p) 2>/dev/null; rm -rf "$W"' EXIT
+# The servers by their pids: `jobs -p` in a trap's command substitution runs
+# in a subshell, which has no jobs, so a lane that failed left them running.
+PIDS=
+trap 'kill $PIDS 2>/dev/null; rm -rf "$W"' EXIT
 cd "$W" || exit 1
 # The CA and the certificate of listed.test, made before the lab (PKI, the
 # second argument), as podlab's --serve-ca names the CA at its start.
@@ -47,9 +52,11 @@ EOF
 # OpenSSH's privilege separation needs its directory, which a lab may lack.
 mkdir -p /run/sshd
 /usr/sbin/sshd -f sshd_config -D -e > sshd.log 2>&1 &
+PIDS="$PIDS $!"
 # The relay role, behind the lab's proxy.
 "$B" relay serve --listen 127.0.0.1:8443 --cert leaf.pem --key leaf.key --mint anyone --allow-private \
     > relay.log 2>&1 &
+PIDS="$PIDS $!"
 sleep 2
 o="-i $W/user_key -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=$W/known -o Port=2222"
 # shellcheck disable=SC2086 # $ADDR and $o are lists of options, a word each
@@ -119,3 +126,47 @@ else
     echo "FAIL the session across a cut: rc=$rc, $(wc -l < ticks) lines of 12"; grep -i -E "resum|lost|link" resume.err | tail -8
     exit 1
 fi
+# The error rows (T-809, after podnet's QA round, PodUtils/podnet#649): each
+# failure ends within its limit, with its documented exit code, and says its
+# cause in one line. A line of information (a new key, a host key added) is
+# no error line. A row that hangs, exits with another code, or says its cause
+# twice fails the lane.
+row() {
+    name=$1 code=$2 words=$3 limit=$4
+    shift 4
+    s=$(date +%s)
+    SSL_CERT_FILE=$W/trust.pem timeout "$limit" "$@" < /dev/null > row.out 2> row.err
+    rc=$?
+    took=$(( $(date +%s) - s ))
+    grep -v -e "a new key for this client" -e "Permanently added" row.err > row.lines
+    n=$(grep -c . row.lines)
+    if [ "$rc" = "$code" ] && [ "$n" = 1 ] && grep -q -e "$words" row.lines; then
+        echo "ok   $name: exit $rc in $took s, one line: $(cat row.lines)"
+    else
+        echo "FAIL $name: exit $rc (want $code) in $took s, $n lines (want 1, with \"$words\")"
+        sed 's/^/     /' row.err
+        exit 1
+    fi
+}
+# The relay's port where nothing listens: the token's mint is refused.
+# shellcheck disable=SC2086 # $ADDR and $o are lists of options, a word each
+row "a dead relay" 255 "could not mint" 60 "$B" ssh --relay-host listed.test:1 $ADDR $o root@127.0.0.1 true
+# A port of the target where nothing listens, behind the role.
+# shellcheck disable=SC2086 # $ADDR is a list of options, a word each
+row "a refused connect" 255 "could not reach" 60 "$B" ssh --relay-host "$RELAY" $ADDR \
+    -i "$W/user_key" -o BatchMode=yes -o StrictHostKeyChecking=no -o "UserKnownHostsFile=$W/known" -o Port=2299 \
+    root@127.0.0.1 true
+# An address that no route of the lab reaches.
+# shellcheck disable=SC2086 # $ADDR and $o are lists of options, a word each
+row "an unreachable target" 255 "could not reach" 120 "$B" ssh --relay-host "$RELAY" $ADDR $o root@10.255.255.1 true
+# A name that no resolver answers: the role says so in the words of its
+# policy, as for each target that it does not dial (GitHub #126).
+# shellcheck disable=SC2086 # $ADDR and $o are lists of options, a word each
+row "a name with no answer" 255 "does not allow" 60 "$B" ssh --relay-host "$RELAY" $ADDR $o root@no-such-host.invalid true
+# A pair whose node is not online.
+# shellcheck disable=SC2086 # $ADDR is a list of options, a word each
+SSL_CERT_FILE=$W/trust.pem timeout 60 "$B" relay pair lane-off --relay-host "$RELAY" $ADDR > /dev/null 2>&1
+# shellcheck disable=SC2086 # $ADDR is a list of options, a word each
+row "a node that is not online" 69 "node unavailable" 60 "$B" operator lane-off $ADDR
+# shellcheck disable=SC2086 # $ADDR is a list of options, a word each
+SSL_CERT_FILE=$W/trust.pem timeout 30 "$B" relay revoke lane-off $ADDR > /dev/null 2>&1

@@ -12,7 +12,7 @@ use std::time::Duration;
 
 use podssh_relay::reverse::closes::resumes;
 use podssh_relay::reverse::{legs, OperatorConfig, OperatorLimits, Outcome as LegOutcome, RelayClose};
-use podssh_relay::session::client::{self, Found, Outcome};
+use podssh_relay::session::client::{self, Found};
 use podssh_relay::session::resume::{self, Next, Note};
 use podssh_relay::session::{
     deadline, hearing, replay, Ask, End, Ended, Hearing, OsEntropy, Settings, KEEP, SHELL_FEATURES,
@@ -352,30 +352,7 @@ where
     .await
 }
 
-/// What the layer says of a session that did not end well: `None` for a
-/// good end, and for a lost link, of which the road says more.
-pub(crate) fn why_ended(outcome: Outcome) -> Option<String> {
-    match outcome {
-        Outcome::Plain(_) => None,
-        Outcome::Layer(ended) => match ended.end {
-            End::Closed(reason) if !reason.is_empty() => {
-                Some(format!("the far end ended the session: {}", podssh_ws::text::one_line(&reason)))
-            }
-            End::Broken(e) => Some(e.to_string()),
-            End::GaveUp(gave) => {
-                Some(format!("the session could not go on: {}", podssh_ws::text::one_line(&gave.reason)))
-            }
-            // The leg's close code and reason say more of a lost link.
-            End::Closed(_)
-            | End::LocalEnd
-            | End::Closing
-            | End::Lost(_)
-            | End::Stopped
-            | End::Retired
-            | End::Moving => None,
-        },
-    }
-}
+pub(crate) use crate::layer_told::why_ended;
 
 /// How long to wait before the warning of a pair that expires at
 /// `expires_ms`, at `now_ms`: none once the pair expired, as the relay then

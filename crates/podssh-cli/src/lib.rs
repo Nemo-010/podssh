@@ -106,6 +106,7 @@ pub mod keygen_convert;
 pub mod keygen_hosts;
 pub mod keygen_sign;
 pub mod keygen_sk;
+pub(crate) mod layer_told;
 pub mod layered;
 pub(crate) mod leg_end;
 // Whether this host has an sshd, for a roost and for doctor (T-590).

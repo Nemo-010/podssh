@@ -449,12 +449,14 @@ async fn tries(resolved: &Resolved, log: &Arc<Log>) -> (i32, Option<podssh_ssh::
         // A rank in the session's background, with RelayRank auto (T-608).
         let ranker = crate::relay_rank_auto::spawn(&resolved.transport, reached.relay.is_some());
         opts.window_cap = window::road(&resolved.transport, &reached).cap();
-        let outcome = podssh_ssh::run::run_outcome(reached.stream, &opts, reached.relay, log.clone()).await;
+        let mut outcome = podssh_ssh::run::run_outcome(reached.stream, &opts, reached.relay, log.clone()).await;
         for watch in [near, idle, ranker].into_iter().flatten() {
             watch.abort();
         }
         // The layer's CLOSE, and the line of its failure, before the exit.
+        let layered = reached.layer.is_some();
         transport::settle(reached.layer).await;
+        crate::layer_told::once(&mut outcome.lines, layered);
         // An IPv6 target that the relay opened, then closed before any byte:
         // the direct road once, in place of another try of the relay (T-253).
         if outcome.retry.is_some() && transport::ipv6_unreached(resolved, relay.as_ref()) {

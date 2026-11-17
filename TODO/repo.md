@@ -7444,3 +7444,19 @@ command too. The Premise's "no check parses the manual's EXAMPLES" is wrong. The
 Partial, 2026-11-17. Item 1 was there (Correction). Item 4: `docs/HANDOFF.md`, "A take of podcrates", says to search
 the workflows and scripts for each moved line after a take. Waits: item 2 with T-791's lane, item 3 before the next
 beta.
+
+2026-11-17, item 2: the error rows of the lane (`scripts/pod-lab-serve-lane.sh`, `row`): a dead relay (255, "could not
+mint"), a refused connect and an unreachable target (255, "could not reach"), a name with no answer (255, the role's
+words of its policy, GitHub #126), and a pair whose node is not online (`operator`, 69, "node unavailable"); each
+within its limit, with its code, and one line of its cause (a line of a new key or a host key added is information).
+Measured first on this host's loopback with the role and an sshd, before the rows were written. Found and repaired:
+- `podssh ssh` on the layer's road said a refused target twice: the layer's cause, then the SSH client's "the
+  connection closed unexpectedly". `crates/podssh-cli/src/layer_told.rs`: a road that said why its session ended
+  marks it (`why_ended` moved there from `layered.rs`), and once the layer's last line is said (`transport::settle`),
+  the client's echo of a closed connection is no second line. `cargo test -p podssh-cli --test error_lines`: one
+  line and 255 through podssh's own relay role; planted, the echo kept: caught. `--lib layer_told` 1 passed.
+- The lane's EXIT trap killed nothing (`$(jobs -p)` runs in a subshell), so a lane that failed left its relay and
+  sshd running; it kills them by their pids now (nothing left after a failed run, checked).
+Found, and asked of podcrates: `pod_relay::open::OpenError::lines` says a refusal of the policy (403) and a 502 twice
+(COORD-112, #309). The row of a name with no answer fails until that tag is taken; the lane runs whole here
+otherwise (the four success rows, then the dead relay, the refused connect and the unreachable target).
