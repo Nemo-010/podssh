@@ -513,6 +513,10 @@ egress, which the net's rule of the exit holds as on each road. `podssh
 ssh`, `proxy` and `pipe` take `--exit NAME` beside `--carrier ADDR` too
 (T-614, Q90): a host that starts the channel itself carries its own session
 through the egress of the node at its other end, with no proxy between.
+A bucket of the S3 API is such a stream too (T-725, `--carrier s3:FILE`),
+for a host whose one way out is an object store: each end writes one prefix
+and reads the other, each object sealed, the file hosts' link of T-738
+above it ([carriers.md](carriers.md) gives its limits).
 
 The standard protocols of Q66, so that a server that the user runs is a
 road with no relay: HTTP CONNECT to a second proxy over TLS, HTTP/1.1 and

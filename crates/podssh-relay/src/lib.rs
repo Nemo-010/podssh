@@ -85,6 +85,9 @@
 //! - `filehost` (feature `filehost`): file hosts as the last carrier of the
 //!   resumable layer (T-738), a last fallback of Q78: each piece one sealed
 //!   upload to a public file host, its URL sealed on a board;
+//! - `bucket` (feature `bucket`): a bucket of the S3 API as a carrier of two
+//!   ends (T-725), the file-host carrier with the bucket as its board, each
+//!   end writing one prefix and reading the other;
 //! - `code` (feature `code`): pairing by a short code (T-086), SPAKE2 over a
 //!   magic-wormhole mailbox, which moves a pair's operator's part and each
 //!   end's key;
@@ -104,6 +107,9 @@ pub use pod_session::answer;
 pub mod blocking;
 #[cfg(feature = "bore")]
 pub mod bore;
+// A bucket of the S3 API as a carrier (T-725).
+#[cfg(feature = "bucket")]
+pub mod bucket;
 pub mod cache;
 pub mod cleartext;
 // The wall clock of a node's pairs and the role's, which a test follows (T-710).

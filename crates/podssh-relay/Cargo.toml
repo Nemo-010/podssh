@@ -102,6 +102,12 @@ pod-wormhole = { git = "https://github.com/PodUtils/podcrates", tag = "v0.69.0",
 # Pure Rust; only with the feature `croc`.
 num-bigint = { version = "0.5", optional = true }
 aes-gcm = { workspace = true, optional = true }
+# The bucket carrier (T-725): Signature Version 4 of the S3 API and its
+# endpoint, pod-link's of PodUtils/podcrates (`pod_link::s3::sign`, tested
+# there against AWS's examples), so podssh keeps no signer of its own. Its
+# feature `s3` builds crates that the lock has already (pod-tls, pod-ws,
+# sha2, hmac); no C.
+pod-link = { git = "https://github.com/PodUtils/podcrates", tag = "v0.69.0", optional = true, features = ["s3"] }
 # The Dev Tunnels forward road (src/devtunnel/, T-755): the client side of
 # Microsoft Dev Tunnels (the management API, the relay WebSocket, SSH with no
 # user authentication to the tunnel's host, `direct-tcpip` channels) is
@@ -235,6 +241,11 @@ croc = ["dep:num-bigint", "dep:aes-gcm"]
 # pod-wormhole's (`code`). The binary builds it; podssh-cli's own feature
 # `filehost` turns the road on. No C either.
 filehost = ["smee", "code", "dep:aes-gcm"]
+# A bucket of the S3 API as a carrier of two podssh ends (T-725): the
+# file-host carrier's link and seal with the bucket as its board, one way at
+# each end, signed by pod-link's SigV4. podssh-cli's `--carrier s3:FILE`
+# takes it. No C either.
+bucket = ["filehost", "dep:pod-link"]
 # The Dev Tunnels forward road (T-755): a `direct-tcpip` channel to a port of
 # a tunnel's host through Microsoft's relay on 443. Off by default, as a
 # trial until its live run; it brings ring with pod-devtunnel's russh.

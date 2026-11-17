@@ -25,7 +25,8 @@ LISTENERS = {
     # ADDR:PORT`: the bind is the probe, and PODSSH_LISTEN turns it off;
     # its QUIC (T-667) takes the bound listener's address, and its test binds
     # one on the loopback. And the stand-in of ZeroTier's relay (T-733),
-    # for tests alone, on the loopback. And the
+    # for tests alone, on the loopback, and the stand-in bucket of the S3
+    # API (T-725), a test module of src/ that its tests/ start too. And the
     # target that the exit behind a quick tunnel dials in its tests (T-459),
     # on the loopback, as the node's real dial reaches it.
     "TcpListener": [
@@ -36,6 +37,7 @@ LISTENERS = {
         "crates/podssh-ssh/src/remote_tests.rs",
         "crates/podssh-cli/src/ssh/local_bind.rs",
         "crates/podssh-zerotier/src/stand_in.rs",
+        "crates/podssh-relay/src/bucket/standin.rs",
     ],
     # The control socket of `podssh ssh -M` (T-039), which the user asks for:
     # pipe/listen.rs makes it before anything connects (the probe), and the
@@ -114,9 +116,10 @@ LISTENERS = {
     # beside it so that it stays within 500 lines: the loopback's port 0. And
     # doctor's line nat and its stand-ins (T-641), as above. And the Hysteria 2
     # road's probe, its connection's socket and the tests of Salamander's
-    # wrapper (T-580), as above.
+    # wrapper (T-580), as above. And the stand-in bucket (T-725), as above.
     "bind(": [
         "crates/podssh-cli/src/exit/tunnel_tests.rs",
+        "crates/podssh-relay/src/bucket/standin.rs",
         "crates/podssh-ws/src/hysteria/probe.rs",
         "crates/podssh-ws/src/hysteria/quic.rs",
         "crates/podssh-ws/src/hysteria/salamander.rs",

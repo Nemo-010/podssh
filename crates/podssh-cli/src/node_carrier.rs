@@ -1,8 +1,9 @@
 //! `podssh node NAME TARGET --carrier ADDR` (T-595): the node's socket of the
 //! reverse road on a stream that exists already, for a host whose every road
 //! out is closed: stdin and stdout, as the exec channel of a platform's own
-//! SSH gives them to the program that it starts; a descriptor; or a program
-//! that the node starts. The other end (`podssh operator --carrier`) serves
+//! SSH gives them to the program that it starts; a descriptor; a program
+//! that the node starts; or a bucket of the S3 API (`s3:FILE`, T-725), whose
+//! stream opens when a client's hello comes. The other end (`podssh operator --carrier`) serves
 //! the relay's side of the socket in its own process (`crate::carrier`). No
 //! relay, no pair and no token: the stream is the door, and NAME is a label
 //! alone, for the node's key. One stream for the node's life: at its end the
@@ -26,8 +27,9 @@ use tokio::process::Child;
 use crate::exitmap::Fault;
 use crate::node::{key_flags, probe, routes_of, serving, stop_signal, targets_of, words_of, NodeArgs, DIAL_LIMIT};
 // The routes with those to a Unix socket beside them (T-714).
+use crate::carrier::Found;
+use crate::carrier_bucket::Side;
 use crate::node_unix_open::Routed;
-use crate::pipe::address::Address;
 use crate::relay_settings::Refusal;
 
 /// How long the program that carried the stream may take to end after it.
@@ -90,7 +92,7 @@ struct Ready {
     label: String,
     /// The stream, in the user's words, and as `pipe` reads it.
     text: String,
-    found: Address,
+    found: Found,
     targets: Vec<Route>,
     plain: bool,
     key: Option<podssh_relay::identity::file::Key>,
@@ -182,7 +184,16 @@ async fn serve(ready: Ready, err: &mut dyn Write) -> i32 {
             None
         }
     };
-    let (link, child) = match crate::carrier::open(&found) {
+    let opened = match &found {
+        // A bucket's stream starts once a client's hello comes: the node's
+        // Pings before it would meet nobody.
+        Found::Bucket(spec) => {
+            let _ = writeln!(err, "podssh node: {label}: waiting at the bucket for a client's hello");
+            crate::carrier_bucket::accept(spec).await.map(|link| (link, None))
+        }
+        Found::Stream(_) => crate::carrier::open(&found, Side::Node),
+    };
+    let (link, child) = match opened {
         Ok(opened) => opened,
         Err(refusal) => return refusal.report("node", err),
     };

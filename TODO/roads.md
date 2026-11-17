@@ -190,7 +190,7 @@ the file that `--ts-state` names (`crates/podssh-cli/src/flags.rs:377-378`,
 5. The node prints its ticket and its fingerprint on stderr when it starts.
    `podssh ssh iroh:TICKET` dials it (the address of `docs/design.md:1154`).
 6. Add the key files to FILES in the manual
-   (`crates/podssh-cli/src/man/data.rs:162-498`), and each new variable to
+   (`crates/podssh-cli/src/man/data.rs:162-499`), and each new variable to
    `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-280`).
 
 ## Decision
@@ -9851,7 +9851,7 @@ Read at `2042200`:
 - No code of podssh speaks STUN (searched); the TURN road would bring a STUN codec (T-621, its step 2).
 - The measured sandbox refuses UDP: `docs/target-environment.md:23` says "EPERM", so there the line is
   unknown.
-- A socket that a source binds must be named in `scripts/repo_listeners.py` (`:83` for `UdpSocket`),
+- A socket that a source binds must be named in `scripts/repo_listeners.py` (`:85` for `UdpSocket`),
   which `scripts/check-repo.py:289` reads.
 
 ## Approach

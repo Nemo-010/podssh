@@ -121,6 +121,8 @@ mod notes_turn;
 mod notes_devtunnel;
 // The notes of the GSRN road, gsocket's relay by a shared secret (T-707).
 mod notes_gsr;
+// The notes of --carrier s3:FILE, a bucket as a node's stream (T-725).
+mod notes_bucket;
 pub mod roff;
 
 use std::io::{BufRead, Write};

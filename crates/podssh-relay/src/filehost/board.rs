@@ -25,6 +25,23 @@ pub trait Board: Send + Sync {
     fn name(&self) -> &str;
     /// The most bytes of one message.
     fn most(&self) -> usize;
+    /// Whether a message may hold a whole piece, so that each write rides
+    /// in its note and no file host is asked: a bucket of the user's own
+    /// (T-725), never a public broker, whose fair use is small messages.
+    fn holds_pieces(&self) -> bool {
+        false
+    }
+    /// The longest pause between two polls of a link's way: `None` keeps
+    /// the carrier's own. A bucket asks for less, as the relay role gives a
+    /// node 15 s to answer an open.
+    fn poll_most(&self) -> Option<std::time::Duration> {
+        None
+    }
+    /// The longest pause between two polls of a node's door: `None` keeps
+    /// the carrier's own minute.
+    fn door_poll_most(&self) -> Option<std::time::Duration> {
+        None
+    }
     /// Keep `payload` as the message of `topic`, in the place of the one
     /// before.
     fn put<'a>(&'a self, topic: &'a str, payload: Vec<u8>) -> Posting<'a, ()>;

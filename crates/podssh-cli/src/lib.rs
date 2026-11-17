@@ -34,6 +34,8 @@ pub mod agent;
 // `--carrier ADDR`: the node's road over a stream that exists already, and
 // the relay role's side of it in its client (T-595).
 pub mod carrier;
+// `--carrier s3:FILE`: a bucket of the S3 API as that stream (T-725).
+pub mod carrier_bucket;
 pub mod channel;
 pub mod chat;
 // `--chisel URL`: a chisel server in place of the relay (T-490).
@@ -105,6 +107,7 @@ pub mod keygen_hosts;
 pub mod keygen_sign;
 pub mod keygen_sk;
 pub mod layered;
+pub(crate) mod leg_end;
 // Whether this host has an sshd, for a roost and for doctor (T-590).
 pub mod local_sshd;
 // The manual (`man/`) and the pager that shows it on a terminal.

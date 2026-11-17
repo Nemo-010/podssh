@@ -10516,9 +10516,9 @@ the roads over TCP.
 ## Premise
 
 - `docs/decisions.md:39` says "Q82: roads over UDP where UDP passes".
-- `docs/carriers.md:2256-2257` says "a client's first request is an HTTP/3", a `POST /auth` with
-  `Hysteria-Auth`; `docs/carriers.md:2258` says "answers status 233", then each TCP stream opens
-  with a request of ID 0x401 and the address; `docs/carriers.md:2252` says "UDP alone, which the
+- `docs/carriers.md:2284-2285` says "a client's first request is an HTTP/3", a `POST /auth` with
+  `Hysteria-Auth`; `docs/carriers.md:2286` says "answers status 233", then each TCP stream opens
+  with a request of ID 0x401 and the address; `docs/carriers.md:2280` says "UDP alone, which the
   hosts of podssh's design do not have".
 - `crates/podssh-relay/src/quick/probe.rs:1` says "The probe of UDP before QUIC (T-400): one QUIC
   packet of a reserved", and `crates/podssh-relay/Cargo.toml:60` says "The quick tunnel over
@@ -10646,9 +10646,9 @@ road with no relay. podssh does not speak it (Q82).
 ## Premise
 
 - `docs/decisions.md:39` says "Q82: roads over UDP where UDP passes".
-- `docs/carriers.md:2264-2265` says "a token of 32 bytes that the TLS keying material exporter
-  derives", and `docs/carriers.md:2267-2268` says "as the server never answers a command";
-  `docs/carriers.md:2270` says "are mihomo, shoes, sing-box and Itsusinn's tuic".
+- `docs/carriers.md:2292-2293` says "a token of 32 bytes that the TLS keying material exporter
+  derives", and `docs/carriers.md:2295-2296` says "as the server never answers a command";
+  `docs/carriers.md:2298` says "are mihomo, shoes, sing-box and Itsusinn's tuic".
 - `crates/podssh-relay/Cargo.toml:60` says "The quick tunnel over QUIC (src/quick/quic.rs,
   T-301): noq, the QUIC of the".
 
@@ -10710,7 +10710,7 @@ exporter's label and context swapped, and the test of the banner fails.
 fixes only, and once podssh takes the crate the work is done in PodUtils/podcrates, which podssh
 takes by the next tag; a test of the moved code then runs there.
 
-2026-11-12. The Premise holds: `docs/decisions.md:39`, `docs/carriers.md:2264-2270` and
+2026-11-12. The Premise holds: `docs/decisions.md:39`, `docs/carriers.md:2292-2298` and
 `crates/podssh-relay/Cargo.toml:60` say what it quotes. `pod-egress` is not taken (`TODO/PROGRESS.md`,
 State, item 7), so the road is in `podssh-ws` (`tuic/`, behind its feature `quic`) until it is, as T-739's
 VMess is; podcrates imports it with the other roads of `pod-egress`. The QUIC that it needs is `pod-quic`'s,
@@ -11102,7 +11102,7 @@ through a relay. A feature of the mesh (Q63; Q77, the fallbacks that exist).
 - Read: `pipe` does not refuse a terminal on stdin (no such check in `crates/podssh-cli/src/pipe/`
   at `3bb42ea`); the issue's "as `pipe` does" is not this code's.
 - Read: the exit lends its egress on the node's roads
-  (`crates/podssh-cli/src/man/notes_pair.rs:303-313`); a carrier is one more road for it (T-596).
+  (`crates/podssh-cli/src/man/notes_pair.rs:304-314`); a carrier is one more road for it (T-596).
 
 ## Approach
 
@@ -11456,8 +11456,8 @@ roads, and a carrier must be one of them.
 ## Premise
 
 - Read: the exit goes on the pair's, the iroh, the DERP, the transit and the Piping Server roads
-  (`crates/podssh-cli/src/man/notes_pair.rs:312-313`), and needs the net's role exit, signed by
-  its owner (`:309-310`).
+  (`crates/podssh-cli/src/man/notes_pair.rs:313-314`), and needs the net's role exit, signed by
+  its owner (`:310-311`).
 - Read: `podssh exit NAME --listen` gives SOCKS5, SOCKS4a and HTTP CONNECT on a loopback address
   (`docs/STATUS.md:172`).
 - In the issue's case the end with egress starts the channel (`ssh -T sandbox CMD`), so the node
@@ -14247,7 +14247,7 @@ key, so a plant that accepts a wrong key is not one line.
 **Milestone:** M10
 **Priority:** P3
 **Effort:** L
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -14273,11 +14273,64 @@ put objects that a reader gets, so two such carriers (one for each direction) ca
 3. Rule 2: one outbound HTTPS connection through `HTTPS_PROXY`; no listener. No host is hardcoded.
 4. Honest limits in `docs/carriers.md`: the latency of a list, the cost of each request.
 
+## Decision
+
+1. **The carrier's link and seal are the file-host carrier's (T-738), with the bucket as its board.** A
+   `Board` (`podssh_relay::filehost::board`) is a place that keeps one message for each topic; a bucket is
+   one, by object name. So `podssh_relay::bucket::board::BucketBoard` puts each note at `WRITE/TOPIC` and
+   takes it from `READ/TOPIC`, and the file-host carrier's `Link`, `Keys` (AES-256-GCM, the topic a MAC of
+   the pair's key, the kind, way, link and number in the associated data) and its gate (one request at a
+   time) do the rest. Two new default methods of `Board`: `holds_pieces` lets a note hold a whole piece of
+   4 MiB, so that each write is one PUT and no file host is asked; `poll_most` caps a way's poll at 3 s
+   (about 3,000 requests an hour while idle, `docs/carriers.md`). Lost: a stream of podssh's own over
+   numbered objects (a second link, framing and seal beside T-738's, for the same job); and pod-link's own
+   S3 carrier (`pod_link::s3::S3`, PodUtils/podcrates, below).
+2. **pod-link's S3 carrier is not the road; its signer is.** `pod_link::s3::S3` (podnet's, at the pinned
+   `v0.68.0`) runs pinned TLS 1.3 over objects with one key pair for both ways, keeps a pool of up to 16
+   connections and 8 requests in flight on each side, and lists each prefix. Rule 2 asks one outbound
+   connection, and the ask is two key pairs; so podssh takes `pod_link::s3::sign` (SigV4, tested in
+   podcrates against AWS's examples) and `Endpoint`/`Style`, and keeps no signer of its own (Rule Q3: no
+   second copy of shared code). Lost: writing SigV4 in podssh (a duplicate of podcrates' code, the brief's
+   fallback); a crate of crates.io (none in `Cargo.lock` signs S3; `aws-sigv4` would bring the AWS SDK's
+   crates); asking podcrates for a one-connection, two-key mode of `S3` first (the road works without it).
+3. **No LIST.** Each object's name is a MAC that both ends compute, so a reader GETs the name that it waits
+   for. A GET is the cheapest request at AWS and at most others, and a key with no `s3:ListBucket` still
+   works. Lost: the Approach's "the reader lists, gets, then deletes", and pod-link's listing of
+   `up/SESSION/SEQ`.
+4. **`--carrier s3:FILE`, not `s3://ENDPOINT/BUCKET/PREFIX` with `--carrier-up` and `--carrier-down`.**
+   Each end needs the endpoint, the bucket, two prefixes, one or two key files and the secret's file; one
+   file holds them, the same at both ends but for the keys, and the command line holds a path alone. A
+   name of FILE that is no setting is refused (78), so a key pasted into FILE is never read or shown.
+   Lost: a URL plus four flags on each command that takes `--carrier` (node, operator, proxy, ssh, cp, mv,
+   scp, sftp, pipe, exit); variables (a session's environment is shown more often than a file).
+5. **The pair's key comes from a secret file that both ends hold** (at least 16 bytes), keyed over the
+   endpoint's host, the bucket and both prefixes. The Approach's "sealed by the node's end-to-end channel"
+   cannot be: the channel runs above the stream, and its key exchange needs the stream first; it still
+   runs above, and checks each end's key. Lost: no seal below the channel (a bucket's operator would see
+   the reverse road's frames, their sizes and the routes before the channel), and presigned URLs (a name
+   for each piece is unknown in advance; a POST policy of a prefix is a write right anyway).
+6. **One-way rights.** The client writes `up` and reads `down`; the node the other way. `credentials` is
+   one key pair for both ways; `write-credentials` and `read-credentials` two; `read-credentials = none`
+   reads a public prefix unsigned. A reader that may not delete leaves each object to the bucket's own
+   lifecycle; a client's hello older than 10 minutes by the server's own `Date` against its
+   `Last-Modified` opens nothing, so a stale hello of a run long gone starts no stream. A 403
+   `AccessDenied` to a GET is read as "not there yet", as AWS answers so for a missing object to a key
+   with no `s3:ListBucket`; a probe at start (a GET of `READ/podssh-probe`) says so in a line, and refuses
+   a wrong key or signature (the stream ends, 69).
+7. **One stream for the node's life**, as each carrier of T-595: the node waits at its door until a
+   client's hello comes, serves that stream, and exits at its end. Lost: a node that serves stream after
+   stream (it needs `node_carrier`'s serve as a loop, each channel and handler made again; an entry of its
+   own if a tester asks).
+8. **http:// on the loopback alone**, for a test's stand-in: plain HTTP elsewhere shows each name and
+   size, and a proxy's CONNECT is podssh's way for HTTPS.
+
 ## Prove
 
 ```sh
 export CARGO_BUILD_JOBS=4
 cargo test -p podssh-cli --test carrier_s3 -- --test-threads=1
+cargo test -p podssh-relay --features bucket bucket:: -- --test-threads=1
+cargo test -p podssh-cli --lib carrier_bucket
 ```
 
 Test against a stand-in S3 that the build image supplies (MinIO or `s3s`; software that podssh did not
@@ -14288,6 +14341,52 @@ write right works. Plant: reuse a sequence number; the test fails on a repeated 
 
 Offline work now, against a stand-in S3 server. A live step against AWS or another provider waits: the
 owner ruled on 2026-11-09 that there are no test accounts as CI secrets.
+
+## Correction
+
+- 2026-11-17 (the draft): "No S3 code exists" no longer holds. PodUtils/podcrates' `pod-link` (at the
+  pinned `v0.68.0`, `PodUtils/podcrates:crates/pod-link/src/s3.rs`) has an S3 carrier (podnet's T-279), SigV4
+  (`s3/sign.rs`, with AWS's examples in its tests) and a stand-in of the S3 API on the loopback that
+  checks each signature (`s3-standin`). podssh takes the signer and the stand-in (Decision 2); `pod-link`
+  was in no `Cargo.toml` of podssh before.
+- The Approach's frame (one object for each chunk, a sequence number and a random run id, a LIST) is the
+  file-host carrier's link now (Decision 1, 3): the run id is the link's id, the number is in each name's
+  MAC and in each seal's associated data, and a reader GETs each name.
+- The Prove's stand-in is two: podssh's own in `crates/podssh-relay/src/bucket/standin.rs` (rights by key
+  and prefix, as an IAM policy grants them, which pod-link's lacks), and pod-link's for the binary's test
+  (software that podssh did not write). MinIO and `s3s` wait for the build image (T-251).
+
+## Done
+
+2026-11-17 (main session; drafted the same day by a drafting agent). Built and tested here:
+
+- `crates/podssh-relay/src/bucket/` (the place, the key of a secret, the carrier, `dial`, `accept`,
+  `probe`; PUT, GET and DELETE on one kept connection, signed by `pod_link::s3::sign` or unsigned; the
+  one-way board and the door's freshness; a stand-in with rights by key and prefix) and its tests: AWS's
+  GET Object example, the planted signature on another key (403, nothing stored), each end's one way,
+  1 MiB each way with equal digests, an unsigned reader of a public prefix, a stale hello, and the
+  Prove's plant (note 0's object under note 1's name: not taken).
+- `crates/podssh-relay/src/filehost/`: `Board::holds_pieces`, `poll_most` (3 s for a bucket) and
+  `door_poll_most` (10 s); and `settle.rs`, the writes under way, which a client's end waits for
+  (`Carrier::settled`). Found by the merge: the client's Close went into the link's pipe and the
+  process ended before its PUT, so the node waited 30 s for Pings and exited 69. The client now waits
+  for its last note (`carrier_bucket::settled`, within `bucket::CLOSE_LIMIT`, 20 s), and the last leg
+  of a session through a bucket has 40 s to end (`bucket::LEG_END`, `crates/podssh-cli/src/leg_end.rs`).
+- `crates/podssh-cli/src/carrier_bucket.rs` (FILE, the AWS credentials form, the lazy stream) with its
+  tests; `carrier.rs`, `node_carrier.rs`; the manual, `llms-full.txt`, `docs/cli.md`,
+  `docs/carriers.md`, `docs/mesh.md`; `pod-link` at podcrates `v0.69.0` (feature `s3`, and `s3-standin`
+  for the tests); the bucket's stand-in in the listener allowance of `scripts/repo_listeners.py`.
+
+Prove, 2026-11-17: `cargo test -p podssh-cli --test carrier_s3`, 3 passed (node and operator through
+pod-link's stand-in, 1 MiB back whole, both exit 0, nothing in clear in the bucket; a wrong secret 69;
+a key in FILE 78); `cargo test -p podssh-relay --features bucket --lib -- filehost bucket`, 50 passed;
+`cargo test -p podssh-cli --lib`, 1247 passed; `--test carrier_filehost` (feature `filehost`) 2 and
+`--test node_carrier` 15 passed; clippy of both crates with `-D warnings`. What waits: MinIO or `s3s`
+as a stand-in in the build image (T-251), and a live run against a provider (the Start condition: no
+test accounts).
+
+The COORD issue that the draft proposed (a feature `s3-sign` of pod-link with the signer alone) is
+optional: the road needs no change of pod-link.
 
 # T-733: ZeroTier's TCP relay and an ad-hoc network as a last road of a podssh pair
 

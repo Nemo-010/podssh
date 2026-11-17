@@ -26,6 +26,7 @@ use super::board::Board;
 use super::host::{Host, Refusal, Stored};
 use super::keys::{Keys, Kind, LinkId, Way, OVERHEAD};
 use super::pace::{Gate, Hosts, REST};
+use super::settle::Sends;
 use super::{third_party_line, Say, PIECE_MOST};
 use crate::session::OsEntropy;
 
@@ -58,6 +59,8 @@ pub struct Carrier {
     told: Mutex<HashSet<String>>,
     /// The links that a hello opened: a hello played back opens none.
     seen: Mutex<HashSet<LinkId>>,
+    /// The writes under way, which an end that leaves waits for.
+    sends: Sends,
 }
 
 fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
@@ -76,7 +79,15 @@ impl Carrier {
             say,
             told: Mutex::new(HashSet::new()),
             seen: Mutex::new(HashSet::new()),
+            sends: Sends::default(),
         }
+    }
+
+    /// Until no write of this carrier is under way and none started for
+    /// `quiet`, within `limit`: an end that leaves (a client's Close) waits
+    /// for its last note.
+    pub async fn settled(&self, quiet: Duration, limit: Duration) -> bool {
+        self.sends.settled(quiet, limit).await
     }
 
     pub fn keys(&self) -> &Keys {
@@ -84,9 +95,11 @@ impl Carrier {
     }
 
     /// The most bytes of a write that rides in its note: the board's
-    /// message, at most [`INLINE_MOST`], less the seal.
+    /// message, at most [`INLINE_MOST`] (or a whole piece on a board that
+    /// holds pieces), less the seal.
     pub fn room(&self) -> usize {
-        self.board.most().min(INLINE_MOST).saturating_sub(OVERHEAD)
+        let most = if self.board.holds_pieces() { PIECE_MOST + OVERHEAD } else { INLINE_MOST };
+        self.board.most().min(most).saturating_sub(OVERHEAD)
     }
 
     /// Wait until a host may take an upload of `size` bytes; at once when
@@ -102,6 +115,7 @@ impl Carrier {
     /// [`Carrier::room`], else sealed, uploaded to the first host that takes
     /// it, and its note put on the board.
     pub async fn send(&self, way: Way, link: &LinkId, n: u64, piece: &[u8]) -> Result<(), String> {
+        let _on = self.sends.start();
         if piece.len() > PIECE_MOST {
             return Err(format!("a piece of {} bytes is over {PIECE_MOST}", piece.len()));
         }
@@ -228,7 +242,8 @@ impl Carrier {
                 return Err(format!("no piece {n} within {} s", wait.as_secs()));
             }
             let nudged = nap(pause.min(deadline.saturating_duration_since(Instant::now())), nudge).await;
-            pause = if nudged { POLL_FIRST } else { (pause * 2).min(POLL_MOST) };
+            let most = self.board.poll_most().unwrap_or(POLL_MOST);
+            pause = if nudged { POLL_FIRST.min(most) } else { (pause * 2).min(most) };
         }
     }
 
@@ -334,7 +349,7 @@ impl Carrier {
                 return Err(format!("no client's hello within {} s", wait.as_secs()));
             }
             tokio::time::sleep(pause.min(deadline.saturating_duration_since(Instant::now()))).await;
-            pause = (pause * 2).min(DOOR_POLL_MOST);
+            pause = (pause * 2).min(self.board.door_poll_most().unwrap_or(DOOR_POLL_MOST));
         }
     }
 }

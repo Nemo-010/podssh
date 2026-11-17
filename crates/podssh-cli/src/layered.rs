@@ -30,9 +30,7 @@ use crate::relay_settings::Refusal;
 const PIPE: usize = 256 * 1024;
 /// How long a lost leg may take to say why it ended.
 pub(crate) const LEG_WAIT: Duration = Duration::from_secs(5);
-/// How long the last leg may take to end after the session: its Close and
-/// the relay's answer.
-const LEG_END: Duration = Duration::from_secs(12);
+
 /// How long a leg of the layer waits, once the layer let it go, for the node
 /// to end it: more than the far end's 30 s for a handshake (T-388).
 const NODE_ENDS: Duration = Duration::from_secs(35);
@@ -413,7 +411,7 @@ pub(crate) fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 /// The last leg's end, once it has sent its Close and the relay answered.
 pub(crate) async fn last(legs: &Mutex<Option<JoinHandle<LegOutcome>>>) -> Option<LegOutcome> {
     let handle = lock(legs).take()?;
-    tokio::time::timeout(LEG_END, handle).await.ok()?.ok()
+    tokio::time::timeout(crate::leg_end::now(), handle).await.ok()?.ok()
 }
 
 /// A new leg in place of a lost one, unless the lost one ended with a close

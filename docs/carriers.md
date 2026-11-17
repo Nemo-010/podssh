@@ -2082,6 +2082,34 @@ the stream is the door, and it sees the frames, their sizes and their
 times; the end-to-end channel keeps the bytes from it, and the layer runs
 above it as on each road.
 
+A bucket as that stream (T-725, cfb's ask A-S-17): a host whose one way
+out is an object store of the S3 API (`--carrier s3:FILE`). Each end writes
+its way's objects under one prefix and reads the other's, so each end's key
+needs a write right on one prefix and a read right on the other: one key
+pair, two, or none for a reader of a public prefix. The road is the file
+hosts' carrier of T-738 with the bucket as its board
+(`podssh_relay::bucket`): each write one object, sealed with AES-256-GCM
+under a key of a secret that both ends hold, its name a MAC of that key, so
+the reader needs no LIST and the bucket holds no byte in clear. A client's
+hello at the node's door opens the stream; a hello older than 10 minutes by
+the server's clock opens nothing, for a reader that may not delete. The
+signature is pod-link's SigV4 (PodUtils/podcrates), tested there against
+AWS's own examples. Each request goes on one connection, through
+`HTTPS_PROXY`, one at a time (rule 2).
+
+Its honest limits. The latency is a poll's: a reader asks for the next name
+each 2 s while its own end writes, and each 3 s at most when idle (the relay
+role gives a node 15 s to answer an open, which crosses the bucket twice); a
+node's door each 10 s at most (the relay role pings the node from the
+client's first moment, and gives it 60 s). So a round trip takes seconds.
+The cost: the role pings the node each 20 s, so an idle stream makes about
+6 PUTs and 40 GETs a minute at each end, about 3,000 requests an hour, and
+a node that waits for a client 6 GETs a minute; each is billed at most
+providers (AWS bills PUT and GET per thousand). An object is at most 4 MiB, a write of the layer. A reader that
+may not delete leaves each object to the bucket's own lifecycle rule. The
+node serves one stream, as each carrier's node does: start it again for the
+next client.
+
 ## Servers that a user runs
 
 Since Q66 (2026-11-02, [decisions.md](decisions.md)), podssh speaks, as a

@@ -3,7 +3,9 @@
 //! channel, such as the exec channel of a platform's own SSH. `--carrier
 //! ADDR` names it at either end, in `pipe`'s words: `stdio` (or `-`), `fd:N`
 //! (Unix) or `exec:CMD`, a program that the end which names it starts, with
-//! no shell. The node (`node_carrier`) runs its socket of the reverse road on
+//! no shell; or `s3:FILE`, a bucket of the S3 API that FILE describes, each
+//! end writing one prefix and reading the other (T-725, `crate::carrier_bucket`).
+//! The node (`node_carrier`) runs its socket of the reverse road on
 //! the stream; the client's end runs the relay role's side of that socket in
 //! its own process (`podssh_relay::serve::reverse::carrier`), and each
 //! operator's leg is a pipe to that role. No relay, no pair and no token: the
@@ -23,6 +25,8 @@ use podssh_ws::client::ConnectError;
 use podssh_ws::{ProxyChoice, Trust};
 use tokio::process::Child;
 
+pub(crate) use crate::carrier_bucket::Found;
+use crate::carrier_bucket::Side;
 use crate::exitmap::Fault;
 use crate::layered::{Carried, Line};
 use crate::operator::OperatorArgs;
@@ -30,7 +34,7 @@ use crate::pipe::address::{self, Address};
 use crate::relay_settings::Refusal;
 
 /// The kinds of a carrier, as the refusals name them.
-const KINDS: &str = "stdio (or -), fd:N (Unix) or exec:CMD";
+const KINDS: &str = "stdio (or -), fd:N (Unix), exec:CMD or s3:FILE";
 /// How long the node may take to read a stream that was just started: a
 /// program that logs in somewhere first, and a node that dials its TARGET.
 const READY_LIMIT: Duration = Duration::from_secs(60);
@@ -46,10 +50,14 @@ const LOOK: Duration = Duration::from_millis(250);
 /// The client that each leg of a command shares, once one asked for it.
 static SHARED: Mutex<Option<Arc<Client>>> = Mutex::new(None);
 
-/// `--carrier ADDR`: a local end of `pipe`, and only those.
-pub(crate) fn parse(text: &str) -> Result<Address, Refusal> {
+/// `--carrier ADDR`: a local end of `pipe`, and only those; or a bucket,
+/// whose file is read and checked here, before anything connects.
+pub(crate) fn parse(text: &str) -> Result<Found, Refusal> {
+    if let Some(path) = text.strip_prefix(crate::carrier_bucket::SCHEME) {
+        return crate::carrier_bucket::read(path).map(|spec| Found::Bucket(std::sync::Arc::new(spec)));
+    }
     match address::parse(text) {
-        Ok(found @ (Address::Stdio | Address::Fd(_) | Address::Exec(_))) => Ok(found),
+        Ok(found @ (Address::Stdio | Address::Fd(_) | Address::Exec(_))) => Ok(Found::Stream(found)),
         Err(refusal) if text.starts_with("fd:") || text.starts_with("exec:") => {
             Err(Refusal::usage(format!("--carrier {}", refusal.message)))
         }
@@ -59,9 +67,9 @@ pub(crate) fn parse(text: &str) -> Result<Address, Refusal> {
 
 /// `--carrier ADDR` of a client of a node: [`parse`]'s, but stdio, as this
 /// end's stdin and stdout are its own (`why`): stdio is the node's end.
-pub(crate) fn for_a_client(text: &str, why: &str) -> Result<Address, Refusal> {
+pub(crate) fn for_a_client(text: &str, why: &str) -> Result<Found, Refusal> {
     let found = parse(text)?;
-    if found == Address::Stdio {
+    if found == Found::Stream(Address::Stdio) {
         return Err(Refusal::usage(format!("--carrier {text}: {why}; name fd:N or exec:CMD")));
     }
     Ok(found)
@@ -69,8 +77,8 @@ pub(crate) fn for_a_client(text: &str, why: &str) -> Result<Address, Refusal> {
 
 /// A terminal on stdin is a person's keys, which a node would read as
 /// frames: `--carrier stdio` is for a program's stream.
-pub(crate) fn no_terminal(found: &Address, stdin_is_terminal: bool) -> Result<(), Refusal> {
-    if *found == Address::Stdio && stdin_is_terminal {
+pub(crate) fn no_terminal(found: &Found, stdin_is_terminal: bool) -> Result<(), Refusal> {
+    if *found == Found::Stream(Address::Stdio) && stdin_is_terminal {
         return Err(Refusal::usage(
             "--carrier stdio: stdin is a terminal, whose keys the node would read as frames; the program that \
              carries the stream starts the node, as ssh -T HOST podssh node --carrier stdio NAME TARGET",
@@ -84,8 +92,16 @@ pub(crate) fn stdin_is_terminal() -> bool {
 }
 
 /// The stream of `found`, in a tokio runtime, and the program that carries
-/// it when the end started one.
-pub(crate) fn open(found: &Address) -> Result<(Link, Option<Child>), Refusal> {
+/// it when the end started one; a bucket's, as `side` reaches it.
+pub(crate) fn open(found: &Found, side: Side) -> Result<(Link, Option<Child>), Refusal> {
+    let found = match found {
+        Found::Stream(found) => found,
+        Found::Bucket(spec) => {
+            // A bucket answers a Close more slowly than a stream (T-725).
+            crate::leg_end::set(podssh_relay::bucket::LEG_END);
+            return Ok((crate::carrier_bucket::open(spec.clone(), side), None));
+        }
+    };
     let end = crate::pipe::local::open(found)
         .map_err(|unopened| Refusal { message: format!("the carrier: {}", unopened.why), code: unopened.code })?;
     Ok((Box::new(tokio::io::join(end.read, end.write)), end.child))
@@ -102,14 +118,19 @@ pub(crate) struct Client {
     /// A stream that this end was given (`stdio`, `fd:N`), which nothing
     /// starts again: its end is the client's (T-596).
     one_life: bool,
+    /// How long the node may take to read the stream.
+    ready: Duration,
+    /// How long the client's Close may take to go out: a bucket's is a PUT
+    /// that the node reads at its next poll (T-725).
+    close: Duration,
 }
 
 impl Client {
     /// The stream of `found`, which `text` names, and the role over it; in
     /// a tokio runtime. A program is started again for the next link of a
-    /// resume; a stream that this end was given has one life.
-    pub(crate) fn start(text: &str, found: &Address) -> Result<Client, Refusal> {
-        let (link, child) = open(found)?;
+    /// resume; a stream that this end was given, or a bucket, has one life.
+    pub(crate) fn start(text: &str, found: &Found) -> Result<Client, Refusal> {
+        let (link, child) = open(found, Side::Client)?;
         let child = Arc::new(Mutex::new(child));
         // A bound that gives up ends the program too, as each one that
         // carries the stream later is kept in the same place.
@@ -120,10 +141,10 @@ impl Client {
             }
         }));
         let again: Option<Again> = match found {
-            Address::Exec(_) => {
+            Found::Stream(Address::Exec(_)) => {
                 let (found, child) = (found.clone(), child.clone());
                 Some(Box::new(move || -> Result<Link, String> {
-                    let (link, started) = open(&found).map_err(|refusal| refusal.message)?;
+                    let (link, started) = open(&found, Side::Client).map_err(|refusal| refusal.message)?;
                     // The program of a stream that ended goes with it, and
                     // is reaped.
                     if let Some(mut old) = std::mem::replace(&mut *lock(&child), started) {
@@ -142,7 +163,13 @@ impl Client {
         role.attach(link).map_err(Refusal::config)?;
         let relay = Relay { host: carrier::NAME.into(), port: 0 };
         let (trust, ctx) = (Trust::Default, podssh_relay::context::of(&ProxyChoice::Direct));
-        Ok(Client { door: Door::of(role), child, relay, trust, ctx, one_life })
+        // A bucket's node reads its door 10 s apart at most, and its
+        // first bytes come at the pace of a poll.
+        let (ready, close) = match found {
+            Found::Bucket(_) => (podssh_relay::bucket::READY_LIMIT, podssh_relay::bucket::CLOSE_LIMIT),
+            Found::Stream(_) => (READY_LIMIT, CLOSE_LIMIT),
+        };
+        Ok(Client { door: Door::of(role), child, relay, trust, ctx, one_life, ready, close })
     }
 
     /// Until the node left a stream that this end cannot start again, for a
@@ -167,7 +194,7 @@ impl Client {
             connect_token: "",
             trust: &self.trust,
             ctx: &self.ctx,
-            timeout: READY_LIMIT,
+            timeout: self.ready,
             limits: OperatorLimits { on_ready: Some(crate::connect_bound::ready), ..OperatorLimits::default() },
             wire: Wire::Carrier(Carrier::of(self.door)),
         }
@@ -181,7 +208,9 @@ impl Client {
 
     /// [`Client::finish`], for a client that the legs of a command share.
     pub(crate) async fn end(&self) {
-        self.door.role().close(CLOSE_LIMIT).await;
+        self.door.role().close(self.close).await;
+        // A bucket's Close is a note that a task still puts (T-725).
+        crate::carrier_bucket::settled(self.close).await;
         let child = lock(&self.child).take();
         if let Some(mut child) = child {
             if tokio::time::timeout(CHILD_LIMIT, child.wait()).await.is_err() {
@@ -291,7 +320,7 @@ async fn carry(
 /// checked: the label, the carrier in the user's words and as `pipe` reads
 /// it, the channel's ask and the bound of `--ConnectTimeout`, or of its other
 /// names (T-613).
-type Prepared = (String, String, Address, crate::channel::Ask, Option<crate::connect_bound::Bound>);
+type Prepared = (String, String, Found, crate::channel::Ask, Option<crate::connect_bound::Bound>);
 
 /// The checks before anything starts: the carrier, the bound, NAME and its
 /// route, the channel's flags; a relay's or a pair's flag has nothing to
@@ -386,13 +415,14 @@ mod tests {
 
     #[test]
     fn a_carrier_is_a_local_end_of_pipe_and_only_one() {
-        assert_eq!(parse("stdio").unwrap(), Address::Stdio);
-        assert_eq!(parse("-").unwrap(), Address::Stdio);
+        let stream = Found::Stream;
+        assert_eq!(parse("stdio").unwrap(), stream(Address::Stdio));
+        assert_eq!(parse("-").unwrap(), stream(Address::Stdio));
         let words = ["ssh", "-T", "box", "podssh", "node", "--carrier", "stdio", "lab"];
         let exec = Address::Exec(words.iter().map(|w| w.to_string()).collect());
-        assert_eq!(parse("exec:ssh -T box podssh node --carrier stdio lab").unwrap(), exec);
+        assert_eq!(parse("exec:ssh -T box podssh node --carrier stdio lab").unwrap(), stream(exec));
         if cfg!(unix) {
-            assert_eq!(parse("fd:3").unwrap(), Address::Fd(3));
+            assert_eq!(parse("fd:3").unwrap(), stream(Address::Fd(3)));
         }
         for bad in ["tcp:127.0.0.1:22", "node:lab", "tcp-listen:2222", "relay:example.org:22", "nonsense", "fd:2"] {
             let refusal = parse(bad).unwrap_err();
@@ -409,15 +439,17 @@ mod tests {
         assert_eq!(refusal.code, 64);
         assert!(refusal.message.starts_with("--carrier stdio: its own; name fd:N or exec:CMD"), "{}", refusal.message);
         assert_eq!(for_a_client("-", "its own").unwrap_err().code, 64);
-        assert_eq!(for_a_client("exec:cat", "its own").unwrap(), Address::Exec(vec!["cat".into()]));
+        assert_eq!(for_a_client("exec:cat", "its own").unwrap(), Found::Stream(Address::Exec(vec!["cat".into()])));
         assert_eq!(for_a_client("tcp:127.0.0.1:22", "its own").unwrap_err().code, 64);
     }
 
     #[test]
     fn a_terminal_on_stdin_is_refused_for_stdio_alone() {
-        assert_eq!(no_terminal(&Address::Stdio, true).unwrap_err().code, 64);
-        assert!(no_terminal(&Address::Stdio, false).is_ok());
-        assert!(no_terminal(&Address::Exec(vec!["cat".into()]), true).is_ok(), "a program's stream is its own");
+        let stream = Found::Stream;
+        assert_eq!(no_terminal(&stream(Address::Stdio), true).unwrap_err().code, 64);
+        assert!(no_terminal(&stream(Address::Stdio), false).is_ok());
+        let program = stream(Address::Exec(vec!["cat".into()]));
+        assert!(no_terminal(&program, true).is_ok(), "a program's stream is its own");
     }
 
     #[test]

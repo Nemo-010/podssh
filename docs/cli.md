@@ -4824,6 +4824,20 @@ commands. The rules behind them:
   are `podssh exit NAME --listen ADDR:PORT --carrier ADDR` (T-596), whose
   `stdio` is its own to give, and `ssh`, `proxy` and `pipe` with `--exit
   NAME --carrier ADDR` (T-614).
+- **A bucket as the carrier's stream (T-725).** `--carrier s3:FILE`, at
+  each end of the carrier, for a host whose one way out is an object store
+  of the S3 API. FILE names the endpoint, the bucket, the prefixes `up` and
+  `down`, the key files and a secret file (the manual's FILES): no key is in
+  argv or in FILE, and no refusal (78) shows a word of one. A name of FILE
+  that is no setting is refused, so a key pasted into it is never read. The
+  stream is a pipe at once (`crates/podssh-cli/src/carrier_bucket.rs`),
+  whose far end a task carries over the road (`podssh_relay::bucket`) once a
+  link opens: first a read of a name that no note has, so a wrong key or
+  signature is said and the stream ends (69); then the client's hello, or
+  the node's wait for one, before its socket starts (a socket would ping
+  nobody and end). The client's role pings the node from the start, and
+  the node polls its door 10 s apart at most, within the role's 60 s. The
+  bucket has one life, as `stdio`: the node serves one stream.
 - **A link can drop.** The relay's side ends a socket of the reverse road
   at random, with no Close (T-255). `operator` and `ssh node://NAME` then
   say that the link ended with no Close, or that the node's link ended

@@ -1455,7 +1455,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c54e03a951783e8b327515db3f2a2fd0e3bed362a96b066f341ce66ed49b4ead"
 dependencies = [
  "data-encoding",
- "syn 1.0.109",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -1564,7 +1564,7 @@ checksum = "17933e749f2502cfcd1c27519292fbbea22e8fc64ce680e863f855e8cd8cce23"
 dependencies = [
  "heck",
  "indexmap 2.14.2",
- "itertools 0.15.0",
+ "itertools 0.14.0",
  "proc-macro-crate",
  "proc-macro2",
  "quote",
@@ -5268,6 +5268,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "pod-link"
+version = "0.69.0"
+source = "git+https://github.com/PodUtils/podcrates?tag=v0.69.0#d85f2d245b9de93b6932124c06463c7f6416203e"
+dependencies = [
+ "base64 0.23.1",
+ "hmac 0.13.0",
+ "libc",
+ "pod-core",
+ "pod-identity",
+ "pod-tls",
+ "pod-ws",
+ "rustls",
+ "sha2 0.11.1",
+ "tokio",
+ "tokio-rustls",
+ "tracing",
+]
+
+[[package]]
 name = "pod-manual"
 version = "0.69.0"
 source = "git+https://github.com/PodUtils/podcrates?tag=v0.69.0#d85f2d245b9de93b6932124c06463c7f6416203e"
@@ -5627,6 +5646,7 @@ dependencies = [
  "pod-core",
  "pod-derp",
  "pod-iroh",
+ "pod-link",
  "pod-manual",
  "pod-services",
  "pod-term",
@@ -5722,6 +5742,7 @@ dependencies = [
  "pod-devtunnel",
  "pod-e2e",
  "pod-identity",
+ "pod-link",
  "pod-opentunnel",
  "pod-piping",
  "pod-proxy",
@@ -7867,7 +7888,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",

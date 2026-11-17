@@ -45,6 +45,7 @@ pub mod mqtt;
 pub mod pace;
 pub mod road;
 pub mod services;
+pub mod settle;
 
 #[cfg(test)]
 mod carrier_inline_tests;

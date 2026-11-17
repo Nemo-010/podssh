@@ -1948,9 +1948,10 @@ podssh ssh
         node://NAME: reach the node at the other end of ADDR, a stream that
         exists already, as its one road, with no relay and no pair: exec:CMD, a
         program started with no shell, as exec:'ssh -T HOST podssh node
-        --carrier stdio NAME TARGET', or fd:N (Unix); NAME is then the label
-        under which the node's key is pinned; with --exit NAME, the exit at the
-        other end of ADDR dials the host.
+        --carrier stdio NAME TARGET', or fd:N (Unix); or s3:FILE, the node's
+        bucket of the S3 API; NAME is then the label under which the node's key
+        is pinned; with --exit NAME, the exit at the other end of ADDR dials
+        the host.
     --gsr-secret-file FILE
         node://NAME: race the GSRN road last, to the node that serves it with
         the secret of FILE, a private file of yours (default: env
@@ -3636,9 +3637,10 @@ podssh proxy
     --carrier ADDR
         node://NAME: reach the node at the other end of ADDR, a stream that
         exists already, with no relay and no pair, as podssh operator --carrier
-        does: exec:CMD, a program started with no shell, or fd:N (Unix); NAME
-        is then the label under which the node's key is pinned; with --exit
-        NAME HOST PORT, the exit at the other end of ADDR dials HOST PORT.
+        does: exec:CMD, a program started with no shell, fd:N (Unix), or
+        s3:FILE; NAME is then the label under which the node's key is pinned;
+        with --exit NAME HOST PORT, the exit at the other end of ADDR dials
+        HOST PORT.
     --ConnectTimeout SECONDS
         the bound on the time to the session's open, 1 to 86400: the relay's
         answer (each host's dial, TLS, the upgrade, its dial of HOST), or that
@@ -3995,10 +3997,10 @@ podssh pipe
     --carrier ADDR
         node: and udp:node:: reach the node at the other end of ADDR, a stream
         that exists already, with no relay and no pair, as podssh operator
-        --carrier does: exec:CMD, a program started with no shell, or fd:N
-        (Unix); each client of a listening side is a session of the one stream;
-        with --exit NAME, relay: starts at the exit at the other end of ADDR,
-        with no node: side.
+        --carrier does: exec:CMD, a program started with no shell, fd:N (Unix),
+        or s3:FILE; each client of a listening side is a session of the one
+        stream; with --exit NAME, relay: starts at the exit at the other end of
+        ADDR, with no node: side.
     --no-resume
         node:, udp:node: and iroh:: no resume, as with operator's: each session
         ends with its link, and the node keeps nothing of it after a loss.
@@ -4797,6 +4799,17 @@ podssh node
   words that never hold it. A build without the feature refuses --gsr and
   --gsr-secret-file (70).
 
+  --carrier s3:FILE carries the node's stream through a bucket of the S3 API,
+  for a host whose one way out is an object store. FILE says where the bucket
+  is and where the keys are (see FILES). Each end writes its objects under one
+  prefix and reads the other's. So a key needs a write right on one prefix and
+  a read right on the other. Each object is sealed under a key of FILE's
+  secret, its name a MAC of it: the bucket holds no byte in clear. The node
+  waits until a client's hello comes, then serves that one stream. Each request
+  goes on one connection, through HTTPS_PROXY, one at a time. The road is slow:
+  each end polls each 2 to 3 s, and each request is billed at most providers.
+  podssh names no provider; the endpoint is yours.
+
   With --frp FILE, the node serves TARGET through the user's own frps, as an
   frpc of it does, with no relay and no pair: it logs in with frps's token, and
   registers an STCP service of NAME (or of the file's name line) with the
@@ -5250,8 +5263,9 @@ podssh node
     --carrier ADDR
         serve TARGET over ADDR, a stream that exists already, with no relay and
         no pair: stdio (or -), as the exec channel of a platform's own SSH
-        gives it, fd:N (Unix), or exec:CMD, a program started with no shell;
-        the other end runs podssh operator --carrier, or proxy, ssh, cp, scp or
+        gives it, fd:N (Unix), or exec:CMD, a program started with no shell; or
+        s3:FILE, a bucket of the S3 API that FILE describes (see FILES); the
+        other end runs podssh operator --carrier, or proxy, ssh, cp, scp or
         sftp --carrier to node://NAME; or for --exit, podssh exit NAME --listen
         ADDR:PORT --carrier, or ssh, proxy or pipe with --exit NAME --carrier;
         stdin may not be a terminal.
@@ -5779,7 +5793,8 @@ podssh operator
         reach the node at the other end of ADDR, a stream that exists already,
         with no relay and no pair: exec:CMD, a program started with no shell,
         as exec:'ssh -T HOST podssh node --carrier stdio NAME TARGET', or fd:N
-        (Unix); NAME is then the label under which the node's key is pinned.
+        (Unix); or s3:FILE, the node's bucket of the S3 API (see FILES); NAME
+        is then the label under which the node's key is pinned.
     --help
         Print help for this subcommand and exit.
 
@@ -6134,9 +6149,10 @@ podssh exit
         the exit is the node at the other end of ADDR, a stream that exists
         already; with no relay and no pair (podssh node NAME --exit --carrier):
         stdio (or -), as the exec channel of a platform's own SSH gives it,
-        fd:N (Unix), or exec:CMD, a program started with no shell; each
-        connection is a session of the one stream; a stream of stdio or fd:N
-        ends the proxy when its node leaves; stdin may not be a terminal.
+        fd:N (Unix), or exec:CMD, a program started with no shell; or s3:FILE,
+        a bucket of the S3 API (see FILES); each connection is a session of the
+        one stream; a stream of stdio or fd:N ends the proxy when its node
+        leaves; stdin may not be a terminal.
     -q, --quiet
         no line for each connection; errors still go to stderr.
     --help
@@ -6822,9 +6838,10 @@ podssh cp
         node://NAME: reach the node at the other end of ADDR, a stream that
         exists already, as its one road, with no relay and no pair: exec:CMD, a
         program started with no shell, as exec:'ssh -T HOST podssh node
-        --carrier stdio NAME TARGET', or fd:N (Unix); NAME is then the label
-        under which the node's key is pinned; with --exit NAME, the exit at the
-        other end of ADDR dials the host.
+        --carrier stdio NAME TARGET', or fd:N (Unix); or s3:FILE, the node's
+        bucket of the S3 API; NAME is then the label under which the node's key
+        is pinned; with --exit NAME, the exit at the other end of ADDR dials
+        the host.
     --no-resume
         node://NAME, iroh:TICKET, derp:TICKET, a node's cf://HOST and --exit
         NAME: no resume; the session ends with its link, and the node, asked
@@ -7050,9 +7067,10 @@ podssh scp
         node://NAME: reach the node at the other end of ADDR, a stream that
         exists already, as its one road, with no relay and no pair: exec:CMD, a
         program started with no shell, as exec:'ssh -T HOST podssh node
-        --carrier stdio NAME TARGET', or fd:N (Unix); NAME is then the label
-        under which the node's key is pinned; with --exit NAME, the exit at the
-        other end of ADDR dials the host.
+        --carrier stdio NAME TARGET', or fd:N (Unix); or s3:FILE, the node's
+        bucket of the S3 API; NAME is then the label under which the node's key
+        is pinned; with --exit NAME, the exit at the other end of ADDR dials
+        the host.
     --no-resume
         node://NAME, iroh:TICKET, derp:TICKET, a node's cf://HOST and --exit
         NAME: no resume; the session ends with its link, and the node, asked
@@ -7294,9 +7312,10 @@ podssh sftp
         node://NAME: reach the node at the other end of ADDR, a stream that
         exists already, as its one road, with no relay and no pair: exec:CMD, a
         program started with no shell, as exec:'ssh -T HOST podssh node
-        --carrier stdio NAME TARGET', or fd:N (Unix); NAME is then the label
-        under which the node's key is pinned; with --exit NAME, the exit at the
-        other end of ADDR dials the host.
+        --carrier stdio NAME TARGET', or fd:N (Unix); or s3:FILE, the node's
+        bucket of the S3 API; NAME is then the label under which the node's key
+        is pinned; with --exit NAME, the exit at the other end of ADDR dials
+        the host.
     --no-resume
         node://NAME, iroh:TICKET, derp:TICKET, a node's cf://HOST and --exit
         NAME: no resume; the session ends with its link, and the node, asked
@@ -7528,9 +7547,10 @@ podssh mv
         node://NAME: reach the node at the other end of ADDR, a stream that
         exists already, as its one road, with no relay and no pair: exec:CMD, a
         program started with no shell, as exec:'ssh -T HOST podssh node
-        --carrier stdio NAME TARGET', or fd:N (Unix); NAME is then the label
-        under which the node's key is pinned; with --exit NAME, the exit at the
-        other end of ADDR dials the host.
+        --carrier stdio NAME TARGET', or fd:N (Unix); or s3:FILE, the node's
+        bucket of the S3 API; NAME is then the label under which the node's key
+        is pinned; with --exit NAME, the exit at the other end of ADDR dials
+        the host.
     --no-resume
         node://NAME, iroh:TICKET, derp:TICKET, a node's cf://HOST and --exit
         NAME: no resume; the session ends with its link, and the node, asked
@@ -12547,6 +12567,17 @@ FILES
       character, the run is refused (78). Its words never hold the secret. It
       never goes to argv, a line or the relay: the relay sees the address and
       the shard that it gives. podssh never writes it.
+  the file of --carrier s3:FILE
+      The bucket of the carrier: NAME = VALUE lines, # for a comment. endpoint,
+      https://HOST[:PORT][/PATH] of the S3 API; region, us-east-1 unless given;
+      bucket; style, path or virtual. up and down, the prefixes of the client's
+      way and the node's, the same at both ends. credentials, a file of the AWS
+      form (aws_access_key_id, aws_secret_access_key, aws_session_token) for
+      both ways. Or write-credentials and read-credentials, two key pairs;
+      read-credentials none reads a public prefix unsigned. secret-file, at
+      least 16 bytes that both ends hold. A relative path is read beside FILE.
+      No key goes in FILE itself; a name that is no setting is refused (78), in
+      words that never hold a key.
 
 EXIT STATUS
   0
