@@ -1163,7 +1163,7 @@ their own server, and the gate tests faults against a stand-in in Python.
 
 Read: the relay is a Cloudflare Worker, and its own document is the contract
 (`docs/relay.md:1-21`, `README.md:39-42`). The stand-in serves the forward
-path, `/v1/mint` and `/health` only (`scripts/fake-relay.py:157-175`). The
+path, `/v1/mint` and `/health` only (`scripts/fake-relay.py:164-188`). The
 pinned contract gives the forward path and the tokens
 (`crates/podssh-probe/tests/spec/relay-spec-2026-10-03-r2.txt:73-104`), the
 reverse path and its close table
@@ -1221,8 +1221,8 @@ read, moved here as `cargo todo check` refuses a Blocker on an open entry:
 Lifted on 2026-11-02 by Q63: see below.
 
 The Premise is stale in one sentence: the stand-in serves more than "the forward path,
-`/v1/mint` and `/health` only". At `scripts/fake-relay.py:167-171` it also serves `/relays.json`
-and `/trace`, and `scripts/fake-relay.py:162` hands the whole reverse road to
+`/v1/mint` and `/health` only". At `scripts/fake-relay.py:180-184` it also serves `/relays.json`
+and `/trace`, and `scripts/fake-relay.py:175` hands the whole reverse road to
 `scripts/fake_reverse.py`, which is as strict as the live relay for an id that it forgot, and
 tells a frame in flight apart (`scripts/fake_reverse.py:293-305`). The rest holds; the ruling of
 2026-10-08 that it cites is changed.
@@ -10652,6 +10652,23 @@ exit 78. `--lib -- man:: node_install:: operator` 98 passed. Still waits: `Heade
 `pipe --access-host` on `ws:`, a stand-in of the relay's road that demands the headers, and the live step with a
 Cloudflare account.
 
+
+2026-11-17, later still: the stand-in of the relay's roads. `scripts/fake-relay.py --mode access` answers 403 to each
+request without its service token, as the gate of Access does. `crates/podssh-cli/tests/access_relay.rs`, 2 tests:
+`podssh ssh --access-host relay-a.test` through it runs its command; with no host named, or `another.test` named, the
+gate's 403 ends the run with 255 (ssh's code for each first hop not reached; `proxy` keeps 77); and with `AccessHost` in
+the settings, `relay pair`, `node` and `operator` reach it, 64 KiB back whole from the node's TARGET, while with no
+settings the pair gets the 403. No run shows the secret. Planted, each caught: the headers given to no host, and given to
+each host. Found by the test: the node's probe of its upgrade (`pod_piping::probe::upgrade`) writes no header of the
+caller, so the gate refused it and the node left the pair's road for the Piping Server's. podssh now skips that probe
+for a relay host that it sends the credentials to (`podssh_ws::access::process_names`, `node_piping.rs`); the fix is
+asked of podcrates as COORD-109 (#306). `cargo test -p podssh-cli --test access_relay`: 3 passed, 3 runs in 3;
+`podssh-ws --lib access` 6 passed.
+
+A Correction of the waits above: `Headers::in_cleartext` is needed by no road. `cf://` (`ssh/cloudflare.rs`) and
+`pipe --access-host` on `ws:` (`podssh_ws::access::dial`) write the headers into their own requests. Still waits: the
+node's 77 kept from a restart (Decision: `RestartPreventExitStatus` keeps `64 78`; a refusal by Access and an expired
+pair share 77), COORD-109's fix, and the live step with a Cloudflare account (Blocker).
 
 # T-727: SSH login with a short-lived Access certificate over `cf://`
 

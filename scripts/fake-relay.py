@@ -62,6 +62,10 @@ Modes:
                    the same, SECONDS after the first session's upgrade
   slowopen:MS      behave, with each upgrade answered MS milliseconds late:
                    a host that opens after another (T-220)
+  access           behave behind a gate like Cloudflare Access: each request
+                   without the stand-in's service token (ACCESS_ID and
+                   ACCESS_SECRET in CF-Access-Client-Id and -Secret) gets
+                   403, as the gate answers (T-718)
   badaccept        answer each upgrade with a 101 whose Sec-WebSocket-Accept
                    is not the key's, and dial no target: a hop that answers
                    in the relay's place (T-324)
@@ -118,6 +122,9 @@ from fake_shape import SHAPED, Shaper
 from fake_ws import close_frame, frame, read_frame, response, upgraded
 
 TOKEN = "fake-relay-token-for-the-interop-harness"
+# The service token of the gate of mode `access`: made-up values of the tests.
+ACCESS_ID = "id-of-the-stand-in.access"
+ACCESS_SECRET = "secret-of-the-stand-in-7c1e"
 # The relay's own reasons for each code (docs/relay.md, forward path).
 # The sessions upgraded so far, for the modes that drop only the first.
 UPGRADED = {"count": 0}
@@ -156,7 +163,13 @@ async def handle(reader, writer):
             if ":" in line:
                 k, v = line.split(":", 1)
                 headers[k.strip().lower()] = v.strip()
-        if args.mode == "noupgrade" and headers.get("upgrade", "").lower() == "websocket":
+        if args.mode == "access" and (headers.get("cf-access-client-id"), headers.get("cf-access-client-secret")) != (
+            ACCESS_ID,
+            ACCESS_SECRET,
+        ):
+            event(f"access refused {path}")
+            writer.write(response(403, "Forbidden", b"Forbidden: this application is behind Cloudflare Access"))
+        elif args.mode == "noupgrade" and headers.get("upgrade", "").lower() == "websocket":
             event(f"upgrade refused {path}")
             writer.write(response(403, "Forbidden", b"Forbidden: WebSocket upgrades are not allowed by policy"))
         elif await fake_reverse.handle(method, path, headers, reader, writer):

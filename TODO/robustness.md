@@ -927,7 +927,7 @@ fail when the resume layer is off.
 ## Correction
 
 Item 4 needs the reverse road in the stand-in relay, which serves the
-forward road only (`scripts/fake-relay.py:156-157`). T-156 builds it (its
+forward road only (`scripts/fake-relay.py:163-164`). T-156 builds it (its
 item 1) and makes those checks its measurement (its items 2 to 5). T-203
 gives T-156 the faults that those checks need: `pause:AFTER:FOR` for the
 stall that ends, `cut` for a host stopped mid-session, and `--move` for the

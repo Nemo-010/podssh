@@ -414,7 +414,7 @@ trip (`PodUtils/podssh:crates/podssh-ws/src/session.rs:305-333`; the payload is 
 prints the milliseconds of each `/health` request
 (`crates/podssh-cli/src/doctor/relay_checks.rs`, lines 130-132 at `24f3e2a`). The relay counts both directions
 against 64 MiB for each session (`docs/relay.md:475`). The stand-in relay answers pings
-(`scripts/fake-relay.py:339-340`).
+(`scripts/fake-relay.py:352-353`).
 
 ## Approach
 

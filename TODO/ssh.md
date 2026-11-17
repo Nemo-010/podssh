@@ -1521,7 +1521,7 @@ Read:
   stops reading makes the session idle, not stuck (GitHub #36). Only a stall
   below SSH causes the hang.
 - The stand-in relay's `stall:` mode reads the client's frames and drops them
-  (`scripts/fake-relay.py:330-334`), so no fault tests a stuck write today.
+  (`scripts/fake-relay.py:343-347`), so no fault tests a stuck write today.
   GitHub #36 cites it as scripts/box/fake-relay.py, which does not exist.
 - The reporter measured a zero-window stall outside podssh: after 2.0 MiB,
   the write stayed blocked (read in the issue, not verified here).
