@@ -141,3 +141,17 @@ fn a_node_says_when_the_net_lists_other_routes_than_its_own() {
     assert!(none.contains("lists the routes none"), "{none}");
     assert!(listed_apart(&[], &[]).is_none(), "an exit with no range, listed with none");
 }
+
+/// A member never reaches a Unix socket through the exit: a host `unix:PATH`
+/// is a route's of the node's owner, which `pod-relay` dials (`Route::unix`).
+#[tokio::test]
+async fn a_host_of_a_unix_socket_is_refused_before_any_resolve() {
+    let key = |b: u8| podssh_relay::identity::PublicKey([b; 32]);
+    for host in ["unix:/run/docker.sock", "unix:@abstract", "unix:"] {
+        match open(&key(1), &key(2), host, 0, &[]).await {
+            Err(NodeRefusal::NoTarget(why)) => assert!(why.contains("never a Unix socket"), "{host}: {why}"),
+            Err(other) => panic!("{host}: {other:?}"),
+            Ok(_) => panic!("{host}: dialed"),
+        }
+    }
+}

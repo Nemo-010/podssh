@@ -185,6 +185,11 @@ async fn open(
     port: u16,
     ranges: &[Range],
 ) -> Result<TcpStream, NodeRefusal> {
+    // A host `unix:PATH` is a Unix socket of a route of the node's owner,
+    // which `pod-relay` dials; a member never names one through the exit.
+    if podssh_relay::reverse::unix_target::unix_path(host).is_some() || host.starts_with("unix:") {
+        return Err(NodeRefusal::NoTarget(format!("{host}: an exit dials TCP, never a Unix socket")));
+    }
     let shown = podssh_ws::dial::authority(host, port);
     let deadline = Instant::now() + RESOLVE_LIMIT;
     let found = podssh_ws::resolve::resolve(host, port, deadline)

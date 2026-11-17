@@ -350,8 +350,8 @@ trufflehog images) and #292 and #293 (the minor and patch group, rsa 0.10) are T
 | #287 | COORD-095: pod-relay: a link of the resumable layer over the HTTP road (to podcrates) | closed 2026-11-17: podcrates `v0.65.0` gives the client (its entry 801), taken (COORD-097) | T-798 |
 | #288 | COORD-096: pod-manual: four things podssh's manual needs before its text, help and JSON move to the crate (to podcrates) | closed 2026-11-17: podcrates `v0.65.0` gives the four forms (its entry 807), taken (COORD-097) | T-790 |
 | #289 | COORD-097: podssh took podcrates v0.65.0 at 843e3c5, with pod-tor and pod-iroh (to podcrates) | open 2026-11-17: until podcrates records the take | T-684 |
-| #294 | COORD-098: pod-relay: renew reads the default relay's 400 for an unknown reverse path as an error, not as no renewal (to podcrates) | open 2026-11-17: until podcrates answers | T-713 |
-| #295 | COORD-099: pod-relay: a route of a node to a Unix socket, as a target kind of Route (to podcrates) | open 2026-11-17: until podcrates answers | T-714 |
+| #294 | COORD-098: pod-relay: renew reads the default relay's 400 for an unknown reverse path as an error, not as no renewal (to podcrates) | closed 2026-11-17: podcrates `v0.67.0` reads that 400 as no renewal (its entry 834), taken (COORD-102) | T-713 |
+| #295 | COORD-099: pod-relay: a route of a node to a Unix socket, as a target kind of Route (to podcrates) | closed 2026-11-17: podcrates `v0.67.0` gives `Route::unix` (its entry 836); its Windows path is asked in COORD-102 | T-714 |
 | #296 | COORD-100: podssh took podcrates v0.66.0 at ae9cf1b (to podcrates) | open 2026-11-17: until podcrates records the take | T-684 |
 | #297 | COORD-101: pod-tls: webpki-roots 1.0.12 with its ROOTS_VERSION, and rsa 0.10 (to podcrates) | open 2026-11-17: until podcrates answers | T-802 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | closed 2026-11-17: T-790 and T-730 done; podnet closed its COORD-090 (PodUtils/podnet#584) | T-730, T-790 |

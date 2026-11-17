@@ -214,11 +214,8 @@ async fn extensions(offers: &Offers, hello: &Value, ctx: &PairContext<'_>, made:
     let renewed = renew::renew(ctx, made).await;
     checks.push(match renewed {
         Ok(Renewed::Until(ms)) => Check::pass("ext.renew", clause::ROLE_REVERSE, format!("until {ms}"), started),
-        Ok(Renewed::NotServed) => Check::skip("ext.renew", clause::ROLE_REVERSE, "no renewal (404 or 405)"),
-        // A relay of the contract answers a path it does not have with 400
-        // and the list of its paths: no renewal, as a 404 would say.
-        Err(PairError::Failed { status: 400, detail }) if detail.contains("/v1/stop/") => {
-            Check::skip("ext.renew", clause::ROLE_REVERSE, "no renewal (400: its paths, with none to renew)")
+        Ok(Renewed::NotServed) => {
+            Check::skip("ext.renew", clause::ROLE_REVERSE, "no renewal (404, 405, or the list of its paths)")
         }
         Err(e) => Check::fail("ext.renew", clause::ROLE_REVERSE, e.to_string(), started),
     });

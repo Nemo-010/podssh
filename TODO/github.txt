@@ -299,7 +299,7 @@
 291 pull open
 292 pull open
 293 pull open
-294 issue open
-295 issue open
+294 issue closed
+295 issue closed
 296 issue open
 297 issue open

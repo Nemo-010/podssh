@@ -5948,6 +5948,17 @@ tag: each dependency and `issue-sync.yml` name `v0.66.0`; `get-core.sh` keeps it
 `cargo test -p podssh-cli -p podssh-relay -p podssh-ws --lib` 1212, 399 and 81 passed; `--features devtunnel --lib
 devtunnel` 3 passed.
 
+2026-11-17, podcrates `v0.67.0` (`1d7e983c`, COORD-128, PodUtils/podcrates#218): no public API breaks. Taken with
+podssh's parts: `pair::renew` reads the default relay's `400` that lists its reverse paths as no renewal (COORD-098,
+#294), so `podssh relay conform`'s own reading of it goes (live against the default relay: 22 passed, 0 failed,
+`ext.renew` a skip); `Route::unix` (COORD-099, #295): an exit of podssh refuses a host `unix:PATH` before any resolve
+(`node_exit.rs`, a test, planted: the guard out fails it), while podssh's own opener of a Unix route stays, as
+`pod-relay`'s `unix_target::connect` has no Windows path ("this system has no Unix socket for a route") where
+podssh's reaches an AF_UNIX socket by WinSock: asked of podcrates (COORD-102); `pod-relay`'s node ends a session
+when its local side did not read for 2 s or past 4 times its queue (its entry 837); `pod_core::files::replace_private`
+for podssh's two writes of a private file and the record of spent grants is T-805. Each dependency and
+`issue-sync.yml` name `v0.67.0`; `get-core.sh` keeps its pins.
+
 Next: `pod-cloudflare` and `pod-ts` as podcrates names them, then `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
 
@@ -7134,3 +7145,40 @@ tcp.ssh.relay.ajam.dev.`: 9 passed, 0 failed); a name whose last label is hex is
 with its words (`"relay.0x1f" is not a valid server name: invalid dns name`). Held: webpki-roots 1.0.12, whose
 version `pod_tls::trust::ROOTS_VERSION` records in podcrates, and the one rsa 0.9 of the tree, which `pod-tls` takes:
 both asked of podcrates (COORD-101, #297). Then each Dependabot pull request closes once its update is on `main`.
+
+
+# T-805: podssh's private files written by `pod_core::files::replace_private`
+
+**Source:** podcrates' COORD-128 (PodUtils/podcrates#218), its entry 192: one durable replace of a file.
+**Category:** chore
+**Milestone:** M10
+**Priority:** P3
+**Effort:** S
+**Status:** open
+
+## Problem
+
+podssh has two writes of a private file of its own (a temporary file beside the path, then a rename) and its record
+of spent grants syncs its directory by hand. podcrates' `pod_core::files::replace_private(path, body, mode,
+in_place_fallback)` does each step (the write and its sync, the rename, the directory's sync), says which one did not
+hold (`Commit::Durable`, `InstalledUnconfirmed`, `InPlace`), and changes nothing on an error.
+
+## Premise
+
+- To be read: podssh's two copies of the replace and the `sync_dir` of the spent-grant record, as podcrates names them
+  (`crates/podssh-cli/src/grants.rs` and the files that write a private file through a temporary one).
+
+## Approach
+
+Each copy calls `replace_private`; a `Commit::InstalledUnconfirmed` says one warning, as podcrates asks; the tests of
+each file stay.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-cli --lib grants
+```
+
+The same tests pass, and no copy of the replace is left (a search for the temporary file's rename).
+

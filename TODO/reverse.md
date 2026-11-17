@@ -5230,5 +5230,6 @@ Partial, 2026-11-16 (drafted on `draft-t714`; not built).
   `a_node_refuses_a_unix_route_that_it_cannot_serve` left in the temporary directory (`scratch` makes it, and nothing
   removed it); the test removes it now, also when an assertion fails. `--test node_unix_route` 3 passed, and nothing
   of it stays.
-- Waits: podcrates' answer to COORD-099 (#295), the ask above; a relative PATH under `--install` (a service starts in another
+- 2026-11-17: podcrates `v0.67.0` gives `Route::unix` (COORD-099, #295, closed), with no Windows path yet; podssh's
+  opener stays until a tag carries one (COORD-102). Waits: a relative PATH under `--install` (a service starts in another
   directory) and a socket under a home that a system unit's `ProtectHome` hides are not checked yet.
