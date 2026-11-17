@@ -4820,7 +4820,7 @@ podssh's own, which makes it M.
   (`PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs`, `:338-339`), as the design chose for a host with no
   DNS (`docs/design.md:1225`, `:1235`).
 - Read: the node's key is Ed25519 and stays across its pairs, and the operator pins it by label
-  (`docs/reverse.md:606-610`).
+  (`docs/reverse.md:609-613`).
 - Read in the study (https://docs.iroh.computer/connecting/dns-address-lookup): an endpoint
   publishes a signed packet to a DNS/Pkarr server over HTTP; n0's servers are free, rate-limited,
   with no guaranteed uptime, and "You're more than welcome to run production systems" on them,

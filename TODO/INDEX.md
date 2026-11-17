@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**760 entries: 40 open, 36 partial, 11 blocked, 673 done.**
+**760 entries: 39 open, 37 partial, 11 blocked, 673 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 2 | 8 | 3 | 81 | 94 |
-| P2 | 3 | 22 | 2 | 287 | 314 |
+| P2 | 2 | 23 | 2 | 287 | 314 |
 | P3 | 35 | 6 | 6 | 304 | 351 |
-| **All** | 40 | 36 | 11 | 673 | 760 |
+| **All** | 39 | 37 | 11 | 673 | 760 |
 
 ## Entries
 
@@ -742,7 +742,7 @@ repository and CI).
 | [T-709](serve.md) | P1 | M | M10 | feature | partial | A node as a hardened system service of a named user: `--print-unit`, `--install --system --run-as` |
 | [T-710](reverse.md) | P1 | M | M10 | measurement | open | A node stays reachable for months: pair renewal and legs by key, proven over 90 days and in a beta |
 | [T-711](mesh.md) | P1 | M | M10 | feature | blocked | One switch `PODSSH_PUBLIC` over each third-party service, and `status --json` gives the set |
-| [T-712](reverse.md) | P2 | M | M10 | feature | open | Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s |
+| [T-712](reverse.md) | P2 | M | M10 | feature | partial | Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s |
 | [T-713](relay.md) | P2 | M | M10 | feature | done | `podssh relay conform --relay-host HOST [--reverse] --json` |
 | [T-714](reverse.md) | P2 | M | M10 | feature | partial | A node route to a Unix socket, with a first line that names the caller's key and route |
 | [T-715](mesh.md) | P2 | M | M10 | feature | open | A node's door from a signed net document at an HTTPS URL, with a TTL and a stale limit |

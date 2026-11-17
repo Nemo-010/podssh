@@ -1510,9 +1510,9 @@ Read:
   (`crates/podssh-ws/src/client.rs:42-43`, given to the session at
   `PodUtils/podssh:crates/podssh-ws/src/client.rs:204`), and `write` applies it
   (`PodUtils/podssh:crates/podssh-ws/src/session.rs:420-427`). Then the copy task stops
-  (`crates/podssh-ssh/src/relay_stream.rs:216-232`), the next ping meets the
+  (`crates/podssh-ssh/src/relay_stream.rs:226-242`), the next ping meets the
   same limit and ends the read task (`PodUtils/podssh:crates/podssh-ws/src/session.rs:329-332`,
-  `crates/podssh-ssh/src/relay_stream.rs:240-251`), and russh's next write
+  `crates/podssh-ssh/src/relay_stream.rs:250-261`), and russh's next write
   fails. So the relay road ends a stuck write in about 60 to 130 s.
 - The direct road gives russh the TCP stream with only `nodelay` set
   (`crates/podssh-cli/src/ssh/transport.rs`, lines 99-101 at `cafcdb4`,
@@ -2445,7 +2445,7 @@ and a send waits for the channel's window; while it waited, the loop read
 none of the channel's messages, which carry the end. And in the relay
 stream, the task that sends stopped reading the pipe when a send failed,
 while the task that receives could wait for russh to read (now
-`crates/podssh-ssh/src/relay_stream.rs:195-292`): russh, which waited on a
+`crates/podssh-ssh/src/relay_stream.rs:205-302`): russh, which waited on a
 write into the pipe, read nothing, so neither task ended.
 
 ## Approach
@@ -2476,7 +2476,7 @@ hang. Plant: the relay stream's receiving task with no stop fails its test.
 2026-10-10. The session's loop reads the channel's messages while a send
 waits for the window (`crates/podssh-ssh/src/io.rs:233-245`), and in the
 relay stream each task's end with the link stops the other
-(`crates/podssh-ssh/src/relay_stream.rs:195-292`).
+(`crates/podssh-ssh/src/relay_stream.rs:205-302`).
 - T-156's control of a stopped relay host (the forward road, 20 MiB up and
   back, the relay host's connections end with RST at 8 MiB; a limit of 60 s
   for each run): before, 7 of 54 runs never ended; with the loop's change
@@ -3424,7 +3424,7 @@ first word is the cut's. A warning 30 s before would let the user press a key, o
 - Read: the relay stream counts the payload both ways
   (`crates/podssh-ssh/src/relay_stream.rs:133-137`), and keeps the time of the relay's last frame
   of any kind, keepalives among them (`PodUtils/podssh:crates/podssh-ws/src/session.rs:291-294`,
-  `crates/podssh-ssh/src/relay_stream.rs:192`); it kept no time of the last payload before this
+  `crates/podssh-ssh/src/relay_stream.rs:202`); it kept no time of the last payload before this
   entry's draft (read at `582b1bf`). So #98's
   reading that the client already knows the time of the last byte holds for no clock that the cut
   counts: russh's keepalive counts SSH's packets in.

@@ -40,7 +40,7 @@ byte is read as a Close with no code (`session.rs` lines 275-278 at `076e3ce`); 
    `WsError::Frame` when `fin` is clear or the length is over 125. Name the rule in the message.
 2. Refuse a Close payload of 1 byte in the same place.
 3. The read then fails (`crates/podssh-ws/src/session.rs` line 176 at `3b60753`). Today a failed
-   read sends no Close (`crates/podssh-ssh/src/relay_stream.rs:282-284`): send 1002 (protocol
+   read sends no Close (`crates/podssh-ssh/src/relay_stream.rs:292-294`): send 1002 (protocol
    error) there, as lines 130-137 do for an unexpected frame. `podssh proxy` exits as for a
    broken session.
 4. `PodUtils/podssh:crates/podssh-ws/tests/rfc6455.rs` has 486 lines: put the new tests in a new file,
@@ -3625,7 +3625,7 @@ two requests in two directions.
 - The split is a stream of two halves (`PodUtils/podcrates:crates/pod-egress/src/vless/split.rs`).
 - `docs/STATUS.md:307` records VLESS over XHTTP against Xray-core v26.10.21, shoes and nginx in
   front of Xray-core, in packet-up, stream-up and stream-one on HTTP/2, with HTTP/1.1 refused
-  with 78. That refusal is older than T-456: `docs/STATUS.md:1058` records packet-up and stream-up
+  with 78. That refusal is older than T-456: `docs/STATUS.md:1059` records packet-up and stream-up
   over HTTP/1.1 on two connections, and stream-one alone refused
   (`PodUtils/podcrates:crates/pod-egress/src/vless/h1_modes.rs`, its reason at
   `PodUtils/podcrates:crates/pod-egress/src/vless/h1_modes.rs`). The issue's "keep the 78 refusal" reads as:

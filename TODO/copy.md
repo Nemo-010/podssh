@@ -645,8 +645,8 @@ old writer can race the new one.
   IRC, with a budget of 60 MiB and the reason for the margin
   (`crates/podssh-core/src/irc/limits.rs:88-95`).
 - Read: the relay stream sees each payload byte both ways
-  (`crates/podssh-ssh/src/relay_stream.rs:226`,
-  `crates/podssh-ssh/src/relay_stream.rs:255-267`). Each new SSH
+  (`crates/podssh-ssh/src/relay_stream.rs:236`,
+  `crates/podssh-ssh/src/relay_stream.rs:265-277`). Each new SSH
   connection asks again for a passphrase or a password
   (`crates/podssh-ssh/src/keys.rs:301-363`,
   `crates/podssh-ssh/src/auth.rs:328-389`).

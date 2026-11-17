@@ -28,7 +28,7 @@ a session id and a 256-bit resume secret, under SSH (`docs/design.md:713-730`),
 in a `session` module of `podssh-relay` (`docs/design.md:613-622`), a crate
 with no C. Measured: `grep -ril resum crates` finds only the IRC client.
 Today russh's bytes go through a pipe to the relay session
-(`crates/podssh-ssh/src/relay_stream.rs:182-295`). Frame boundaries mean nothing
+(`crates/podssh-ssh/src/relay_stream.rs:182-305`). Frame boundaries mean nothing
 on the relay (`docs/relay.md:358-361`), and the relay reads each record and can
 drop or add frames (`SECURITY.md:33-36`).
 

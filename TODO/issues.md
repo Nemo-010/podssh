@@ -127,7 +127,7 @@ corrects a claim that the code does not support.
 
 ## Requests after the triage (#51 on)
 
-#37 to #50, #52, #53, #57, #58, #64 to #68, #77, #78 to #82, #119, #120, #122, #123, #149, #150, #197 to #202 and #290 to #293 are pull requests;
+#37 to #50, #52, #53, #57, #58, #64 to #68, #77, #78 to #82, #119, #120, #122, #123, #149, #150, #197 to #202, #290 to #293 and #301 are pull requests;
 Dependabot's #44 to #47, updates of a major version, are T-330, but #47 (aes-gcm 0.11), which is
 T-333 (done on 2026-10-31, after the ruling of Q48); Dependabot's #57 and #64
 to #68 are T-355, and so is #77 (pageant 0.2.5 in `fuzz/Cargo.lock`, as in the
@@ -138,7 +138,8 @@ image's digest, sha2 0.11.1 and simple-dns 0.13) are T-597. Dependabot's #149 an
 (taiki-e/install-action 2.90.0 and aes 0.9.4) are T-691. Dependabot's #197 to #202 of 2026-11-12
 (trufflehog, the actions group, the minor and patch group, Arti's tor-rtcompat and tor-error 0.48,
 and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12. Dependabot's #290 and #291 of 2026-11-17 (the tailscale and
-trufflehog images) and #292 and #293 (the minor and patch group, rsa 0.10) are T-802.
+trufflehog images) and #292 and #293 (the minor and patch group, rsa 0.10) are T-802; Dependabot closed
+the four once `main` held them, and opened #301 for webpki-roots 1.0.12 alone, also T-802 (it waits for `pod-tls`).
 
 | Issue | Subject | State | Entries |
 | --- | --- | --- | --- |
@@ -356,6 +357,7 @@ trufflehog images) and #292 and #293 (the minor and patch group, rsa 0.10) are T
 | #297 | COORD-101: pod-tls: webpki-roots 1.0.12 with its ROOTS_VERSION, and rsa 0.10 (to podcrates) | open 2026-11-17: until podcrates answers | T-802 |
 | #298 | COORD-102: podssh took podcrates v0.67.0 at a4b1436; a Unix route of pod-relay on Windows (to podcrates) | open 2026-11-17: until podcrates records the take and answers the Windows path | T-684, T-714 |
 | #299 | COORD-103: the two speeds of podssh relay serve: the runtime's placement of tasks, not the role (to podcrates) | open 2026-11-17: until podcrates has read it | T-803 |
+| #300 | COORD-104: pod-relay and pod-session: a relay's liveness offer, so a Durable Object relay can hibernate (to podcrates) | open 2026-11-17: until podcrates answers | T-712 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | closed 2026-11-17: T-790 and T-730 done; podnet closed its COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |

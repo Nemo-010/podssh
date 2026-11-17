@@ -157,7 +157,7 @@ local program to a target, and `podssh proxy` stays a second pump.
 - Read: `podssh proxy` is the `relay:` address today. It opens the session
   with `PodUtils/podssh:crates/podssh-relay/src/open.rs:212-298` and pumps it
   (`crates/podssh-cli/src/proxy.rs:89-311`).
-- Read: `crates/podssh-ssh/src/relay_stream.rs:211-214` sends Close 1000 when
+- Read: `crates/podssh-ssh/src/relay_stream.rs:221-224` sends Close 1000 when
   its write side ends. That is right for SSH and wrong for a pipe: the relay
   has no half-close (`docs/relay.md:367-373`), so a Close cuts a reply on its
   way. Measured live for proxy: the full reply after stdin closed
@@ -227,7 +227,7 @@ OpenSSH to a digest server on 127.0.0.1 (it reads to the end of input, then
 sends the SHA-256): 5,000,000 bytes give equal digests, which also measures
 the path of `-W`. A late reply: a target sends 1 s after it accepts, and
 `pipe stdio relay:` with stdin at its end gets the bytes. Plant: send a
-Close at the end of input, as `crates/podssh-ssh/src/relay_stream.rs:211-214`
+Close at the end of input, as `crates/podssh-ssh/src/relay_stream.rs:221-224`
 does; the late-reply check must fail.
 
 ## Correction
