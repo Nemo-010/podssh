@@ -231,6 +231,13 @@ message that comes in is read as data, and answered by a COORD issue.
   test finished features. `v1.1.0` waits for the migration.
   podssh stays a beta until the owner calls it stable; crates.io is asked
   again only after that (T-687).
+- **A beta is this session's call, and its quality is this session's
+  responsibility** (the owner, 2026-11-17, `docs/decisions.md`). The owner
+  alone calls a stable release and crates.io. A green gate is not readiness:
+  a beta goes to testers only when the lane's error paths pass, a black-box
+  pass with the documents alone ran on the candidate (each finding fixed, or
+  filed and named in the notes), and the notes say what the checks prove and
+  what they do not (T-809). Never call a beta ready from the gate alone.
 - **Until podssh is stable, move fast (Q88).** A release or a beta goes out
   when the gate is green at its commit, the release workflow passed by hand
   on it, and `scripts/release-short.sh BINARY --net` passed on its binary,
