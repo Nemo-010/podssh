@@ -275,7 +275,7 @@ nothing, and a host that does not start TLS, each cost the 20 s limit before the
 1. After a host fails with an error that another host can repair (`another_host_may_help`,
    `PodUtils/podssh:crates/podssh-relay/src/open.rs:71-93`), write a record (host, time, class) into a private
    file `relay-failures-KEY.json` with `cache::store_file`
-   (`crates/podssh-relay/src/cache.rs:74-108`). Remove the record when the host succeeds.
+   (`crates/podssh-relay/src/cache.rs:77-111`). Remove the record when the host succeeds.
 2. At the start of `open` (`PodUtils/podssh:crates/podssh-relay/src/open.rs:212-298`), move each host whose
    record is younger than a fixed window (10 min) to the end of the list, in its old order.
    Never remove a host: each host is still tried.
@@ -911,7 +911,7 @@ the module comment repeats it (`crates/podssh-relay/src/cache.rs`, lines 4-8 at 
    then the platform's temporary directory (`std::env::temp_dir`) with the user's tag; then the
    working directory. No path literal stays in `cache.rs`.
 3. Probe each as now: a missing directory is made with mode 0700
-   (`crates/podssh-relay/src/cache.rs:327-344`), and one that refuses a write is skipped. When the
+   (`crates/podssh-relay/src/cache.rs:337-354`), and one that refuses a write is skipped. When the
    directory of `PODSSH_CACHE_DIR` is skipped, say so once on stderr, with the reason.
 4. Take the environment as a parameter, as `dial::proxy_from_vars` does
    (`PodUtils/podssh:crates/podssh-ws/src/dial.rs:109-123`), so that the tests can set it.
@@ -1644,7 +1644,7 @@ the user's own file is read. Planted: a check that returns `true`; a test fails.
 
 ## Done
 
-2026-10-11. On Windows `closed` (`crates/podssh-relay/src/cache.rs:362-388`) reads the owner and
+2026-10-11. On Windows `closed` (`crates/podssh-relay/src/cache.rs:372-398`) reads the owner and
 the access list of the opened file (`crates/podssh-relay/src/cache/closed_win.rs:45-49`) and judges
 them by the rules of the Decision (`crates/podssh-relay/src/cache/closed.rs:45-65`); podssh's
 directories and files are made private (`crates/podssh-relay/src/cache/closed_win.rs:218-294`).
@@ -4370,7 +4370,7 @@ Read at `2042200`:
 - The key is known at the mint: `crates/podssh-relay/src/serve/mod.rs:396-400` takes the key that
   proved itself, and drops it after its line.
 - The role keeps one private file already, by an atomic writer (`crates/podssh-relay/src/serve/reverse/pairs.rs:455`)
-  and a SHA-256 of each token (`:452`).
+  and a SHA-256 of each token (`:454`).
 - The brake counts requests for each address (`crates/podssh-relay/src/serve/brake.rs:22` says
   "pub const PER_MINUTE: usize = 120;"), never bytes.
 
@@ -4413,7 +4413,7 @@ plant), and a session cut at its key's budget, which the Approach does not ask a
 client's shell in the middle. A request that never became a session (a refusal, a target out of
 reach) charges nothing and counts no session: the count starts at the upgrade. Each link of the layer
 is a session of its own, its frames of the layer among its payload, as for its cap of 64 MiB. The file
-is read up to 16 MiB, not the cache's 64 KiB (`crates/podssh-relay/src/cache.rs:48`), which holds a few
+is read up to 16 MiB, not the cache's 64 KiB (`crates/podssh-relay/src/cache.rs:51`), which holds a few
 hundred keys: a role whose own file grew past it would not start. `--quota` is whole MiB from 1 to
 16777216; `--quota` and `--usage` beside `--mint anyone` or `nobody`, which count no key, are usage
 errors (64). The relay behind a quick tunnel counts in memory, with no budget; lost: `--quota` for
@@ -4817,7 +4817,7 @@ Read at `2042200`:
 - A list fetched over HTTPS exists for Shadowsocks: a cap of 1 MiB
   (`crates/podssh-cli/src/shadowsocks/subscription.rs:24`), a day kept (`:26`), 20 s (`:28`), three
   redirects (`:30`), `https://` alone (`:65`), through `podssh_ws::client::https_get`
-  (`PodUtils/podssh:crates/podssh-ws/src/client.rs:294`), kept by `crates/podssh-relay/src/cache.rs:76`.
+  (`PodUtils/podssh:crates/podssh-ws/src/client.rs:294`), kept by `crates/podssh-relay/src/cache.rs:79`.
 
 ## Approach
 

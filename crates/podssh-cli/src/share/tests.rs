@@ -78,17 +78,22 @@ fn an_edit_keeps_the_file_whole_and_a_node_reads_it_again() {
     let dir = scratch("edit");
     let place = Place::File(dir.join("lab.shares"));
     assert_eq!(file::read(&place), Ok(None), "no file: no share");
-    let add = |s: Share| file::edit(&place, move |text| Ok((Some(file::with_share(text, &s).0), ())));
+    let add =
+        |s: Share| file::edit(&place, &mut std::io::sink(), move |text| Ok((Some(file::with_share(text, &s).0), ())));
     add(share("web", 8080)).unwrap();
     add(share("db", 5432)).unwrap();
     let (path, text) = file::read(&place).unwrap().expect("the file");
     assert_eq!(path, dir.join("lab.shares"));
     assert_eq!(Shares::parse(&text).list, vec![share("web", 8080), share("db", 5432)]);
+    // The replace leaves no temporary file beside it (T-805).
+    let names: Vec<String> =
+        std::fs::read_dir(&dir).unwrap().map(|e| e.unwrap().file_name().to_string_lossy().into_owned()).collect();
+    assert!(names.iter().all(|n| !n.ends_with(".tmp")), "{names:?}");
     // A change that changes nothing writes nothing.
-    let unchanged = file::edit(&place, |_| Ok((None, "said")));
+    let unchanged = file::edit(&place, &mut std::io::sink(), |_| Ok((None, "said")));
     assert_eq!(unchanged.map(|(_, said)| said), Ok("said"));
     // A refusal of the change leaves the file as it was.
-    let refused = file::edit(&place, |_| Err::<(Option<String>, ()), _>(Refusal::usage("no")));
+    let refused = file::edit(&place, &mut std::io::sink(), |_| Err::<(Option<String>, ()), _>(Refusal::usage("no")));
     assert_eq!(refused.map(|_| ()), Err(Refusal::usage("no")));
     assert_eq!(file::read(&place).unwrap().map(|(_, t)| t), Some(text));
     let _ = std::fs::remove_dir_all(&dir);
@@ -105,7 +110,8 @@ fn two_changes_at_once_both_count_under_the_lock() {
         std::thread::spawn(move || {
             for n in 0..40u16 {
                 let s = share(&format!("{prefix}{n}"), base + n);
-                file::edit(&place, move |text| Ok((Some(file::with_share(text, &s).0), ()))).expect("an edit");
+                file::edit(&place, &mut std::io::sink(), move |text| Ok((Some(file::with_share(text, &s).0), ())))
+                    .expect("an edit");
             }
         })
     };
@@ -134,7 +140,7 @@ fn a_change_that_waits_behind_others_that_end_is_not_refused() {
             while std::time::Instant::now() < end {
                 let s = share(&format!("o{n}"), 2000 + n % 1000);
                 let started = started.clone();
-                file::edit(&place, move |text| {
+                file::edit(&place, &mut std::io::sink(), move |text| {
                     let _ = started.send(());
                     std::thread::sleep(std::time::Duration::from_millis(50));
                     Ok((Some(file::with_share(text, &s).0), ()))
@@ -148,7 +154,7 @@ fn a_change_that_waits_behind_others_that_end_is_not_refused() {
     first.recv().expect("the others took the lock");
     let mine = share("mine", 9000);
     let waited = std::time::Instant::now();
-    let result = file::edit(&place, move |text| Ok((Some(file::with_share(text, &mine).0), ())));
+    let result = file::edit(&place, &mut std::io::sink(), move |text| Ok((Some(file::with_share(text, &mine).0), ())));
     let n = others.join().unwrap();
     if let Err(refusal) = &result {
         panic!("refused after {:?} behind {n} changes that each ended: {}", waited.elapsed(), refusal.message);
@@ -171,7 +177,7 @@ fn a_lock_held_past_the_wait_fails_the_change_with_75() {
         return;
     }
     let start = std::time::Instant::now();
-    let held = file::edit(&place, |_| Ok((Some("web=127.0.0.1:8080\n".to_string()), ())));
+    let held = file::edit(&place, &mut std::io::sink(), |_| Ok((Some("web=127.0.0.1:8080\n".to_string()), ())));
     match held {
         Err(refusal) => {
             assert_eq!(refusal.code, sysexits::EX_TEMPFAIL, "{}", refusal.message);

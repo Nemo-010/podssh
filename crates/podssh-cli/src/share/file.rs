@@ -189,9 +189,11 @@ pub fn read(place: &Place) -> Result<Option<(PathBuf, String)>, String> {
 
 /// `change` made to the file of `place` under its lock: given the text read
 /// there again (none: empty), it gives the new text, or none for no change,
-/// and what to say. The file's path, and that.
+/// and what to say. The file's path, and that; a replace that is not proved
+/// on disk says one warning to `err`.
 pub fn edit<T>(
     place: &Place,
+    err: &mut dyn std::io::Write,
     change: impl FnOnce(&str) -> Result<(Option<String>, T), Refusal>,
 ) -> Result<(PathBuf, T), Refusal> {
     let path = write_path(place)?;
@@ -199,7 +201,11 @@ pub fn edit<T>(
     let text = cache::read_own(&path, Others::Read).map_err(Refusal::config)?.unwrap_or_default();
     let (next, said) = change(&text)?;
     if let Some(next) = next {
-        replace(&path, next.as_bytes()).map_err(|why| Refusal { message: why, code: sysexits::EX_CANTCREAT })?;
+        let note =
+            replace(&path, next.as_bytes()).map_err(|why| Refusal { message: why, code: sysexits::EX_CANTCREAT })?;
+        if let Some(note) = note {
+            let _ = writeln!(err, "podssh share: warning: {note}");
+        }
     }
     Ok((path, said))
 }
@@ -301,22 +307,12 @@ fn held_too_long(lock: &Path) -> Refusal {
 }
 
 /// `path` replaced whole by `body`: a private file beside it, then a rename,
-/// so that a node that reads it meanwhile reads the one before or this one.
-fn replace(path: &Path, body: &[u8]) -> Result<(), String> {
-    use std::io::Write;
-    let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
-    let tmp = path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));
-    let _ = std::fs::remove_file(&tmp);
-    let result = (|| {
-        let mut file = cache::create_new_private(&tmp)?;
-        file.write_all(body)?;
-        file.sync_all()?;
-        drop(file);
-        std::fs::rename(&tmp, path)
-    })();
-    if let Err(e) = result {
-        let _ = std::fs::remove_file(&tmp);
-        return Err(format!("{}: {e}", path.display()));
-    }
-    Ok(())
+/// so that a node that reads it meanwhile reads the one before or this one;
+/// then its directory synced (pod-core's replace, T-805). The warning of a
+/// commit that is not proved on disk, for the caller to say.
+fn replace(path: &Path, body: &[u8]) -> Result<Option<String>, String> {
+    // No write in place: a node reads the file for each session, and a
+    // bind-mounted one is changed on its host, where the rename works.
+    let commit = cache::replace_private(path, body, 0o600, false).map_err(|e| format!("{}: {e}", path.display()))?;
+    Ok(cache::commit_note(path, &commit))
 }

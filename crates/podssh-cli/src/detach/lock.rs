@@ -319,20 +319,11 @@ pub fn ran(pid: u32) {
 /// A record in one rename, so that a reader never sees half of one; a
 /// failure is no failure of the run, whose lock is what counts.
 fn write_record(path: &Path, record: &Value) {
-    let mut part = path.as_os_str().to_owned();
-    part.push(format!(".{}.part", std::process::id()));
-    let part = PathBuf::from(part);
-    let mut options = std::fs::OpenOptions::new();
-    options.write(true).create(true).truncate(true);
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::OpenOptionsExt;
-        options.mode(0o600);
-    }
-    let written = options.open(&part).and_then(|mut f| f.write_all(format!("{record}\n").as_bytes()));
-    if written.is_err() || std::fs::rename(&part, path).is_err() {
-        let _ = std::fs::remove_file(&part);
-    }
+    // pod-core's replace (T-805). A record that is not proved on disk is
+    // no failure either, so it says nothing: a run's stderr is its log, and
+    // `podssh detached` trusts the locks, never the record alone. A file of
+    // the cache is never bind-mounted: no write in place.
+    let _ = podssh_relay::cache::replace_private(path, format!("{record}\n").as_bytes(), 0o600, false);
 }
 
 #[cfg(test)]

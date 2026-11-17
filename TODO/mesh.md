@@ -13756,7 +13756,7 @@ that a person copies (`net join`, `net invite`).
   (`crates/podssh-cli/src/flags/node.rs:137`, `crates/podssh-cli/src/node_members.rs:1-10`,
   `crates/podssh-cli/src/net/store.rs:62`).
 - Read: `store::take(signed, owner, now)` verifies a document against its owner's key and its end
-  (`crates/podssh-cli/src/net/store.rs:174`); the document is signed (`crates/podssh-cli/src/net/sign.rs`).
+  (`crates/podssh-cli/src/net/store.rs:166`); the document is signed (`crates/podssh-cli/src/net/sign.rs`).
 - Read: the relay role reads a list from a file or an `https://` URL with `--list-ttl` and `--list-stale`
   (T-646, `TODO/relay.md`): a copy older than TTL plus stale limit lets no one in. The source is a trait with
   a file and a URL behind it. Reuse it.

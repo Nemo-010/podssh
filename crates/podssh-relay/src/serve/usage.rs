@@ -108,6 +108,9 @@ struct Ledger {
     /// A count moved since the last write.
     dirty: AtomicBool,
     say: Mutex<Option<Say>>,
+    /// A write whose directory was not synced was said: once, as the
+    /// writes come each 2 s.
+    unconfirmed: AtomicBool,
 }
 
 fn lock<T>(held: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -135,6 +138,7 @@ impl Usage {
             totals: Mutex::new(totals),
             dirty: AtomicBool::new(false),
             say: Mutex::new(None),
+            unconfirmed: AtomicBool::new(false),
         }))
     }
 
@@ -303,7 +307,12 @@ impl Usage {
         let written = serde_json::to_vec(&File { keys })
             .map_err(|e| e.to_string())
             .and_then(|body| super::reverse::pairs::write_private(path, &body).map_err(|e| e.to_string()));
-        written.map(|()| true).map_err(|why| {
+        if let Ok(Some(note)) = &written {
+            if !self.0.unconfirmed.swap(true, Ordering::SeqCst) {
+                self.say(&format!("usage: {note}"));
+            }
+        }
+        written.map(|_| true).map_err(|why| {
             self.0.dirty.store(true, Ordering::SeqCst);
             format!("{}: {why}", path.display())
         })

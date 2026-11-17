@@ -537,7 +537,7 @@ Read, the bounds today:
   proxy (`PodUtils/podssh:crates/podssh-ws/src/dial.rs:25`) and for the upgrade
   (`PodUtils/podssh:crates/podssh-ws/src/handshake.rs:144`).
 - The pool document: 256 KiB (`PodUtils/podssh:crates/podssh-relay/src/pool.rs:37`). A cache
-  file: 64 KiB (`crates/podssh-relay/src/cache.rs:48`).
+  file: 64 KiB (`crates/podssh-relay/src/cache.rs:51`).
 - The SSH window: 512 KiB (`crates/podssh-ssh/src/run.rs:30`). The relay pipe:
   256 KiB each way, frames of 64 KiB
   (`crates/podssh-ssh/src/relay_stream.rs:36-39`). Pump buffers: 32 KiB
@@ -617,7 +617,7 @@ The test target `limits` of `podssh-ws` moved to `pod-ws` of PodUtils/podcrates 
   covers both reads.
 - A pool body past its bound, and a file of the cache past its bound, are dropped with no word:
   the refresh's error goes nowhere (`PodUtils/podssh:crates/podssh-relay/src/open.rs:417`), and the cache reads a
-  file that it cannot use as none (`crates/podssh-relay/src/cache.rs:223-225`). Each is made again,
+  file that it cannot use as none (`crates/podssh-relay/src/cache.rs:226-228`). Each is made again,
   so the table says so, and nothing is added.
 - `PODSSH_REPLAY_BUFFER` above 16 MiB gives 4 MiB, the default, not 16 MiB
   (`PodUtils/podssh:crates/podssh-relay/src/session/replay.rs:27-31`), as its comment says: another value is

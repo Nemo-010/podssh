@@ -154,7 +154,7 @@ fn reached(label: Option<&str>, name: &str) -> (String, String) {
 /// `add NAME=HOST:PORT`: the share, or a new target of the share of its name.
 fn add(word: &str, label: Option<&str>, place: &Place, err: &mut dyn Write) -> Result<i32, Refusal> {
     let share = Share::parse(word).map_err(Refusal::usage)?;
-    let (path, before) = file::edit(place, |text| {
+    let (path, before) = file::edit(place, err, |text| {
         let (next, before) = file::with_share(text, &share);
         if before.as_ref() == Some(&share) {
             return Ok((None, before));
@@ -180,7 +180,7 @@ fn rm(name: &str, label: Option<&str>, place: &Place, err: &mut dyn Write) -> Re
     podssh_ws::names::check_node_name(name)
         .map_err(|_| Refusal::usage(format!("{name:?} is not a share's name: letters, digits, '.', '-' and '_'")))?;
     let (who, at) = reached(label, name);
-    let (path, gone) = file::edit(place, |text| match file::without(text, name) {
+    let (path, gone) = file::edit(place, err, |text| match file::without(text, name) {
         (next, Some(gone)) => Ok((Some(next), gone)),
         (_, None) => Err(Refusal::usage(format!("{who} has no share {name}: podssh share ls lists its shares"))),
     })?;

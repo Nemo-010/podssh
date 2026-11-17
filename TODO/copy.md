@@ -491,7 +491,7 @@ GitHub #17 measured one drop (`1011`) in 180 short sessions from one edge
   (T-140), a later write can land while an earlier one fails.
 - Read: the cache directories keep private files of mode 0600
   (`crates/podssh-relay/src/cache.rs`, lines 62-76 at `4dd52f8`,
-  `crates/podssh-relay/src/cache.rs:65-109`).
+  `crates/podssh-relay/src/cache.rs:68-112`).
 - Read: after a drop, the relay closes the target's TCP connection within
   15 s (`docs/design.md:698-701`), so a far `cat` can write for a while.
 

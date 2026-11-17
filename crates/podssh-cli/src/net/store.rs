@@ -96,42 +96,34 @@ fn read(place: &Place) -> Result<Option<(PathBuf, String)>, String> {
 /// bring a document.
 static WRITING: Mutex<()> = Mutex::new(());
 
-/// Keep `signed` in place of the document held.
-fn write(place: &Place, signed: &Signed) -> Result<PathBuf, String> {
+/// Keep `signed` in place of the document held: where, and the warning of a
+/// replace that is not proved on disk, for the caller to say.
+fn write(place: &Place, signed: &Signed) -> Result<(PathBuf, Option<String>), String> {
     let body = signed.to_bytes();
     match place {
         Place::Off => Err(format!("{ENV}=no: the net is off, and its document is kept nowhere")),
-        Place::Cache => cache::store_file(FILE, &body),
+        // A file of the cache: a sync of its directory that failed is no
+        // failure, as for each file of the cache.
+        Place::Cache => cache::store_file(FILE, &body).map(|path| (path, None)),
         Place::File(path) => replace(path, &body),
     }
 }
 
-/// `path` replaced whole by `body`: a private file beside it, then a rename.
-fn replace(path: &Path, body: &[u8]) -> Result<PathBuf, String> {
-    use std::io::Write;
-    let shown = path.display();
-    let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
-    let tmp = path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));
-    let _ = std::fs::remove_file(&tmp);
-    let result = (|| {
-        let mut file = cache::create_new_private(&tmp)?;
-        file.write_all(body)?;
-        file.sync_all()?;
-        drop(file);
-        std::fs::rename(&tmp, path)
-    })();
-    if let Err(e) = result {
-        let _ = std::fs::remove_file(&tmp);
-        return Err(format!("{shown}: {e}"));
-    }
-    Ok(path.to_path_buf())
+/// `path` replaced whole by `body`: a private file beside it, then a rename,
+/// then its directory synced (pod-core's replace, T-805).
+fn replace(path: &Path, body: &[u8]) -> Result<(PathBuf, Option<String>), String> {
+    // No write in place: a node reads the file for each session, and half
+    // a document is no document; a bind-mounted one is replaced from its host.
+    let commit = cache::replace_private(path, body, 0o600, false).map_err(|e| format!("{}: {e}", path.display()))?;
+    Ok((path.to_path_buf(), cache::commit_note(path, &commit)))
 }
 
 /// What a document offered to this host came to.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Taken {
-    /// Kept, in this file, in place of the serial before (none: the first).
-    Kept { path: PathBuf, before: Option<u64> },
+    /// Kept, in this file, in place of the serial before (none: the first);
+    /// the warning of a replace that is not proved on disk.
+    Kept { path: PathBuf, before: Option<u64>, note: Option<String> },
     /// This host holds it already.
     Same,
 }
@@ -201,13 +193,14 @@ pub fn take(signed: &Signed, owner: Option<&podssh_relay::identity::KeyName>, no
             None
         }
     };
-    let path = write(&place, signed).map_err(NotTaken::Bad)?;
-    Ok(Taken::Kept { path, before })
+    let (path, note) = write(&place, signed).map_err(NotTaken::Bad)?;
+    Ok(Taken::Kept { path, before, note })
 }
 
 /// Keep a document that the owner signed here, in place of the one held:
 /// its serial follows the held one's, as [`super::doc::Doc::next`] made it.
-pub fn keep_own(signed: &Signed) -> Result<PathBuf, String> {
+/// Its path, and the warning of a replace that is not proved on disk.
+pub fn keep_own(signed: &Signed) -> Result<(PathBuf, Option<String>), String> {
     let place = place()?;
     let _one = WRITING.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     if let Some(held) = held()? {
@@ -238,5 +231,29 @@ mod tests {
         let absolute = if cfg!(windows) { "C:\\net\\doc" } else { "/net/doc" };
         assert_eq!(place_of(Some(absolute)), Ok(Place::File(PathBuf::from(absolute))));
         assert!(place_of(Some("relative/doc")).is_err(), "a relative path follows each run's directory");
+    }
+
+    /// The file of `PODSSH_NET` is replaced whole and private, with no
+    /// temporary file left beside it (T-805).
+    #[test]
+    fn a_named_file_is_replaced_whole_and_no_temporary_file_stays() {
+        let dir = std::env::temp_dir().join(format!("podssh-net-store-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        cache::private_dir(&dir).unwrap();
+        let path = dir.join("net.doc");
+        std::fs::write(&path, b"old").unwrap();
+        let (kept, note) = replace(&path, b"new").unwrap();
+        assert_eq!((kept.as_path(), note), (path.as_path(), None), "a durable commit has no warning");
+        assert_eq!(std::fs::read(&path).unwrap(), b"new");
+        let names: Vec<_> = std::fs::read_dir(&dir).unwrap().map(|e| e.unwrap().file_name()).collect();
+        assert_eq!(names, [std::ffi::OsString::from("net.doc")]);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert_eq!(std::fs::metadata(&path).unwrap().permissions().mode() & 0o777, 0o600);
+        }
+        let failed = replace(&dir.join("gone").join("net.doc"), b"x").expect_err("no directory");
+        assert!(failed.contains("gone"), "{failed}");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

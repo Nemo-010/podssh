@@ -387,7 +387,9 @@ impl Pairs {
         // Each pair as its file keeps it, its stop token as rotated (T-615).
         let kept: Vec<Kept> = self.map.lock().unwrap_or_else(|e| e.into_inner()).values().map(|p| p.kept()).collect();
         let body = serde_json::to_vec(&File { pairs: kept }).map_err(|e| e.to_string())?;
-        write_private(path, &body).map_err(|e| format!("{}: {e}", path.display()))
+        // The table has no line of its own: a commit that is not proved on
+        // disk is written, as the rename held (the role's file before T-805).
+        write_private(path, &body).map(drop).map_err(|e| format!("{}: {e}", path.display()))
     }
 }
 
@@ -451,24 +453,14 @@ fn load(path: &Path) -> Result<Vec<Kept>, String> {
 }
 
 /// `body` into `path` through a private file beside it and a rename, so
-/// that no reader sees half of it, and nobody else may read it at any time.
-pub(crate) fn write_private(path: &Path, body: &[u8]) -> std::io::Result<()> {
-    use std::io::Write as _;
-    let dir = path.parent().filter(|d| !d.as_os_str().is_empty()).unwrap_or_else(|| Path::new("."));
-    let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_else(|| "pairs".into());
-    let tmp = dir.join(format!(".{name}.{}.tmp", std::process::id()));
-    let _ = std::fs::remove_file(&tmp);
-    let written = (|| {
-        let mut file = crate::cache::create_new_private(&tmp)?;
-        file.write_all(body)?;
-        file.sync_all()?;
-        drop(file);
-        std::fs::rename(&tmp, path)
-    })();
-    if written.is_err() {
-        let _ = std::fs::remove_file(&tmp);
-    }
-    written
+/// that no reader sees half of it, and nobody else may read it at any time:
+/// pod-core's replace (T-805), whose warning comes back for the caller to
+/// say, none when the commit is durable.
+pub(crate) fn write_private(path: &Path, body: &[u8]) -> std::io::Result<Option<String>> {
+    // A role's own file, which its operator names: never a bind-mounted
+    // one, and a write in place could let a restart read half a table.
+    let commit = crate::cache::replace_private(path, body, 0o600, false)?;
+    Ok(crate::cache::commit_note(path, &commit))
 }
 
 // The names and tokens that a pair draws, and their digests.
