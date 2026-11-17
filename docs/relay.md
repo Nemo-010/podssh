@@ -1196,6 +1196,25 @@ and the signed one.
   not name the address; the next ones until it is let through again say
   nothing.
 
+## The rate of the relay role (T-726)
+
+`python scripts/relay-measure.py --role --podssh target/release/podssh --out FILE` measures `podssh relay serve`
+on the host's loopback, as podssh's client gets it: an OpenSSH sshd behind the role, each measure one `podssh ping`
+through it (`scripts/relay_measure_role.py`). The client, the role and the sshd share the host's cores, so the rates
+are a floor of the role's own. A release build, on a cloud host of 4 cores and 15 GiB, 2026-11-17:
+
+| Measure | Rate |
+| --- | --- |
+| One session, 30 MiB each way | 49.1 MiB/s down, 43.2 MiB/s up |
+| 16 sessions at once, 30 MiB each way each | 85.4 MiB/s in all (960 MiB in 11.3 s) |
+| Cold connects (token, TLS, upgrade, SSH login, `true`) | 191 ms p50, 235 ms p95, one at a time |
+| 16 runs of 20 cold connects at once | 40.9 connects/s |
+| The role's peak resident memory over the run | 65 MiB |
+
+The rate of one session is SSH's, through the client's and the sshd's ciphers; the relay role copies frames. The
+measured two speeds of the role's bridge (T-803) are above each of these. The runner's numbers come from the
+workflow `relay-measure.yml` with `role: yes`.
+
 ## The relay role's mailbox (T-086)
 
 `podssh relay serve` is a meeting point of the pairing by a short code

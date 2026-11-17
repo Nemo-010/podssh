@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**763 entries: 30 open, 38 partial, 11 blocked, 684 done.**
+**763 entries: 29 open, 39 partial, 11 blocked, 684 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 0 | 9 | 3 | 82 | 94 |
 | P2 | 0 | 22 | 2 | 290 | 314 |
-| P3 | 30 | 7 | 6 | 311 | 354 |
-| **All** | 30 | 38 | 11 | 684 | 763 |
+| P3 | 29 | 8 | 6 | 311 | 354 |
+| **All** | 29 | 39 | 11 | 684 | 763 |
 
 ## Entries
 
@@ -756,7 +756,7 @@ repository and CI).
 | [T-723](relay.md) | P3 | M | M10 | docs | done | The versioned wire document of the relay and the reverse road, with test vectors |
 | [T-724](mesh.md) | P3 | M | M10 | feature | done | `-J node://NAME` and `mcp` destinations that name a node |
 | [T-725](mesh.md) | P3 | L | M10 | feature | open | A one-way carrier through an object store (an S3-compatible bucket) |
-| [T-726](machine.md) | P3 | M | M10 | feature | open | A local forward as a service, and the measured rate of the relay role |
+| [T-726](machine.md) | P3 | M | M10 | feature | partial | A local forward as a service, and the measured rate of the relay role |
 | [T-727](roads.md) | P3 | M | backlog | feature | blocked | SSH login with a short-lived Access certificate over `cf://` |
 | [T-728](repo.md) | P1 | L | M10 | measurement | done | Windows (x86_64, aarch64) and macOS smoke tests of each operator command, and `ProxyCommand` with Windows OpenSSH |
 | [T-729](roads.md) | P1 | M | M10 | feature | blocked | The Access TCP client on `cf://`: the login of a user, on Windows, macOS and Linux |

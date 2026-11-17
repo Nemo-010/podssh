@@ -2029,7 +2029,7 @@ Partial, 2026-11-16 (drafted on `draft-t716`; not built).
 **Milestone:** M10
 **Priority:** P3
 **Effort:** M
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -2067,6 +2067,29 @@ Plant: a unit that holds a token on its `ExecStart`; the test that greps the uni
 
 Part 1 (the rate) starts now. Part 2 (the unit) uses `pod-unit` of podcrates T-102 when podssh takes it;
 until then, write it on the unit code of `node_install/`, and move it at the take.
+
+## Correction
+
+2026-11-17: `podssh ssh --install NAME` exists already (T-393, `crates/podssh-cli/src/node_install/ssh.rs`), so `ssh
+-N -L ... --install NAME` is a service today; what part 2 still needs is `pipe`'s. `docs/relay-operator.md` is the page
+of the operator's relay, not of podssh's role: the role's rate goes to `docs/relay.md` ("The rate of the relay role").
+The Prove's `relay-measure.py --role` takes `--podssh BIN --out FILE`, as the script's other stages do.
+
+## Done
+
+Partial, 2026-11-17. Part 1, the rate: `scripts/relay_measure_role.py` (new), the stage that `scripts/relay-measure.py
+--role` runs: an OpenSSH sshd and `podssh relay serve` on the loopback (as `scripts/smoke_servers.py` starts them),
+then `podssh ping` through the role for one session, 16 at once, cold connects one at a time and 16 runs at once, and
+the role's peak memory. A job `role` of `relay-measure.yml` (input `role: yes`) runs it on a runner with a release
+build. `docs/relay.md` has the table of this host's run (a release build, 4 cores, 2026-11-17): one session 49.1 MiB/s
+down and 43.2 up; 16 at once 85.4 MiB/s in all; cold connects 191 ms p50; 40.9 connects/s with 16 at once; 65 MiB of
+peak memory. The debug build gave 4.7 and 5.2 MiB/s for one session. `python3 scripts/relay-measure.py --self-test`
+passes.
+
+Next: the runner's run (`relay-measure.yml` with `role: yes`), its row in `docs/STATUS.md`; then part 2, `podssh pipe
+--install NAME` and `--print-unit` on `node_install/` (a `Kind` of its own beside `Ssh`), with the test that greps a
+unit for a credential and its plant.
+
 
 # T-730: `llms.txt`, `llms-full.txt` and `--help --json`
 

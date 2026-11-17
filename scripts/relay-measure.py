@@ -282,6 +282,10 @@ def arguments(argv: list[str]):
     p.add_argument("--out", default="relay-measure.json")
     p.add_argument("--ci", action="store_true")
     p.add_argument("--self-test", action="store_true")
+    # T-726: the rate of podssh's own relay role on this host's loopback
+    # (scripts/relay_measure_role.py), in place of the stages above.
+    p.add_argument("--role", action="store_true")
+    p.add_argument("--parallel", type=int, default=16)
     a = p.parse_args(argv)
     if a.self_test:
         return a, None
@@ -377,6 +381,13 @@ def main(argv: list[str]) -> int:
     if refused:
         print(f"relay-measure: {refused}", file=sys.stderr)
         return 2
+    if a.role:
+        import relay_measure_role
+        size = a.size if a.size != "8M" else "30M"
+        doc = relay_measure_role.measure(a.podssh, size=size, parallel=a.parallel)
+        write(a.out, doc)
+        print(json.dumps(doc), file=sys.stderr)
+        return 1 if "error" in doc or "error" in doc.get("one", {}) else 0
     result, code = measure(a, [a.podssh], dict(os.environ))
     if "error" in result:
         print(f"relay-measure: {result['error']}", file=sys.stderr)

@@ -26,6 +26,9 @@ on:
       roads:
         description: "Roads of the stage roads, separated by ';' (e.g. --forwarder mudlet;--forwarder wisp)"
         default: ""
+      role:
+        description: "Also measure podssh's own relay role on the runner's loopback, a release build (T-726): yes or no"
+        default: "no"
 
 permissions:
   contents: read
@@ -98,4 +101,34 @@ jobs:
         with:
           name: relay-measure
           path: ${{ runner.temp }}/relay-measure.json
+          if-no-files-found: warn
+
+  # T-726: the rate of `podssh relay serve` on the runner's loopback, as
+  # podssh's client gets it through the role to an sshd there, with a
+  # release build: one session, 16 at once, cold connects, the role's peak
+  # memory. Nothing leaves the runner.
+  role:
+    if: inputs.role == 'yes'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CARGO_BUILD_JOBS: "4"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: build podssh (release)
+        run: cargo build --locked --release -p podssh-cli --bin podssh
+      - name: an sshd for the role to reach
+        run: sudo apt-get install -y -q openssh-server && sudo mkdir -p /run/sshd
+      - name: measure the role
+        run: |
+          rc=0
+          timeout 1800 python3 -I scripts/relay-measure.py --role --podssh target/release/podssh \
+            --out "$RUNNER_TEMP/role-rate.json" || rc=$?
+          cat "$RUNNER_TEMP/role-rate.json"
+          exit "$rc"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: role-rate
+          path: ${{ runner.temp }}/role-rate.json
           if-no-files-found: warn
