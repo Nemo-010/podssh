@@ -3,8 +3,8 @@
 //! a file of its own, so that `node_iroh` stays short.
 
 use iroh::{PublicKey, SecretKey};
-use podssh_iroh::keys::{self, Place};
-use podssh_iroh::Allowlist;
+use pod_iroh::keys::{self, Place};
+use pod_iroh::Allowlist;
 use podssh_relay::identity::PublicKey as IdentityKey;
 use podssh_relay::session::OsEntropy;
 
@@ -15,7 +15,8 @@ use crate::relay_settings::Refusal;
 /// loads its own as before.
 pub(crate) fn key(place: &Place, node: bool) -> Result<keys::Key, Refusal> {
     if !node {
-        return keys::load(place, &mut OsEntropy).map_err(|why| Refusal::config(format!("the node's key: {why}")));
+        return crate::iroh_way::load_key(place, &mut OsEntropy)
+            .map_err(|why| Refusal::config(format!("the node's key: {why}")));
     }
     let key = crate::node_upgrade::parts::node_key(place)?;
     let secret = SecretKey::from_bytes(&key.identity.seed());

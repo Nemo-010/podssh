@@ -564,7 +564,7 @@ Read, the bounds today:
    `crates/podssh-ssh/src/run.rs:26-29` does since T-024, and the result of
    T-062 when it exists.
 3. Tests in the process, with a peer over `tokio::io::duplex`, so no network
-   (`docs/development.md:592-595`): a proxy head that never ends stops at
+   (`docs/development.md:591-594`): a proxy head that never ends stops at
    16 KiB, and an upgrade head too; fragments past 16 MiB give the error, not
    more memory; a pool body over 256 KiB is refused; a cache file over 64 KiB
    is ignored.
@@ -885,7 +885,7 @@ Read:
    session back from 127.0.0.2, and a stall of 3 minutes, each with the digest
    of a running transfer intact. T-156 uses these checks as its measurement.
 5. Update docs/development.md (item 8 of the gate, item 9 since T-156,
-   `docs/development.md:378-390`) and the faults table of docs/STATUS.md.
+   `docs/development.md:377-389`) and the faults table of docs/STATUS.md.
 
 Pitfall: each check must show that its fault was injected (see Prove).
 
@@ -2083,7 +2083,7 @@ The gate must be green before other work, and each of the three workflows was re
 ## Premise
 
 - Read: `gate (lint)` failed on clippy's `large_enum_variant` (Rust 1.99) at the enum `Said` of
-  `crates/podssh-iroh/src/pkarr.rs`: `Put(Roads)` holds at least 208 bytes, `Failed` none.
+  `PodUtils/podcrates:crates/pod-iroh/src/pkarr.rs`: `Put(Roads)` holds at least 208 bytes, `Failed` none.
 - Read: `deny` failed on RUSTSEC-2026-0459 (SQLite before 3.54.0, a crafted `-wal` file), in
   `libsqlite3-sys` 0.38.2 through `rusqlite` 0.40.2, `tor-dirmgr` 0.47.0 and `podssh-tor`. The fixed
   `libsqlite3-sys` 0.39 comes with `rusqlite` 0.41, and each release of `tor-dirmgr` to 0.48.0 asks
@@ -2331,18 +2331,18 @@ and the push of cc316b3), as it had twice on 2026-11-12 (02:49 and 10:15 to 11:0
 ## Problem
 
 `a_node_s_onion_service_carries_a_mebibyte_each_way_and_hides_from_a_stranger`
-(`crates/podssh-tor/tests/onion_service.rs`) waited its 600 s for the descriptor and failed with "not published
+(`PodUtils/podcrates:crates/pod-tor/tests/onion_service.rs`) waited its 600 s for the descriptor and failed with "not published
 within 600 s (Bootstrapping)"; in the runs that pass it is published in 0 s.
 
 ## Premise
 
 - The job starts chutney's network, then runs `private_network`, `tor_private` and `onion_service`
-  (`.github/workflows/build.yml:421-431`); the time between the start and the onion test is the build's, shorter
+  (`.github/workflows/build.yml:421-429`); the time between the start and the onion test is the build's, shorter
   with a warm cache.
 - Arti 0.48 calls a service `Running` only once its descriptor went to both rings of HSDirs, the current time
   period's and the second one (`upload_result_state` in `tor-hsservice` 0.48.0, `src/publish/reactor.rs`); until
   then, and while its uploads are rate-limited, it is `Bootstrapping`. `OnionService::published` waits for
-  `is_fully_reachable` (`crates/podssh-tor/src/onion.rs:197-222`).
+  `is_fully_reachable` (`PodUtils/podcrates:crates/pod-tor/src/onion.rs`).
 
 ## Approach
 
@@ -2357,6 +2357,10 @@ sh scripts/tor-net.sh wait-onion .work/tor-net
 PODSSH_TEST_TOR_NETWORK=$toml cargo test -p podssh-tor --test onion_service -- --nocapture
 sh scripts/tor-net.sh stop .work/tor-net
 ```
+
+## Correction
+
+2026-11-17. The package podssh-tor is `pod-tor` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-tor` are podcrates' now (`cargo test -p pod-tor` there); podssh's part of it is the CLI's glue and its tests with `--features tor`.
 
 ## Done
 
@@ -2606,6 +2610,13 @@ in the half that reads the target and writes to the link, after the resume of a 
 (#283), amended, gives podcrates the line and asks for a look at that half, or a line of its room and wait.
 
 
+
+2026-11-17, podcrates `v0.65.0` taken (COORD-125): its answer to COORD-091 (#283) is the far end's line
+`session.stall`, once for each wait of the node's reader of the target that holds 20 s (the replay buffer, the
+window, the link's writer, the records sent again, or a target that sent nothing while it took bytes), with the
+offsets sent and acknowledged, the bytes kept, the room and the window; and `session.resume` ends with the room and the
+window. m6's test keeps the node's lines (`-v`), so the next hang names its wait. Next: at the next failure of `gate
+(m6)`, read the node's `session.stall` and write it on #283.
 # T-781: A session through a tunnel of HTTP alone made no progress at localhost.run, as each spare link replayed the same bytes
 
 **Source:** the live job of T-565 in `last-roads-live.yml` (runs 42989086142, 42994885604 and 43560494966).

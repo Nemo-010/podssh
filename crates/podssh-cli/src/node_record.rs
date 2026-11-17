@@ -21,7 +21,7 @@ use podssh_ws::Trust;
 use crate::relay_settings::Refusal;
 
 #[cfg(feature = "iroh")]
-use podssh_iroh::pkarr::{self, Roads};
+use pod_iroh::pkarr::{self, Roads};
 #[cfg(feature = "iroh")]
 use tokio::sync::watch;
 
@@ -142,7 +142,7 @@ pub(crate) enum Named {}
 /// configuration error (78).
 #[cfg(feature = "iroh")]
 pub(crate) fn named() -> Result<Option<Named>, Refusal> {
-    Ok(of_choice(pkarr::choice_from_environment().map_err(Refusal::config)?))
+    Ok(of_choice(crate::iroh_way::pkarr_choice().map_err(Refusal::config)?))
 }
 
 /// The server of a node with no iroh endpoint for `choice`.
@@ -175,9 +175,8 @@ pub(crate) fn alone(
     line(format!("the record of its roads goes to {server} ({}=off sends none)", pkarr::ENV));
     let secret = iroh::SecretKey::from_bytes(&identity.seed());
     let (told, roads) = watch::channel(Roads::default());
-    let proxy = podssh_ws::ProxyChoice::FromEnvironment;
     let said = move |words: String| say(words);
-    let task = tokio::spawn(pkarr::keep_roads(secret, server, trust.clone(), proxy, roads, said));
+    let task = tokio::spawn(pkarr::keep_roads(secret, server, trust.clone(), crate::iroh_way::way(), roads, said));
     (Kept(Some(task)), Tell { told: Some(told) })
 }
 
@@ -197,14 +196,14 @@ pub(crate) fn keep(
     endpoint: &iroh::Endpoint,
     server: Option<pkarr::Server>,
     trust: &Trust,
-    proxy: &podssh_ws::ProxyChoice,
+    way: &pod_ws::Way,
     say: impl Fn(String) + Send + 'static,
     line: impl FnOnce(String),
 ) -> (Kept, Tell) {
     let Some(server) = server else { return (Kept::default(), Tell::default()) };
     line(format!("the record of its roads goes to {server} ({}=off sends none)", pkarr::ENV));
     let (told, others) = watch::channel(Roads::default());
-    let kept = pkarr::keep(endpoint.clone(), server, trust.clone(), proxy.clone(), Some(others), say);
+    let kept = pkarr::keep(endpoint.clone(), server, trust.clone(), way.clone(), Some(others), say);
     (Kept(Some(tokio::spawn(kept))), Tell { told: Some(told) })
 }
 

@@ -14,17 +14,9 @@ fn crate_dir(name: &str) -> PathBuf {
 fn sources() -> Vec<(PathBuf, String)> {
     let mut out = Vec::new();
     let mut crates = vec!["podssh-cli", "podssh-ssh", "podssh-relay", "podssh-ws"];
-    // The iroh road's crate is in the binary with its feature only.
-    if cfg!(feature = "iroh") {
-        crates.push("podssh-iroh");
-    }
     // WARP's road's crate is in the binary with its feature only (T-352).
     if cfg!(feature = "warp") {
         crates.push("podssh-warp");
-    }
-    // The Tor road's crate is in the binary with its feature only (T-353).
-    if cfg!(feature = "tor") {
-        crates.push("podssh-tor");
     }
     let mut dirs: Vec<PathBuf> = crates.iter().map(|c| crate_dir(c)).collect();
     while let Some(dir) = dirs.pop() {
@@ -39,6 +31,11 @@ fn sources() -> Vec<(PathBuf, String)> {
                 // A file of tests is test code, as `non_test` drops it inside a file.
                 let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
                 if name == "tests.rs" || name.ends_with("_tests.rs") {
+                    continue;
+                }
+                // What podssh gives the iroh road, which reads its variables,
+                // is in the binary with its feature only.
+                if name == "iroh_way.rs" && !cfg!(feature = "iroh") {
                     continue;
                 }
                 let text = std::fs::read_to_string(&path).unwrap();

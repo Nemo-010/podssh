@@ -116,7 +116,7 @@ fn fingerprint_after(text: &str, after: &str) -> String {
 fn a_chat_over_the_iroh_road_lets_in_only_the_allowed_key() {
     let home = scratch("road");
     let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap();
-    let relay = runtime.block_on(podssh_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
+    let relay = runtime.block_on(pod_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
     let (cert, url) = (relay.cert.to_string_lossy().into_owned(), relay.url.to_string());
     let path = |name: &str| home.join(name).to_string_lossy().into_owned();
     std::fs::create_dir_all(home.join("inbox")).unwrap();

@@ -9,13 +9,13 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use iroh::RelayUrl;
-use podssh_iroh::keys::{self, Place};
-use podssh_iroh::{ticket, Dialer, Failure, Finder, Options, Udp};
+use pod_iroh::keys::{self, Place};
+use pod_iroh::{ticket, Dialer, Failure, Finder};
 use podssh_relay::session::hearing::WAIT;
 use podssh_relay::session::resume::Note;
 use podssh_relay::session::{Hearing, OsEntropy};
 use podssh_ssh::{Log, EXIT_FAILURE};
-use podssh_ws::{ProxyChoice, Trust};
+use podssh_ws::Trust;
 
 use crate::layered::Line;
 
@@ -57,7 +57,8 @@ pub(crate) async fn prepare(
         Some(file) => Place::File(file.into()),
         None => keys::client_place(),
     };
-    let key = keys::load(&place, &mut OsEntropy).map_err(|why| format!("{shown}: this client's key: {why}"))?;
+    let key = crate::iroh_way::load_key(&place, &mut OsEntropy)
+        .map_err(|why| format!("{shown}: this client's key: {why}"))?;
     let fingerprint = keys::fingerprint(&key.public());
     let node = keys::identity_key(&addr.id);
     let kept = key.path.as_ref().map(|p| p.display().to_string()).unwrap_or_default();
@@ -75,7 +76,7 @@ pub(crate) async fn prepare(
     // node's, when it answers (T-165).
     let mut list: Vec<RelayUrl> = addr.relay_urls().cloned().collect();
     let theirs = list.len();
-    let ours: Vec<RelayUrl> = relays.iter().filter_map(|text| podssh_iroh::relays::parse_url(text).ok()).collect();
+    let ours: Vec<RelayUrl> = relays.iter().filter_map(|text| pod_iroh::relays::parse_url(text).ok()).collect();
     for relay in &ours {
         if !list.contains(relay) {
             list.push(relay.clone());
@@ -83,22 +84,17 @@ pub(crate) async fn prepare(
     }
     // The server of the node's record: n0's for n0's relays, else the
     // variable's (T-350).
-    let record = podssh_iroh::pkarr::choose(&ours).map_err(|why| format!("{shown}: {why}"))?;
-    let proxy = ProxyChoice::FromEnvironment;
-    let (home, missed) = podssh_iroh::relays::home(&list, trust, &proxy).await;
+    let record = crate::iroh_way::pkarr_server(&ours).map_err(|why| format!("{shown}: {why}"))?;
+    let way = crate::iroh_way::way();
+    let (home, missed) = pod_iroh::relays::home(&list, trust, &way).await;
     for why in &missed {
         log.verbose(&format!("{shown}: an iroh relay did not answer: {why}"));
     }
-    let options = Options {
-        relays: home,
-        proxy,
-        trust: trust.clone(),
-        udp: Udp::from_environment(),
-        secret: Some(key.secret.clone()),
-        accepts: false,
-        ..Options::default()
-    };
-    let opened = podssh_iroh::endpoint::open(&options).await.map_err(|e| format!("{shown}: {e}"))?;
+    let mut options = crate::iroh_way::options().map_err(|why| format!("{shown}: {why}"))?;
+    options.relays = home;
+    options.trust = trust.clone();
+    options.secret = Some(key.secret.clone());
+    let opened = pod_iroh::endpoint::open(&options).await.map_err(|e| format!("{shown}: {e}"))?;
     // Which answer the road took of this host's UDP (T-359), and the arm of
     // QUIC's settings when it is not iroh's own (T-665).
     log.verbose(&format!("{shown}: the iroh road: {}", opened.udp));
@@ -115,7 +111,7 @@ pub(crate) async fn prepare(
         let first = theirs > 0 && missed.len() >= theirs;
         log.verbose(&format!("{shown}: if the ticket's relay does not reach the node, its record is at {server}"));
         let (said, about) = (log.clone(), shown.clone());
-        let finder = Finder::new(server, trust.clone(), ProxyChoice::FromEnvironment)
+        let finder = Finder::new(server, trust.clone(), way)
             .first(first)
             .saying(move |line| said.verbose(&format!("{about}: {line}")));
         dialer = dialer.finding(finder);
@@ -167,7 +163,7 @@ pub(super) async fn connect(
             say(crate::layered::line_of(note));
         }
     };
-    let settings = crate::layered::iroh_settings(podssh_iroh::FEATURES);
+    let settings = crate::layered::iroh_settings(pod_iroh::FEATURES);
     // The far end's silence, for a notice (T-302).
     let hearing = Arc::new(Hearing::default());
     let read = hearing.clone();
@@ -192,7 +188,7 @@ pub(super) async fn connect(
     let opts = &crate::ssh::window::on(opts, podssh_ssh::pace::Road::Iroh);
     let (code, carried, failed) = tokio::join!(
         podssh_ssh::run(ssh_end, opts, None, log.clone()),
-        podssh_iroh::client::carry_heard(&dialer, layer_app, settings, note, hearing),
+        pod_iroh::client::carry_heard(&dialer, layer_app, settings, note, hearing),
         session
     );
     // Whether the relay carried each byte, or a direct path some (T-335).
@@ -213,9 +209,9 @@ pub(super) async fn connect(
     if let (true, Some(why)) = (code == EXIT_FAILURE, why_failed(carried, &fingerprint)) {
         log.error(&format!("{shown}: {why}"));
         // A relay that refused this build's iroh says so (T-348).
-        if !podssh_iroh::version::is_online(&endpoint) {
-            let proxy = ProxyChoice::FromEnvironment;
-            if let Some(notice) = podssh_iroh::version::refusal(&relays, trust, &proxy).await {
+        if !pod_iroh::version::is_online(&endpoint) {
+            let (way, remedy) = (crate::iroh_way::way(), crate::iroh_way::REMEDY);
+            if let Some(notice) = pod_iroh::version::refusal(&relays, trust, &way, remedy).await {
                 log.error(&format!("{shown}: {notice}"));
             }
         }
@@ -259,14 +255,14 @@ pub(super) async fn reach(
             Line::Verbose(text) => log.verbose(&format!("{shown}: {text}")),
         };
         let note = |note: Note| say(crate::layered::line_of(note));
-        let settings = crate::layered::iroh_settings(podssh_iroh::FEATURES);
+        let settings = crate::layered::iroh_settings(pod_iroh::FEATURES);
         let session = async move {
             match session {
                 Some(session) => session.await.err(),
                 None => None,
             }
         };
-        let carry = podssh_iroh::client::carry_heard(&dialer, layer_app, settings, note, Arc::new(Hearing::default()));
+        let carry = pod_iroh::client::carry_heard(&dialer, layer_app, settings, note, Arc::new(Hearing::default()));
         let (carried, failed) = tokio::join!(carry, session);
         if let Some((fault, why)) = failed.as_ref().and_then(|e| crate::channel::judged(e, Some(&me))) {
             log.error(&format!("{shown}: {why}"));

@@ -162,7 +162,7 @@ fn fingerprint_after(text: &str, after: &str) -> String {
 fn a_client_is_refused_then_let_in_and_runs_a_command_over_the_iroh_road() {
     let home = scratch("e2e");
     let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap();
-    let relay = runtime.block_on(podssh_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
+    let relay = runtime.block_on(pod_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
     let host_key = home.join("host_key");
     let host_key_text = host_key.to_string_lossy().into_owned();
     let (rc, _, err) = run(&home, &["keygen", "-q", "-t", "ed25519", "-N", "", "-f", &host_key_text]);
@@ -264,7 +264,7 @@ fn a_session_over_the_iroh_road_goes_on_across_the_node_s_upgrade() {
     const DOWN: u64 = 16 << 20;
     let home = scratch("upgrade");
     let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap();
-    let relay = runtime.block_on(podssh_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
+    let relay = runtime.block_on(pod_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
     let host_key = home.join("host_key");
     let host_key_text = host_key.to_string_lossy().into_owned();
     let (rc, _, err) = run(&home, &["keygen", "-q", "-t", "ed25519", "-N", "", "-f", &host_key_text]);
@@ -372,7 +372,7 @@ fn a_relay_that_refuses_this_iroh_stops_the_node_with_its_notice() {
     assert_ne!(code, 0, "{err}");
     for part in [
         "127.0.0.1 refuses the iroh of this binary",
-        &format!("iroh {}", podssh_iroh::version::IROH),
+        &format!("iroh {}", pod_iroh::version::IROH),
         "we support iroh-relay-v3",
         "podssh update",
         "--iroh-relay URL",
@@ -392,7 +392,7 @@ fn a_relay_that_refuses_this_iroh_stops_the_node_with_its_notice() {
 fn doctor_says_the_ping_of_each_iroh_relay_and_the_home_relay() {
     let home = scratch("doctor");
     let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap();
-    let relay = runtime.block_on(podssh_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
+    let relay = runtime.block_on(pod_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
     let silent = std::net::TcpListener::bind("127.0.0.1:0").unwrap().local_addr().unwrap().port();
     let list = format!("https://localhost:{silent},{}", relay.url);
     let mut cmd = command(&home, &["doctor"]);

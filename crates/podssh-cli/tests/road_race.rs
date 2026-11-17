@@ -16,7 +16,7 @@ use std::sync::atomic::Ordering;
 use std::time::{Duration, Instant};
 
 use iroh::EndpointAddr;
-use podssh_iroh::keys::{self, Place};
+use pod_iroh::keys::{self, Place};
 use podssh_relay::session::OsEntropy;
 use ssh_harness::GREETING;
 use throughput_harness::{lines_of, wait_for, Session};
@@ -67,7 +67,7 @@ fn the_iroh_road_wins_when_both_answer_and_the_pair_s_road_when_iroh_cannot() {
         eprintln!("skipped: {} exists, and this test does not replace it", bundle.display());
         return;
     }
-    let relay = session.runtime.block_on(podssh_iroh::test_relay::spawn(&session.home)).expect("a relay");
+    let relay = session.runtime.block_on(pod_iroh::test_relay::spawn(&session.home)).expect("a relay");
     std::fs::copy(&relay.cert, &bundle).expect("the relay's certificate beside the binary");
     let _bundle = Bundle(bundle);
 
@@ -79,7 +79,8 @@ fn the_iroh_road_wins_when_both_answer_and_the_pair_s_road_when_iroh_cannot() {
 
     // This client's key, in the node's allowlist.
     let client_key = session.home.join("client.key");
-    let key = keys::load(&Place::File(client_key.clone()), &mut OsEntropy).expect("the client's key");
+    let key =
+        podssh_cli::iroh_way::load_key(&Place::File(client_key.clone()), &mut OsEntropy).expect("the client's key");
     let allow = session.home.join("allow");
     std::fs::write(&allow, format!("{}\n", keys::fingerprint(&key.public()))).unwrap();
 
@@ -141,10 +142,10 @@ fn the_iroh_road_wins_when_both_answer_and_the_pair_s_road_when_iroh_cannot() {
 
     // The iroh road cannot answer: the node's key at a relay where nothing
     // listens. The pair's road, after the head start, wins.
-    let node_id = podssh_iroh::ticket::parse(&ticket).expect("the ticket").id;
+    let node_id = pod_iroh::ticket::parse(&ticket).expect("the ticket").id;
     let silent = std::net::TcpListener::bind("127.0.0.1:0").unwrap().local_addr().unwrap().port();
     let nowhere = EndpointAddr::new(node_id).with_relay_url(format!("https://localhost:{silent}").parse().unwrap());
-    let (rc, out, err) = ssh(&podssh_iroh::ticket::format(&nowhere));
+    let (rc, out, err) = ssh(&pod_iroh::ticket::format(&nowhere));
     assert_eq!(rc, 0, "stdout {out:?}, stderr {err}");
     assert_eq!(out, GREETING);
     assert!(err.contains("the pair's road answered first"), "{err}");

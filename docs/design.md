@@ -1225,14 +1225,18 @@ sandbox itself is not measured):
 | No DNS | The `Minimal` preset (no pkarr or DNS lookups), podssh's own relay URL, peers dialled by ticket (a key and a relay URL), a resolver that fails fast |
 | A home relay | The HTTPS `/ping` probe must pass through the proxy. Without it, the endpoint can connect out but nothing can connect to it. |
 
-**Built (T-162, 2026-10-09):** the crate `podssh-iroh`, in the binary with
+**Built (T-162, 2026-10-09):** the crate of the road, in the binary with
 the feature `iroh` only, which each release binary has since T-348 (Q50).
 When a home relay refuses the iroh of a binary, as n0's relays will refuse
 an old one, the relay is asked once, after its connection failed, with
 iroh's own upgrade, and its answer is named, with `podssh update` and
-`--iroh-relay` as the ways out (`podssh-iroh`'s `version.rs`). iroh 1.4.1 with no default features and
-`tls-aws-lc-rs`: no ring, no port mapping, no metrics. The endpoint has the
-`Minimal` preset and no address lookup; the relays given, n0's four public
+`--iroh-relay` as the ways out (`version.rs`). The crate of the road is
+`pod-iroh` of PodUtils/podcrates (T-684), with the fork of iroh-relay in its
+`vendor/`; it reads no variable, and `podssh-cli`'s `iroh_way.rs` gives it
+podssh's TLS context, resolver, proxy and way out, and the values of
+`PODSSH_IROH_*`. iroh 1.4.1 with no default features and `tls-ring`: no
+aws-lc, no port mapping, no metrics; the endpoint takes the provider of
+podssh's TLS context. The endpoint has no address lookup; the relays given, n0's four public
 relays by default; podssh's proxy for the relay (iroh's `proxy_url`), at an
 address that podssh resolved; podssh's name resolution in place of iroh's
 resolver; podssh's trust store for the relay's certificate; and no IP
@@ -1333,7 +1337,7 @@ allowlist, with no new start of the node, the command runs, and the host
 key is kept under `iroh:` and the node's key.
 
 **Built (T-350, 2026-10-31):** a node's record of pkarr, for a client whose
-ticket names a relay where the node is no more (`podssh-iroh`'s
+ticket names a relay where the node is no more (`pod-iroh`'s
 `pkarr.rs`). The node keeps a record of its home relay at a server of
 pkarr: n0's (`https://dns.iroh.link/pkarr`) when its relays are n0's, else
 the one of `PODSSH_IROH_PKARR`, and none with `off`; at its start, when its
@@ -1380,7 +1384,7 @@ QUIC's floor, which osewa takes for Tailscale's 1280, then MTU discovery.
 iroh's UDP sockets ask for 7 MiB of buffer each way by `SO_RCVBUF` and
 `SO_SNDBUF` (netwatch 0.19.3), never the `FORCE` forms; the kernel grants up to
 its `rmem_max` and `wmem_max`, which an A/B run keeps. `PODSSH_IROH_QUIC`
-chooses the arm at each end (`podssh-iroh`'s `tuning.rs`): `iroh`, iroh's
+chooses the arm at each end (`pod-iroh`'s `tuning.rs`): `iroh`, iroh's
 own; `tuned`, the default, osewa's where iroh lets podssh set them (a first round trip
 of 100 ms, a first window of 32 packets, receive windows of 8 MiB a stream,
 above the resumable layer's 4 MiB in flight, and 16 MiB a connection); or its
@@ -1396,7 +1400,7 @@ each of its rounds beat each of iroh's own, down and up (T-665).
 one connection. A second SSH connection of a process to a node that the iroh
 road of `node://NAME` reaches (a copy beside a session of the same process, or
 the two sessions of a copy within one server that has no SFTP) takes a lease
-of the dialer that the first made (`podssh-iroh`'s `share.rs`): a new QUIC
+of the dialer that the first made (`pod-iroh`'s `share.rs`): a new QUIC
 stream of its connection, with no new endpoint, relay connection, path or
 handshake. Sessions share a dialer in one runtime, with one key of the client,
 to one node, and the connection and its endpoint close with the last lease.

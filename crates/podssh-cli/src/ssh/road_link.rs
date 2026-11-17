@@ -19,7 +19,7 @@ use crate::layered::Shell;
 /// A link on any road.
 pub enum Road {
     #[cfg(feature = "iroh")]
-    Iroh(podssh_iroh::Stream),
+    Iroh(pod_iroh::Stream),
     Pair(DuplexStream),
     Derp(podssh_relay::derp::Link),
     Transit(podssh_relay::transit::Link),

@@ -12,7 +12,7 @@ use super::{command, fingerprint_after, line_with, lines_of, run, scratch, wait_
 fn each_runs_its_command_on_the_node_of_an_iroh_ticket() {
     let home = scratch("each");
     let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap();
-    let relay = runtime.block_on(podssh_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
+    let relay = runtime.block_on(pod_iroh::test_relay::spawn(&home)).expect("a relay on the loopback");
     let host_key = home.join("host_key").to_string_lossy().into_owned();
     let (rc, _, err) = run(&home, &["keygen", "-q", "-t", "ed25519", "-N", "", "-f", &host_key]);
     assert_eq!(rc, 0, "{err}");

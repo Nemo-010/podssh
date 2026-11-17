@@ -122,7 +122,7 @@ echo "steps: $*"
 
 # Each package of the workspace, by name: `cargo fmt --all` would also format
 # the fork in vendor/, which keeps its own format and its patches.
-PKGS="-p podssh-cli -p podssh-ssh -p podssh-relay -p podssh-ws -p podssh-core -p podssh-probe -p podssh-ts -p podssh-iroh -p podssh-todo -p podssh-warp -p podssh-tor -p podssh-zerotier"
+PKGS="-p podssh-cli -p podssh-ssh -p podssh-relay -p podssh-ws -p podssh-core -p podssh-probe -p podssh-ts -p podssh-todo -p podssh-warp -p podssh-zerotier"
 
 # The library crates. Each crate may use C, zig and the newest stable Rust;
 # the one rule of the build is a statically compiled binary (the operator,
@@ -152,7 +152,7 @@ step_lint() {
     # `iroh-test` is the feature `iroh` with the test relay: each target of
     # the road, its end-to-end test included.
     run "clippy: no warning with the iroh feature" \
-        cargo clippy --locked --all-targets -p podssh-cli -p podssh-iroh --features podssh-cli/iroh-test -- -D warnings $LINTS_ALLOWED
+        cargo clippy --locked --all-targets -p podssh-cli --features podssh-cli/iroh-test -- -D warnings $LINTS_ALLOWED
     # WARP's road (T-352): the CLI's road with its feature, over pod-warp
     # through podssh-warp; the quick tunnel's edge inside it (T-374).
     run "clippy: no warning with the WARP feature" \
@@ -164,7 +164,7 @@ step_lint() {
         cargo clippy --locked --all-targets -p podssh-relay --features serve,plain-ws,quick,quic -- -D warnings $LINTS_ALLOWED
     # The Tor road (T-353): the crate and the CLI's road with its feature.
     run "clippy: no warning with the Tor feature" \
-        cargo clippy --locked --all-targets -p podssh-cli -p podssh-tor --features podssh-cli/tor -- -D warnings $LINTS_ALLOWED
+        cargo clippy --locked --all-targets -p podssh-cli --features podssh-cli/tor -- -D warnings $LINTS_ALLOWED
     # ZeroTier's road (T-733): the CLI's road with its stand-in.
     run "clippy: no warning with the ZeroTier feature" \
         cargo clippy --locked --all-targets -p podssh-cli -p podssh-zerotier --features podssh-cli/zerotier-test -- -D warnings $LINTS_ALLOWED
@@ -319,16 +319,16 @@ step_ts() {
 
 step_iroh() {
     # With the test relay, so that the command line's test from end to end
-    # (`tests/iroh_road.rs`) runs too.
+    # (`tests/iroh_road.rs`) runs too. The tests of the road's crate,
+    # pod-iroh, are podcrates'.
     tests "the iroh road (feature iroh, needs cc): tests" \
-        cargo test --locked --no-fail-fast -p podssh-iroh -p podssh-cli --features podssh-cli/iroh-test
+        cargo test --locked --no-fail-fast -p podssh-cli --features podssh-cli/iroh-test
 }
 
-# The Tor road (T-353): the tests of podssh-tor (its TCP provider through a
-# stand-in proxy) and the CLI's own with the feature. Arti's SQLite is C, as
-# the Tailscale and iroh features' C is.
+# The Tor road (T-353): the CLI's own tests with the feature; the tests of
+# the road are pod-tor's, in podcrates. Arti's SQLite is C, as the Tailscale
+# and iroh features' C is.
 step_tor() {
-    tests "podssh-tor: its tests" cargo test --locked --no-fail-fast -p podssh-tor
     tests "podssh-cli with the feature tor: its library's tests" \
         cargo test --locked --no-fail-fast -p podssh-cli --features tor --lib
 }

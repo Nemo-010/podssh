@@ -1016,9 +1016,9 @@ facade later, as an operator action (the operator's ruling of 2026-10-08).
 ## Premise
 
 Read: the box like the target sandbox has one CONNECT proxy for ports 443, 80 and 8443 as its only
-way out, refuses `bind` and UDP, and has no `/dev/ptmx` (`docs/development.md:488-548`,
+way out, refuses `bind` and UDP, and has no `/dev/ptmx` (`docs/development.md:487-547`,
 `scripts/test_in_box.sh`). It allows `connect()` to loopback, which the real sandbox refuses
-(`docs/development.md:547-548`, `docs/target-environment.md:22`).
+(`docs/development.md:546-547`, `docs/target-environment.md:22`).
 
 Read: in such a sandbox nothing can listen (`docs/target-environment.md:25`, `:99-102`), so a node
 there has no local TCP service to offer before `podssh serve` (M5). Its TARGET must be a host that
@@ -1451,8 +1451,8 @@ fail. Live: a second node with another key under the same label is refused by th
 
 2026-10-10, read in the tree:
 - T-163 keeps an Ed25519 key for each role of the iroh road already, in a private file of the
-  cache's directories (`crates/podssh-iroh/src/keys.rs`), and an allowlist of client keys
-  (`crates/podssh-iroh/src/allow.rs`). This entry shares them, rather than making keys of its own.
+  cache's directories (`PodUtils/podcrates:crates/pod-iroh/src/keys.rs`), and an allowlist of client keys
+  (`PodUtils/podcrates:crates/pod-iroh/src/allow.rs`). This entry shares them, rather than making keys of its own.
 - A refused operator cannot get `reject {id, "not allowed"}`: the node answers `ready` before it
   knows the operator's key, which only the channel's handshake gives (the operator's input waits for
   `ready`, and with the layer `ready` goes out at once, `PodUtils/podssh:crates/podssh-relay/src/reverse/layered.rs`).
@@ -1510,7 +1510,7 @@ podbox has the same, on by default (`NodeChannel`, `OperatorChannel`). The manua
 # T-088: End-to-end encryption between two podssh ends
 
 **Source:** GitHub #18 (report on warren; read in the report, not verified here);
-`docs/design.md:1464-1470`, `:1593-1597`.
+`docs/design.md:1468-1474`, `:1597-1601`.
 **Category:** feature
 **Milestone:** backlog
 **Priority:** P2
@@ -1529,8 +1529,8 @@ Read: the relay sees the target, the time and volume of the traffic, and the sta
 connection; after the key exchange it sees only ciphertext (`SECURITY.md:21-31`). It can drop, delay
 or add frames (`SECURITY.md:33-36`).
 
-Read: the road between two podssh ends carries SSH, `cp`, `pipe` and chat (`docs/design.md:1464-1470`);
-for chat, the operator chose the roads, end to end encrypted, after M6 (`docs/design.md:1596-1598`).
+Read: the road between two podssh ends carries SSH, `cp`, `pipe` and chat (`docs/design.md:1468-1474`);
+for chat, the operator chose the roads, end to end encrypted, after M6 (`docs/design.md:1600-1602`).
 The resumable layer of M6 runs under SSH (`docs/design.md:713-725`).
 
 Read in the report (GitHub #18, not verified here): warren uses `Noise_IK_25519_ChaChaPoly_BLAKE2s`
@@ -1926,7 +1926,7 @@ Measured: `grep -rni sshsig crates scripts docs Cargo.toml` finds nothing (exit 
 tests of primitives (`PodUtils/podssh:crates/podssh-ws/tests/crypto_vectors.rs:125-159`,
 `PodUtils/podssh:crates/podssh-ws/tests/signatures.rs:29-172`); the comment's `crypto_vectors.rs:192` is not one. Read: the
 issue's "rule 8" is rule 6 (`docs/architecture.md:326-331`), and its "section 2" sentence about an allowlist of
-keys is in section 7 (`docs/design.md:1427-1428`). Read in the report (not verified here): syq signs a grant in a
+keys is in section 7 (`docs/design.md:1431-1432`). Read in the report (not verified here): syq signs a grant in a
 fixed namespace and redeems it at most once with `flock`, `O_EXCL`, `linkat` and `fsync` (lines 55 at `22c3b88` and
 1416-1492 of `greaber/syq:src/delegation.rs`). The reporter's correction: a signed grant leaks as a token does
 (lines 11-12 at `22c3b88`); signing buys scope, single use and non-repudiation, not safety after a leak.
@@ -4749,7 +4749,7 @@ which `piping.yml` installs, and the second's API and edge are Cloudflare's alon
   the run to connect again as the same. A key of `--ephemeral-key` is made anew at each start
   (`PodUtils/podssh:crates/podssh-relay/src/identity/file.rs:97` says "Place::Ephemeral => Ok(Key { identity:
   make(entropy)?, path: None, made: true }),"), and it is the iroh road's endpoint
-  (`crates/podssh-cli/src/node_iroh.rs:272` says "secret: Some(key.secret.clone()),") and the DERP road's
+  (`crates/podssh-cli/src/node_iroh.rs:273` says "options.secret = Some(key.secret.clone());") and the DERP road's
   key at its server (`crates/podssh-cli/src/node_derp.rs:186` says "let (secret, dial) =
   (Arc::new(Secret::of_node(identity)), dial::tls(trust.clone(), proxy.clone()));"): a new key is a new ticket. A quick tunnel's name is new at each
   request (`crates/podssh-cli/src/node_quick.rs:4` says "The name is new each run"), which the node made

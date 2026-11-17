@@ -80,7 +80,7 @@ pub struct Session {
     /// itself (T-421): the session's end does not fail for them.
     claimed: AtomicBool,
     #[cfg(feature = "iroh-test")]
-    pub relays: Mutex<Vec<podssh_iroh::test_relay::TestRelay>>,
+    pub relays: Mutex<Vec<pod_iroh::test_relay::TestRelay>>,
 }
 
 impl Session {

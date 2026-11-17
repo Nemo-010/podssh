@@ -5,7 +5,7 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
-use podssh_tor::{Bridge, Options, Tor, TorStream};
+use pod_tor::{Bridge, Options, Tor, TorStream};
 use podssh_ws::dial::ProxyChoice;
 use podssh_ws::Trust;
 
@@ -162,7 +162,7 @@ pub async fn bootstrap_at(
     let held = match (&bridges, &ports) {
         // A bridge is the first hop, through its transport: the ports of a
         // relay do not hold.
-        (Some((list, file)), _) => format!("{}, named in {file}", podssh_tor::bridges::summary(list)),
+        (Some((list, file)), _) => format!("{}, named in {file}", pod_tor::bridges::summary(list)),
         (None, Some(ports)) => {
             let list: Vec<String> = ports.iter().map(u16::to_string).collect();
             format!("first hops on port {} alone", list.join(", "))
@@ -172,7 +172,7 @@ pub async fn bootstrap_at(
     let mut options = Options {
         state_dir,
         cache_dir,
-        proxy: ProxyChoice::FromEnvironment,
+        way: podssh_ws::client::way(&ProxyChoice::FromEnvironment),
         first_hop_ports: if bridges.is_some() { None } else { ports },
         trust_directories: false,
         network: network.as_ref().map(|(text, _)| text.clone()),

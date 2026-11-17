@@ -1,6 +1,6 @@
 //! The onion road of a pair (T-578, the operator's ruling Q78): a node that
 //! waits beside the pair's road as an onion service in the Tor network,
-//! Arti's in this process through the Tor road (`podssh_tor`), and a client
+//! Arti's in this process through the Tor road (`pod_tor`), and a client
 //! that reaches it by its onion address, when each other road failed. Both
 //! ends make a key of restricted discovery of the pair's name and connect
 //! token, so the service's descriptor is readable only by the pair's

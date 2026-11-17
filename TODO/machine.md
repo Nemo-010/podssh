@@ -2,7 +2,7 @@ This file holds the work that makes podssh usable by programs and agents: JSON f
 `man` and the result of `ssh`, `podssh status`, the end-to-end check in the binary, `podssh
 ping`, an MCP server, and a log of sessions. stdout carries the answer and nothing else
 (`docs/architecture.md:332-333`). `serde` and `serde_json` are already dependencies of the binary
-(`crates/podssh-cli/Cargo.toml:158`), so no entry here needs a new crate for JSON.
+(`crates/podssh-cli/Cargo.toml:167`), so no entry here needs a new crate for JSON.
 
 # T-049: `podssh doctor --json` (GitHub #9)
 
@@ -1935,7 +1935,7 @@ node's, the client's, the iroh key, the net owner's) sit in the cache, and the t
   (`crates/podssh-cli/src/status.rs:1-8`); `--net` is its precedent for a flag (`status.rs:26`).
 - Read: the key files and places are in `pod-identity`, taken
   (`crates/podssh-relay/src/identity.rs:5-25`, `Place`, `existing`, which reads and never makes a key); the
-  iroh key reuses them (`crates/podssh-iroh/src/keys.rs:9-18`); the net owner's key is in the net's store
+  iroh key reuses them (`PodUtils/podcrates:crates/pod-iroh/src/keys.rs`); the net owner's key is in the net's store
   (`crates/podssh-cli/src/net/store.rs`).
 
 ## Approach
@@ -1991,7 +1991,7 @@ private body is not in the output. Planted: a `load` in place of `existing` fail
 - `keygen -y` and `-l` are at `crates/podssh-cli/src/flags/keygen.rs:31-34`, not 23-28; the rest holds.
 - In `status.rs`, `SCHEMA` was at line 21 at `5ca8795` and `--net`'s field at line 31 at `5ca8795`, not 25 and 26;
   the rest holds.
-- The iroh road has no key of its own: `crates/podssh-iroh/src/keys.rs:9-18` reuses the client's and the nodes'
+- The iroh road has no key of its own: `PodUtils/podcrates:crates/pod-iroh/src/keys.rs` reuses the client's and the nodes'
   files (`client_place`, `node_place`). So no row has the role `iroh`; each Ed25519 row carries `iroh`, the key in
   iroh's hex, which is the node's name on that road.
 - The net's store holds no key of the owner: the document names the owner's public key (`net/doc.rs`, `owner`),

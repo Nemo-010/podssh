@@ -6,15 +6,15 @@
 //!
 //! A second session of this process to the same node (a copy beside a
 //! terminal, T-666) takes a stream of the connection that the first made,
-//! in its own lane: `podssh_iroh::share`. The connection and its endpoint
+//! in its own lane: `pod_iroh::share`. The connection and its endpoint
 //! close with the last session's road.
 
 use iroh::{EndpointAddr, RelayUrl};
-use podssh_iroh::keys::{self, Place};
-use podssh_iroh::{Dialer, Failure, Finder, Lane, Lease, Options, Udp};
+use pod_iroh::keys::{self, Place};
+use pod_iroh::{Dialer, Failure, Finder, Lane, Lease};
 use podssh_relay::session::OsEntropy;
 use podssh_ssh::Log;
-use podssh_ws::{ProxyChoice, Trust};
+use podssh_ws::Trust;
 use tokio::sync::OnceCell;
 
 use super::Race;
@@ -35,7 +35,7 @@ pub(crate) struct IrohRoad<'a> {
 impl<'a> IrohRoad<'a> {
     /// The road to the node of `race`'s ticket; else why it is no ticket.
     pub(crate) fn new(race: &Race, trust: &Trust, log: &'a Log) -> Result<IrohRoad<'a>, String> {
-        let addr = podssh_iroh::ticket::parse(&race.ticket)?;
+        let addr = pod_iroh::ticket::parse(&race.ticket)?;
         let (race, trust) = (race.clone(), trust.clone());
         Ok(IrohRoad { race, trust, addr, made: OnceCell::new(), finder: None, log })
     }
@@ -66,7 +66,8 @@ impl<'a> IrohRoad<'a> {
             Some(file) => Place::File(file.into()),
             None => keys::client_place(),
         };
-        let key = keys::load(&place, &mut OsEntropy).map_err(|why| format!("this client's key: {why}"))?;
+        let key =
+            crate::iroh_way::load_key(&place, &mut OsEntropy).map_err(|why| format!("this client's key: {why}"))?;
         let fingerprint = keys::fingerprint(&key.public());
         if key.made {
             self.log.info(&format!(
@@ -77,7 +78,7 @@ impl<'a> IrohRoad<'a> {
             self.log.info(&format!("this client's iroh key: {note}"));
         }
         let secret = key.secret.clone();
-        let lease = podssh_iroh::share::lease(key.public(), self.addr.id, || Box::pin(self.make(secret))).await?;
+        let lease = pod_iroh::share::lease(key.public(), self.addr.id, || Box::pin(self.make(secret))).await?;
         if lease.joined() {
             let lane = match lease.lane() {
                 Lane::Bulk => "a copy, below a terminal",
@@ -92,23 +93,17 @@ impl<'a> IrohRoad<'a> {
     /// its dialer.
     async fn make(&self, secret: iroh::SecretKey) -> Result<Dialer, String> {
         let mut list: Vec<RelayUrl> = self.addr.relay_urls().cloned().collect();
-        for relay in self.race.relays.iter().filter_map(|text| podssh_iroh::relays::parse_url(text).ok()) {
+        for relay in self.race.relays.iter().filter_map(|text| pod_iroh::relays::parse_url(text).ok()) {
             if !list.contains(&relay) {
                 list.push(relay);
             }
         }
-        let proxy = ProxyChoice::FromEnvironment;
-        let (home, _) = podssh_iroh::relays::home(&list, &self.trust, &proxy).await;
-        let options = Options {
-            relays: home,
-            proxy,
-            trust: self.trust.clone(),
-            udp: Udp::from_environment(),
-            secret: Some(secret),
-            accepts: false,
-            ..Options::default()
-        };
-        let opened = podssh_iroh::endpoint::open(&options).await.map_err(|e| e.to_string())?;
+        let (home, _) = pod_iroh::relays::home(&list, &self.trust, &crate::iroh_way::way()).await;
+        let mut options = crate::iroh_way::options()?;
+        options.relays = home;
+        options.trust = self.trust.clone();
+        options.secret = Some(secret);
+        let opened = pod_iroh::endpoint::open(&options).await.map_err(|e| e.to_string())?;
         // Which answer the road took of this host's UDP (T-359), and the arm
         // of QUIC's settings when it is not iroh's own (T-665).
         self.log.verbose(&format!("the iroh road: {}", opened.udp));

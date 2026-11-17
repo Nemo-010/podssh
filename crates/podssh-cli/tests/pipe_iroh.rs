@@ -37,19 +37,19 @@ fn echo_target() -> u16 {
 fn a_line_goes_to_the_target_of_a_node_of_the_iroh_road_and_comes_back() {
     let session = Session::start("pipe-iroh");
     let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap();
-    let relay = runtime.block_on(podssh_iroh::test_relay::spawn(&session.home)).expect("a relay on the loopback");
+    let relay = runtime.block_on(pod_iroh::test_relay::spawn(&session.home)).expect("a relay on the loopback");
     let (url, cert) = (relay.url.to_string(), relay.cert.to_string_lossy().into_owned());
     let text = |p: &std::path::Path| p.to_string_lossy().into_owned();
     // The client's key, made here, so that the node's allowlist holds it.
     let client_key = session.home.join("client.key");
-    let place = podssh_iroh::keys::Place::File(client_key.clone());
-    let key = podssh_iroh::keys::load(&place, &mut podssh_relay::session::OsEntropy).expect("a key");
+    let place = pod_iroh::keys::Place::File(client_key.clone());
+    let key = podssh_cli::iroh_way::load_key(&place, &mut podssh_relay::session::OsEntropy).expect("a key");
     // In a directory of its own: the node refuses an allowlist that others
     // can change, as a host's temporary directory may let them.
     let private = session.home.join("private");
     podssh_relay::cache::private_dir(&private).unwrap();
     let allow = private.join("allow");
-    std::fs::write(&allow, format!("{} the test's client\n", podssh_iroh::keys::fingerprint(&key.public()))).unwrap();
+    std::fs::write(&allow, format!("{} the test's client\n", pod_iroh::keys::fingerprint(&key.public()))).unwrap();
     let node_args = [
         "node".to_string(),
         "lab".into(),

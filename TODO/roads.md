@@ -7,7 +7,7 @@ HTTP and of HTTP/2 to the relay.
 
 # T-162: The iroh road behind the cargo feature `iroh`
 
-**Source:** ROADMAP M6 (the iroh road); `docs/design.md:1196-1470`;
+**Source:** ROADMAP M6 (the iroh road); `docs/design.md:1196-1474`;
 `docs/decisions.md` (2026-10-08: iroh is a road that the user must select);
 GitHub #18 (Nemo-010, 2026-10-08: the iroh-ssh, zuko, GPU-Share and quic-ssh
 reports).
@@ -31,7 +31,7 @@ to 245 crates. In the target sandbox it runs only with no UDP transport (or a
 UDP bind after a probe), podssh's proxy in `proxy_url(...)`, the `Minimal`
 preset with no pkarr or DNS, peers dialled by ticket, and a home relay whose
 `/ping` passes the proxy. The operator accepted netlink sockets and extra
-connections for this road (`docs/design.md:1459-1462`). The sandbox refuses UDP
+connections for this road (`docs/design.md:1463-1466`). The sandbox refuses UDP
 (`docs/target-environment.md:23`). Measured on `3ee70dc`: `--iroh` is an
 unknown flag (exit 64), and `Cargo.lock` has no iroh crate.
 
@@ -84,6 +84,10 @@ The first shows that the default build refuses an iroh destination and names
 the feature. The second runs two endpoints with no UDP, through a stand-in
 CONNECT proxy, and carries 20 MiB with an equal SHA-256; a planted endpoint
 that uses iroh's own proxy selection fails with `ALL_PROXY` set.
+
+## Correction
+
+2026-11-17. The package podssh-iroh is `pod-iroh` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-iroh` are podcrates' now (`cargo test -p pod-iroh` there); podssh's part of it is `crates/podssh-cli/src/iroh_way.rs` and the CLI's tests with `--features iroh-test`.
 
 ## Done
 
@@ -142,7 +146,7 @@ that uses iroh's own proxy selection fails with `ALL_PROXY` set.
 # T-163: iroh tickets and node keys
 
 **Source:** ROADMAP M6 (dialled by ticket); `docs/design.md:1225` and
-`docs/design.md:1427-1428`; GitHub #18 (Nemo-010, 2026-10-08: zuko's ticket
+`docs/design.md:1431-1432`; GitHub #18 (Nemo-010, 2026-10-08: zuko's ticket
 handoff; iroh-ssh's persistent and ephemeral keys).
 **Category:** feature
 **Milestone:** M6
@@ -159,7 +163,7 @@ no form for a ticket, no place for the keys, and no rule for who may connect.
 
 Read: with the `Minimal` preset nothing is discovered, so a ticket gives the
 key and the relay URL (`docs/design.md:1225`). The key is the identity, and
-access is by an allowlist of keys or a relay token (`docs/design.md:1427-1428`).
+access is by an allowlist of keys or a relay token (`docs/design.md:1431-1432`).
 Read in the reports, not verified here: iroh-ssh warns when a server's key is
 ephemeral (`rustonbsd/iroh-ssh:src/ssh.rs`); zuko hands over a ticket out of
 band (`adonm/zuko:docs/protocol.md`). Read: `podssh ts` keeps its node key in
@@ -243,6 +247,10 @@ link and a file that others can read, and shows that no output holds the
 secret. The ticket test parses tickets that iroh made (fixed strings, not
 made by podssh's encoder), and refuses a client key that is not in the
 allowlist. A planted node that accepts each key fails it.
+
+## Correction
+
+2026-11-17. The package podssh-iroh is `pod-iroh` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-iroh` are podcrates' now (`cargo test -p pod-iroh` there); podssh's part of it is `crates/podssh-cli/src/iroh_way.rs` and the CLI's tests with `--features iroh-test`.
 
 ## Done
 
@@ -349,7 +357,7 @@ limit of iroh to each connection.
 Read: for a podssh node, the iroh road is first and the reverse road with the
 resumable layer is second, raced (`docs/design.md:48-53`). The first real
 sandbox can block what iroh needs, so the fallback is necessary
-(`docs/design.md:1464-1470`). The user must select iroh (`docs/decisions.md`,
+(`docs/design.md:1468-1474`). The user must select iroh (`docs/decisions.md`,
 2026-10-08). Each road has one attempt for each host, with a time limit
 (`docs/design.md:76-83`). The relay opener tries one host at a time
 (`PodUtils/podssh:crates/podssh-relay/src/open.rs:212-298`), and no code races two roads.
@@ -489,9 +497,9 @@ forward road has one default relay name in library code
 (`PodUtils/podssh:crates/podssh-relay/src/relay.rs:12-13`) and a seed pool
 (`PodUtils/podssh:crates/podssh-relay/src/pool.rs:25-34`); the same shape fits the iroh
 relays. n0's free relays are for development, with a rate limit that is not
-published (`docs/design.md:1444-1446`). At least three projects run the iroh
+published (`docs/design.md:1448-1450`). At least three projects run the iroh
 relay protocol on Workers and Durable Objects (read, not verified:
-`docs/design.md:1450-1452`). The URLs of n0's relays for iroh 1.x must be read
+`docs/design.md:1454-1456`). The URLs of n0's relays for iroh 1.x must be read
 in iroh's source at the pinned version.
 
 ## Approach
@@ -574,6 +582,10 @@ answer `/ping`; a planted list that ignores the flag fails it. The test of the
 manual finds the variable and the flag in a build with the feature, and in no
 other build.
 
+## Correction
+
+2026-11-17. The package podssh-iroh is `pod-iroh` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-iroh` are podcrates' now (`cargo test -p pod-iroh` there); podssh's part of it is `crates/podssh-cli/src/iroh_way.rs` and the CLI's tests with `--features iroh-test`.
+
 ## Done
 
 2026-10-10.
@@ -624,7 +636,7 @@ other build.
 # T-166: A roost: a podssh next to a standard sshd
 
 **Source:** `docs/design.md:52` (a standard sshd behind a podssh `roost`) and
-`docs/design.md:727-730`; the `roost` of pigeons (`docs/design.md:1454-1457`);
+`docs/design.md:727-730`; the `roost` of pigeons (`docs/design.md:1458-1461`);
 GitHub #18 (Nemo-010, 2026-10-08: iroh-ssh reaches sshd by node id, and
 refuses early when no sshd answers).
 **Category:** feature
@@ -2559,7 +2571,7 @@ The test target `mptcp` of `podssh-ws` moved to `pod-proxy` of PodUtils/podcrate
 # T-173: Resumption in the relay for a standard sshd
 
 **Source:** ROADMAP M8 (not now; look at it again after M6);
-`docs/design.md:731-748` (layer 3) and `docs/design.md:1586-1589` (question 1 of
+`docs/design.md:731-748` (layer 3) and `docs/design.md:1590-1593` (question 1 of
 section 8).
 **Category:** feature
 **Milestone:** M10
@@ -2582,7 +2594,7 @@ a resume token in the `101` response, and offset framing as a protocol
 version that the client selects. It is a project of the relay's operator, and
 it costs Durable Object time for the whole session (`docs/design.md:744-748`).
 The recommendation is "not now; look at it again after M6"
-(`docs/design.md:1586-1589`). The relay is in another repository.
+(`docs/design.md:1590-1593`). The relay is in another repository.
 
 ## Approach
 
@@ -3045,8 +3057,8 @@ proxy only, so podssh refuses the setting for the iroh road before anything bind
 ## Premise
 
 - Read: podssh refuses a SOCKS5 proxy for the iroh road by name
-  (`crates/podssh-iroh/src/endpoint.rs`, lines 134-140 at `3224a88`); the test
-  `a_socks5_proxy_is_refused_by_name` asserts it (`crates/podssh-iroh/tests/relays.rs`, line 144
+  (`PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs`, lines 134-140 at `3224a88`); the test
+  `a_socks5_proxy_is_refused_by_name` asserts it (`PodUtils/podcrates:crates/pod-iroh/tests/relays.rs`, line 144
   at `3224a88`).
 - Read: iroh-relay 1.3.0's client opens its relay connection through a proxy in
   `dial_url_proxy`: TCP to the proxy, TLS to it for each scheme but `http`, then an HTTP `CONNECT`
@@ -3067,8 +3079,8 @@ proxy only, so podssh refuses the setting for the iroh road before anything bind
 ## Decision
 
 2026-10-12: step 2, a patch of iroh-relay that podssh carries, as no hook exists (see
-Correction). The crate as crates.io publishes it is in `vendor/iroh-relay`, byte for byte, with
-`vendor/patches/iroh-relay/0001-socks5-proxy.patch` applied, and the root's `[patch.crates-io]`
+Correction). The crate as crates.io publishes it is in `PodUtils/podcrates:vendor/iroh-relay/`, byte for byte, with
+`PodUtils/podcrates:vendor/patches/iroh-relay/0001-socks5-proxy.patch` applied, and the root's `[patch.crates-io]`
 makes iroh 1.3.0 build it; the tree is excluded from the workspace, as `vendor/tailscale-rs` is.
 What lost:
 - Asking upstream alone: the entry would wait on another project, and a host whose only way out
@@ -3084,7 +3096,7 @@ What lost:
   crates would tie both. The patch's module sends the bytes that `PodUtils/podssh:crates/podssh-ws/src/socks5.rs`
   sends: the name with the address type 3 for `socks5://` too (T-070's decision), RFC 1929, the
   reply read to its end, and on reply 8 one more connection with an address from the dial's
-  resolver, which is podssh's own (`crates/podssh-iroh/src/resolve.rs`).
+  resolver, which is podssh's own (`PodUtils/podcrates:crates/pod-iroh/src/resolve.rs`).
 
 2026-10-12: podssh gives iroh `socks5h://` at the proxy's address, which podssh resolved, as it
 gives an HTTP proxy at its address, so iroh resolves no name. The check of a proxy's credentials
@@ -3120,11 +3132,13 @@ only with its feature `socks`, which no crate of podssh's graph turned on; witho
 fails, and the endpoint gets no home relay. The patch turns the feature on: in reqwest 0.13 it is
 hyper-util's SOCKS client, which reqwest already builds, so no crate is added.
 
+2026-11-17. The package podssh-iroh is `pod-iroh` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-iroh` are podcrates' now (`cargo test -p pod-iroh` there); podssh's part of it is `crates/podssh-cli/src/iroh_way.rs` and the CLI's tests with `--features iroh-test`.
+
 ## Done
 
 2026-10-13. The iroh road goes through a SOCKS5 proxy, by the relay's name.
-- `vendor/iroh-relay`: iroh-relay 1.3.0 as published (43 files, all but cargo's `.cargo-ok`), and
-  its patch `vendor/patches/iroh-relay/0001-socks5-proxy.patch`: `src/client/socks5.rs` (new; the
+- `PodUtils/podcrates:vendor/iroh-relay/`: iroh-relay 1.3.0 as published (43 files, all but cargo's `.cargo-ok`), and
+  its patch `PodUtils/podcrates:vendor/patches/iroh-relay/0001-socks5-proxy.patch`: `src/client/socks5.rs` (new; the
   exchange of RFC 1928 and RFC 1929, within 10 s), `src/client/tls.rs` (`dial_url_proxy` gives a
   SOCKS5 proxy the exchange in place of `CONNECT` and TLS; `dial_socks5` tries once more with an
   address on reply 8; a proxy URL with no port means 1080; the debug line of the dial names the
@@ -3132,16 +3146,16 @@ hyper-util's SOCKS client, which reqwest already builds, so no crate is added.
   `Cargo.toml` (reqwest's `socks`). The root `Cargo.toml`: `exclude` and `[patch.crates-io]`.
   `vendor/README.md`: the section iroh-relay, how to run the patch's unit tests and how to carry
   it to another version. Measured with no build: the patch applies with `git apply` to a copy of
-  the published crate (exit 0), and the result equals `vendor/iroh-relay` (`diff -r`, exit 0).
-- `crates/podssh-iroh/src/endpoint.rs`: the refusal is gone; a SOCKS5 proxy is `socks5h://` at its
-  resolved address; `sendable` for an HTTP proxy only. `crates/podssh-iroh/src/relays.rs`: the way
+  the published crate (exit 0), and the result equals `PodUtils/podcrates:vendor/iroh-relay/` (`diff -r`, exit 0).
+- `PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs`: the refusal is gone; a SOCKS5 proxy is `socks5h://` at its
+  resolved address; `sendable` for an HTTP proxy only. `PodUtils/podcrates:crates/pod-iroh/src/relays.rs`: the way
   of `/ping`, which `podssh doctor` prints, says `SOCKS5 CONNECT` through a SOCKS5 proxy.
-- Tests: `crates/podssh-iroh/tests/proxy_env.rs`, `a_socks5_proxy_in_all_proxy_reaches_the_relay_by_name`
+- Tests: `PodUtils/podcrates:crates/pod-iroh/tests/proxy_env.rs`, `a_socks5_proxy_in_all_proxy_reaches_the_relay_by_name`
   (`ALL_PROXY=socks5h://USER:PASSWORD@...` alone; the stand-in of
-  `crates/podssh-iroh/tests/common/socks5.rs` is the only way to the relay, takes only its user
+  `PodUtils/podcrates:crates/pod-iroh/tests/common/socks5.rs` is the only way to the relay, takes only its user
   and password, and opens a tunnel only to the relay's name with the address type 3; the endpoint
   goes online, and each CONNECT that it got was by name); the two tests of that binary take turns
-  on the environment. `crates/podssh-iroh/tests/relays.rs`,
+  on the environment. `PodUtils/podcrates:crates/pod-iroh/tests/relays.rs`,
   `a_socks5_proxy_is_taken_with_a_password_that_connect_would_send_wrong`, in place of
   `a_socks5_proxy_is_refused_by_name`. The patch's unit tests in `src/client/socks5.rs` (4: the
   name's bytes and a reply read to its end, RFC 1929's bytes, reply 8 told apart and a refusal
@@ -3154,7 +3168,7 @@ hyper-util's SOCKS client, which reqwest already builds, so no crate is added.
   podssh-iroh -p podssh-cli --features podssh-cli/iroh-test`, 791 passed and 1 failed at random,
   a test of `--persist` that a race of podssh's forward table made fail, repaired in its own
   commit; clippy with `iroh-test` and rustfmt clean. `patch -p1` on the crate of the registry
-  gave `vendor/iroh-relay` file for file. The first build rewrote the entry of iroh-relay in
+  gave `PodUtils/podcrates:vendor/iroh-relay/` file for file. The first build rewrote the entry of iroh-relay in
   `Cargo.lock` to the path. Planted, the refusal of SOCKS5 put back in `proxy_url`: both
   `a_socks5_proxy_in_all_proxy_reaches_the_relay_by_name` and
   `a_socks5_proxy_is_taken_with_a_password_that_connect_would_send_wrong` failed; restored, they
@@ -4046,7 +4060,7 @@ breaks, and commits the update with the repair.
 ## Problem
 
 The group moves iroh from 1.3.0 to 1.4.1, which asks for iroh-relay 1.4.1.
-podssh's patched copy (`vendor/iroh-relay`, T-280) was 1.3.0, so cargo built
+podssh's patched copy (`PodUtils/podcrates:vendor/iroh-relay/`, T-280) was 1.3.0, so cargo built
 the published iroh-relay and left the patch unused: the relay dial took a
 `socks5h://` proxy for one that speaks TLS, and the iroh road through a
 SOCKS5 proxy never came online.
@@ -4083,13 +4097,17 @@ cargo test --no-fail-fast
 Each passes, and the lock file holds no unused patch. Planted: the
 published iroh-relay 1.4.1 with no patch; the SOCKS5 test fails.
 
+## Correction
+
+2026-11-17. The package podssh-iroh is `pod-iroh` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-iroh` are podcrates' now (`cargo test -p pod-iroh` there); podssh's part of it is `crates/podssh-cli/src/iroh_way.rs` and the CLI's tests with `--features iroh-test`.
+
 ## Done
 
 2026-10-30. The 11 updates of the pull request are on `main`: serde_json 1.0.154, libc 0.2.191,
 zeroize 1.9.1, iroh 1.4.1, aws-lc-rs 1.18.2 (with aws-lc-sys 0.46.0), pageant 0.2.5, hyper 1.12.0,
 smallvec 1.16.4, tokio-util 0.7.20, yoke 0.8.4 and zerocopy 0.8.63, each by `cargo update -p
-NAME --precise VERSION`. `vendor/iroh-relay` is iroh-relay 1.4.1 as published (from n0-computer/iroh
-at `d6c6963`, its `.cargo_vcs_info.json`), and the patch of `vendor/patches/iroh-relay/` applied to
+NAME --precise VERSION`. `PodUtils/podcrates:vendor/iroh-relay/` is iroh-relay 1.4.1 as published (from n0-computer/iroh
+at `d6c6963`, its `.cargo_vcs_info.json`), and the patch of `PodUtils/podcrates:vendor/patches/iroh-relay/` applied to
 it with no change; the lock file builds that copy and holds no unused patch. Each updated crate's
 minimum Rust is within the gate's: zeroize and tokio-util declare 1.85, as the library crates do,
 pageant 1.89 and iroh 1.91, as before. aws-lc-sys 0.46 asks for NASM on Windows x86-64 as 0.45 did
@@ -4242,9 +4260,9 @@ roots must be exactly three, and a refusal of the edge does not say which releas
   (`crates/podssh-relay/src/quick/edge.rs:22-29`); the roots must give 3 anchors and no invalid
   one (`:66-70`); the API's host is fixed (`crates/podssh-relay/src/quick/api.rs:28`). The node
   registers as `podssh` and the package's version (`crates/podssh-cli/src/node_quick.rs:348-349`),
-  `1.0.0-beta.2` today (`Cargo.toml:51`).
+  `1.0.0-beta.2` today (`Cargo.toml:48`).
 - Read: the three roots end on 2029-08-15, 2029-08-15 and 2029-11-01
-  (`PodUtils/podssh:crates/podssh-relay/src/quick/cloudflare-roots.pem:6`, `:27`, `:54`).
+  (`PodUtils/podssh:crates/podssh-relay/src/quick/cloudflare-roots.pem:6`, `:25`, `:51`).
 - Read: cloudflared's README says "Cloudflare currently supports versions of cloudflared that are
   within one year of the most recent release", and that breaking changes "may be introduced" for
   older ones (`cloudflare/cloudflared:README.md`, read in a clone).
@@ -4505,8 +4523,8 @@ that says why.
 
 - Read: the release builds `podssh-cli` with no feature on each target
   (`.github/workflows/release.yml:129`, `:198`, `:292`, `:340`, `:421`); the feature `iroh` is
-  off by default, and `crates/podssh-cli/Cargo.toml:26-28` says "about 200 crates, needs Rust
-  1.91 and a C compiler" of it.
+  off by default, and `crates/podssh-cli/Cargo.toml` at `27b8d8f` said "about 200 crates, needs
+  Rust 1.91 and a C compiler" of it.
 - Read: `docs/decisions.md` line 41 at `27b8d8f` said "iroh is a road that the user must select", and made n0's
   public relays its default until the operator runs one. The row says nothing of the release
   binaries: "off in the release" is the default of `Cargo.toml` and the build of the workflow,
@@ -4799,7 +4817,7 @@ podssh's own, which makes it M.
 ## Premise
 
 - Read: the endpoint has no address lookup: a peer is dialled by its key and its relay
-  (`crates/podssh-iroh/src/endpoint.rs:4-7`, `:338-339`), as the design chose for a host with no
+  (`PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs`, `:338-339`), as the design chose for a host with no
   DNS (`docs/design.md:1225`, `:1235`).
 - Read: the node's key is Ed25519 and stays across its pairs, and the operator pins it by label
   (`docs/reverse.md:606-610`).
@@ -4840,7 +4858,7 @@ The operator's ruling of 2026-10-31 (Q50, `docs/decisions.md`): n0's server of p
   before anything connects. Lost: a flag on `node`, `ssh`, `pipe` and `chat`, four commands'
   arguments and tables for a setting that the default fits.
 - The client of pkarr is podssh's own, over podssh-ws, as `/ping` goes
-  (`crates/podssh-iroh/src/pkarr.rs`, beside `crates/podssh-iroh/src/relays.rs`), with
+  (`PodUtils/podcrates:crates/pod-iroh/src/pkarr.rs`, beside `PodUtils/podcrates:crates/pod-iroh/src/relays.rs`), with
   iroh-dns's `SignedPacket` and `EndpointInfo` for the record. Lost: iroh's own `PkarrPublisher`
   and `PkarrResolver` in the endpoint's builder. They take the endpoint's proxy (the Correction),
   but its one proxy, chosen for the first relay, so `NO_PROXY` is not read for the server's host;
@@ -4863,7 +4881,7 @@ The operator's ruling of 2026-10-31 (Q50, `docs/decisions.md`): n0's server of p
   at the start, which a server that evicts old records forgets; a shorter interval, more
   requests to n0's free server for a record that does not change.
 - When a client asks: only when the ticket's relay does not reach the node, after 10 s with no
-  connection (`FIND_AFTER`, `crates/podssh-iroh/src/client.rs`), or before the first dial when
+  connection (`FIND_AFTER`, `PodUtils/podcrates:crates/pod-iroh/src/client.rs`), or before the first dial when
   each of the ticket's relays missed its `/ping`. It then dials an address with the ticket's
   relay and the record's, and iroh sends to each relay of an address until a path is chosen
   (`handle_msg_send_datagram`, `n0-computer/iroh:iroh/src/socket/remote_map/remote_state.rs`), so
@@ -4871,7 +4889,7 @@ The operator's ruling of 2026-10-31 (Q50, `docs/decisions.md`): n0's server of p
   at most between. Lost: a lookup at each dial, a request to n0 for each session; the full 30 s
   first, which a client with a stale ticket waits each time; 5 s, which a relay that holds the
   node but answers slowly through a proxy can pass.
-- What is taken of a record: a relay that `crates/podssh-iroh/src/relays.rs` takes
+- What is taken of a record: a relay that `PodUtils/podcrates:crates/pod-iroh/src/relays.rs` takes
   (`https://HOST[:PORT]`), from a record whose signature is the node's key's. The QUIC handshake
   and the end-to-end channel (T-088) check the node's key either way, so a record that names
   another relay fails the session, and no more. Its age refuses nothing: a stale record names a
@@ -4883,7 +4901,7 @@ The operator's ruling of 2026-10-31 (Q50, `docs/decisions.md`): n0's server of p
 - The race of `podssh ssh node://NAME --iroh-ticket` (T-164) keeps its dial: the pair's road is
   its fallback, and its leg borrows a log that a lookup's lines cannot keep. Lost: the record in
   the race too, a third fallback in a race of two.
-- The tests: a stand-in server of pkarr in `podssh-iroh` (`crates/podssh-iroh/src/test_pkarr.rs`,
+- The tests: a stand-in server of pkarr in `podssh-iroh` (`PodUtils/podcrates:crates/pod-iroh/src/test_pkarr.rs`,
   feature `test-relay`), HTTPS on the loopback with a self-signed certificate, which reads each
   `PUT` with iroh-dns's check, as iroh's own test server does; and iroh 1.4.1's own
   `PkarrRelayClient` against it, so podssh's record is read by software that podssh did not
@@ -4916,18 +4934,20 @@ test `resolver_uses_endpoint_proxy` sees `CONNECT pkarr.test:443` at the proxy. 
 condition holds, then; the Decision takes podssh's own client over podssh-ws for the reasons that
 it names, and item 3 is that client.
 
+2026-11-17. The package podssh-iroh is `pod-iroh` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-iroh` are podcrates' now (`cargo test -p pod-iroh` there); podssh's part of it is `crates/podssh-cli/src/iroh_way.rs` and the CLI's tests with `--features iroh-test`.
+
 ## Done
 
 2026-10-31: drafted (branch `draft-pkarr`, `efbef3c`), then merged and measured:
 
-- `crates/podssh-iroh/src/pkarr.rs`: the server (`Server`, n0's `N0`), the variable
+- `PodUtils/podcrates:crates/pod-iroh/src/pkarr.rs`: the server (`Server`, n0's `N0`), the variable
   `PODSSH_IROH_PKARR` (`Choice`, `choose`: n0's server for n0's relays alone), the record
   (`Record`, `read`, which checks the signature), `publish` and `lookup` over podssh-ws, the
   node's `keep`, and the client's `Finder`; its tests with no network in
-  `crates/podssh-iroh/src/pkarr_tests.rs`.
-- `crates/podssh-iroh/src/client.rs`: `Dialer::finding`, the first 10 s at the ticket's
+  `PodUtils/podcrates:crates/pod-iroh/src/pkarr_tests.rs`.
+- `PodUtils/podcrates:crates/pod-iroh/src/client.rs`: `Dialer::finding`, the first 10 s at the ticket's
   address, the lookup, the dial with the record's relay too, and `Dialer::moved`.
-- `crates/podssh-iroh/src/test_pkarr.rs`: the stand-in server (feature `test-relay`, with
+- `PodUtils/podcrates:crates/pod-iroh/src/test_pkarr.rs`: the stand-in server (feature `test-relay`, with
   `tokio-rustls` of the workspace); `iroh-dns` 1.4.1 a dependency. Both were in the lock, whose
   entry of `podssh-iroh` gained the two names by hand.
 - The command line: `crates/podssh-cli/src/node_iroh.rs` keeps the node's record and says where;
@@ -4938,7 +4958,7 @@ it names, and item 3 is that client.
   facts moved to `crates/podssh-cli/src/man/facts/iroh_road.rs` (`facts.rs` was at 500 lines);
   a sentence in the notes of `node` and of `ssh`. `docs/design.md` (section 7) and
   `docs/STATUS.md` name it.
-- The tests: `crates/podssh-iroh/tests/pkarr_lookup.rs` (a client with the first ticket, a
+- The tests: `PodUtils/podcrates:crates/pod-iroh/tests/pkarr_lookup.rs` (a client with the first ticket, a
   ticket whose relay does not answer, a record that another key signed and the planted reader,
   iroh's own client); `crates/podssh-cli/tests/pipe_iroh_record.rs` (`podssh node` twice and
   `podssh pipe`, from end to end); the variable removed from the environment of the command
@@ -4958,7 +4978,7 @@ test of the record that another key signed failed.
 At the merge, `pkarr_lookup`'s first test and the existing `--test tickets` overflowed the 2 MiB
 stack of their threads: the draft's `Dialer::connect` built its dials and its lookup inline, a
 state too large to poll in a debug build, as a tokio worker would poll it too. Each is boxed now
-(`crates/podssh-iroh/src/client.rs`), and both pass on plain test threads; `tickets`, 9 passed.
+(`PodUtils/podcrates:crates/pod-iroh/src/client.rs`), and both pass on plain test threads; `tickets`, 9 passed.
 
 # T-351: Roads through a cloud's own tunnel: GCP IAP TCP forwarding, then EC2 Instance Connect Endpoint
 
@@ -5462,6 +5482,8 @@ directly, then through `scripts/box/proxy.py`, the box's proxy of a cage's ports
 planted case of the Prove (the first hops not held to the proxy's ports) is the private network's
 (`tor_private`, the dial made direct), as a public run planted to fail is no short run.
 
+2026-11-17. The package podssh-tor is `pod-tor` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-tor` are podcrates' now (`cargo test -p pod-tor` there); podssh's part of it is the CLI's glue and its tests with `--features tor`.
+
 ## Done
 
 2026-11-01, partial: begun. Read in arti-client 0.47.0 and its crates (fetched, not built):
@@ -5475,7 +5497,7 @@ swaps the TCP provider, so each first hop can go through podssh-ws's own `dial` 
 
 Built and tested here (2026-11-01), the live run waiting for Q60:
 
-- `crates/podssh-tor` (not a default member): `runtime.rs`, Arti's TCP provider as podssh-ws's
+- `PodUtils/podcrates:crates/pod-tor/` (not a default member): `runtime.rs`, Arti's TCP provider as podssh-ws's
   `dial` through the environment's proxy, each relay by its IP literal and port, listening on
   nothing; `client.rs`, the configuration (state and cache directories, `reachable_addrs` from the
   first hop's ports, Arti's check of the directories or not), the bootstrap within a time limit,
@@ -5589,7 +5611,7 @@ starts none of (`AGENTS.md`, section 5, rule 3).
   of its own for a transport's factory: `ChanMgr::set_pt_mgr` needs `experimental-api` and comes
   after the bootstrap began. An unmanaged transport (`[[bridges.transports]]` with a
   `proxy_addr` and no `path`) is dialled through the client's own runtime as a SOCKS5 proxy, so
-  podssh's TCP provider (`crates/podssh-tor/src/runtime.rs`) can answer that address in the
+  podssh's TCP provider (`PodUtils/podcrates:crates/pod-tor/src/runtime.rs`) can answer that address in the
   process.
 - Read (section 2 of the study): meek_lite's wire form: one POST at a time with `X-Session-Id`, a
   body of 64 KiB at most, lyrebird's polls; the bridge line's `url=` and `front=`. Read (section
@@ -5817,11 +5839,11 @@ code that no command of the default build uses is P2 at most".
 ## Premise
 
 - Read: the probe binds a UDP socket to port 0 and drops it, and
-  `crates/podssh-iroh/src/probe.rs` lines 9-10 at `925c94b` say "Nothing is sent"; the endpoint
+  `PodUtils/podcrates:crates/pod-iroh/src/probe.rs` lines 9-10 at `925c94b` say "Nothing is sent"; the endpoint
   adds `0.0.0.0:0` and `[::]:0`, not required, when the probe binds
-  (`crates/podssh-iroh/src/endpoint.rs` lines 222-227 at `925c94b`).
+  (`PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs` lines 222-227 at `925c94b`).
   T-162 chose this probe (`TODO/roads.md:50-52`).
-- Read: `crates/podssh-iroh/src/endpoint.rs` lines 71-74 at `925c94b` say "as on a host whose
+- Read: `PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs` lines 71-74 at `925c94b` say "as on a host whose
   UDP is refused further on than the probe sees" of `PODSSH_IROH_UDP=off`, and the manual says
   that "UDP is used when a socket binds" (`crates/podssh-cli/src/man/facts.rs` lines 273-274 at
   `925c94b`).
@@ -5834,7 +5856,7 @@ code that no command of the default build uses is P2 at most".
 - Read, in iroh 1.4.1 (the local cargo registry, `src/net_report/report.rs`): iroh's report of
   the network holds `udp_v4` and `udp_v6`, "A QAD IPv4 round trip completed", QAD being QUIC
   address discovery against a relay, on the relay's port 7842
-  (`vendor/iroh-relay/src/defaults.rs:3-7`). The report is public behind iroh's feature
+  (`PodUtils/podcrates:vendor/iroh-relay/src/defaults.rs`). The report is public behind iroh's feature
   `unstable-net-report` (`Endpoint::net_report`), and iroh's test relay runs QAD when it is asked
   to (`run_relay_server_with`, in iroh's `src/test_utils.rs`). So a datagram that came back from
   the road's own relay is in reach.
@@ -5850,7 +5872,7 @@ code that no command of the default build uses is P2 at most".
   (`scripts/box/seccomp.json:19-198`): there the probe is right. Inferred: it is wrong on a host
   that allows a UDP socket and drops its datagrams, as a network whose way out is a proxy can.
 - Inferred, not measured: iroh dials a peer that it knows by its key and relay alone
-  (`crates/podssh-iroh/src/endpoint.rs:4-5`) over the relay first, and tries direct paths beside
+  (`PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs`) over the relay first, and tries direct paths beside
   it; so on a host that drops UDP the cost is probes that never arrive and a report that waits
   for them, not a wait before the relay. `-v` says at a session's end which path carried it
   (T-335).
@@ -5872,7 +5894,7 @@ code that no command of the default build uses is P2 at most".
    is set, a QUIC handshake to the quick tunnel's edge as `podssh node --quick-tunnel` makes it
    (`crates/podssh-relay/src/quick/quic.rs:60-68`), and with a proxy set, that the quick tunnel
    takes HTTP/2. Each answer is `ok`, as a road with no UDP works; a home relay that does not
-   answer is already `FAIL` (`crates/podssh-cli/src/doctor/iroh.rs:89-95`).
+   answer is already `FAIL` (`crates/podssh-cli/src/doctor/iroh.rs:90-96`).
 5. `-v` says which answer the road took. The manual's `PODSSH_IROH_UDP`, `docs/design.md`
    (section 7), `docs/architecture.md` (rule 3) and `SECURITY.md` say that the iroh road takes UDP
    after a datagram came back, not after a socket binds.
@@ -5936,13 +5958,15 @@ doctor's `UDP out` says so; a box that allows UDP and drops it waits for T-251.
 
 ## Correction
 
-2026-10-31: the bound of the wait is 6 s (`crates/podssh-iroh/src/probe.rs`, `REPORT_LIMIT`), not
+2026-10-31: the bound of the wait is 6 s (`PodUtils/podcrates:crates/pod-iroh/src/probe.rs`, `REPORT_LIMIT`), not
 the 3 s of Approach item 2. iroh 1.4.1 publishes its first report once its QUIC address discovery
 probes have ended, each within 3 s (its `PROBES_TIMEOUT`), and its HTTPS probes, which go through
 the proxy, within 5 s (its `TIMEOUT`); a host with an IPv6 address and no IPv6 route waits the
 3 s of its IPv6 probe even where IPv4 answers. A bound of 3 s would take such a host, and a slow
 proxy, for one that drops UDP. The wait on a host that drops UDP stays the 3 s of Decision item
 2, as iroh's own limit gives it: 3003 ms against n0's relay on this session's host.
+
+2026-11-17. The package podssh-iroh is `pod-iroh` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-iroh` are podcrates' now (`cargo test -p pod-iroh` there); podssh's part of it is `crates/podssh-cli/src/iroh_way.rs` and the CLI's tests with `--features iroh-test`.
 
 ## Done
 
@@ -5955,7 +5979,7 @@ against Cloudflare's edge.
   socket binds), `Unknown` (bound, and nothing came back), `BindOnly` (`PODSSH_IROH_UDP=on`) and
   `Off`. With no round trip, the endpoint is closed and made again with no UDP and its key, before
   it dials or serves. `podssh ssh` says the answer with `-v`, and a node at its start.
-- Tests (`crates/podssh-iroh/src/endpoint_udp_tests.rs`, against iroh's relay server on the
+- Tests (`PodUtils/podcrates:crates/pod-iroh/src/endpoint_udp_tests.rs`, against iroh's relay server on the
   loopback with its QUIC address discovery on): `Answered`, with the UDP sockets kept
   (`Endpoint::bound_sockets`); the discovery's port behind a socket of the test that reads and
   never answers: `Unknown` in about 3 s, datagrams read, no UDP socket, the same key, and online
@@ -6914,7 +6938,7 @@ edge still needs the operator's relay. WARP's tunnel (T-352) carries any port ov
 ## Premise
 
 - Read: `PodUtils/podssh:crates/podssh-relay/src/quick/edge.rs:23` says "pub const PORT: u16 = 7844". The relay's
-  VPC road carried TLS to that port, and `TODO/roads.md:1975` says "the edge's 443 and 8443 serve
+  VPC road carried TLS to that port, and `TODO/roads.md:1987` says "the edge's 443 and 8443 serve
   no tunnel".
 - Read: the measured proxy allows ports 443, 80 and 8443 alone (`docs/target-environment.md:21`).
 - Read: T-352 plans WARP's road over HTTP/2, with smoltcp for TCP inside, which the operator
@@ -9436,7 +9460,7 @@ banner where a hop holds the body: the form needs a test of the way and a fallba
 
 ## Premise
 
-- `TODO/roads.md:3240` says "An answer down ends 20 ms after nothing more came": T-319's answers
+- `TODO/roads.md:3254` says "An answer down ends 20 ms after nothing more came": T-319's answers
   end so that a hop which holds them holds little, and none of its forms streams an answer while
   its request's body is open.
 - `crates/podssh-cli/src/doctor/stream/mod.rs:2` says "passes as it comes or is held until its
@@ -9578,7 +9602,7 @@ iroh road takes iroh's defaults, and nobody has measured them on a wide-area pat
 
 ## Premise
 
-- `crates/podssh-iroh/src/endpoint.rs` builds the endpoint with no transport settings of its own.
+- `PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs` builds the endpoint with no transport settings of its own.
 
 ## Approach
 
@@ -9595,7 +9619,7 @@ iroh road takes iroh's defaults, and nobody has measured them on a wide-area pat
 `Cargo.lock` holds):
 
 1. **iroh's own settings stay the default until the A/B run shows what helps** (`DEFAULT` in
-   `crates/podssh-iroh/src/tuning.rs`), as the Approach sets only what the run shows; the arm is one
+   `PodUtils/podcrates:crates/pod-iroh/src/tuning.rs`), as the Approach sets only what the run shows; the arm is one
    variable, `PODSSH_IROH_QUIC`, which each end reads, so that the node and the client of a cell take
    the same arm. Lost: osewa's values as the default at once (measured on none of podssh's paths); a
    flag of `ssh` and `node` (a setting for a measurement, not for a user).
@@ -9652,7 +9676,7 @@ moved code then runs there.
 
 Partial, 2026-11-04, merged from its draft (`2ad81c5`).
 
-- `PODSSH_IROH_QUIC` chooses an arm of the iroh road's QUIC at both ends (`crates/podssh-iroh/src/tuning.rs`):
+- `PODSSH_IROH_QUIC` chooses an arm of the iroh road's QUIC at both ends (`PodUtils/podcrates:crates/pod-iroh/src/tuning.rs`):
   iroh's own settings by default; `tuned`, a first round trip of 100 ms, a first window of 32
   packets and receive windows of 8 MiB a stream and 16 MiB a connection; `bbr` or `newreno` for the
   congestion control. A bad value exits 78; a value that iroh cannot hold keeps iroh's and says so.
@@ -9687,7 +9711,7 @@ ISP's queues, middleboxes or NAT.
 to 60 ms each way and 50 Mbit/s, the shape's filters at prio 1 to 4 accepted; asked by #256), 5 rounds of 4 MiB, each
 on the direct path: `iroh` down 1.72, 1.79, 1.88 MiB/s (min, p50, max), up 0.86, 0.88, 0.88; `tuned` down 1.89, 2.00,
 2.12, up 0.93, 0.95, 0.97. Each round of `tuned` beat each round of iroh's own, both ways (+12 % down and +8 % up at
-p50), so `DEFAULT` of `crates/podssh-iroh/src/tuning.rs` is `tuned` (Approach 2); `PODSSH_IROH_QUIC=iroh` keeps
+p50), so `DEFAULT` of `PodUtils/podcrates:crates/pod-iroh/src/tuning.rs` is `tuned` (Approach 2); `PODSSH_IROH_QUIC=iroh` keeps
 iroh's own. The run measured the arm whole, not each word apart: which of `rtt`, `window` and `streams` gives the
 gain is not known, and the lab shows no real ISP's queues, middleboxes or NAT. Checks: `cargo test -p podssh-iroh
 --lib` 36 passed (`the_default_arm_is_tuned_and_iroh_names_iroh_s_own`); `cargo test -p podssh-cli --features
@@ -9728,7 +9752,7 @@ road puts up to 16 sessions on one TCP connection (T-321).
 `Cargo.lock` holds):
 
 1. **Where sessions share.** A process-wide list of dialers in podssh-iroh
-   (`crates/podssh-iroh/src/share.rs`), each made once by the first lease that needs it, shared by
+   (`PodUtils/podcrates:crates/pod-iroh/src/share.rs`), each made once by the first lease that needs it, shared by
    the sessions of one tokio runtime (an endpoint's tasks are its runtime's) with one key of the
    client to one node; the connection and its endpoint close with the last lease, and a lease that is
    dropped unreleased gives itself back. The iroh road of `node://NAME` takes a lease
@@ -9787,7 +9811,7 @@ Partial, 2026-11-04, merged from its draft (`05a7326`).
 
 - The SSH connections of one process to one node, with one runtime and one client key, share one
   iroh connection, each on a QUIC stream of its own, and the connection closes with the last
-  session (`crates/podssh-iroh/src/share.rs`); a copy's stream goes at priority -1 against a
+  session (`PodUtils/podcrates:crates/pod-iroh/src/share.rs`); a copy's stream goes at priority -1 against a
   terminal's 0, its lane told by a first byte only after both ends agree on the ALPN `podssh/2`,
   so an older node gets `podssh/1` and goes on as before.
 - `cargo test -p podssh-iroh --test share`: passed (at the merge a test's source of entropy is held
@@ -9820,15 +9844,15 @@ Read at `2042200`:
 - The section is opened at `crates/podssh-cli/src/doctor/mod.rs:265`; its network part is
   `crates/podssh-cli/src/doctor/net.rs:165`.
 - The two lines of UDP that exist each ask one server: `crates/podssh-cli/src/doctor/quick.rs:55`
-  (`UDP out`, the quick tunnel's edge) and `crates/podssh-cli/src/doctor/iroh.rs:34` (`iroh UDP out`); a bind
-  that fails is a fact, not a failure (`crates/podssh-cli/src/doctor/iroh.rs:23`), by the rule of
+  (`UDP out`, the quick tunnel's edge) and `crates/podssh-cli/src/doctor/iroh.rs:33` (`iroh UDP out`); a bind
+  that fails is a fact, not a failure (`crates/podssh-cli/src/doctor/iroh.rs:22`), by the rule of
   `crates/podssh-cli/src/doctor/mod.rs:6`, which says "A condition podssh is built for (no listener, no
   pty, no user database".
 - No code of podssh speaks STUN (searched); the TURN road would bring a STUN codec (T-621, its step 2).
 - The measured sandbox refuses UDP: `docs/target-environment.md:23` says "EPERM", so there the line is
   unknown.
-- A socket that a source binds must be named in `scripts/repo_listeners.py` (`:91` for `UdpSocket`),
-  which `scripts/check-repo.py:287` reads.
+- A socket that a source binds must be named in `scripts/repo_listeners.py` (`:83` for `UdpSocket`),
+  which `scripts/check-repo.py:289` reads.
 
 ## Approach
 
@@ -9860,7 +9884,7 @@ whole signal).
   MESSAGE-INTEGRITY on its reader. Lost: podssh-core, which holds sans-IO protocols too, but where the
   TURN road would not be; a codec inside `doctor`, which T-621 could not share.
 - UDP goes straight out whether a proxy is set or not, as the iroh road's probe sends it
-  (`crates/podssh-iroh/src/probe.rs:4` says "drop its datagrams further on, as a network whose way out"):
+  (`PodUtils/podcrates:crates/pod-iroh/src/probe.rs` says "drop its datagrams further on, as a network whose way out"):
   the line asks about direct
   paths, which the iroh road tries behind a proxy too. Lost: nothing sent behind a proxy, as `UDP out`
   does; that line tells what the quick tunnel's node takes, which behind a proxy is HTTP/2 whatever
@@ -10357,7 +10381,7 @@ podssh. A known defect of the crate on Windows ARM64 (podcrates T-131) leaves th
 road until podcrates repairs it. The entry is open, by its priority (P3), behind podssh's own work.
 
 2026-11-14 (the draft): the road is a crate of its own, `crates/podssh-gsr`, behind the feature `gsr` of
-podssh-cli, as `crates/podssh-warp` and `crates/podssh-tor` are, not a module of podssh-ws: pod-gsr links
+podssh-cli, as `crates/podssh-warp` and `PodUtils/podcrates:crates/pod-tor/` are, not a module of podssh-ws: pod-gsr links
 OpenSSL, which no default build of podssh-ws takes. So the Prove's `cargo test -p podssh-ws gsr` becomes
 `cargo test -p podssh-gsr`, and the feature's tests of podssh-cli join it. The roads' order: the client
 races the road once each road before it failed, after the bore road and before the file hosts' road, the

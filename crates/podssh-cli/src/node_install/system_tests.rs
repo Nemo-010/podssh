@@ -301,7 +301,9 @@ fn a_printed_unit_writes_no_file() {
         Ok(planned) => {
             assert_eq!(code, 0, "{err}");
             assert!(out.contains("ExecStart=") && out.contains(&format!("node {name} 127.0.0.1:22")), "{out}");
-            assert!(out.contains(&planned.display().to_string()), "the file that --install writes: {out}");
+            // Its name: Windows quotes the path with each backslash doubled.
+            let file = planned.file_name().unwrap_or_default().to_string_lossy().into_owned();
+            assert!(out.contains(&file), "the file that --install writes: {out}");
             assert!(!planned.exists(), "{} was written", planned.display());
         }
         // A cache of none: the refusal, and nothing written either.

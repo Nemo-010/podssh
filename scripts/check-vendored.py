@@ -2,7 +2,7 @@
 """The upstreams of the vendored crates against what vendor/README.md names (T-341).
 
 Dependabot moves no path package, so nothing else says that russh (a copy
-again since T-460), iroh-relay, ssh-key (T-609) or the Tailscale fork released again. For
+again since T-460), ssh-key (T-609) or the Tailscale fork released again. For
 each section of vendor/README.md that a copy under vendor/ still has, this
 reads the upstream's newest release
 (crates.io's max_stable_version, or the repository's latest release on
@@ -45,7 +45,6 @@ README = ROOT / "vendor" / "README.md"
 # manifest of the copy with the keys of its version.
 WATCHES = [
     ("russh", "crates.io", "russh", "vendor/russh/Cargo.toml", ("package", "version")),
-    ("iroh-relay", "crates.io", "iroh-relay", "vendor/iroh-relay/Cargo.toml", ("package", "version")),
     ("ssh-key", "crates.io", "ssh-key", "vendor/ssh-key/Cargo.toml", ("package", "version")),
     ("tailscale-rs", "github", "tailscale/tailscale-rs", "vendor/tailscale-rs/Cargo.toml",
      ("workspace", "package", "version")),

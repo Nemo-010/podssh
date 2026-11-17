@@ -63,7 +63,7 @@ Recommendation: the server goes in crates/podssh-ssh/src/server/, and only
 the command line in crates/podssh-cli/src/serve.rs. `docs/design.md:28-30`
 gives `podssh-ssh` the "russh client and server"; the crate links aws-lc
 already (`crates/podssh-ssh/Cargo.toml:10-15`), holds the helpers to reuse,
-and is read by the variable test (`crates/podssh-cli/src/man/facts/tests.rs:16-29`).
+and is read by the variable test (`crates/podssh-cli/src/man/facts/tests.rs:16-21`).
 A new crate lost: it repeats the russh dependency and its C exception, and
 makes the helpers public. `podssh-cli` lost: it is the command line.
 
@@ -109,7 +109,7 @@ on T-698.
 2026-11-13. The Premise, read again at `f6c8ba7`:
 
 - russh is 0.65.0, not 0.64.1, and the tree builds it from `vendor/russh` with podssh's patches,
-  through `[patch.crates-io]` of the workspace (`Cargo.toml:217`). Its server module is still built
+  through `[patch.crates-io]` of the workspace (`Cargo.toml:214`). Its server module is still built
   on each target but wasm (`vendor/russh/src/lib_inner.rs:67-68`). `auth_publickey` now takes a
   `VerifiedPublicKey` (the key and the algorithm of its signature), and `auth_publickey_offered` a
   `PublicKeyOffer` (`vendor/russh/src/server/mod.rs:210-251`); a request handler that does not answer
@@ -1424,7 +1424,7 @@ syslog and no `/var`. A record must not leak secrets or session data.
 
 - Read: podssh's log goes to stderr or to a file
   (`crates/podssh-ssh/src/log.rs:46-62`), as lines with no structure.
-- Read: `serde_json` is a workspace dependency (`Cargo.toml:124`), but not a
+- Read: `serde_json` is a workspace dependency (`Cargo.toml:121`), but not a
   dependency of `podssh-ssh` yet.
 - Read in the report of GitHub #25, not verified here: USBoverSSH writes an
   audit log of connection events.

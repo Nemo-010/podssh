@@ -42,7 +42,7 @@ jobs:
           fi
           echo "the planted sum exited 1, as it must"
 
-  # crates.io's newest russh and iroh-relay, and tailscale-rs's latest
+  # crates.io's newest russh and ssh-key, and tailscale-rs's latest
   # release, against the copies and the lines "Upstream read" of
   # vendor/README.md: Dependabot moves no path package.
   vendored:

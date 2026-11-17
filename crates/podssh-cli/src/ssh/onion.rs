@@ -38,7 +38,7 @@ pub(crate) struct OnionRoads {
     shown: String,
     /// This end's client of Tor, bootstrapped at the first link of the run.
     #[cfg(feature = "tor")]
-    tor: tokio::sync::OnceCell<podssh_tor::Tor>,
+    tor: tokio::sync::OnceCell<pod_tor::Tor>,
 }
 
 impl OnionRoads {
@@ -131,11 +131,11 @@ impl OnionRoads {
             })
             .await?;
         self.log.verbose(&format!("{}: the onion road to the node's service", self.shown));
-        let key = podssh_tor::Discovery::from_secret(self.discovery);
+        let key = pod_tor::Discovery::from_secret(self.discovery);
         let port = crate::onion::VIRTUAL_PORT;
         let stream = tor.connect_onion(address, port, Some(&key), LIMIT).await;
         let stream = stream.map_err(|f| format!("the onion road: {f}"))?;
-        Ok(Road::Onion(Box::new(podssh_tor::onion::bridged(stream))))
+        Ok(Road::Onion(Box::new(pod_tor::onion::bridged(stream))))
     }
 
     #[cfg(not(feature = "tor"))]

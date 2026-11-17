@@ -1179,8 +1179,8 @@ road, and the same faults end a session of the forward road with 255
   `scripts/fake_ws.py`, which `scripts/fake-relay.py` imports);
   `--stop-after`, `--pause` and `--start-file` in `scripts/fake-proxy.py`;
   iroh's relay server under a name (`spawn_named` in
-  `crates/podssh-iroh/src/test_relay.rs`); and `PODSSH_IROH_UDP=off`, which
-  turns the iroh road's UDP off (`crates/podssh-iroh/src/endpoint.rs`, in
+  `PodUtils/podcrates:crates/pod-iroh/src/test_relay.rs`); and `PODSSH_IROH_UDP=off`, which
+  turns the iroh road's UDP off (`PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs`, in
   the manual).
 - The checks: 11 ignored tests in `crates/podssh-cli/tests/m6_exit.rs`, and
   the gate's step `m6` (`scripts/gate.sh`), which CI runs at each push.
@@ -1199,7 +1199,7 @@ road, and the same faults end a session of the forward road with 255
 # T-157: Throughput on each road and relay, by a committed method
 
 **Source:** ROADMAP M6 (throughput on each road and relay, in and out of a
-sandbox, before a default depends on it); `docs/design.md:1432-1452`; the two
+sandbox, before a default depends on it); `docs/design.md:1436-1456`; the two
 sandbox reports of 2026-10-08; GitHub #18 (warren's method) and GitHub #23
 (sshping: throughput up and down).
 **Category:** measurement
@@ -1223,7 +1223,7 @@ proxy (4 runs). Read in the report, not verified here: the script's target
 (thinkbroadband) gave `1011 write failed` and 0 bytes, and the relay's
 `/trace` showed that the relay could not reach it.
 Read: no iroh figure exists for a relay through a CONNECT proxy
-(`docs/design.md:1432-1452`). A session carries 64 MiB at most, both directions
+(`docs/design.md:1436-1456`). A session carries 64 MiB at most, both directions
 together (`docs/relay.md:475`).
 
 ## Approach
@@ -2882,8 +2882,8 @@ relay's figure.
 ## Premise
 
 - Read: the iroh road turns UDP off with `PODSSH_IROH_UDP`
-  (`crates/podssh-iroh/src/endpoint.rs:96`), and its probe only binds a
-  socket (`crates/podssh-iroh/src/probe.rs:24-27`).
+  (`PodUtils/podcrates:crates/pod-iroh/src/endpoint.rs`), and its probe only binds a
+  socket (`PodUtils/podcrates:crates/pod-iroh/src/probe.rs`).
 - Read: no file of `crates/podssh-cli/tests/throughput_harness/` sets
   `PODSSH_IROH_UDP`.
 - Inferred: iroh moves a connection to a direct path when one works.
@@ -2913,7 +2913,7 @@ say so:
 
 - The iroh client watches the paths of each connection (iroh's
   `paths_stream`), and notes when a direct path is the one that carries the
-  data (`crates/podssh-iroh/src/client.rs`); `Dialer::path` gives "the
+  data (`PodUtils/podcrates:crates/pod-iroh/src/client.rs`); `Dialer::path` gives "the
   relay carried each byte of the session" or "a direct path carried the
   session", and nothing before a connection. `podssh ssh iroh:TICKET`, and
   the race of a pair's label with the iroh road, say it at the end of the

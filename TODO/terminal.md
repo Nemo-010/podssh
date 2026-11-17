@@ -150,7 +150,7 @@ writes over the rows above it.
   (`git show 7e4a518:crates/podssh-terminal/src/term.rs`, lines 47-53). The documented rule
   sends `TERM` unchanged (`docs/terminal.md:110-115`). The
   manual does not name `PODSSH_TERM`, and its variable test does not read
-  this crate (`crates/podssh-cli/src/man/facts/tests.rs:16-29`).
+  this crate (`crates/podssh-cli/src/man/facts/tests.rs:16-21`).
 
 ## Approach
 

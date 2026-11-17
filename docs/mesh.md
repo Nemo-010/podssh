@@ -131,7 +131,7 @@ What T-445 built (drafted 2026-11-02; [design.md](design.md), section 7):
   `quick=NAME.trycloudflare.com`, and `pinggy=NAME#PIN` since T-548's step
   3), which iroh reads past; a key that iroh
   does not know under `_iroh` would make iroh refuse the whole record
-  (`crates/podssh-iroh/src/pkarr_record.rs`).
+  (`crates/pod-iroh/src/pkarr_record.rs` of PodUtils/podcrates).
 - A node of `--iroh --derp` names its DERP home once its DERP road is
   online, and again at each move; a node of `--quick-tunnel`, of the DERP
   road alone, or of `--pinggy` (each tunnel's address, as the free tunnel's

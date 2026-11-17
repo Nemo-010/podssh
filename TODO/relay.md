@@ -943,7 +943,7 @@ sh scripts/dev.sh check                   # interop-faults: a token in PODSSH_CA
 
 With a set environment: `PODSSH_CACHE_DIR` comes first, `none` gives no candidate, and
 `XDG_RUNTIME_DIR` comes before the temporary directory. A scan of `cache.rs`, as
-`crates/podssh-cli/src/man/facts/tests.rs:14-51` scans source, finds no absolute path literal. In
+`crates/podssh-cli/src/man/facts/tests.rs:14-48` scans source, finds no absolute path literal. In
 the gate, the token file goes into a new `PODSSH_CACHE_DIR`; with a plain file there, the run
 still exits 0 and names the refusal. Planted defect: put `/dev/shm` back; the scan fails.
 
@@ -4098,7 +4098,7 @@ Read at `2042200`:
   (`crates/podssh-relay/src/serve/reverse/pairs.rs:296`), and ACME's cache at each renewal. A root
   that dropped `CAP_DAC_OVERRIDE` reads a file of another owner only as its mode lets uid 0
   (Inferred from capabilities(7); not measured here).
-- `crates/podssh-cli/Cargo.toml:211` says "[target.'cfg(unix)'.dependencies]" above the binary's
+- `crates/podssh-cli/Cargo.toml:220` says "[target.'cfg(unix)'.dependencies]" above the binary's
   `libc` row, so the calls need no new crate and no C of a library crate (rule 4 of `AGENTS.md`).
 - `crates/podssh-cli/src/exitmap.rs:139` says "Fault::Capability | Fault::Config => sysexits::EX_CONFIG":
   78 is this host not set up for the mode.
@@ -5503,7 +5503,7 @@ Podcrates T-120 takes the document at its import; podssh writes it first.
 - `crates/podssh-probe/tests/spec/relay-spec-2026-10-03-r2.txt`: the forward contract, as the default relay
   gives it.
 - `docs/reverse.md`, `docs/design.md` (section 5): the reverse and layer frames, in prose.
-- `docs/design.md:1305`: a test vector exists for iroh's tickets only.
+- `docs/design.md:1309`: a test vector exists for iroh's tickets only.
 
 ## Approach
 
@@ -5976,7 +5976,7 @@ GitHub #225's author lifts [DEFERRED], or the owner orders it.
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** blocked
+**Status:** open
 
 ## Problem
 
@@ -6011,7 +6011,52 @@ podlab run --serve 8443 --serve-ca PKI/ca.pem ws-upgrade-refused -- sh scripts/p
 Command 6 says "the session resumed" in `ws-upgrade-refused` too. Planted: the role refuses the layer over the road, and
 command 6 ends the session.
 
-## Blocker
+## Correction
 
-PodUtils/podcrates: `pod-relay`'s client of the HTTP road names no target but a host and a port (COORD-095, #287). Then steps 2
-and 3 are podssh's.
+2026-11-17. podcrates `v0.65.0` (its T-801, COORD-125) gives the client: `forward_layer::Dialer::link_or_road` and
+`carry_or_road` take the HTTP road for a link once the way refused a link's upgrade, each link a new session of the
+road; the wire is `POST /v1/http/open-layer/HOST/PORT` and `/v1/http/one-layer/HOST/PORT` (`layer_route`). What stays
+podssh's: the role serves the two opens (`crates/podssh-relay/src/serve/http_road`) and gives the bytes to its layer as
+one link, and `relay_layer.rs` calls the two. podcrates' `tests/http_road_layer.rs` has a stand-in role that does it.
+
+
+# T-801: The relay role drops a node's socket at once after a reset or a failed write, and says why a node does not open
+
+**Source:** PodUtils/podnet#604 (COORD-098 of podnet), ask 1, passed to podssh by podcrates' COORD-124
+(PodUtils/podcrates#214): the relay role is podssh's until `pod-relay-serve` (podcrates T-036), whose import takes
+the fix.
+**Category:** defect
+**Milestone:** M10
+**Priority:** P2
+**Effort:** S
+**Status:** open
+
+## Problem
+
+podnet saw a node that the relay answered `409` for its own socket for minutes after the node's link was lost: the
+role still held the lost socket, so the node's new socket was refused and each operator's connection reached the old
+one and stopped. A socket whose read reset or whose write failed is dead; the role should forget it at once, and an
+operator whose node does not open should hear why.
+
+## Premise
+
+- To be read at the start: where podssh's role keeps a node's socket and answers `409`
+  (`crates/podssh-relay/src/serve/reverse/`), and what it does with a reset on the read or a failed write.
+
+## Approach
+
+1. On a reset of the node's read or a failed write to it, the role drops the socket from its table at once, so the
+   node's next socket is taken with no `409`.
+2. An operator's connection to a node whose socket the role dropped gets a Close whose reason says the node's link was
+   lost, not a silent end.
+3. A test: a node's socket reset (its TCP closed with RST), then the node's next socket is accepted at once and an
+   operator reaches it.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-relay --features serve --lib serve::reverse
+```
+
+A planted hold of the dead socket makes the test's second socket get `409`.

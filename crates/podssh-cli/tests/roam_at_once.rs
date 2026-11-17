@@ -117,17 +117,17 @@ mod iroh {
         }
         let session = Session::start(tag);
         let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap();
-        let relay = runtime.block_on(podssh_iroh::test_relay::spawn_named(&session.home, NAME)).expect("an iroh relay");
+        let relay = runtime.block_on(pod_iroh::test_relay::spawn_named(&session.home, NAME)).expect("an iroh relay");
         let port = relay.url.port().expect("the relay's port");
         let start = session.home.join("start");
         let map = [format!("{NAME}=127.0.0.1:{port}")];
         let node_proxy = proxy(&session, "node", &map, &[], &start);
         let client_proxy = proxy(&session, "client", &map, fault, &start);
         let client_key = session.home.join("client.key");
-        let place = podssh_iroh::keys::Place::File(client_key.clone());
-        let key = podssh_iroh::keys::load(&place, &mut podssh_relay::session::OsEntropy).expect("a key");
+        let place = pod_iroh::keys::Place::File(client_key.clone());
+        let key = podssh_cli::iroh_way::load_key(&place, &mut podssh_relay::session::OsEntropy).expect("a key");
         let allow = session.home.join("allow");
-        let line = format!("{} the test's client\n", podssh_iroh::keys::fingerprint(&key.public()));
+        let line = format!("{} the test's client\n", pod_iroh::keys::fingerprint(&key.public()));
         std::fs::write(&allow, line).unwrap();
         let (url, cert) = (relay.url.to_string(), relay.cert.to_string_lossy().into_owned());
         let text = |p: &std::path::Path| p.to_string_lossy().into_owned();

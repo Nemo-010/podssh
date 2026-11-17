@@ -408,7 +408,7 @@ edited by hand.
   road (`podssh node --help`); the end-to-end channel proves each end's Ed25519 key
   (`PodUtils/podssh:crates/podssh-relay/src/e2e/handshake.rs`).
 - A node's record at a pkarr server names its iroh home relay
-  (`crates/podssh-iroh/src/pkarr.rs:1`).
+  (`PodUtils/podcrates:crates/pod-iroh/src/pkarr.rs`).
 
 ## Approach
 
@@ -2692,7 +2692,7 @@ name stay unknown.
 
 ## Premise
 
-- `crates/podssh-iroh/src/pkarr.rs:1` says "A node's record at a server of pkarr (T-350"; read at
+- `PodUtils/podcrates:crates/pod-iroh/src/pkarr.rs` says "A node's record at a server of pkarr (T-350"; read at
   `f8d15bf`, before this entry, the line went on "): its home relay, signed with", and
   `Record::of` read iroh's `EndpointInfo` alone.
 
@@ -2780,20 +2780,24 @@ cargo test -p podssh-iroh
 A record with each road is read back whole; a client with the node's key alone reaches it over
 DERP when iroh is refused. Planted: the DERP record dropped, and the test fails.
 
+## Correction
+
+2026-11-17. The package podssh-iroh is `pod-iroh` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-iroh` are podcrates' now (`cargo test -p pod-iroh` there); podssh's part of it is `crates/podssh-cli/src/iroh_way.rs` and the CLI's tests with `--features iroh-test`.
+
 ## Done
 
 2026-11-02: drafted by an agent in a worktree of its own (branch `worktree-agent-t445-record`),
 which built nothing; merged and measured by the main session the same day.
 
-- `crates/podssh-iroh/src/pkarr_record.rs`: `Roads` (what a node puts), `Record` (moved from
+- `PodUtils/podcrates:crates/pod-iroh/src/pkarr_record.rs`: `Roads` (what a node puts), `Record` (moved from
   `pkarr.rs`, with `derp`, `quick` and `set_aside`), `packet` and its signature, `quick_name`;
-  its tests with no network in `crates/podssh-iroh/src/pkarr_record_tests.rs`.
-- `crates/podssh-iroh/src/pkarr.rs`: `publish` takes `Roads`; `keep` takes the node's other roads
+  its tests with no network in `PodUtils/podcrates:crates/pod-iroh/src/pkarr_record_tests.rs`.
+- `PodUtils/podcrates:crates/pod-iroh/src/pkarr.rs`: `publish` takes `Roads`; `keep` takes the node's other roads
   (`None` for the home relay alone), `keep_roads` for a node with no endpoint.
-  `crates/podssh-iroh/src/client.rs`: a record with no iroh relay is said so. podssh-iroh builds
+  `PodUtils/podcrates:crates/pod-iroh/src/client.rs`: a record with no iroh relay is said so. podssh-iroh builds
   podssh-relay with `derp` (pure Rust), and simple-dns; its tests take crypto_box for the stand-in
   DERP server; the lock's entry of `podssh-iroh` gained the two names by hand.
-- `crates/podssh-iroh/tests/record_roads.rs`: a record with each road through the stand-in server
+- `PodUtils/podcrates:crates/pod-iroh/tests/record_roads.rs`: a record with each road through the stand-in server
   of pkarr, read back by podssh and by iroh's `PkarrRelayClient`; a node that keeps its record as
   its DERP road comes online at podssh-relay's stand-in DERP server, and a client with its key
   alone that races the record's iroh road (a relay where nothing listens) and DERP road, and
@@ -2809,7 +2813,7 @@ which built nothing; merged and measured by the main session the same day.
   (`crates/podssh-cli/src/man/facts/iroh_road.rs`); the notes of `node` (`--iroh`, `--derp`,
   `--quick-tunnel`), of `ssh` (node://NAME of a member) and of `net`. `docs/mesh.md` (section 3),
   `docs/design.md` (section 7) and `docs/STATUS.md` name it.
-- Planted: `scripts/plants/t445-record-no-derp.patch`, the DERP home left out of the packet; the
+- Planted: `PodUtils/podcrates:scripts/plants/t445-record-no-derp.patch`, the DERP home left out of the packet; the
   test of the client with the key alone must fail, waiting for it.
 - The merge: applied onto `582b1bf`; its conflicts with T-428's relay behind the quick tunnel
   (`node_quick.rs`: the role and the record side by side, the optional TARGET kept),
@@ -4757,7 +4761,7 @@ Read again on 2026-11-03 at the cited lines and in the code:
 
 - Approach, item 1: "its record names the road once T-445 is done". T-445 is done, but its record
   names three roads, the iroh home relay, the DERP home and the quick tunnel
-  (`crates/podssh-iroh/src/pkarr_record.rs:104` says "pub struct Roads"), and a member's client
+  (`PodUtils/podcrates:crates/pod-iroh/src/pkarr_record.rs` says "pub struct Roads"), and a member's client
   races those three alone. Naming the OpenTunnel name there is a new kind of road in that record,
   in its reader and in the client's race: T-611.
 - Approach, item 3: the operator's ruling Q76 answered question 3: the unasked fallback, for a node
@@ -6900,7 +6904,7 @@ port 443 over a WebSocket.
 - `docs/carriers.md:1572` says "NetBird's relays, 67 over a WebSocket on TCP 443," and
   `docs/carriers.md:1575` says "so each peer needs an account": a relay admits a peer with a token
   of NetBird's management server alone.
-- `crates/podssh-iroh/src/probe.rs:1` says "Whether this host's UDP goes out and comes back
+- `PodUtils/podcrates:crates/pod-iroh/src/probe.rs` says "Whether this host's UDP goes out and comes back
   (T-359). A sandbox can": podssh probes UDP before it takes it.
 
 ## Approach
@@ -10258,7 +10262,7 @@ WebTunnel in its own process. podssh's Tor road dials out alone.
 - `docs/carriers.md:1468-1469` says "the purpose fits, but Tor's TLS fails through a proxy that
   re-terminates TLS", and `docs/carriers.md:1473-1474` says "Both reasons changed on 2026-11-01:
   T-385 runs meek_lite and WebTunnel in podssh's own process".
-- `crates/podssh-tor/src/lib.rs:8` says "Bridges (T-385) take their first hops in place of the
+- `PodUtils/podcrates:crates/pod-tor/src/lib.rs` says "Bridges (T-385) take their first hops in place of the
   directory's".
 
 ## Approach
@@ -10349,7 +10353,7 @@ Partial (step 1, read on 2026-11-12 in arti-client 0.48.0, tor-hsservice 0.48.0 
   which podssh's loader keeps.
 
 Merged on 2026-11-12 (the draft `draft-t578`, `2fe94e3`, built and run; steps 2 to 4 in part):
-- `crates/podssh-tor/src/onion.rs`: `Tor::serve_onion` (the service of `ServiceOptions`: nickname, virtual
+- `PodUtils/podcrates:crates/pod-tor/src/onion.rs`: `Tor::serve_onion` (the service of `ServiceOptions`: nickname, virtual
   port, the keys of restricted discovery), `Onion::published`, `Onion::accept` (a stream to the port; END to
   another), `Tor::connect_onion` (the key of discovery put in the client's keystore), `Discovery`, `is_onion`.
   `Cargo.toml` takes arti-client's `onion-service-client`, `onion-service-service`, `restricted-discovery` and
@@ -11828,7 +11832,7 @@ way to it: the node's record of pkarr names its other roads alone.
 
 ## Premise
 
-- `crates/podssh-iroh/src/pkarr_record.rs:104` says "pub struct Roads": the iroh home relay, the
+- `PodUtils/podcrates:crates/pod-iroh/src/pkarr_record.rs` says "pub struct Roads": the iroh home relay, the
   DERP home and the quick tunnel's name, which `crates/podssh-cli/src/node_record.rs` keeps up to
   date (`Tell`, its `derp` and `quick`).
 - `crates/podssh-cli/src/node_opentunnel.rs` knows the node's name once its tunnel is ready.
@@ -11898,7 +11902,7 @@ podssh takes by the next tag; a test of the moved code then runs there.
 
 2026-11-13, the draft. podssh has not taken `pod-iroh` or `pod-opentunnel`: neither is in the list
 of crates taken (`TODO/PROGRESS.md`, state item 7, at `v0.40.0`), and that item says that no file of
-podssh is frozen now. So `crates/podssh-iroh/src/pkarr_record.rs`, crates/podssh-relay/src/opentunnel/ at `b9c04657`
+podssh is frozen now. So `PodUtils/podcrates:crates/pod-iroh/src/pkarr_record.rs`, crates/podssh-relay/src/opentunnel/ at `b9c04657`
 and the command line's files of this entry are podssh's to change, and the work is done here. The
 Prove's second command needs the feature `iroh-test`, not `iroh`: the server of pkarr on the
 loopback (`podssh_iroh::test_pkarr`) is built with `podssh-iroh/test-relay` alone, as the test of
@@ -11910,10 +11914,10 @@ module `opentunnel_record` of `crates/podssh-cli/tests/opentunnel_road.rs`, whic
 
 Done 2026-11-13, merged from the draft `ae145e7` of the branch `draft-t611`, built and tested by the main session:
 
-- `crates/podssh-iroh/src/pkarr_record.rs`: `OPENTUNNEL_KEY` (`opentunnel=`), `MAX_OPENTUNNEL`,
+- `PodUtils/podcrates:crates/pod-iroh/src/pkarr_record.rs`: `OPENTUNNEL_KEY` (`opentunnel=`), `MAX_OPENTUNNEL`,
   `opentunnel_name`; `Roads` and `Record` hold the name; the parser reads it, sets a bad one or a
   second one aside unsaid; a record too long goes without the onion, then without the name.
-- `crates/podssh-iroh/src/pkarr.rs`: the keeper of a record with an iroh endpoint takes each road
+- `PodUtils/podcrates:crates/pod-iroh/src/pkarr.rs`: the keeper of a record with an iroh endpoint takes each road
   of its `Tell` but the home relay.
 - `crates/podssh-cli/src/node_record.rs`: `Tell::opentunnel`; `crates/podssh-cli/src/node_opentunnel.rs`
   reads `PODSSH_IROH_PKARR` before anything connects and tells the record its name once its tunnel
@@ -11923,7 +11927,7 @@ Done 2026-11-13, merged from the draft `ae145e7` of the branch `draft-t611`, bui
   each name (`crate::ssh::opentunnel::dialer_of`).
 - The manual: iroh record in THE RELAY, the notes of `--opentunnel` and `--opentunnel-name`, and the
   roads of a member's record in the notes of `podssh ssh`.
-- Planted: `scripts/plants/t611-name-not-read.patch`, the parser drops the name (GROUP=cli-tests).
+- Planted: `PodUtils/podcrates:scripts/plants/t611-name-not-read.patch`, the parser drops the name (GROUP=cli-tests).
 
 Results:
 
@@ -13062,7 +13066,7 @@ A session through the role over QUIC on the loopback; with UDP refused, the race
   (`crates/podssh-relay/src/quick/probe.rs:24` says "pub async fn probe(addrs: &[SocketAddr], wait: Duration)"),
   one packet of a reserved version to the host's own port, which a server of QUIC answers with a
   Version Negotiation, noq's too. T-359's, which Approach 2 names, is QUIC address discovery to
-  iroh's own relays (`crates/podssh-iroh/src/probe.rs:6` says "takes UDP after a datagram came back: the round trip of QUIC address"),
+  iroh's own relays (`PodUtils/podcrates:crates/pod-iroh/src/probe.rs` says "takes UDP after a datagram came back: the round trip of QUIC address"),
   in podssh-iroh, which this road does not build and whose answer says nothing of the relay host.
 - Q82, which the Premise names, puts the roads over UDP after the roads over TCP
   (`docs/decisions.md:39` says "tried only where a probe found that UDP passes, after the roads over TCP");
@@ -13924,7 +13928,7 @@ cannot be the meeting point of its own net. The ask: the same listener also spea
   `/trace`, `/llms-full.txt` and `/connect/`. No route speaks DERP or iroh's relay protocol.
 - `PodUtils/podcrates:crates/pod-derp/src/conn.rs`: podssh's DERP code is a client and the node's end of a link.
   It never forwards a frame between two other keys.
-- `Cargo.toml:43`, `vendor/iroh-relay`: iroh's relay is a client only here.
+- `Cargo.toml:43`, `PodUtils/podcrates:vendor/iroh-relay/`: iroh's relay is a client only here.
 
 ## Approach
 

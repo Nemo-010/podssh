@@ -352,7 +352,7 @@ its client; this deployment serves them once its contract has them.
 13. **An iroh relay of the operator's** (no entry; optional). podssh's iroh
     road (behind the cargo feature `iroh`, in each release binary since
     T-348) uses n0's public relays
-    (`crates/podssh-iroh/src/relays.rs`), which n0 offers for development
+    (`crates/pod-iroh/src/relays.rs` of PodUtils/podcrates), which n0 offers for development
     and hobby use ([design.md](design.md), section 7). The operator decided
     on 2026-10-08 that an iroh relay on the operator's own Cloudflare
     account goes first once it exists, with n0's relays after it

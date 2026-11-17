@@ -6,7 +6,7 @@
 
 use std::time::Duration;
 
-use podssh_iroh::Failure;
+use pod_iroh::Failure;
 use podssh_relay::session::resume::Note;
 use podssh_ssh::{Log, LogLevel};
 use podssh_ws::Trust;
@@ -79,7 +79,7 @@ pub(in crate::chat) async fn run<W: AsyncWrite + Unpin>(
         Ok(prepared) => prepared,
         Err(why) => return run::refused(EX_UNAVAILABLE, why, lines, out).await,
     };
-    let settings = crate::layered::iroh_settings(podssh_iroh::FEATURES);
+    let settings = crate::layered::iroh_settings(pod_iroh::FEATURES);
     // Whether "tries again" was said since the last peer.
     let mut said = false;
     let code = loop {
@@ -102,7 +102,7 @@ pub(in crate::chat) async fn run<W: AsyncWrite + Unpin>(
                     None => None,
                 }
             };
-            tokio::join!(podssh_iroh::carry(&dialer, layer_app, settings, note), session)
+            tokio::join!(pod_iroh::carry(&dialer, layer_app, settings, note), session)
         };
         let conversation = converse_until(chat, lines, out, opts.clone(), until.wait());
         let (summary, road) = both(conversation, road).await;

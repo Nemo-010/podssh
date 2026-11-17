@@ -19,9 +19,7 @@ LISTENERS = {
     # directory: test modules of src/ that reach the crate's own login. And
     # -L and -D of `podssh ssh` (T-038), which the user asks for: the bind and
     # the listen, before anything connects, are the probe, and PODSSH_LISTEN
-    # turns them off. And the stand-in server of pkarr on the loopback
-    # (T-350), beside iroh's test relay: the tests' own, behind the feature
-    # test-relay, which no release builds.
+    # turns them off.
     # And the relay as a role of podssh
     # (T-169, Q63), which the user asks for with `podssh relay serve --listen
     # ADDR:PORT`: the bind is the probe, and PODSSH_LISTEN turns it off;
@@ -37,7 +35,6 @@ LISTENERS = {
         "crates/podssh-cli/src/pipe/listen.rs",
         "crates/podssh-ssh/src/remote_tests.rs",
         "crates/podssh-cli/src/ssh/local_bind.rs",
-        "crates/podssh-iroh/src/test_pkarr.rs",
         "crates/podssh-zerotier/src/stand_in.rs",
     ],
     # The control socket of `podssh ssh -M` (T-039), which the user asks for:
@@ -54,18 +51,13 @@ LISTENERS = {
         "crates/podssh-ssh/src/mux/master.rs",
         "crates/podssh-ssh/src/mux/tests.rs",
     ],
-    # The iroh road (feature `iroh`, T-162), which the user selects: its probe
-    # binds a UDP socket to port 0 and closes it, and only when the probe
-    # allowed it does the endpoint bind UDP for direct paths. And a node's
-    # UDP TARGET (T-168), which the user names (`podssh node NAME
+    # A node's UDP TARGET (T-168), which the user names (`podssh node NAME
     # udp:HOST:PORT`): each flow is a socket of port 0, connected to the
     # target, made only after the node's probe made and closed one. And the
     # quick tunnel over QUIC (T-301), which the user asks for with `podssh
     # node --quick-tunnel`: one socket of port 0 for its one connection to
     # the edge, only with no proxy set; a bind that fails is the probe's
-    # answer, and the node takes HTTP/2. And the tests of the iroh road's
-    # probe (T-359): a UDP port on the loopback that reads and never answers,
-    # as a network that drops UDP further on. And the quick tunnel's probe of
+    # answer, and the node takes HTTP/2. And the quick tunnel's probe of
     # UDP before QUIC (T-400), with the same flag and only with no proxy set:
     # a socket of port 0 for each address probed, connected to it, which
     # sends one packet and closes within 300 ms; doctor's --full sends it too.
@@ -90,8 +82,6 @@ LISTENERS = {
     # the tests of Salamander's wrapper, on the loopback.
     "UdpSocket": [
         "crates/podssh-ws/src/hysteria/probe.rs",
-        "crates/podssh-iroh/src/probe.rs",
-        "crates/podssh-iroh/src/endpoint_udp_tests.rs",
         "crates/podssh-relay/src/udp/flow.rs",
         "crates/podssh-relay/src/quick/quic.rs",
         "crates/podssh-relay/src/quick/probe.rs",
@@ -102,17 +92,17 @@ LISTENERS = {
         "crates/podssh-cli/src/doctor/nat_tests.rs",
     ],
     # The bind probes of `podssh doctor`, which close at once and never listen;
-    # and the iroh road's probe and endpoint, as above, with the commands that
-    # make the endpoint: `podssh node --iroh`, `podssh ssh iroh:` (T-163) and
-    # the race of `podssh ssh --iroh-ticket` (T-164). And `podssh agent`
+    # and the commands that make the iroh road's endpoint (pod-iroh of
+    # PodUtils/podcrates binds it, after its probe of UDP): `podssh node
+    # --iroh`, `podssh ssh iroh:` (T-163) and the race of `podssh ssh
+    # --iroh-ticket` (T-164). And `podssh agent`
     # (T-034), which the user starts: it binds through `podssh pipe`'s
     # listener, after PODSSH_LISTEN, and the bind is its probe. And the
     # flows of a node's UDP TARGET (T-168), as above. And the daemon of
     # `podssh session start` and `serve` (T-186), which the user asks for:
     # it binds through the same listener, after PODSSH_LISTEN, before it
     # connects, and the bind is its probe. And the quick tunnel over QUIC
-    # (T-301) and its probe of UDP (T-400), the tests of the iroh road's
-    # probe (T-359), and the stand-in server of pkarr (T-350), as above. And
+    # (T-301) and its probe of UDP (T-400), as above. And
     # `podssh exit --listen` (T-431), which the user asks for: it binds
     # through `podssh pipe`'s listener, after PODSSH_LISTEN, on a loopback
     # address alone, and the bind is its probe. And the tests of a service's
@@ -138,8 +128,6 @@ LISTENERS = {
         "crates/podssh-cli/src/relay_serve.rs",
         "crates/podssh-cli/src/relay_serve/quic.rs",
         "crates/podssh-cli/src/relay_serve/tests.rs",
-        "crates/podssh-iroh/src/test_pkarr.rs",
-        "crates/podssh-iroh/src/endpoint_udp_tests.rs",
         "crates/podssh-relay/src/udp/flow.rs",
         "crates/podssh-relay/src/quick/quic.rs",
         "crates/podssh-relay/src/quick/probe.rs",
@@ -149,8 +137,6 @@ LISTENERS = {
         "crates/podssh-cli/src/pipe/listen.rs",
         "crates/podssh-cli/src/pipe/listen_win.rs",
         "crates/podssh-cli/src/pipe/serve.rs",
-        "crates/podssh-iroh/src/probe.rs",
-        "crates/podssh-iroh/src/endpoint.rs",
         "crates/podssh-cli/src/node_iroh.rs",
         "crates/podssh-cli/src/ssh/iroh/dial.rs",
         "crates/podssh-cli/src/ssh/iroh/race.rs",
@@ -177,7 +163,6 @@ LISTENERS = {
         "crates/podssh-cli/src/pipe/listen_win.rs",
         "crates/podssh-cli/src/doctor/unix.rs",
         "crates/podssh-zerotier/src/stand_in.rs",
-        "crates/podssh-tor/src/runtime.rs",
         "crates/podssh-zerotier/src/member_tests.rs",
         "crates/podssh-zerotier/src/road.rs",
     ],

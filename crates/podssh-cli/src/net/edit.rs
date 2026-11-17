@@ -260,8 +260,8 @@ fn rm(before: &Doc, name: &str, issued: i64, expires: i64) -> Result<(Doc, Strin
 /// without it, the ticket is kept unread, for the ends that have the road.
 #[cfg(feature = "iroh")]
 fn iroh_names(text: &str, key: &KeyName) -> Result<(), Refusal> {
-    let addr = podssh_iroh::ticket::parse(text).map_err(|why| Refusal::usage(format!("--iroh-ticket: {why}")))?;
-    let node = podssh_iroh::keys::identity_key(&addr.id);
+    let addr = pod_iroh::ticket::parse(text).map_err(|why| Refusal::usage(format!("--iroh-ticket: {why}")))?;
+    let node = pod_iroh::keys::identity_key(&addr.id);
     match key.matches(&node) {
         true => Ok(()),
         false => Err(Refusal::usage(format!("--iroh-ticket names the node {node}, not {key}"))),

@@ -59,7 +59,7 @@ pub(super) fn blocks() -> Vec<Block> {
 /// The relays of the iroh road (T-165).
 #[cfg(feature = "iroh")]
 fn relays() -> Block {
-    use podssh_iroh::relays;
+    use pod_iroh::relays;
     item(
         vec![lit("iroh relays")],
         format!(
@@ -78,7 +78,7 @@ fn relays() -> Block {
 /// A node's record of its roads at a server of pkarr (T-350, T-445).
 #[cfg(feature = "iroh")]
 fn record() -> Block {
-    use podssh_iroh::pkarr;
+    use pod_iroh::pkarr;
     item(
         vec![lit("iroh record")],
         format!(
@@ -105,7 +105,7 @@ fn record() -> Block {
             n0 = pkarr::n0_url(),
             env = pkarr::ENV,
             minutes = pkarr::REPUBLISH.as_secs() / 60,
-            after = podssh_iroh::client::FIND_AFTER.as_secs(),
+            after = pod_iroh::client::FIND_AFTER.as_secs(),
             limit = pkarr::LIMIT.as_secs(),
             opentunnel = pkarr::record::MAX_OPENTUNNEL,
         ),

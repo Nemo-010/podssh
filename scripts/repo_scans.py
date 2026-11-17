@@ -107,9 +107,11 @@ PATCH_RULE = "the lock builds the release in place of the copy of vendor/: move 
 
 def patch_misses(manifest: str, lock: str) -> tuple[int, list[str]]:
     """Each package of the manifest's `[patch.crates-io]` that the lock does
-    not take from its path, and each `[[patch.unused]]` of the lock: an
-    update of the crate that did not move the copy builds the release, with
-    none of the patch, and cargo only warns. The count is of the patches read."""
+    not take from its path, or from the git repository that the patch names
+    (a fork of PodUtils/podcrates), and each `[[patch.unused]]` of the lock:
+    an update of the crate that did not move the copy builds the release,
+    with none of the patch, and cargo only warns. The count is of the
+    patches read."""
     patched = ((tomllib.loads(manifest).get("patch") or {}).get("crates-io") or {})
     locked = tomllib.loads(lock)
     misses = [f"[[patch.unused]] names {u.get('name')} {u.get('version')}"
@@ -118,5 +120,8 @@ def patch_misses(manifest: str, lock: str) -> tuple[int, list[str]]:
         found = [p for p in locked.get("package", []) if p.get("name") == name]
         if not found:
             misses.append(f"{name} is patched, and no package of the lock has that name")
-        misses.extend(f"{name} {p.get('version')} comes from {p['source']}" for p in found if "source" in p)
+        git = patched[name].get("git") if isinstance(patched[name], dict) else None
+        ours = f"git+{git}?" if git else None
+        misses.extend(f"{name} {p.get('version')} comes from {p['source']}" for p in found
+                      if "source" in p and not (ours and p["source"].startswith(ours)))
     return len(patched), misses

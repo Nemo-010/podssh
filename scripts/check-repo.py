@@ -26,10 +26,12 @@
   9. No source of crates/*/src, outside its tests, prints with a macro that
      panics when its write fails (`eprintln!` and its kin), as the release
      aborts on a panic (T-389). A planted one is found; one in tests is not.
- 10. Each package of a `[patch.crates-io]` (the copies of vendor/) is built
-     from its path by its lock file: an update of the crate that did not
-     move the copy builds the release, with none of podssh's patch, and
-     cargo only warns (T-460). Two planted locks must be found.
+ 10. Each package of a `[patch.crates-io]` (the copies of vendor/, and the
+     fork of iroh-relay of PodUtils/podcrates) is built from its path, or
+     from the repository that it names, by its lock file: an update of the
+     crate that did not move the copy builds the release, with none of
+     podssh's patch, and cargo only warns (T-460). Three planted locks must
+     be found.
  11. docs/STATUS.md reads `main`, so each row of work after `v1.0.0` names
      the first release that holds it, or says `unreleased`; a row that says
      `unreleased` with a date before the newest release's is stale (T-594).
@@ -382,7 +384,16 @@ def check_patches_used() -> list[str]:
             problems.append(f"the scan of the patches is vacuous: it passed the lock {planted!r}")
     if patch_misses(patch, path)[1]:
         problems.append("the scan of the patches fails a lock that builds the copy")
-    check_patches_used.note = f"{read} packages of [patch.crates-io] read, each built from its path; 2 planted locks found"
+    # A fork of podcrates by its git tag: the lock takes it from that
+    # repository; the release of crates.io is still a miss.
+    fork = '[patch.crates-io]\niroh-relay = { git = "https://github.com/PodUtils/podcrates", tag = "v1.0.0" }\n'
+    taken = '[[package]]\nname = "iroh-relay"\nversion = "1.4.1"\n' \
+        'source = "git+https://github.com/PodUtils/podcrates?tag=v1.0.0#0123abc"\n'
+    if patch_misses(fork, taken)[1]:
+        problems.append("the scan of the patches fails a lock that builds the fork of podcrates")
+    if not patch_misses(fork, release.replace("russh", "iroh-relay"))[1]:
+        problems.append("the scan of the patches passed the release in place of the fork of podcrates")
+    check_patches_used.note = f"{read} packages of [patch.crates-io] read, each built from its source; 3 planted locks found"
     return problems
 
 

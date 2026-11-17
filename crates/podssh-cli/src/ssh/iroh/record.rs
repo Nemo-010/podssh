@@ -17,14 +17,14 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use iroh::{EndpointAddr, PublicKey};
-use podssh_iroh::pkarr::{self, Finder, Record, Roads};
+use pod_iroh::pkarr::{self, Finder, Record, Roads};
 use podssh_relay::derp::{servers, Dialer, Server, Ticket};
 use podssh_relay::identity::KeyName;
 use podssh_relay::opentunnel::{Dialer as OpenTunnelDialer, Name as OpenTunnelName};
 use podssh_relay::session::race::{Start, HEAD_START};
 use podssh_ssh::Log;
 use podssh_ws::cloudflare::Access;
-use podssh_ws::{ProxyChoice, Trust};
+use podssh_ws::Trust;
 use tokio::sync::OnceCell;
 use tokio::time::Instant;
 
@@ -74,8 +74,8 @@ pub(crate) fn record_ask(
     let Some(member) = crate::net::lookup::member(label).filter(|_| !channel.off) else { return Ok(None) };
     let KeyName::Key(key) = member.key else { return Ok(None) };
     let Ok(key) = PublicKey::from_bytes(&key.0) else { return Ok(None) };
-    let (relays, _) = podssh_iroh::relays::from_environment(None).map_err(Refusal::config)?;
-    let Some(server) = pkarr::choose(&relays).map_err(Refusal::config)? else { return Ok(None) };
+    let (relays, _) = crate::iroh_way::relays(None).map_err(Refusal::config)?;
+    let Some(server) = crate::iroh_way::pkarr_server(&relays).map_err(Refusal::config)? else { return Ok(None) };
     let iroh = (!iroh_given).then(|| relays.iter().map(ToString::to_string).collect());
     let derp = (derp.fallback && derp.road(label).is_none()).then(|| derp.servers.clone());
     // As the DERP home: a name given or kept is the road of its own place.
@@ -138,7 +138,7 @@ impl<'a> RecordRoads<'a> {
     async fn look(&self) -> Result<Record, String> {
         let (shown, host) = (self.shown, self.ask.server.host().to_string());
         self.log.verbose(&format!("{shown}: asking the node's record at {host}, by the key that the net names"));
-        let finder = Finder::new(self.ask.server.clone(), self.trust.clone(), ProxyChoice::FromEnvironment);
+        let finder = Finder::new(self.ask.server.clone(), self.trust.clone(), crate::iroh_way::way());
         match finder.find(&self.ask.key).await {
             Ok(Some(record)) => {
                 let (relay, derp, quick) = (record.relays.first().cloned(), record.derp.clone(), record.quick.clone());
@@ -169,9 +169,9 @@ impl<'a> RecordRoads<'a> {
             return Err("its record names no iroh relay".into());
         };
         let addr = record.relays.iter().cloned().fold(EndpointAddr::new(self.ask.key), EndpointAddr::with_relay_url);
-        let (ticket, key) = (podssh_iroh::ticket::format(&addr), self.ask.client_key.clone());
+        let (ticket, key) = (pod_iroh::ticket::format(&addr), self.ask.client_key.clone());
         let race = Race { ticket, key, relays: relays.clone() };
-        let finder = Finder::new(self.ask.server.clone(), self.trust.clone(), ProxyChoice::FromEnvironment);
+        let finder = Finder::new(self.ask.server.clone(), self.trust.clone(), crate::iroh_way::way());
         Ok(IrohRoad::new(&race, self.trust, self.log)?.finding(finder))
     }
 
@@ -233,7 +233,11 @@ impl<'a> RecordRoads<'a> {
     /// net names; so a stranger at an old name is refused at TLS.
     pub(crate) async fn pinggy(&self) -> Result<podssh_relay::pinggy::Address, String> {
         let record = self.record().await?;
-        record.pinggy.ok_or_else(|| "its record names no Pinggy tunnel".into())
+        let address = record.pinggy.ok_or("its record names no Pinggy tunnel")?;
+        // pod-iroh checks the form of the record's address; podssh's Pinggy
+        // road reads it with its own parser.
+        podssh_relay::pinggy::Address::parse(&address.to_string())
+            .map_err(|why| format!("its record's Pinggy tunnel: {why}"))
     }
 
     /// The name of the record's tunnel of HTTP made by `ssh -R`, for

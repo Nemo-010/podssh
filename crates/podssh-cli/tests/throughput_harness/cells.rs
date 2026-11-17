@@ -294,7 +294,7 @@ impl Cell {
         let name = "iroh road, iroh's relay server on the loopback".to_string();
         let relay = s
             .runtime
-            .block_on(podssh_iroh::test_relay::spawn(&s.home))
+            .block_on(pod_iroh::test_relay::spawn(&s.home))
             .map_err(|e| (name.clone(), format!("the relay: {e}")))?;
         let (url, cert) = (relay.url.to_string(), relay.cert.clone());
         s.relays.lock().unwrap().push(relay);
@@ -404,10 +404,11 @@ mod iroh {
     /// ssh iroh:TICKET`; `cert` is the relays' certificate, when podssh's
     /// trust store does not hold it.
     pub fn cell(s: &Session, name: String, relays: &str, cert: Option<&Path>) -> Result<Cell, Skipped> {
-        use podssh_iroh::keys::{self, Place};
+        use pod_iroh::keys::{self, Place};
         let client_key = s.home.join("iroh-client.key");
-        let key = keys::load(&Place::File(client_key.clone()), &mut podssh_relay::session::OsEntropy)
-            .map_err(|why| (name.clone(), why))?;
+        let key =
+            podssh_cli::iroh_way::load_key(&Place::File(client_key.clone()), &mut podssh_relay::session::OsEntropy)
+                .map_err(|why| (name.clone(), why))?;
         let allow = s.home.join("iroh-allow");
         std::fs::write(&allow, format!("{}\n", keys::fingerprint(&key.public())))
             .map_err(|e| (name.clone(), e.to_string()))?;
@@ -425,7 +426,7 @@ mod iroh {
         // find a direct path (T-335).
         let mut node = s
             .command(&node_args)
-            .env(podssh_iroh::endpoint::UDP_ENV, "off")
+            .env(pod_iroh::endpoint::UDP_ENV, "off")
             .stdin(Stdio::null())
             .stderr(Stdio::piped())
             .spawn()
@@ -445,8 +446,8 @@ mod iroh {
             client_key.display().to_string(),
         ]);
         args.push(format!("tester@{ticket}"));
-        let env = vec![(podssh_iroh::endpoint::UDP_ENV.to_string(), "off".to_string())];
-        let must_say = Some(podssh_iroh::client::RELAY_ONLY.to_string());
+        let env = vec![(pod_iroh::endpoint::UDP_ENV.to_string(), "off".to_string())];
+        let must_say = Some(pod_iroh::client::RELAY_ONLY.to_string());
         Ok(Cell { name, args, far: Far::Test, env, must_say, through: None })
     }
 }

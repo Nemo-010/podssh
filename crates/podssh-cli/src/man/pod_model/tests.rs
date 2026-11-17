@@ -17,11 +17,11 @@ fn crate_src(name: &str) -> PathBuf {
 /// manual itself, which names each variable.
 fn sources() -> Vec<(PathBuf, String)> {
     let mut crates = vec!["podssh-cli", "podssh-ssh", "podssh-relay", "podssh-ws"];
-    // A road's crate is in the binary with its feature only.
+    // A road's crate is in the binary with its feature only. The Tor road is
+    // `pod-tor` of podcrates now, which podssh-cli's glue gives its settings.
     for (on, name) in [
         (cfg!(feature = "iroh"), "podssh-iroh"),
         (cfg!(feature = "warp"), "podssh-warp"),
-        (cfg!(feature = "tor"), "podssh-tor"),
         (cfg!(feature = "ts"), "podssh-ts"),
         (cfg!(feature = "zerotier"), "podssh-zerotier"),
         (cfg!(feature = "gsr"), "podssh-gsr"),

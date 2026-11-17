@@ -331,7 +331,7 @@ mod iroh {
     /// order: the processes, then the relay, then its runtime.
     struct Road {
         session: Session,
-        _relay: podssh_iroh::test_relay::TestRelay,
+        _relay: pod_iroh::test_relay::TestRelay,
         _runtime: tokio::runtime::Runtime,
         url: String,
         cert: String,
@@ -353,7 +353,7 @@ mod iroh {
             let session = Session::start(tag);
             let runtime = tokio::runtime::Builder::new_multi_thread().worker_threads(2).enable_all().build().unwrap();
             let relay = runtime
-                .block_on(podssh_iroh::test_relay::spawn_named(&session.home, NAME))
+                .block_on(pod_iroh::test_relay::spawn_named(&session.home, NAME))
                 .expect("an iroh relay on the loopback");
             let port = relay.url.port().expect("the relay's port");
             let start = session.home.join("start");
@@ -362,10 +362,10 @@ mod iroh {
             let proxy = proxy(&session, "client", &map, fault, &start);
             // The client's key, made here, so that the node's allowlist holds it.
             let client_key = session.home.join("client.key");
-            let place = podssh_iroh::keys::Place::File(client_key.clone());
-            let key = podssh_iroh::keys::load(&place, &mut podssh_relay::session::OsEntropy).expect("a key");
+            let place = pod_iroh::keys::Place::File(client_key.clone());
+            let key = podssh_cli::iroh_way::load_key(&place, &mut podssh_relay::session::OsEntropy).expect("a key");
             let allow = session.home.join("allow");
-            let line = format!("{} the test's client\n", podssh_iroh::keys::fingerprint(&key.public()));
+            let line = format!("{} the test's client\n", pod_iroh::keys::fingerprint(&key.public()));
             std::fs::write(&allow, line).unwrap();
             let (url, cert) = (relay.url.to_string(), relay.cert.to_string_lossy().into_owned());
             let text = |p: &std::path::Path| p.to_string_lossy().into_owned();

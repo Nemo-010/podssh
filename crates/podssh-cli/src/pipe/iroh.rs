@@ -30,7 +30,7 @@ mod built {
     use std::pin::Pin;
     use std::time::Duration;
 
-    use podssh_iroh::Failure;
+    use pod_iroh::Failure;
     use podssh_relay::session::resume::Note;
     use podssh_ssh::{Log, LogLevel};
     use podssh_ws::Trust;
@@ -75,7 +75,7 @@ mod built {
                     podssh_ssh::err_line!("podssh pipe: {shown}: {text}");
                 }
             };
-            let settings = crate::layered::iroh_settings(podssh_iroh::FEATURES);
+            let settings = crate::layered::iroh_settings(pod_iroh::FEATURES);
             let pin_shown = shown.clone();
             let pin_say = move |line: String| podssh_ssh::err_line!("podssh pipe: {pin_shown}: {line}");
             let (layer_app, session) = crate::channel::around(theirs, channel, pin_say);
@@ -85,7 +85,7 @@ mod built {
                     None => None,
                 }
             };
-            let (carried, failed) = tokio::join!(podssh_iroh::carry(&dialer, layer_app, settings, note), session);
+            let (carried, failed) = tokio::join!(pod_iroh::carry(&dialer, layer_app, settings, note), session);
             dialer.close().await;
             let _ = tokio::time::timeout(CLOSE_LIMIT, endpoint.close()).await;
             if let Some((fault, why)) = failed.as_ref().and_then(|e| crate::channel::judged(e, Some(&identity))) {

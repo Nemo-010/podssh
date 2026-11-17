@@ -35,7 +35,7 @@ cargo test -p podssh-core          # one crate
 cargo build -p podssh-cli --features ts                          # with Tailscale
 cargo test -p podssh-ts -p podssh-cli --features podssh-cli/ts   # its tests
 cargo build -p podssh-cli --features iroh                        # with the iroh road
-cargo test -p podssh-iroh -p podssh-cli --features podssh-cli/iroh-test   # its tests
+cargo test -p podssh-cli --features iroh-test                    # its tests
 cargo test -p podssh-ws --features plain-ws --test plain_loopback   # plain ws:// to loopback, for tests
 cargo test -p podssh-ws --features plain-ws --test cloudflare_access # the road of cloudflared (T-264)
 cargo build -p podssh-cli --features warp                        # with WARP's road (T-352)
@@ -44,8 +44,7 @@ cargo test -p podssh-relay --features warp --test quick_edge_warp # the edge ins
 ```
 
 - A `cargo build` or `cargo test` at the root uses `default-members`. These
-  do not include `crates/podssh-ts` or `crates/podssh-iroh`. Use
-  `--workspace` to include them.
+  do not include `crates/podssh-ts`. Use `--workspace` to include it.
 - Use `--no-fail-fast`. Without it, cargo stops at the first test target
   that fails, and the remaining targets do not run.
 - The workspace builds and tests natively on Windows (MSVC) and Linux. The
@@ -863,7 +862,7 @@ as the author, and each commit of this repository is the operator's
 
 Dependabot moves no path package, so the crates of `vendor/` have two
 watches of their own (T-341). `.github/workflows/upstream.yml` reads each
-week crates.io's newest release of russh and of iroh-relay, and the latest
+week crates.io's newest release of russh and of ssh-key, and the latest
 release of tailscale-rs on GitHub, against each copy and the line
 "Upstream read" of its section of `vendor/README.md`
 (`scripts/check-vendored.py`). And cargo-deny passes over a path package (an

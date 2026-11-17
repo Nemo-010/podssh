@@ -7,11 +7,9 @@ members = [
   "crates/podssh-probe",
   "crates/podssh-relay",
   "crates/podssh-ts",
-  "crates/podssh-iroh",
   "crates/podssh-ssh",
   "crates/podssh-todo",
   "crates/podssh-warp",
-  "crates/podssh-tor",
   "crates/podssh-zerotier",
   "crates/podssh-gsr",
 ]
@@ -40,11 +38,10 @@ default-members = [
 # the fork's `tailscale` package by path. `fuzz/` is cargo-fuzz's workspace
 # (T-198), built with nightly Rust and libFuzzer, never by the gate.
 # `vendor/russh` is the release of russh with podssh's patch (T-460), and
-# `vendor/iroh-relay` the same for iroh's relay client (T-280), and
 # `vendor/ssh-key` for the keys that russh reads (T-609), which the
 # `[patch]` below puts in their places; excluded, they are no members, so
 # their tests and examples are not podssh's.
-exclude = ["vendor/tailscale-rs", "vendor/russh", "vendor/iroh-relay", "vendor/ssh-key", "fuzz"]
+exclude = ["vendor/tailscale-rs", "vendor/russh", "vendor/ssh-key", "fuzz"]
 
 # Versions below were resolved on 2026-10-01, not recalled.
 [workspace.package]
@@ -227,18 +224,18 @@ strip = true
 # change; an update of russh moves the patches first, and drops each once a
 # release does what it does (`scripts/check-repo.py` fails on a patch that
 # the lock does not use).
-# iroh's relay client with podssh's patch (T-280,
-# `vendor/patches/iroh-relay/`): its relay dial speaks SOCKS5 too, where
-# iroh-relay 1.4.1 speaks HTTP CONNECT only, and iroh's HTTPS probe of the
-# relays gets reqwest's SOCKS5. `vendor/iroh-relay` is the crate as
-# crates.io publishes it, and `exclude` above keeps it out of the workspace,
-# with its tests and their dependencies. Only the feature `iroh` of
-# podssh-cli builds it. An iroh that asks for another iroh-relay leaves this
-# patch unused, and cargo says so: carry the patch to that version first
-# (`vendor/README.md`).
+# iroh's relay client with the patch that podssh made (T-280): its relay
+# dial speaks SOCKS5 too, where iroh-relay 1.4.1 speaks HTTP CONNECT only,
+# and iroh's HTTPS probe of the relays gets reqwest's SOCKS5. The fork is
+# `vendor/iroh-relay` of PodUtils/podcrates, at the tag of the other crates
+# of podcrates: a `[patch]` of podcrates does not reach podssh, so podssh
+# names the fork here. Cargo finds the package in that repository, outside
+# its workspace. Only the feature `iroh` of podssh-cli builds it (pod-iroh).
+# An iroh that asks for another iroh-relay leaves this patch unused, and
+# cargo says so: podcrates carries the fork to that version first.
 [patch.crates-io]
 russh = { path = "vendor/russh" }
-iroh-relay = { path = "vendor/iroh-relay" }
+iroh-relay = { git = "https://github.com/PodUtils/podcrates", tag = "v0.65.0" }
 # ssh-key, whose release refuses an ECDSA key of OpenSSH whose scalar has a
 # leading zero byte (T-609).
 ssh-key = { path = "vendor/ssh-key" }

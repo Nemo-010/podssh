@@ -62,9 +62,9 @@ fn a_pipe_with_the_first_ticket_finds_the_node_on_its_second_relay() {
     let (dir_a, dir_b) = (session.home.join("relay-a"), session.home.join("relay-b"));
     std::fs::create_dir_all(&dir_a).unwrap();
     std::fs::create_dir_all(&dir_b).unwrap();
-    let first = runtime.block_on(podssh_iroh::test_relay::spawn(&dir_a)).expect("the first relay");
-    let second = runtime.block_on(podssh_iroh::test_relay::spawn(&dir_b)).expect("the second relay");
-    let pkarr = runtime.block_on(podssh_iroh::test_pkarr::spawn(&session.home)).expect("a server of pkarr");
+    let first = runtime.block_on(pod_iroh::test_relay::spawn(&dir_a)).expect("the first relay");
+    let second = runtime.block_on(pod_iroh::test_relay::spawn(&dir_b)).expect("the second relay");
+    let pkarr = runtime.block_on(pod_iroh::test_pkarr::spawn(&session.home)).expect("a server of pkarr");
     // One file of trust for the two relays and the server, as --ca-file
     // takes a bundle.
     let ca = session.home.join("ca.pem");
@@ -77,14 +77,14 @@ fn a_pipe_with_the_first_ticket_finds_the_node_on_its_second_relay() {
 
     // The client's key, made here, so that the node's allowlist holds it.
     let client_key = session.home.join("client.key");
-    let place = podssh_iroh::keys::Place::File(client_key.clone());
-    let key = podssh_iroh::keys::load(&place, &mut podssh_relay::session::OsEntropy).expect("a key");
+    let place = pod_iroh::keys::Place::File(client_key.clone());
+    let key = podssh_cli::iroh_way::load_key(&place, &mut podssh_relay::session::OsEntropy).expect("a key");
     // In a directory of its own: the node refuses an allowlist that others
     // can change, as a host's temporary directory may let them.
     let private = session.home.join("private");
     podssh_relay::cache::private_dir(&private).unwrap();
     let allow = private.join("allow");
-    std::fs::write(&allow, format!("{} the test's client\n", podssh_iroh::keys::fingerprint(&key.public()))).unwrap();
+    std::fs::write(&allow, format!("{} the test's client\n", pod_iroh::keys::fingerprint(&key.public()))).unwrap();
     let node_args = [
         "node".to_string(),
         "lab".into(),
@@ -153,5 +153,5 @@ fn a_pipe_with_the_first_ticket_finds_the_node_on_its_second_relay() {
 
 /// The node's key in its ticket.
 fn key_of(ticket: &str) -> iroh::PublicKey {
-    podssh_iroh::ticket::parse(ticket).expect("a ticket").id
+    pod_iroh::ticket::parse(ticket).expect("a ticket").id
 }

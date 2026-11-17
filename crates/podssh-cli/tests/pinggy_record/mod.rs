@@ -1,7 +1,7 @@
 //! The Pinggy address in the node's record of pkarr (T-548's step 3, T-445),
 //! a module of `tests/pinggy_road.rs` for a build with the iroh road's test
 //! servers (feature `iroh-test`): a server of pkarr on the loopback
-//! (`podssh_iroh::test_pkarr`, which checks each record's signature with
+//! (`pod_iroh::test_pkarr`, which checks each record's signature with
 //! iroh-dns's own reading), a net whose owner names the node `lab` by its
 //! key, and `podssh node lab TARGET --pinggy` that puts its tunnel's address
 //! there. A member with no `--pinggy-name` and no name kept reaches the node
@@ -54,7 +54,7 @@ fn a_member_with_no_address_given_or_kept_reaches_the_node_by_the_pinggy_address
     lab.let_in();
     lab.pair_down();
     let dir = lab.node_home.parent().unwrap().to_path_buf();
-    let pkarr = lab.runtime.block_on(podssh_iroh::test_pkarr::spawn(&dir)).expect("a server of pkarr");
+    let pkarr = lab.runtime.block_on(pod_iroh::test_pkarr::spawn(&dir)).expect("a server of pkarr");
     let (url, cert) = (pkarr.url.to_string(), pkarr.cert.to_string_lossy().into_owned());
     // The server is on the loopback, past the stand-in proxy, which passes
     // Pinggy's names alone.

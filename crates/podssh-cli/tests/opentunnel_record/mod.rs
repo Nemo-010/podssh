@@ -1,14 +1,13 @@
 //! The OpenTunnel name in the node's record of pkarr (T-611, T-445), a module
 //! of `tests/opentunnel_road.rs` for a build with the iroh road's test
 //! servers (feature `iroh-test`): a server of pkarr on the loopback
-//! (`podssh_iroh::test_pkarr`, which checks each record's signature with
+//! (`pod_iroh::test_pkarr`, which checks each record's signature with
 //! iroh-dns's own reading), a net whose owner names the node `lab` by its
 //! key, and `podssh node lab TARGET --opentunnel` that puts its name there
 //! once its tunnel is ready. A member with no `--opentunnel-name` and no name
 //! kept reaches the node over the OpenTunnel road with the pair's road down,
-//! and `-v` says that the name came from the record. Planted
-//! (`scripts/plants/t611-name-not-read.patch`): the record's parser drops the
-//! name, and the test fails.
+//! and `-v` says that the name came from the record. The record's parser is
+//! pod-iroh's (PodUtils/podcrates), whose own tests read the name.
 
 use std::path::{Path, PathBuf};
 
@@ -65,7 +64,7 @@ fn a_member_with_no_name_given_or_kept_reaches_the_node_by_the_opentunnel_name_o
     lab.let_in();
     lab.pair_down();
     let dir = lab.node_home.parent().unwrap().to_path_buf();
-    let pkarr = lab.runtime.block_on(podssh_iroh::test_pkarr::spawn(&dir)).expect("a server of pkarr");
+    let pkarr = lab.runtime.block_on(pod_iroh::test_pkarr::spawn(&dir)).expect("a server of pkarr");
     let (url, ca) = (pkarr.url.to_string(), bundle(&lab, &pkarr.cert, &dir));
     // The server is on the loopback, past the stand-in proxy, which passes
     // the service's names alone.

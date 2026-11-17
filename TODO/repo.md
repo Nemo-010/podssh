@@ -458,7 +458,7 @@ Read:
 3. On a run by hand, make the list of the commits since the last tag as an
    artifact, so that it can be read before a tag.
 4. Link each "Fixes #N" of a commit to its issue in the list.
-5. docs/development.md, "Release builds" (`docs/development.md:880-1027`): the
+5. docs/development.md, "Release builds" (`docs/development.md:879-1026`): the
    body is the notes file and the generated list.
 
 No new shell script: each step is a step of the workflow.
@@ -539,8 +539,8 @@ credential that a later commit removed, is not found.
 
 Read:
 
-- `scripts/check-repo.py:79-92` defines the shapes (a relay token, a Tailscale
-  key, a private key block); `scripts/check-repo.py:188-209` scans the tracked
+- `scripts/check-repo.py:81-94` defines the shapes (a relay token, a Tailscale
+  key, a private key block); `scripts/check-repo.py:190-211` scans the tracked
   files outside `vendor/`. It reads no history.
 - `docs/decisions.md` (the repository is public): its history was
   replaced by one commit on 2026-10-08, so a scan of the whole history is
@@ -676,7 +676,7 @@ Read:
 - The KTM tester could not tell from an artifact which commit made it, and
   moved the checkout one commit ahead (the KTM report, section 1a; read in
   the report).
-- `crates/podssh-cli/src/man/facts/tests.rs:88-109`: the drift test of the manual
+- `crates/podssh-cli/src/man/facts/tests.rs:85-106`: the drift test of the manual
   counts each quoted upper-case name with `_` in the sources as a variable
   (except `CARGO_` names).
 
@@ -1183,7 +1183,7 @@ Read:
 4. Pin the images of the box with the build image (T-206).
 5. Credentials: the box mints a token and never prints it
    (`scripts/sandbox-check.sh:2-4`). Before the job is required, scan its
-   first log with the token pattern of `scripts/check-repo.py:83`.
+   first log with the token pattern of `scripts/check-repo.py:85`.
 6. docs/STATUS.md (the box section) cites the CI run; docs/development.md says
    that CI runs the box.
 
@@ -1925,7 +1925,7 @@ leaves armv7 out of the Decision; the plan below takes Alpine's own toolchain fo
   container. Plan B, which the Decision rejected, for native speed: `ghcr.io/cross-rs/armv7-unknown-
   linux-musleabihf:main`, or `cargo-zigbuild` (its CI covers x86_64, aarch64 and Apple, not armv7).
   The release profile is `opt-level = "z"`, `lto = true`, `codegen-units = 1`
-  (`Cargo.toml:211` says "opt-level"; the profile is at the lines around it): the link on a 32-bit
+  (`Cargo.toml:208` says "opt-level"; the profile is at the lines around it): the link on a 32-bit
   rustc may run out of address space, and under QEMU it is slow. Measure first.
 - `riscv64gc-unknown-linux-musl`: Rust tier 2 with host tools. Plan A: `runs-on: ubuntu-24.04`,
   `docker/setup-qemu-action` with `platforms: riscv64`, `docker run --platform linux/riscv64
@@ -2050,7 +2050,7 @@ Read, in the tree as it is now:
   compiles one C++ file with the `cc` crate. With both variables set, the
   build must fail at `/nonexistent`; the control, with `CC` alone, must not
   stop there.
-- `docs/development.md:334-336` states the rule with `CXX`, and
+- `docs/development.md:333-335` states the rule with `CXX`, and
   `docs/STATUS.md:951` records the measurement. Rule 4 of
   `docs/architecture.md` named `CC=/nonexistent` only; it was repaired in the
   same change as the record.
@@ -2111,7 +2111,7 @@ repository (one `README.md`, no `crates/`) printed four `ok` lines and exited
 
 Read:
 
-- `scripts/check-repo.py:127`: the size check walks `crates/` with `rglob`; a
+- `scripts/check-repo.py:129`: the size check walks `crates/` with `rglob`; a
   missing directory yields nothing. (#33 cites line 56 at `22c3b88`; the walk is at 57
   now.)
 - `scripts/check-repo.py` lines 100-129, 132-153 and 156-161 at `e892b0f`: the links, the credentials and the line
@@ -4022,20 +4022,20 @@ identities (x25519-dalek, `podssh-ws` and `podssh-relay`), and its AEAD
 
 ## Premise
 
-- Read: `crates/podssh-ssh/Cargo.toml:23` and `crates/podssh-cli/Cargo.toml:163`
-  ask for `sha1` 0.10.7, and the root `Cargo.toml:141` for `hmac` 0.12;
+- Read: `crates/podssh-ssh/Cargo.toml:23` and `crates/podssh-cli/Cargo.toml:172`
+  ask for `sha1` 0.10.7, and the root `Cargo.toml:138` for `hmac` 0.12;
   `Cargo.lock` holds `sha1` 0.10.7 and 0.11.0, `hmac` 0.12.1 and 0.13.0,
   and `digest` 0.10.7 and 0.11.3, as russh 0.64.1 (vendor/russh/Cargo.toml)
   builds on the newer line, so the binary holds both lines today. podssh's `sha1`
   moves with its `hmac`, where the two meet (the hashed names of
   `known_hosts`): Inferred.
-- Read: the root `Cargo.toml:150` asks for `aes-gcm` 0.10 and
-  `Cargo.toml:159` for `x25519-dalek` 2;
+- Read: the root `Cargo.toml:147` asks for `aes-gcm` 0.10 and
+  `Cargo.toml:156` for `x25519-dalek` 2;
   `PodUtils/podssh:crates/podssh-ws/src/crypto/aead.rs` and `PodUtils/podssh:crates/podssh-ws/src/crypto/kx.rs`
   hold the calls, with `PodUtils/podssh:crates/podssh-relay/src/identity/mod.rs` and
   `PodUtils/podssh:crates/podssh-relay/src/session/secret.rs`, and
   `PodUtils/podssh:crates/podssh-ws/tests/crypto_vectors.rs` their vectors.
-- Read: `vt100` 0.15 (`Cargo.toml:116`) is the model of the terminal
+- Read: `vt100` 0.15 (`Cargo.toml:113`) is the model of the terminal
   oracle (T-200) and of `podssh session` (T-186).
 
 ## Approach
@@ -4291,13 +4291,13 @@ two jobs of the release run an image of Docker Hub by the tag `latest`, with no 
   (https://github.com/docker/setup-qemu-action/blob/v4/action.yml): the action's `image` defaults
   to `docker.io/tonistiigi/binfmt:latest`. The riscv64 job runs it each time, and the armv7 job
   when the runner does not run 32-bit ARM (`.github/workflows/release.yml` lines 166-177 at `1a3e7b6`). No file of
-  `images/` names the image, so the check of images (`scripts/check-repo.py:222-247`) does not
+  `images/` names the image, so the check of images (`scripts/check-repo.py:224-249`) does not
   see it, and its pull gets none of the mirrors of `scripts/pull-image.sh:9-13`.
 - Read: T-210 found the commit of each action, and `TODO/repo.md:786-787` says "whether to pin
   them by commit is a choice of this entry's session"; no entry took it. `setup-nasm` declares
   Node 20 (`TODO/repo.md:788-790`); with no NASM, `AWS_LC_SYS_PREBUILT_NASM=1` asks aws-lc for its
   prebuilt objects (`.github/workflows/release.yml` lines 341-343 at `1a3e7b6`).
-- Read: Dependabot updates the actions each week, in one group (`.github/dependabot.yml:25-32`).
+- Read: Dependabot updates the actions each week, in one group (`.github/dependabot.yml:27-34`).
   Inferred: it moves a pin by commit, and the version in its comment, as it moves a tag.
 - Inferred (the audit's reading, with no source kept): the compromise of tj-actions/changed-files
   (CVE-2025-30066) was a tag moved to an attacker's commit. Each step of a job with
@@ -4312,7 +4312,7 @@ two jobs of the release run an image of Docker Hub by the tag `latest`, with no 
 2. A check in `scripts/check-repo.py`: each `uses:` under `.github/workflows/` names a commit. A
    copy with a planted `@v7` fails it, and its floor fails on an empty tree.
 3. binfmt: `images/binfmt/Dockerfile` names `tonistiigi/binfmt` by its tag and its digest, and
-   Dependabot's list of directories takes it (`.github/dependabot.yml:37-43`). The two jobs read it
+   Dependabot's list of directories takes it (`.github/dependabot.yml:39-45`). The two jobs read it
    as the armv7 job reads its image (`.github/workflows/release.yml:176-183`), pull it through
    `scripts/pull-image.sh`, and run `docker run --privileged --rm IMAGE --install riscv64` (`arm`
    for armv7) in the place of the action. The step then checks that the kernel lists the handler
@@ -4417,7 +4417,7 @@ would get no pull request, and maybe no red job.
 
 ## Premise
 
-- Read: `[patch.crates-io]` puts vendor/russh and `vendor/iroh-relay` in the place of their
+- Read: `[patch.crates-io]` puts vendor/russh and `PodUtils/podcrates:vendor/iroh-relay/` in the place of their
   releases (`Cargo.toml` lines 218-220 at `80e26fc`); russh's entries of the lock files have no source and no
   checksum, as a path package has none (`vendor/README.md` lines 133-134 at `80e26fc`); Dependabot's file says that
   an update of russh moves the patch by hand (`.github/dependabot.yml` lines 7-9 at `80e26fc`).
@@ -5315,9 +5315,9 @@ builds with, so that its DNS packets and iroh's are of one type.
   box's CONNECT proxy (`scripts/box/proxy.py`), which `scripts/test_in_box.sh` and
   `scripts/chat-in-boxes.sh` build; `images/build/Dockerfile:6` pins `rust:1-alpine` by the digest
   `0cce0a5...`, the gate's image.
-- Read: the workspace asks for `sha2` 0.11 (`Cargo.toml:143`), and the lock holds 0.11.0; 0.11.1
-  needs Rust 1.88, under the workspace's 1.89 (`Cargo.toml:58`, Q48).
-- Read: `crates/podssh-iroh/Cargo.toml:62-65` takes `simple-dns` 0.12, "the simple-dns that
+- Read: the workspace asks for `sha2` 0.11 (`Cargo.toml:140`), and the lock holds 0.11.0; 0.11.1
+  needs Rust 1.88, under the workspace's 1.89 (`Cargo.toml:55`, Q48).
+- Read: `PodUtils/podcrates:crates/pod-iroh/Cargo.toml` takes `simple-dns` 0.12, "the simple-dns that
   iroh-dns builds and reads with, so no crate is added"; iroh-dns 1.4.1, which the lock holds,
   takes simple-dns 0.12.0, the lock's only version.
 - Inferred: Dependabot closes each pull request once `main` holds its version, as T-386's were.
@@ -5391,7 +5391,7 @@ built after the transfer refuses each release, whose signer names PodUtils/podss
 
 ## Premise
 
-- Read: `Cargo.toml:59` sets `repository = "https://github.com/Azathothas/podssh"`;
+- Read: `Cargo.toml:56` sets `repository = "https://github.com/Azathothas/podssh"`;
   `crates/podssh-cli/src/update/mod.rs:163` takes the repository from `CARGO_PKG_REPOSITORY`.
 - Read: `crates/podssh-cli/src/update/sigstore.rs:30` makes the signer's URI from that repository,
   and `crates/podssh-cli/src/update/sigstore.rs:134` refuses a leaf that does not name it.
@@ -5449,7 +5449,7 @@ The operator has transferred the repository to PodUtils/podssh.
   `cargo test -p podssh-cli --test update`: 19 passed.
 - Check 12 of `python scripts/check-repo.py` (`scripts/repo_names.py`): no tracked file names the
   old repository outside the dated records; it passed (2,916 files read). Planted, the old name back
-  in `Cargo.toml`: it failed and named `Cargo.toml:59`; `--plant-empty`: each of the 12 checks
+  in `Cargo.toml`: it failed and named `Cargo.toml:56`; `--plant-empty`: each of the 12 checks
   failed on an empty tree.
 - The frozen files of Q3a (`docs/decisions.md`) hold no old name: no file of podcrates' imports
   changed.
@@ -5925,8 +5925,23 @@ podssh: podvm's ids of a foreground run, the installer core for a copy of a tree
 alone 3834 passed, 3 failed, 82 ignored, and the 3 (`doctor_upgrade`'s one and two of `podssh-iroh`'s
 `endpoint::udp_tests`) passed with the network: 3837 in all.
 
-Next: the crates that podcrates names after pod-egress (`pod-tor`, `pod-iroh`, `pod-cloudflare`, `pod-ts`), then
-`pod-relay-serve`.
+2026-11-17, podcrates `v0.65.0` (`4122f398`, COORD-125, PodUtils/podcrates#215; `v0.64.0`, COORD-124, was not taken
+apart, as `v0.65.0` came before its take ended): `pod-tor` and `pod-iroh` taken by their hand-offs
+(`adoption/podssh/pod-tor.patch` and `pod-iroh.patch` at the tag, the first applied as the tag says, the second with
+`PodUtils/podcrates:crates/pod-tor/` already gone): `PodUtils/podcrates:crates/pod-tor/`, `PodUtils/podcrates:crates/pod-iroh/` and `PodUtils/podcrates:vendor/iroh-relay/` leave podssh;
+podssh-cli takes each with its feature and gives it its way out, TLS, resolver and proxy (`iroh_way.rs`); the root's
+`[patch.crates-io] iroh-relay` names the fork of podcrates at the tag. Each podcrates dependency and `issue-sync.yml`
+name `v0.65.0`; `get-core.sh` keeps `v0.63.0`'s pins, as `core.sh` did not change. The tag's breaking changes meet no
+code of podssh (`Missed::Road` and `pod_manual::Command`'s fields are matched or built with a rest). A node of
+`pod-relay` now ends after 60 s of `409` for its lost socket (podcrates' entry 805): podssh takes the hold, as podnet asked.
+The `.run` of each: `check-repo.py`, no file of either crate, no manifest naming them; the build and clippy of the CLI
+with `iroh`, `iroh-test` and `tor` and with none, with the gate's lints; `cargo test -p podssh-cli --features
+iroh,tor --lib` 1207 passed; `--features iroh-test,tor --test iroh_road --test iroh_cli --test chat_iroh --test
+pipe_iroh --test pipe_iroh_record --test pinggy_road --test opentunnel_road --test man_page --test tor_private`
+passed; rustfmt; podcrates' `check-consumer-toolchains.py` and `check-consumer-tests.py` passed. The static musl
+binary with the feature is the gate's `release` job.
+
+Next: `pod-cloudflare` and `pod-ts` as podcrates names them, then `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
 
 **Source:** the operator, 2026-11-05: "we use whatever is necessary, including c, zig, modern rust,
@@ -5953,7 +5968,7 @@ compiled binary, has no check of its own beside the release's.
   (`.github/workflows/build.yml:92`), so a step removed from the list leaves CI.
 - Read: `scripts/gate.sh` runs 17 commands under `env CC=/nonexistent CXX=/nonexistent`, which
   refuse a crate that builds C (`scripts/gate.sh:128` tells why).
-- Read: `Cargo.toml:58` declares `rust-version = "1.89"` and `Cargo.toml:52` edition 2021; each crate
+- Read: `Cargo.toml:55` declares `rust-version = "1.89"` and `Cargo.toml:49` edition 2021; each crate
   declares its own minimum (1.89, 1.91 or 1.92).
 
 ## Approach
@@ -6447,6 +6462,10 @@ cargo deny --locked check
 
 Each passes on the new versions; deny's job and the gate pass in CI on the push.
 
+## Correction
+
+2026-11-17. The package podssh-tor is `pod-tor` of PodUtils/podcrates since podssh took `v0.65.0` (T-684): the Prove's tests of `podssh-tor` are podcrates' now (`cargo test -p pod-tor` there); podssh's part of it is the CLI's glue and its tests with `--features tor`.
+
 ## Done
 
 2026-11-12: the pins of `taiki-e/install-action` are `cfdb7ed` (v2.90.3) in deny, fuzz and release, and of
@@ -6739,6 +6758,10 @@ podssh-cli --lib` 1180 passed (`man::` 73, `each_command_and_flag_is_the_parser_
 clippy (the gate's lints) and rustfmt clean. Next: the text and `--help` on the crate's together, with the parity gate's
 readers; the JSON keeps podssh's shape, which `docs/cli.md`, `podssh mcp`'s `man` and GitHub #10 read, until the crate's
 model carries a command's availability and the kinds of flag (the asks above: COORD-096, #288).
+
+2026-11-17: podcrates `v0.65.0` (its entry 807, COORD-125) gives the four forms (an empty reason's short sentence,
+`FlagKind::NotInRelease`, `Command::availability`, `Command::topics`), taken. Next: the text, `--help` and the JSON
+on the crate's writers.
 
 
 # T-791: Each release run first in `pod-lab`'s profiles of podssh's host classes

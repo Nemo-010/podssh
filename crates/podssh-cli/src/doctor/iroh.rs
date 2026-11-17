@@ -8,9 +8,8 @@
 use std::time::Duration;
 
 use iroh::RelayUrl;
-use podssh_iroh::relays::{self, Source};
-use podssh_iroh::{Options, Udp};
-use podssh_ws::{ProxyChoice, Trust};
+use pod_iroh::relays::{self, Source};
+use podssh_ws::Trust;
 
 use super::diagnosis::{met_of, Met, Of};
 use super::Report;
@@ -18,7 +17,7 @@ use super::Report;
 /// A bind says only that a socket binds: whether a datagram leaves is the
 /// line `iroh UDP out`.
 pub(super) fn udp(report: &mut Report<'_>) {
-    match podssh_iroh::probe::udp() {
+    match pod_iroh::probe::udp() {
         Ok(addr) => report.ok("bind UDP", format!("bound {addr} and closed it, sending nothing")),
         Err(e) => report.ok("bind UDP", format!("refused: {e}; the iroh road then uses its relay alone")),
     }
@@ -32,14 +31,15 @@ const CLOSE_LIMIT: Duration = Duration::from_secs(3);
 /// that the road would take. Each answer is `ok`, as the relay alone is a
 /// road that works; an endpoint that cannot start is the road's failure.
 async fn udp_out(report: &mut Report<'_>, home: RelayUrl, trust: &Trust) {
-    let options = Options {
-        relays: vec![home],
-        proxy: ProxyChoice::FromEnvironment,
-        trust: trust.clone(),
-        udp: Udp::from_environment(),
-        ..Options::default()
+    let opened = match crate::iroh_way::options() {
+        Ok(mut options) => {
+            options.relays = vec![home];
+            options.trust = trust.clone();
+            pod_iroh::endpoint::open(&options).await.map_err(|e| e.to_string())
+        }
+        Err(why) => Err(why),
     };
-    match podssh_iroh::endpoint::open(&options).await {
+    match opened {
         Ok(opened) => {
             report.ok("iroh UDP out", opened.udp.to_string());
             let _ = tokio::time::timeout(CLOSE_LIMIT, opened.endpoint.close()).await;
@@ -51,7 +51,7 @@ async fn udp_out(report: &mut Report<'_>, home: RelayUrl, trust: &Trust) {
 /// `/ping` of each relay, in the order of the list, with the limit that the
 /// road's own choice of a home relay gives each one; then the home relay.
 pub(super) async fn relay(report: &mut Report<'_>, trust: &Trust) {
-    let (list, source) = match relays::from_environment(None) {
+    let (list, source) = match crate::iroh_way::relays(None) {
         Ok(chosen) => chosen,
         Err(why) => {
             report.fail("iroh relays", why);
@@ -63,6 +63,7 @@ pub(super) async fn relay(report: &mut Report<'_>, trust: &Trust) {
         Source::Variable | Source::Flag => relays::ENV.to_string(),
     };
     let mut home = None;
+    let way = crate::iroh_way::way();
     for relay in &list {
         // The port too, when the URL gives one: two relays may share a host.
         let host = relay.host_str().unwrap_or_default();
@@ -71,7 +72,7 @@ pub(super) async fn relay(report: &mut Report<'_>, trust: &Trust) {
             None => format!("iroh relay {host}"),
         };
         // What its TLS met, beside the line, for the diagnosis (T-604).
-        match relays::ping_kept(relay, trust, &ProxyChoice::FromEnvironment, relays::PING_LIMIT).await {
+        match relays::ping_kept(relay, trust, &way, relays::PING_LIMIT).await {
             Ok(pong) => {
                 report.handshake(Of::Iroh, host, Met::Completed);
                 let ms = pong.elapsed.as_millis();

@@ -604,7 +604,7 @@ variable matters when `cp`, `mv` and `relay` exist. `ssh` and `proxy` have no
    or `proxy`.
 4. Same commit: a row in `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-273`),
    which `each_variable_in_the_source_is_documented` requires
-   (`crates/podssh-cli/src/man/facts/tests.rs:71-84`); "default: env
+   (`crates/podssh-cli/src/man/facts/tests.rs:68-81`); "default: env
    PODSSH_TIMEOUT" in the help of each `--timeout` row, as `--relay-host` says
    it (`crates/podssh-cli/src/flags.rs:175-176`); `docs/cli.md:6548-6550`;
    `docs/STATUS.md`.
@@ -2469,7 +2469,7 @@ nothing.
   `crates/podssh-cli/src/doctor/unix.rs` line 4 at `48a8744` says "needs none of these".
 - Read: `crates/podssh-cli/src/doctor/mod.rs` line 15 at `48a8744` says "The bind probes here are the only place
   podssh calls". The listener scan of `scripts/check-repo.py` allows a `bind(` in 17 files
-  (`scripts/check-repo.py:168-189`), and these listen, each when the user asks: `pipe`'s
+  (`scripts/check-repo.py:170-191`), and these listen, each when the user asks: `pipe`'s
   `tcp-listen:` and `unix-listen:` (`crates/podssh-cli/src/pipe/listen.rs:127-141`, `:168-192`),
   the control socket of `-M` (`:194-202`), `-L` and `-D` on a port or a path
   (`crates/podssh-cli/src/ssh/local_bind.rs:78-88`, `:111-128`), `podssh agent`
@@ -3081,7 +3081,7 @@ node at its next line, often "online again" after a reconnect. A server then has
 
 ## Premise
 
-- Read: `panic = "abort"` in the release profile (`Cargo.toml:214`).
+- Read: `panic = "abort"` in the release profile (`Cargo.toml:211`).
 - Read: the node's lines are `eprintln!` (`crates/podssh-cli/src/node.rs:356`,
   `crates/podssh-cli/src/node_derp.rs:334`, `crates/podssh-cli/src/node_iroh.rs:342`), as are 40
   more sites in `crates/podssh-cli/src` and 4 in `crates/podssh-ssh/src` (2026-11-01, a search for
@@ -3717,8 +3717,8 @@ Read at `2042200`:
   (`crates/podssh-cli/src/node_install/env.rs:110-118`), so a retired name is a third case beside them.
 - No module holds retired names (no `retired` in `crates/podssh-cli/src/`), and no variable has been
   retired, as the issue says: the table starts empty.
-- The manual's variables are checked both ways: `crates/podssh-cli/src/man/facts/tests.rs:114` (each
-  documented one is read) and `crates/podssh-cli/src/man/facts/tests.rs:128` (each read one is
+- The manual's variables are checked both ways: `crates/podssh-cli/src/man/facts/tests.rs:111` (each
+  documented one is read) and `crates/podssh-cli/src/man/facts/tests.rs:125` (each read one is
   documented). The issue says the second does not exist; it does, and a retired name written in the
   source would trip it, so the table needs its own place in the manual.
 - The run's funnel `crates/podssh-cli/src/dispatch.rs` is 439 lines; `main_with_args` is at

@@ -31,9 +31,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use iroh::{PublicKey, RelayUrl};
-use podssh_iroh::keys::{self, Place};
-use podssh_iroh::version::Offline;
-use podssh_iroh::{ticket, Options, Udp};
+use pod_iroh::keys::{self, Place};
+use pod_iroh::ticket;
+use pod_iroh::version::Offline;
 use podssh_relay::e2e::ends;
 use podssh_relay::pair::Pair;
 use podssh_relay::reverse::routes::{Route, Routes};
@@ -100,7 +100,7 @@ pub(crate) struct Ready {
     /// The end-to-end channel on both roads (T-088); off with `--no-e2e`.
     pub e2e: bool,
     /// The server of pkarr that keeps the record of the home relay (T-350).
-    pub pkarr: Option<podssh_iroh::pkarr::Server>,
+    pub pkarr: Option<pod_iroh::pkarr::Server>,
     /// The DERP road's servers, with `--derp` (T-379).
     pub derp: Option<Vec<podssh_relay::derp::Server>>,
 }
@@ -150,13 +150,13 @@ fn prepare(args: &NodeArgs) -> Result<(Ready, Vec<Route>), Refusal> {
 /// The relays, the pins and the pair of a node of both roads, in order.
 pub(crate) fn ready(flags: Flags<'_>) -> Result<Ready, Refusal> {
     // A bad flag is a usage error, a bad variable a configuration error.
-    let relays = match podssh_iroh::relays::from_environment(flags.iroh_relay) {
+    let relays = match crate::iroh_way::relays(flags.iroh_relay) {
         Ok((relays, _)) => relays,
         Err(why) if flags.iroh_relay.is_some() => return Err(Refusal::usage(why)),
         Err(why) => return Err(Refusal::config(why)),
     };
     // The record's server: n0's for n0's relays, else the variable's (T-350).
-    let pkarr = podssh_iroh::pkarr::choose(&relays).map_err(Refusal::config)?;
+    let pkarr = crate::iroh_way::pkarr_server(&relays).map_err(Refusal::config)?;
     crate::pins::apply(flags.relay_addr)?;
     // A pair that `--pair-file` names must be good; a stored one may be
     // missing or expired, and the node then serves the iroh road alone.
@@ -240,7 +240,7 @@ where
     let Roads { verb, serving, after, handler, open: target, routes } = roads;
     // The pair's road needs these after the iroh road has taken its own.
     let (label_text, trust_pair) = (label.clone(), trust.clone());
-    let proxy = ProxyChoice::FromEnvironment;
+    let way = crate::iroh_way::way();
     // A node of `podssh node` takes an upgrade in place, never `podssh chat` (T-679).
     let upgrades = verb == "node";
     let key = match admission::key(&place, upgrades) {
@@ -258,22 +258,21 @@ where
     let routes = routes.map(|r| Routes { grant, exit, ..r });
     // The first relay of the list that answers `/ping` is the home relay,
     // and the ticket names it for the run (T-165).
-    let (home, missed) = podssh_iroh::relays::home(&relays, &trust, &proxy).await;
+    let (home, missed) = pod_iroh::relays::home(&relays, &trust, &way).await;
     for why in &missed {
         let _ = writeln!(err, "podssh {verb}: {label}: an iroh relay did not answer: {why}");
     }
     // The question of a refused version (T-348) goes as the endpoint goes.
-    let (asked, asked_trust, asked_proxy) = (home.clone(), trust.clone(), proxy.clone());
-    let options = Options {
-        relays: home,
-        proxy,
-        trust,
-        udp: Udp::from_environment(),
-        secret: Some(key.secret.clone()),
-        accepts: true,
-        ..Options::default()
+    let (asked, asked_trust, asked_way) = (home.clone(), trust.clone(), way);
+    let mut options = match crate::iroh_way::options() {
+        Ok(options) => options,
+        Err(why) => return Refusal::config(why).report(verb, err),
     };
-    let endpoint = match Box::pin(podssh_iroh::endpoint::open(&options)).await {
+    options.relays = home;
+    options.trust = trust;
+    options.secret = Some(key.secret.clone());
+    options.accepts = true;
+    let endpoint = match Box::pin(pod_iroh::endpoint::open(&options)).await {
         Ok(opened) => {
             // Which answer the road took of this host's UDP, once a run, as a
             // node has no -v (T-359), and an arm of QUIC not iroh's (T-665).
@@ -286,11 +285,12 @@ where
     };
     // A home relay that refuses this build's iroh ends the wait at once; a
     // relay that never became the home relay is asked at the limit.
-    let came = podssh_iroh::version::online(&endpoint, ONLINE_LIMIT, &asked_trust, &asked_proxy).await;
+    let remedy = crate::iroh_way::REMEDY;
+    let came = pod_iroh::version::online(&endpoint, ONLINE_LIMIT, &asked_trust, &asked_way, remedy).await;
     let refused = match &came {
         Ok(()) => None,
         Err(Offline::Refused(notice)) => Some(notice.clone()),
-        Err(Offline::TimedOut) => podssh_iroh::version::refusal(&asked, &asked_trust, &asked_proxy).await,
+        Err(Offline::TimedOut) => pod_iroh::version::refusal(&asked, &asked_trust, &asked_way, remedy).await,
     };
     let relay = if came.is_ok() { ticket::home_relay(&endpoint) } else { None };
     let Some(relay) = relay else {
@@ -373,7 +373,7 @@ where
     let line = |words: String| {
         let _ = writeln!(err, "podssh {verb}: {label}: {words}");
     };
-    let (_record, tell) = crate::node_record::keep(&endpoint, pkarr, &asked_trust, &asked_proxy, say.clone(), line);
+    let (_record, tell) = crate::node_record::keep(&endpoint, pkarr, &asked_trust, &asked_way, say.clone(), line);
     let admit = {
         let say = say.clone();
         move |key: &PublicKey| admission::admits(allow.as_deref(), &me, key, &say)
@@ -387,7 +387,7 @@ where
             async move { crate::channel::piped_by(channel, routes, target).await }
         }
     };
-    let settings = Settings { features: podssh_iroh::FEATURES, ..crate::layered::settings().off_the_pair() };
+    let settings = Settings { features: pod_iroh::FEATURES, ..crate::layered::settings().off_the_pair() };
     let budget = podssh_relay::reverse::layered::NODE_BUDGET;
     // One keeper for both roads: a session resumes on either (T-164). A
     // node's is the upgrade's, which hands its sessions to the next binary
@@ -428,7 +428,7 @@ where
     };
     let iroh_road = async {
         tokio::select! {
-            () = Box::pin(podssh_iroh::far::serve_kept(endpoint.clone(), settings, budget, open, admit, keeper.clone())) => {}
+            () = Box::pin(pod_iroh::far::serve_kept(endpoint.clone(), settings, budget, open, admit, keeper.clone())) => {}
             () = until_stopped(stopped.clone()) => {}
         }
     };

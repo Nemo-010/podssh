@@ -63,7 +63,7 @@ the verb, the address grammar, the copy loop, and the local addresses `-`,
    ENOSYS), two pipes; Windows uses pipes. stderr is shared. When the other
    side ends, the child gets the end of input, and podssh waits for it as a
    shell waits. Add the `process` feature of tokio to podssh-cli
-   (`Cargo.toml:80-82` lacks it; `crates/podssh-ssh/Cargo.toml:19` has it).
+   (`Cargo.toml:77-79` lacks it; `crates/podssh-ssh/Cargo.toml:19` has it).
 6. The exit status: the child's, and 128 + N for a signal; with two children,
    B's. A program that is not found gives 127, one that cannot run 126, as a
    shell gives. With no child, a clean end gives 0.
@@ -1424,7 +1424,7 @@ the request's target, would be the proxy that such a program points at.
   each joined to a new instance of the other side (`crates/podssh-cli/src/pipe/serve.rs:1-11`).
 - Read: the operator allows a listener that the user asks for, when a probe allows the bind, on
   loopback or AF_UNIX by default (`docs/decisions.md:86`; `docs/architecture.md:284-293`); the
-  gate's scan of listeners allows the listener of `pipe` (`scripts/check-repo.py:98-122`).
+  gate's scan of listeners allows the listener of `pipe` (`scripts/check-repo.py:100-124`).
 - Read: the SOCKS side of `-D` answers once the server's channel opened, so that a client learns
   whether its target was reached (`crates/podssh-ssh/src/socks.rs:1-5`). The relay refuses a target
   of its policy with a `403` that names it, `not in the ALLOW list` (`docs/relay.md:456-461`).

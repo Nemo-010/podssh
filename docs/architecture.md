@@ -253,7 +253,7 @@ bytes. See [reverse.md](reverse.md).
 
 | Crate | Role | Internal dependencies |
 | --- | --- | --- |
-| `podssh-cli` | The `podssh` binary: arguments, `--help`, the generated man page, dispatch, the `proxy` pump, the options of `ssh`, `doctor`, `keygen` | each crate below (`podssh-ts` only with the feature `ts`, `podssh-iroh` only with the feature `iroh`) |
+| `podssh-cli` | The `podssh` binary: arguments, `--help`, the generated man page, dispatch, the `proxy` pump, the options of `ssh`, `doctor`, `keygen` | each crate below (`podssh-ts` only with the feature `ts`, `pod-iroh` only with the feature `iroh`) |
 | `podssh-ssh` | The SSH client: russh (aws-lc-rs) over a byte stream, the relay stream, `known_hosts`, the authentication chain, prompts, the terminal (raw mode, size, escapes), exit codes, a host-key probe, key generation | `podssh-ws` |
 | `podssh-relay` | Relay hosts, the pool and failover, tokens (mint, cache, mint again), the forward opener; the pairs, the codecs (the framing of the node and operator legs, the control messages, the close table) and the runners of the reverse road (feature `pair`); the resumable layer between two podssh ends (`session/`: its records, offsets and handshake, sans-IO, and its two ends over tokio streams); UDP in a stream (`udp/`, T-168: each datagram after its length, and the flow at the far end, a UDP socket connected to the target); the blocking facade for podvm (feature `blocking`). No C. | `podssh-ws` |
 | `podssh-ws` | The connection to the relay: TCP, proxies, the DNS fallbacks, TLS (rustls with the pure-Rust provider of `pod-tls`, PodUtils/podcrates), the WebSocket client | `pod-tls` |
@@ -261,7 +261,7 @@ bytes. See [reverse.md](reverse.md).
 | `pod-term` (PodUtils/podcrates, taken by git tag, T-684) | A line discipline in the process, for `podssh serve` with no pty (not used yet, T-111); the grammar of a terminal's output and its ring, which `podssh session` reads | none |
 | `podssh-probe` | Facts about the structure of the relay's document (tests only) | none |
 | `podssh-ts` | The Tailscale adapter over `vendor/tailscale-rs` (feature `ts`) | the fork in `vendor/` |
-| `podssh-iroh` | The iroh road between two podssh ends (feature `iroh`, T-162, T-163): an iroh endpoint with podssh's relays, proxy, name resolution and trust store, UDP only after a probe, the resumable layer's sessions over QUIC streams, the keys in private files, the tickets, and the allowlist of a node | `podssh-relay`, `podssh-ws` |
+| `pod-iroh` (PodUtils/podcrates, taken by git tag) | The iroh road between two podssh ends (feature `iroh`, T-162, T-163): an iroh endpoint with the relays, proxy, resolver and trust store that podssh gives it (`podssh-cli`'s `iroh_way.rs`), UDP only after a probe, the resumable layer's sessions over QUIC streams, the keys in private files, the tickets, and the allowlist of a node; the fork of iroh-relay in its `vendor/` | `pod-session`, `pod-identity`, `pod-ws`, `pod-proxy`, `pod-tls` |
 | `podssh-warp` | WARP's road (feature `warp`), glue over `pod-warp` (podcrates): podssh's way out for the API and the session, a stream inside the tunnel | `podssh-ws`, `pod-warp` |
 | `podssh-tor` | The Tor road through Arti (feature `tor`) | `podssh-ws` |
 | `podssh-todo` | `cargo todo`: a wrapper of `pod-todo` (PodUtils/podcrates) with `TODO/todo.toml`, and `cargo todo interop` | none |

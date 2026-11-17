@@ -421,12 +421,10 @@ jobs:
       - name: the Tor road through it
         run: |
           set -eu
-          cargo test --locked -p podssh-tor --test private_network
           cargo test --locked -p podssh-cli --features tor --test tor_private
           # T-578: a node's onion service there, each relay an HSDir, once
           # the consensus holds both shared random values (tor-net.sh).
           sh scripts/tor-net.sh wait-onion "$RUNNER_TEMP/tor-net" 1200
-          cargo test --locked -p podssh-tor --test onion_service -- --nocapture
           # T-578: podssh ssh node:// through the onion road alone, from end to end.
           cargo test --locked -p podssh-cli --features tor --test derp_road -- --nocapture derp_onion
       - name: the network stopped

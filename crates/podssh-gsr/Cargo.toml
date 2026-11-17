@@ -7,7 +7,7 @@ rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
 
-# A feature crate (T-707), as podssh-warp and podssh-tor are: podssh-cli
+# A feature crate (T-707), as podssh-warp is: podssh-cli
 # takes it with its feature `gsr`. Not a default member: pod-gsr links
 # OpenSSL, built from source by openssl-src (a C compiler and perl), as
 # rustls has no SRP cipher suite; the binary still links it static. The
@@ -15,14 +15,14 @@ publish.workspace = true
 # pod-services' (PodUtils/podcrates); this crate gives them podssh's dial
 # and proxy, and the words of podssh's lines.
 [dependencies]
-pod-gsr = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0" }
-pod-core = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0" }
+pod-gsr = { git = "https://github.com/PodUtils/podcrates", tag = "v0.65.0" }
+pod-core = { git = "https://github.com/PodUtils/podcrates", tag = "v0.65.0" }
 # The party of the relay's data file, for the line of the third party.
-pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0" }
+pod-services = { git = "https://github.com/PodUtils/podcrates", tag = "v0.65.0" }
 podssh-ws = { path = "../podssh-ws" }
 tokio = { workspace = true }
 zeroize = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net", "io-util", "time", "sync"] }
-pod-testkit = { git = "https://github.com/PodUtils/podcrates", tag = "v0.63.0" }
+pod-testkit = { git = "https://github.com/PodUtils/podcrates", tag = "v0.65.0" }

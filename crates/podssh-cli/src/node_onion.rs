@@ -63,7 +63,7 @@ impl Road {
 #[cfg(feature = "tor")]
 fn allowed(pair: &Pair) -> String {
     let secret = crate::onion::discovery_secret(&pair.name, pair.connect_token());
-    podssh_tor::Discovery::from_secret(secret).public()
+    pod_tor::Discovery::from_secret(secret).public()
 }
 
 #[cfg(not(feature = "tor"))]
@@ -126,7 +126,7 @@ where
             return std::future::pending().await;
         }
     };
-    let options = podssh_tor::ServiceOptions {
+    let options = pod_tor::ServiceOptions {
         nickname: crate::onion::NICKNAME.to_string(),
         port: crate::onion::VIRTUAL_PORT,
         allowed: vec![road.allowed.clone()],
@@ -155,7 +155,7 @@ where
                 line(format!("its descriptor is published, in {} s", began.elapsed().as_secs()));
                 break;
             }
-            Err(failure) if failure.detail == podssh_tor::onion::STOPPED => {
+            Err(failure) if failure.detail == pod_tor::onion::STOPPED => {
                 line(format!("{failure}; the node serves its other roads"));
                 return std::future::pending().await;
             }
@@ -166,7 +166,7 @@ where
     tokio::spawn(async move {
         while let Some(stream) = onion.accept().await {
             let visitor =
-                Visitor { stream: Box::new(podssh_tor::onion::bridged(stream)), peer: "the onion service".into() };
+                Visitor { stream: Box::new(pod_tor::onion::bridged(stream)), peer: "the onion service".into() };
             if queue.send(visitor).await.is_err() {
                 return;
             }

@@ -82,7 +82,7 @@ pub fn destination(text: &str) -> Result<Option<Destination>, String> {
 /// The node's name: `iroh:` and its key.
 #[cfg(feature = "iroh")]
 fn shown(ticket: &str) -> Result<String, String> {
-    podssh_iroh::ticket::parse(ticket).map(|addr| format!("{SCHEME}{}", podssh_iroh::keys::name(&addr.id)))
+    pod_iroh::ticket::parse(ticket).map(|addr| format!("{SCHEME}{}", pod_iroh::keys::name(&addr.id)))
 }
 
 #[cfg(not(feature = "iroh"))]
@@ -162,13 +162,13 @@ pub(super) fn race(args: &super::args::SshArgs, label: &str) -> Result<Option<Ra
 /// before anything connects.
 #[cfg(feature = "iroh")]
 pub(crate) fn relays(flag: Option<&str>) -> Result<Vec<String>, Refusal> {
-    let list: Vec<String> = match podssh_iroh::relays::from_environment(flag) {
+    let list: Vec<String> = match crate::iroh_way::relays(flag) {
         Ok((list, _)) => list.iter().map(ToString::to_string).collect(),
         Err(why) if flag.is_some() => return Err(Refusal::usage(why)),
         Err(why) => return Err(Refusal::config(why)),
     };
-    podssh_iroh::pkarr::choice_from_environment().map_err(Refusal::config)?;
-    podssh_iroh::tuning::Tuning::from_environment().map_err(Refusal::config)?;
+    crate::iroh_way::pkarr_choice().map_err(Refusal::config)?;
+    crate::iroh_way::tuning().map_err(Refusal::config)?;
     Ok(list)
 }
 
@@ -236,7 +236,7 @@ pub(crate) async fn reach(
 /// its lane. A task that it spawns takes the lane again with this.
 #[cfg(feature = "iroh")]
 pub(crate) fn as_bulk<F: std::future::Future>(future: F) -> impl std::future::Future<Output = F::Output> {
-    podssh_iroh::Lane::Bulk.scope(future)
+    pod_iroh::Lane::Bulk.scope(future)
 }
 
 /// A build with no iroh road has no lane to set.
@@ -249,8 +249,8 @@ pub(crate) fn as_bulk<F: std::future::Future>(future: F) -> F {
 /// node has one key for each road (T-379).
 #[cfg(feature = "iroh")]
 pub(super) fn same_node(iroh_ticket: &str, derp: &podssh_relay::derp::Ticket) -> Result<(), Refusal> {
-    let addr = podssh_iroh::ticket::parse(iroh_ticket).map_err(Refusal::usage)?;
-    let iroh = podssh_iroh::keys::identity_key(&addr.id);
+    let addr = pod_iroh::ticket::parse(iroh_ticket).map_err(Refusal::usage)?;
+    let iroh = pod_iroh::keys::identity_key(&addr.id);
     if iroh == derp.node {
         return Ok(());
     }

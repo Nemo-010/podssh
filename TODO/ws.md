@@ -141,7 +141,7 @@ row, panic the same way: `rng.fill_bytes` for the X25519 secret
    range), and compute the shared secret with the `diffie_hellman` function of `elliptic-curve`
    0.13. Check the API of `p256` 0.13.2 first. No generator that can panic goes in.
 4. Make the source a parameter in the tests, so a failing source can be planted.
-5. Add a test that reads the crate's source, as `crates/podssh-cli/src/man/facts/tests.rs:14-51`
+5. Add a test that reads the crate's source, as `crates/podssh-cli/src/man/facts/tests.rs:14-48`
    does, and fails on `fill_bytes(` or `OsRng` outside `random.rs`.
 
 ## Decision
@@ -240,7 +240,7 @@ cannot look for that word alone.
    (`crates/podssh-ws/examples/inspect_peer_chain.rs`), and remove `pub mod probe;`. Keep each
    file under 500 lines.
 2. Add the test that `probe.rs` (lines 9-12 at `510d86f`) promised: a scan of the source of `podssh-ws`,
-   `podssh-relay`, `podssh-ssh` and `podssh-cli`, as `crates/podssh-cli/src/man/facts/tests.rs:14-51`
+   `podssh-relay`, `podssh-ssh` and `podssh-cli`, as `crates/podssh-cli/src/man/facts/tests.rs:14-48`
    reads source. It fails on `impl ServerCertVerifier` and on `set_certificate_verifier`.
 3. In the example, replace the two unchecked indexes with `get`, so a short certificate gives
    "cannot read" and no panic.
@@ -3126,7 +3126,7 @@ Read at `2042200`:
   this runs for the target", and DNS over HTTPS is the fifth step, after the system's resolver
   (`crates/podssh-ws/src/resolve.rs:10`). So the issue's "ride the query that the name already causes"
   holds for few runs: in the target host, behind its proxy, no query is made at all.
-- TLS has podssh's own provider and no other: `Cargo.toml:84` says "default-features = false and NO
+- TLS has podssh's own provider and no other: `Cargo.toml:81` says "default-features = false and NO
   crypto provider feature."; its parts (`PodUtils/podssh:crates/podssh-ws/src/crypto/`) hold no HPKE, which rustls's ECH
   needs, and aws-lc's is C, which `podssh-ws` may not hold (rule 4 of `AGENTS.md`).
 - The resolvers are compiled in (`crates/podssh-ws/src/resolve.rs:66`), and are asked through the proxy
@@ -3625,7 +3625,7 @@ two requests in two directions.
 - The split is a stream of two halves (`PodUtils/podcrates:crates/pod-egress/src/vless/split.rs`).
 - `docs/STATUS.md:307` records VLESS over XHTTP against Xray-core v26.10.21, shoes and nginx in
   front of Xray-core, in packet-up, stream-up and stream-one on HTTP/2, with HTTP/1.1 refused
-  with 78. That refusal is older than T-456: `docs/STATUS.md:1048` records packet-up and stream-up
+  with 78. That refusal is older than T-456: `docs/STATUS.md:1049` records packet-up and stream-up
   over HTTP/1.1 on two connections, and stream-one alone refused
   (`PodUtils/podcrates:crates/pod-egress/src/vless/h1_modes.rs`, its reason at
   `PodUtils/podcrates:crates/pod-egress/src/vless/h1_modes.rs`). The issue's "keep the 78 refusal" reads as:

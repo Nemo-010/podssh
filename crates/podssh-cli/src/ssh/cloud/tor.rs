@@ -1,6 +1,6 @@
 //! `tor://[user@]HOST[:PORT]` (T-353, the operator's ruling Q52): a port of
 //! any host, 22 by default, through the Tor network, by Arti in podssh's
-//! process (`podssh_tor`), with no relay of podssh's. Each connection to a
+//! process (`pod_tor`), with no relay of podssh's. Each connection to a
 //! Tor relay goes through `HTTPS_PROXY` when one is set, and then only to
 //! the ports of [`PORTS_ENV`], 443 by default; the exit resolves the host's
 //! name. The road is in a build with the feature `tor` only; without it, a

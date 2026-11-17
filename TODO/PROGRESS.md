@@ -52,7 +52,7 @@ Read on 2026-11-15.
    take of `v0.42.0`, which answered each. cfb's asks, T-708 to T-731 (#195), wait behind podssh's own work order, M10
    included (the owner's ruling "Priority").
 7. **The move to PodUtils/podcrates** (T-684, Q101, Rule Q3). podssh pins each podcrates crate at
-   `v0.63.0` (COORD-123, PodUtils/podcrates#211; podssh's answer is COORD-094). Taken, so worked on in
+   `v0.65.0` (COORD-125, PodUtils/podcrates#215; podssh's answer is COORD-097). Taken, so worked on in
    PodUtils/podcrates: `pod-todo`, `pod-term`, `pod-identity`, `pod-core`, `pod-testkit`, `pod-tls`,
    `pod-proxy`, `pod-dns`, `pod-services`, `pod-ws`, `pod-quic`, `pod-wormhole`, `pod-session`, `pod-e2e`
    and `pod-relay` (2026-11-12), `pod-warp` (2026-11-13, COORD-075: `crates/podssh-warp` is its glue), and
@@ -61,8 +61,8 @@ Read on 2026-11-15.
    them (`resolve.rs`, and `via.rs`, `forwarder.rs`, `wstunnel.rs`, `wisp.rs`, `meek.rs`, `webtunnel.rs`, `pt.rs`,
    `cloudflare.rs`, `vless.rs`, `vmess.rs`, `trojan.rs`, `shadowsocks.rs`, `eice.rs` and `iap.rs` of `podssh-ws`; `code/`, `session/`,
    `src/e2e/`, `transit/mod.rs` and the relay client's modules over `context.rs` of `podssh-relay`;
-   `acme/mod.rs` of `podssh-cli`). Nothing is frozen now (2026-11-15). Next, as podcrates names
-   them: `pod-tor`, `pod-iroh`, `pod-cloudflare` and `pod-ts`; then
+   `acme/mod.rs` of `podssh-cli`). Nothing is frozen now (2026-11-15). Taken on 2026-11-17 (`v0.65.0`): `pod-tor` and `pod-iroh`.
+   Next, as podcrates names them: `pod-cloudflare` and `pod-ts`; then
    `pod-relay-serve` last.
 8. **Drafts.** Superseded: `draft/t791-lane` (its commands 5 and 6 are in `scripts/pod-lab-serve-lane.sh`, 2026-11-16; the owner deletes the branch by hand). Merged on 2026-11-16: T-790's model on pod-manual and the five drafts of its long sentences. Merged on 2026-11-15: T-790's sentences of the manual at 25 words or fewer. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
    T-118's, T-117's, T-114's, T-112's,
@@ -200,7 +200,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 755 entries: 41 open, 35 partial, 12 blocked, 667 done.
+`TODO/INDEX.md` holds 756 entries: 43 open, 35 partial, 11 blocked, 667 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 

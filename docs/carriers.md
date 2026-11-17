@@ -709,8 +709,8 @@ The candidates, ranked:
      the proxy's CA (Inferred).
    - Limits: a limit for each connection, not published, that slows the
      sender [R2]; a paid tier at $19 a month gives 5 MB/s [R4].
-   - Rust and C: built (`podssh-iroh`); its aws-lc-rs is C, which is allowed
-     outside the library crates.
+   - Rust and C: built (`pod-iroh` of PodUtils/podcrates); its ring is C,
+     which is allowed outside the library crates.
    - Effort: S. Risks: only the newest iroh is supported [R1]: a relay
      that refuses the iroh of a binary is named, with `podssh update` and
      `--iroh-relay` as the ways out. The release binaries have the road
@@ -726,7 +726,7 @@ The candidates, ranked:
    - The sweep of 2026-11-02 named three relays under `relay.iroh.network.`
      [W1], names of n0's older documents (Inferred): n0's page names no
      host on 2026-11-02 [N5], and podssh's table is that of iroh 1.4.1's
-     `defaults::prod` (`crates/podssh-iroh/src/relays.rs:17-22`).
+     `defaults::prod` (`crates/pod-iroh/src/relays.rs` of PodUtils/podcrates).
 2. **Tailscale's DERP relays for tailcat** (`tc301a.ipn.dev` to
    `tc304a.ipn.dev`).
    - Who, and the account: Tailscale, "our free rate-limited DERP relays"

@@ -216,6 +216,10 @@ pub mod node_members;
 // `podssh node --iroh`: the iroh road, with the feature `iroh` only.
 #[cfg(feature = "iroh")]
 pub mod node_iroh;
+// What podssh gives the iroh road of pod-iroh: its TLS, resolver, proxy and
+// way out, and the values of its variables.
+#[cfg(feature = "iroh")]
+pub mod iroh_way;
 // A node's record of pkarr with each of its roads (T-445); in a build with
 // no iroh road, no record.
 pub mod node_record;
