@@ -7316,3 +7316,41 @@ Done, 2026-11-17 (drafted, then merged, built and run):
   `a_file_stored_again_is_replaced_whole_and_no_temporary_file_stays`.
 - `rg 'rename\(&(tmp|part)' crates` finds one, in the test helper `crates/podssh-cli/tests/serve_certs/mod.rs:117`,
   a test's own certificate: none in podssh's code.
+
+
+# T-808: podssh-ssh's dates without chrono, which RUSTSEC-2026-0543 calls unmaintained
+
+**Source:** the `deny` workflow at `60e997f`, 2026-11-17: RUSTSEC-2026-0543, chrono is unmaintained.
+**Category:** chore
+**Milestone:** none
+**Priority:** P3
+**Effort:** S
+**Status:** open
+
+## Problem
+
+chrono is unmaintained (RUSTSEC-2026-0543, no fixed version). `deny.toml` ignores it with its reason, as russh-sftp and
+the Tailscale fork bring it whatever podssh does. podssh-ssh's own two uses can go.
+
+## Premise
+
+- `crates/podssh-ssh/src/sshsig.rs:16`: a signature's validity dates, read and written in the local time zone.
+- `crates/podssh-ssh/src/sftp/long.rs:10`: the long listing of sftp, a file's time in the local time zone.
+- `crates/podssh-ssh/Cargo.toml:67`: the dependency.
+
+## Approach
+
+Move both to `jiff` (its local time zone reads the system's database, with no unsound call), or to `time` with an
+offset that podssh reads itself. Keep the words and the output byte for byte; drop `chrono` from podssh-ssh. Its ignore
+in `deny.toml` stays while russh-sftp or the Tailscale fork bring it.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-ssh --lib sshsig sftp::long
+cargo tree -p podssh-ssh -e normal --depth 1 | grep -c chrono
+```
+
+The tests of each date form pass with no change of their expected text; the second command prints 0.
+
