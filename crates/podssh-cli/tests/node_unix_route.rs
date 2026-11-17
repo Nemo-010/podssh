@@ -225,6 +225,15 @@ fn a_unix_route_gets_the_line_of_each_key_that_the_door_let_in() {
 #[test]
 fn a_node_refuses_a_unix_route_that_it_cannot_serve() {
     let home = throughput_harness::scratch("unix-route-refused");
+    // The scratch home goes at the end, also when an assertion fails: the
+    // gate fails on a test that leaves its directory.
+    struct Gone(std::path::PathBuf);
+    impl Drop for Gone {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+    let _gone = Gone(home.clone());
     for (extra, says) in [
         (vec!["--sshd"], "--sshd"),
         (vec!["--exit"], "--exit"),
