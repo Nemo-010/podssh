@@ -151,14 +151,79 @@ async fn a_mint_past_120_of_an_address_in_a_minute_is_a_429_until_the_minute_pas
     // A pair shares the count of the mints, as on the default relay.
     let pair = ask(&cfg, "POST", "/v1/pair", a).await;
     assert_eq!((pair.status, pair.header_text("retry-after", 64).as_deref()), (429, Some("60")));
-    // Neither /health nor the forward road is braked: a /connect/ with no
-    // token gets the road's own 403.
+    // /health is not braked; an upgrade of an address whose minute is full
+    // waits before its token is read (T-806).
     assert_eq!(ask(&cfg, "GET", "/health", a).await.status, 200);
     let connect = ask(&cfg, "GET", "/connect/github.com/22", a).await;
-    assert!(connect.status == 403 && connect.body_text(200).contains("token"), "{}", connect.body_text(200));
+    assert_eq!(connect.status, 429, "{}", connect.body_text(200));
     let lines = said.lock().unwrap().iter().filter(|line| line.contains("braked")).count();
     assert_eq!(lines, 1, "one line for the address, not one for each request");
     now.store(WINDOW_MS, Ordering::SeqCst);
     assert_eq!(ask(&cfg, "POST", "/v1/mint", a).await.status, 200, "the first after the minute");
     assert_eq!(ask(&cfg, "POST", "/v1/pair", a).await.status, 200, "and a pair");
+}
+
+/// An upgrade of a client at `from` with the token `token`, if any.
+async fn upgrade(cfg: &Arc<Config>, path: &str, from: &str, token: Option<&str>) -> Response {
+    let (mut client, server) = tokio::io::duplex(64 * 1024);
+    let from: IpAddr = from.parse().unwrap();
+    let headers: Vec<(&str, &str)> = token.map(|t| ("X-Relay-Token", t)).into_iter().collect();
+    let (_, answer) = tokio::join!(
+        serve_from(server, cfg.clone(), None, Some(from)),
+        exchange(&mut client, "GET", "relay-a.test", path, &headers, b"", 16 * 1024),
+    );
+    answer.expect("an answer")
+}
+
+#[tokio::test]
+async fn past_120_wrong_tokens_of_an_address_in_a_minute_its_upgrades_wait() {
+    let (now, clock) = set_clock();
+    let (cfg, _) = role(clock);
+    let a = "192.0.2.1";
+    for i in 0..PER_MINUTE {
+        let wrong = if i % 2 == 0 { None } else { Some("ephm1.9.forward.AAAA") };
+        let refused = upgrade(&cfg, "/connect/github.com/22", a, wrong).await;
+        assert_eq!(refused.status, 403, "try {i}: {}", refused.body_text(200));
+    }
+    let braked = upgrade(&cfg, "/connect/github.com/22", a, None).await;
+    assert_eq!(braked.status, 429, "{}", braked.body_text(200));
+    assert_eq!(braked.header_text("retry-after", 64).as_deref(), Some("60"));
+    // Its good token waits too, and so do its mints, which share the count.
+    let (token, _) = cfg.tokens.mint(super::super::tokens::now_ms(), 60_000);
+    assert_eq!(upgrade(&cfg, "/connect/github.com/22", a, Some(&token)).await.status, 429);
+    assert_eq!(ask(&cfg, "POST", "/v1/mint", a).await.status, 429);
+    assert_eq!(upgrade(&cfg, "/v1/layer/github.com/22", a, None).await.status, 429, "the layer's road");
+    // Another address is not braked.
+    assert_eq!(upgrade(&cfg, "/connect/github.com/22", "198.51.100.7", None).await.status, 403);
+    // A good token that a later check refuses (no upgrade here) is no strike.
+    let b = "203.0.113.9";
+    for i in 0..PER_MINUTE + 10 {
+        let refused = upgrade(&cfg, "/connect/github.com/22", b, Some(&token)).await;
+        assert_ne!(refused.status, 429, "try {i}: {}", refused.body_text(200));
+    }
+    now.store(WINDOW_MS, Ordering::SeqCst);
+    assert_eq!(upgrade(&cfg, "/connect/github.com/22", a, None).await.status, 403, "the minute passed");
+}
+
+#[test]
+fn the_upgrades_that_need_a_token() {
+    for (method, path) in [
+        ("GET", "/connect/github.com/22"),
+        ("GET", "/v1/layer/github.com/22"),
+        ("POST", "/v1/http/open/github.com/22"),
+        ("POST", "/v1/http/one-layer/github.com/22"),
+    ] {
+        assert!(needs_token(method, path), "{method} {path}");
+    }
+    for (method, path) in [("POST", "/v1/mint"), ("GET", "/health"), ("POST", "/v1/http/send/k"), ("GET", "/trace")] {
+        assert!(!needs_token(method, path), "{method} {path}");
+    }
+    let brake = Brake::new(2, WINDOW_MS, ADDRESSES, monotonic());
+    let a = ip("192.0.2.1");
+    brake.strike_at(a, 0);
+    assert!(brake.held_at(a, 0).is_ok(), "one strike of two");
+    brake.strike_at(a, 1);
+    assert_eq!(brake.held_at(a, 2), Err(Braked { wait_s: 60, first: true }));
+    assert!(brake.held_at(ip("192.0.2.2"), 2).is_ok());
+    assert!(brake.held_at(a, WINDOW_MS).is_ok(), "the first strike left the minute");
 }

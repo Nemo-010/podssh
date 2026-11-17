@@ -8,6 +8,12 @@
 //! or spend the role's CPU. `/health`, the documents and the sockets of both
 //! roads are not counted: a socket needs a token that the brake gave out.
 //!
+//! An upgrade whose token is missing or wrong counts too (T-806): a guess
+//! of a token is hopeless (a MAC), but each costs the role a handshake and a
+//! check. Such an upgrade is a strike of its address; an address whose
+//! minute is full gets `429` before any check of its next upgrade or
+//! request. A good token refused by the policy is no strike.
+//!
 //! The counts are bounded: past [`ADDRESSES`], an address whose minute is
 //! over is forgotten first, then the one heard from least lately. The clock
 //! is the caller's, monotonic in the role, so that a test sets the time and
@@ -45,6 +51,15 @@ pub fn braked(method: &str, path: &str) -> bool {
         || path == "/v1/pair"
         || path == super::mailbox::PATH
         || super::leg::serves(path)
+}
+
+/// Whether a request of `method` to `path` is an upgrade or an open that
+/// needs the forward token: `/connect/`, the layer's links, and a session of
+/// the HTTP road (its later requests carry the session's key, not a token).
+pub fn needs_token(method: &str, path: &str) -> bool {
+    use crate::http_road::{ONE, ONE_LAYER, OPEN, OPEN_LAYER};
+    (method == "GET" && (path.starts_with("/connect/") || super::layer::serves(path)))
+        || (method == "POST" && [OPEN, OPEN_LAYER, ONE, ONE_LAYER].iter().any(|p| path.starts_with(p)))
 }
 
 /// The visitor that Cloudflare's edge names in [`EDGE_VISITOR`], one address
@@ -147,6 +162,33 @@ impl Brake {
         self.decide(&mut seen, who, now_ms)
     }
 
+    /// Whether `who` may try an upgrade now: an error once its minute is
+    /// full, as for [`Brake::take`], but nothing is counted.
+    pub fn held(&self, who: Who) -> Result<(), Braked> {
+        let mut seen = self.seen.lock().unwrap_or_else(|e| e.into_inner());
+        let now_ms = (self.clock)();
+        self.peek(&mut seen, who, now_ms)
+    }
+
+    /// [`Brake::held`] at `now_ms`.
+    pub fn held_at(&self, who: Who, now_ms: u64) -> Result<(), Braked> {
+        let mut seen = self.seen.lock().unwrap_or_else(|e| e.into_inner());
+        self.peek(&mut seen, who, now_ms)
+    }
+
+    /// Count a refused token of `who` (T-806).
+    pub fn strike(&self, who: Who) {
+        let mut seen = self.seen.lock().unwrap_or_else(|e| e.into_inner());
+        let now_ms = (self.clock)();
+        let _ = self.decide(&mut seen, who, now_ms);
+    }
+
+    /// [`Brake::strike`] at `now_ms`.
+    pub fn strike_at(&self, who: Who, now_ms: u64) {
+        let mut seen = self.seen.lock().unwrap_or_else(|e| e.into_inner());
+        let _ = self.decide(&mut seen, who, now_ms);
+    }
+
     /// The requests of an address that its window lets through.
     pub fn limit(&self) -> usize {
         self.limit
@@ -159,6 +201,22 @@ impl Brake {
 
     pub fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    /// The verdict of [`Brake::decide`] with nothing counted.
+    fn peek(&self, seen: &mut HashMap<Who, Count>, who: Who, now_ms: u64) -> Result<(), Braked> {
+        let Some(count) = seen.get_mut(&who) else { return Ok(()) };
+        let window = self.window_ms;
+        while count.stamps.front().is_some_and(|t| now_ms.saturating_sub(*t) >= window) {
+            count.stamps.pop_front();
+        }
+        if count.stamps.len() < self.limit {
+            return Ok(());
+        }
+        let oldest = count.stamps.front().copied().unwrap_or(now_ms);
+        let wait_ms = oldest.saturating_add(window).saturating_sub(now_ms);
+        let first = !std::mem::replace(&mut count.said, true);
+        Err(Braked { wait_s: wait_ms.div_ceil(1000).max(1), first })
     }
 
     /// Only a request let through counts, so that the wait said is the wait:

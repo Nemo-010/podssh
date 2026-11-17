@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**762 entries: 37 open, 38 partial, 11 blocked, 676 done.**
+**762 entries: 36 open, 38 partial, 11 blocked, 677 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 2 | 8 | 3 | 81 | 94 |
 | P2 | 0 | 24 | 2 | 288 | 314 |
-| P3 | 35 | 6 | 6 | 306 | 353 |
-| **All** | 37 | 38 | 11 | 676 | 762 |
+| P3 | 34 | 6 | 6 | 307 | 353 |
+| **All** | 36 | 38 | 11 | 677 | 762 |
 
 ## Entries
 
@@ -836,5 +836,5 @@ repository and CI).
 | [T-803](relay.md) | P2 | S | M10 | measurement | done | `podssh relay serve` moved 16 MiB at two speeds on the loopback, 75 or 330 MiB/s |
 | [T-804](relay.md) | P3 | S | M10 | research | done | The ideas of the dig study for the relay server: a ban, PROXY's ranges, STUN, deadlines, an address check |
 | [T-805](repo.md) | P3 | S | M10 | chore | done | podssh's private files written by `pod_core::files::replace_private` |
-| [T-806](relay.md) | P3 | S | M10 | feature | open | An upgrade of the relay role with a wrong token counts against its address |
+| [T-806](relay.md) | P3 | S | M10 | feature | done | An upgrade of the relay role with a wrong token counts against its address |
 | [T-807](relay.md) | P3 | M | M10 | feature | open | The relay role reads the client's address from PROXY protocol's header of a trusted balancer |

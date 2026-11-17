@@ -3788,7 +3788,7 @@ Read at `2042200`:
   `2042200`, took the key that proved itself, said its fingerprint in a line, and returned `Ok(())`,
   which `crates/podssh-relay/src/serve/reverse/mod.rs` called at line 186 at `2042200`, before the pair
   is made.
-- The brake slows one address, not one key: `crates/podssh-relay/src/serve/brake.rs:22` says
+- The brake slows one address, not one key: `crates/podssh-relay/src/serve/brake.rs:28` says
   "pub const PER_MINUTE: usize = 120;", so one address fills the table in under 35 minutes, and several
   addresses sooner (arithmetic, not a measurement).
 - The full table's answer is `429` with the table's size (`crates/podssh-relay/src/serve/reverse/mod.rs`,

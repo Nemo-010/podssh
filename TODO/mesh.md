@@ -3694,7 +3694,7 @@ The draft's calls, 2026-11-02:
 
 1. The count: for each address, the times of the requests let through in the last minute, 120 at
    most, so that `Retry-After` is the wait itself and the first request after it passes
-   (`crates/podssh-relay/src/serve/brake.rs:109`). Only a request let through adds a time: a
+   (`crates/podssh-relay/src/serve/brake.rs:124`). Only a request let through adds a time: a
    client that asks again too soon is told the same end, never a later one. Lost: a minute that
    starts again (240 requests across its edge); two counts weighted by their overlap, three
    numbers an address, whose wait is an estimate, so a client told 60 s could meet a second
@@ -3713,7 +3713,7 @@ The draft's calls, 2026-11-02:
    header, which each client of a listener writes, and would make up anew for each request.
    Behind the quick tunnel (T-428) the peer is Cloudflare's edge, so the hook for T-428 is
    `serve::serve_from(stream, cfg, sni, from)` (`crates/podssh-relay/src/serve/mod.rs:216`),
-   with `from` read by `brake::edge_visitor` (`crates/podssh-relay/src/serve/brake.rs:56`) from
+   with `from` read by `brake::edge_visitor` (`crates/podssh-relay/src/serve/brake.rs:71`) from
    the `cf-connecting-ip` of the edge's own request, which reaches the node only on the
    connection that podssh dialed to the edge. Lost: the role reading that header itself when a
    switch of `Config` says it sits behind the tunnel, a switch that a listener could be given by
@@ -3732,7 +3732,7 @@ The draft's calls, 2026-11-02:
 7. The bound: 4096 addresses, the bound of the table of pairs, each with 120 times of 8 bytes at
    most (under 4 MiB in all). A new address that meets a full table first forgets each address
    whose minute is over, then the one whose last request let through is the oldest
-   (`crates/podssh-relay/src/serve/brake.rs:190`): a scan of 4096 counts at most, and only then.
+   (`crates/podssh-relay/src/serve/brake.rs:248`): a scan of 4096 counts at most, and only then.
    Lost: a list kept in order, more code for no measured need.
 8. The clock: monotonic, the milliseconds since the role's start, and a `brake::Clock` that a test
    sets by hand, so that no test waits a minute and a step of the wall clock neither frees an

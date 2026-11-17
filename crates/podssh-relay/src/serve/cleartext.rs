@@ -58,6 +58,9 @@ where
     S: AsyncRead + AsyncWrite + Unpin + Send + 'static,
 {
     let Some((head, pending, path)) = super::head_of(&mut stream).await else { return };
+    if let Err(braked) = super::strike(&cfg, &head, &path, from) {
+        return super::slow_down(&mut stream, &head, pending, &path, braked, &cfg).await;
+    }
     if brake::braked(&head.method, &path) {
         if let Err(braked) = cfg.brake.take(brake::Who::of(from)) {
             return super::slow_down(&mut stream, &head, pending, &path, braked, &cfg).await;

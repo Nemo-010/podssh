@@ -234,7 +234,11 @@ pub async fn serve_from<S>(mut stream: S, cfg: Arc<Config>, sni: Option<String>,
 where
     S: AsyncRead + AsyncWrite + Unpin + Send + 'static,
 {
-    let Some((head, pending, _)) = head_of(&mut stream).await else { return };
+    let Some((head, pending, first)) = head_of(&mut stream).await else { return };
+    // A wrong token counts before any road reads the request (T-806).
+    if let Err(braked) = strike(&cfg, &head, &first, from) {
+        return slow_down(&mut stream, &head, pending, &first, braked, &cfg).await;
+    }
     // The HTTP road keeps its connection for its next request, and gives
     // back a request of another path that came on it (T-319).
     let (mut stream, head, pending) = if http_road::serves(&head.target) {
@@ -389,6 +393,24 @@ async fn slow_down<S>(
     let wait = braked.wait_s.to_string();
     let why = format!("{path}: {limit} requests of this address in a minute; ask again in {wait} s");
     answer(stream, request::refusal(429, &why, &[("Retry-After", wait.as_str())])).await;
+}
+
+/// Whether the upgrade or open of `head` at `path` may be checked: `Err`
+/// once the address of `from` filled its minute; a token missing or wrong
+/// counts a strike against that address (T-806). A token that the role
+/// minted, and that a later check refuses (its policy, its road), is none.
+fn strike(cfg: &Config, head: &request::Request, path: &str, from: Option<IpAddr>) -> Result<(), brake::Braked> {
+    if !brake::needs_token(&head.method, path) {
+        return Ok(());
+    }
+    let who = brake::Who::of(from);
+    cfg.brake.held(who)?;
+    let now = tokens::now_ms();
+    let good = head.header("x-relay-token").is_some_and(|t| cfg.tokens.check(t, now) || cfg.tokens.is_once(t, now));
+    if !good {
+        cfg.brake.strike(who);
+    }
+    Ok(())
 }
 
 /// The key that proved itself for a mint or a pair, whose share of the pairs

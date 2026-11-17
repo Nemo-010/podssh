@@ -1175,9 +1175,14 @@ and the signed one.
 - The counts take 4096 addresses at most, each with the times of up to 120
   requests: an address whose minute is over is forgotten first, then the
   one heard from least lately.
-- `/health`, `/relays.json`, `/trace`, `/llms-full.txt` and the sockets of
-  both roads are not counted: a socket needs a token or a pair that the
-  brake let through, and the role checks it with a MAC or a digest alone.
+- `/health`, `/relays.json`, `/trace` and `/llms-full.txt` are not
+  counted. An upgrade or an open whose token is missing or wrong is
+  (T-806): `/connect/`, the layer's links, and a session of the HTTP road,
+  over TLS, HTTP/2 and the cleartext road. Each such refusal (`403`) counts
+  in the minute of its address, beside the mints and pairs. An address
+  whose minute is full gets `429` before its next upgrade's token is read.
+  A good token that a later check refuses (the policy, the road) counts
+  nothing.
 - The first refusal of an address is a line on stdout,
   `/v1/mint: braked, an address past 120 requests in a minute`, which does
   not name the address; the next ones until it is let through again say

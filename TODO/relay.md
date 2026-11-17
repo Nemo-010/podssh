@@ -4367,11 +4367,11 @@ Read at `2042200`:
   (`docs/relay.md:92` says "a token is the contract's form under a secret of the run"). A ledger keyed
   by the token, as the issue first proposes, would count a principal that the next mint or restart
   replaces; the issue's own Risks say so.
-- The key is known at the mint: `crates/podssh-relay/src/serve/mod.rs:396-400` takes the key that
+- The key is known at the mint: `crates/podssh-relay/src/serve/mod.rs:418-422` takes the key that
   proved itself, and drops it after its line.
 - The role keeps one private file already, by an atomic writer (`crates/podssh-relay/src/serve/reverse/pairs.rs:455`)
   and a SHA-256 of each token (`:454`).
-- The brake counts requests for each address (`crates/podssh-relay/src/serve/brake.rs:22` says
+- The brake counts requests for each address (`crates/podssh-relay/src/serve/brake.rs:28` says
   "pub const PER_MINUTE: usize = 120;"), never bytes.
 
 ## Approach
@@ -5669,7 +5669,7 @@ all. One client can hold thousands of connections (30 s each before TLS begins);
 - The review: the accept loop of `crates/podssh-cli/src/relay_serve.rs` (`let Ok((tcp, peer)) = accepted else
   { continue };`, then a spawn), with no count and no pause (lines 448-454 at `4489df2`; the loop is at
   `crates/podssh-cli/src/relay_serve.rs:358` since the change).
-- The review: `crates/podssh-relay/src/serve/brake.rs:61-89` (`Who`) already groups an IPv4 address and an
+- The review: `crates/podssh-relay/src/serve/brake.rs:76-104` (`Who`) already groups an IPv4 address and an
   IPv6 /64; `crates/podssh-cli/src/relay_serve/limits.rs:1-11` has no bound of connections.
 
 ## Approach
@@ -5745,7 +5745,7 @@ unauthenticated response name PodUtils, the version or the contract.
   NAME=PAIR` goes to its pair's node, whose own TLS answers it
   (`crates/podssh-relay/src/serve/published.rs:1-13`).
 - The role's router answers its contract's paths and a 404 of its own for the others
-  (`crates/podssh-relay/src/serve/mod.rs:254-281`); no source file of `crates/podssh-relay/src/serve/` serves a static
+  (`crates/podssh-relay/src/serve/mod.rs:258-285`); no source file of `crates/podssh-relay/src/serve/` serves a static
   tree (searched 2026-11-13).
 - `/health` names the service and the version
   (`crates/podssh-relay/src/serve/docs.rs:24-29`; docs/relay.md's "podssh's own relay",
@@ -5927,7 +5927,7 @@ test fail when a new unauthenticated route appears without an entry in an allow-
 
 ## Premise
 
-- The router: `crates/podssh-relay/src/serve/mod.rs:254-281`; the list of the role's own paths,
+- The router: `crates/podssh-relay/src/serve/mod.rs:258-285`; the list of the role's own paths,
   `crates/podssh-relay/src/serve/mod.rs:205-208`.
 - The probes need no token (`crates/podssh-relay/src/serve/probe.rs:11`).
 - These documents are the relay contract's, which podssh's clients read from any relay host:
@@ -6371,7 +6371,7 @@ Done, 2026-11-17. Each idea against the role of `main`:
   refused with `403` and counted nowhere: a token is a MAC, so guessing one is hopeless, but each try costs the role a
   handshake for free. Fits: T-806.
 - **PROXY protocol's trusted ranges**: the role reads the visitor of Cloudflare's edge alone (`EDGE_VISITOR`,
-  `crates/podssh-relay/src/serve/brake.rs:29`); behind a balancer of the user's own (haproxy, nginx's stream), the brake
+  `crates/podssh-relay/src/serve/brake.rs:35`); behind a balancer of the user's own (haproxy, nginx's stream), the brake
   and the slots count the balancer as one address. Fits: T-807.
 - **A STUN responder**: no road of podssh finds a UDP path through the role; the iroh road brings its own relays and
   their address discovery, and the role's UDP is QUIC's alone (`--quic`). Does not fit the role, and no entry.
@@ -6389,7 +6389,7 @@ Done, 2026-11-17. Each idea against the role of `main`:
 **Milestone:** M10
 **Priority:** P3
 **Effort:** S
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -6416,6 +6416,33 @@ cargo test -p podssh-relay --features serve --lib serve::brake
 Past 120 wrong tokens in a minute, an address gets `429`, and another address is not braked. Planted: the refusal not
 counted, and the test fails.
 
+## Correction
+
+2026-11-17: the brake's file holds T-454's minute alone; it is at `crates/podssh-relay/src/serve/brake.rs`. The token is
+checked in five places (`forward.rs`, `layer.rs`, the HTTP road's `checked`, `docs.rs`'s `/trace`, the cleartext road),
+none of which knows the client's address. So the strike is counted once, where each request of TLS, HTTP/2 and the
+cleartext road first comes in with its address (`serve_from`, `cleartext::serve`), before any road reads it.
+
+## Done
+
+2026-11-17. `brake::needs_token` names the upgrades and opens that need the forward token: `GET /connect/`, the layer's
+links, and a session of the HTTP road (`open`, `one`, and their layer's forms; the road's later requests carry the
+session's key). `Brake::held` reads an address's minute and counts nothing; `Brake::strike` counts one. `serve::strike`
+(`crates/podssh-relay/src/serve/mod.rs`) runs before each road in `serve_from`, which HTTP/2's streams reach too, and
+in `cleartext::serve`. An address whose minute is full gets `429` with `Retry-After`. Else a token that neither
+`Tokens::check` nor `Tokens::is_once` accepts is a strike, and the road then refuses it (`403`) as before. A good
+token refused later (its policy, a missing upgrade) counts nothing. `/trace`'s token is not counted: it dials nothing,
+and its `403` costs a MAC alone. `docs/relay.md` ("The relay role's brake") says it.
+
+Prove, 2026-11-17: `cargo test -p podssh-relay --features serve --lib serve::brake`, 7 passed. The new
+`past_120_wrong_tokens_of_an_address_in_a_minute_its_upgrades_wait`: 120 upgrades with no token or a wrong one are each
+`403`, and the 121st is `429` with `Retry-After: 60`. Then the same address's good token, its mint and its layer's link
+each get `429`, while another address still gets `403`. 130 good tokens of a third address are never `429`, and the
+first address gets `403` again after the minute. The test of T-454's mints now expects `429`, not `403`, for the
+`/connect/` of an address whose minute is full. Planted: the strike not counted fails the new test
+(`brake_tests.rs:189`).
+
+
 # T-807: The relay role reads the client's address from PROXY protocol's header of a trusted balancer
 
 **Source:** T-804, the dig study's idea of the trusted ranges of the PROXY protocol (COORD-127).
@@ -6432,7 +6459,7 @@ the role's brake and slots count every client as one address, and its log names 
 
 ## Premise
 
-- The role reads the visitor from Cloudflare's header alone (`crates/podssh-relay/src/serve/brake.rs:29`).
+- The role reads the visitor from Cloudflare's header alone (`crates/podssh-relay/src/serve/brake.rs:35`).
 
 ## Approach
 
