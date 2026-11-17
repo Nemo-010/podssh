@@ -35,11 +35,13 @@ pub(super) fn hops(list: &str, args: &SshArgs, cli: &Settings, env: &Env) -> Res
 pub(super) type Hops = (Vec<Hop>, Vec<Options>, Option<Tunnel>);
 
 /// The road to a first hop that a tunnel reaches: Cloudflare's, by the
-/// name of its rule (T-347), or a cloud's own to a VM (T-351).
+/// name of its rule (T-347), a cloud's own to a VM (T-351), or a node's
+/// roads to its TARGET, by the label of its pair and a route (T-724).
 #[derive(Debug, Clone)]
 pub(super) enum Tunnel {
     Cloudflare(String),
     Cloud(super::cloud::Road),
+    Node(String, Option<String>),
 }
 
 impl Tunnel {
@@ -48,6 +50,7 @@ impl Tunnel {
         match self {
             Tunnel::Cloudflare(host) => host.clone(),
             Tunnel::Cloud(road) => road.shown(),
+            Tunnel::Node(label, route) => super::node::shown(label, route.as_deref()),
         }
     }
 
@@ -56,6 +59,12 @@ impl Tunnel {
         match self {
             Tunnel::Cloudflare(_) => Ok(super::cloudflare::transport(at, env)?),
             Tunnel::Cloud(road) => super::cloud::transport(road, at, env, port),
+            // The node's roads reach its TARGET, the first hop's sshd; each
+            // later hop is inside that hop's connection.
+            Tunnel::Node(label, route) => {
+                let ask = super::node::Ask { label, route: route.as_deref(), ..*at };
+                super::node::resolved(&ask, env, true)
+            }
         }
     }
 }
@@ -118,6 +127,30 @@ impl Chain<'_> {
             let tunnel = super::cloudflare::destination(text)?;
             let cloud = super::cloud::destination(text)?;
             let first = i == 0 && self.path.is_empty() && self.hops.is_empty();
+            // A node as the first hop (T-724): its roads start from this host.
+            if text.starts_with(super::node::SCHEME) {
+                if !first {
+                    return Err(format!(
+                        "-J {text}: a node can only be the first hop: its roads start from this host, and a hop \
+                         inside an SSH channel has none"
+                    )
+                    .into());
+                }
+                let (user, label, route) =
+                    super::node::destination(text)?.ok_or_else(|| format!("-J {text}: no node"))?;
+                let shown = super::node::shown(&label, route.as_deref());
+                let target = Hop { user, host: shown.clone(), port: 22, tls: false };
+                let filed = self.filed(&target)?;
+                let (mut hop, mut options) = self.hop(&target, filed)?;
+                // The node's own name in the known hosts, as for a node://
+                // destination: no HostName of a file moves it.
+                hop.host = shown.clone();
+                options.destination.host = shown;
+                self.tunnel = Some(Tunnel::Node(label, route));
+                self.hops.push(hop);
+                self.options.push(options);
+                continue;
+            }
             let target = match (tunnel, cloud) {
                 // The road of the run reaches the tunnel; a hop inside an SSH
                 // channel has no road to Cloudflare's edge (T-347).

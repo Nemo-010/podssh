@@ -422,7 +422,7 @@ fn node_destinations() {
         (vec!["node://../x"], "not a pair name"),
         (vec!["--direct", "node://lab"], "--direct"),
         (vec!["-J", "jump", "node://lab"], "-J"),
-        (vec!["-J", "node://x", "host"], "-J hop"),
+        (vec!["-J", "jump,node://x", "host"], "a node can only be the first hop"),
         (vec!["-W", "h:1", "node://lab"], "-W"),
         (vec!["-p", "2222", "node://lab"], "no port"),
         (vec!["-o", "HostName=x", "node://lab"], "HostName"),

@@ -129,7 +129,12 @@ scripts. The facts about OpenSSH on this page were measured with OpenSSH
   label NAME (T-084), reached through the relay, with its host key recorded
   under `node://NAME`, which no DNS name can be; `node:22` is still the host
   `node` on port 22. A node has no port, and `-J`, `-W` and `--direct` do
-  not go with it (exit 64). To a node, podssh sends nothing until the
+  not go with it as the destination (exit 64). `-J node://[user@]NAME` makes
+  the node the first hop of a chain (T-724): its roads reach its TARGET, an
+  sshd, whose key is checked under `node://NAME`; each later hop is inside
+  that connection, and a node as a later hop is refused (64). `podssh mcp`
+  takes a node as a destination, which only an `--allow-host` pattern that
+  starts with `node://` lets in. To a node, podssh sends nothing until the
   node's first bytes, 30 s at most: a node that offers the resumable layer
   greets with its first record, and `-v` says whether it did (T-151,
   `docs/design.md` section 5). With the layer, a lost link to the relay is

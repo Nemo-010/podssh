@@ -31,7 +31,7 @@ const PATH_MAX: usize = 4096;
 #[rustfmt::skip]
 pub fn list(settings: &Settings) -> Vec<Value> {
     let (hosts, dirs) = (settings.allow.shown(), settings.dirs.shown());
-    let dest = json!({ "type": "string", "description": format!("[user@]host, a host that matches {hosts}") });
+    let dest = json!({ "type": "string", "description": format!("[user@]host or node://[user@]NAME, one that matches {hosts}") });
     let path = json!({ "type": "string", "minLength": 1, "description": "the path on the host, as podssh cp takes it after host:" });
     let local = json!({ "type": "string", "minLength": 1,
         "description": format!("a path of this host in {dirs} (--allow-dir), a relative one under the first; links are followed and held inside") });

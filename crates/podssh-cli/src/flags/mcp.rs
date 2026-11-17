@@ -8,7 +8,7 @@ use super::{row, FlagKind, FlagRow};
 #[rustfmt::skip]
 pub const MCP_FLAGS: &[FlagRow] = &[
     row(None, "allow-host", Some("PATTERN"), FlagKind::Supported,
-        "a host that ssh_exec, health, the job_ tools and the copies may reach: [USER@]HOST with * and ?, or !PATTERN to exclude; repeat it (default: none)", None),
+        "a host that ssh_exec, health, the job_ tools and the copies may reach: [USER@]HOST with * and ?, or !PATTERN to exclude; repeat it (default: none). A node is node://[USER@]NAME, and only a pattern that starts with node:// matches one", None),
     row(None, "allow-dir", Some("DIR"), FlagKind::Supported,
         "a directory of this host that cp_put may read and cp_get may write, links followed and held inside it; repeat it (default: none, and no copy tool); one that holds ~/.ssh or podssh's cache is refused", None),
     row(None, "allow-session", None, FlagKind::Supported,

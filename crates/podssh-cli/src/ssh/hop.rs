@@ -65,11 +65,8 @@ pub fn parse_hop(text: &str) -> Result<Hop, String> {
     Ok(Hop { user, host, port, tls })
 }
 
-/// A `-J` hop, which a node cannot be yet.
+/// A `-J` hop of a host; a node is read before (`super::jump`, T-724).
 pub(super) fn jump_hop(text: &str) -> Result<Hop, String> {
-    if text.starts_with(super::node::SCHEME) {
-        return Err(format!("-J {text}: a node cannot be a -J hop yet"));
-    }
     parse_hop(text)
 }
 

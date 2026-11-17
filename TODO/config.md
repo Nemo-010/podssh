@@ -1,7 +1,7 @@
 This file holds the work on configuration files: OpenSSH's `ssh_config` (`-F`, `Host`,
 `Include`, `Match` and `-G`), host lists from other clients, and a settings file for podssh's
 own options. The rules of OpenSSH that podssh follows were measured with `ssh -G` and are in
-`docs/cli.md:6639-6751`. Since T-043, `podssh ssh` reads `~/.ssh/config` and the file of `-F`.
+`docs/cli.md:6644-6756`. Since T-043, `podssh ssh` reads `~/.ssh/config` and the file of `-F`.
 
 # T-043: Read `ssh_config`: `~/.ssh/config`, `-F FILE`, `Host` patterns, and `Match` refused by name (GitHub #14, #22)
 
@@ -206,7 +206,7 @@ No glob code exists in podssh. `known_hosts::wildcard`
    stands, and `Match final all` applies after the last line and fills only unset values, as
    measured. Each other `Match` stays refused by name until T-045.
 6. Check each included file as T-043 checks the user file: its owner and its mode.
-7. Change `docs/cli.md:6639-6760`, FILES (`crates/podssh-cli/src/man/data.rs:162-498`) and the
+7. Change `docs/cli.md:6644-6765`, FILES (`crates/podssh-cli/src/man/data.rs:162-498`) and the
    `ssh` notes in the same commit.
 
 ## Prove
@@ -387,7 +387,7 @@ case fails.
 `crates/podssh-cli/src/ssh/config.rs:211-232` and what a `Match` line sees
 at `crates/podssh-cli/src/ssh/config.rs:237-273`; the command line's part
 at `crates/podssh-cli/src/ssh/resolve.rs:136-147` and, for a hop of `-J`,
-`crates/podssh-cli/src/ssh/jump.rs:186-192`. `Tag` at
+`crates/podssh-cli/src/ssh/jump.rs:219-225`. `Tag` at
 `crates/podssh-cli/src/ssh/options.rs:237` and the `tag` line of `-G` at
 `crates/podssh-cli/src/ssh/dump.rs:113-115`; a key file once at
 `crates/podssh-cli/src/ssh/options.rs:135` and
@@ -464,7 +464,7 @@ result, `Resolved` (lines 27-41 at `22c3b88`), holds the settings in effect, the
    `serveraliveinterval 60` (the relay's idle cut, `docs/relay.md:473`) and `connecttimeout 60`.
 6. It does not wait for T-043: with no file, `-G` shows the effect of `-o`. After T-043 and
    T-044, `-v` names the files that were read, on stderr.
-7. Change the `ssh` notes (`crates/podssh-cli/src/man/notes_ssh.rs:4-491` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`) and `docs/cli.md:66-981`
+7. Change the `ssh` notes (`crates/podssh-cli/src/man/notes_ssh.rs:4-493` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`) and `docs/cli.md:66-986`
    in the same commit.
 
 ## Decision
@@ -883,7 +883,7 @@ settings (read in the manual).
 
 Read: the hops come from `-J` or `ProxyJump` as text
 (`crates/podssh-cli/src/ssh/resolve.rs`, lines 201-205 at `b0177cf`), parsed by `jump_hop` alone
-(`crates/podssh-cli/src/ssh/hop.rs:69-74`). Each hop logs in as its own user or the destination's
+(`crates/podssh-cli/src/ssh/hop.rs:69-71`). Each hop logs in as its own user or the destination's
 (`crates/podssh-ssh/src/run.rs:370`), with the identities of the destination
 (`crates/podssh-ssh/src/run.rs:427`).
 
@@ -929,7 +929,7 @@ the check fail.
 
 ## Done
 
-2026-10-11. Each hop reads its own blocks in `crates/podssh-cli/src/ssh/jump.rs:1-276`, and its
+2026-10-11. Each hop reads its own blocks in `crates/podssh-cli/src/ssh/jump.rs:1-309`, and its
 login, made as the destination's, in `crates/podssh-cli/src/ssh/login.rs:1-96`. The options of
 each hop are `Options::jump_options` (`crates/podssh-ssh/src/options.rs:220-224`), which
 `connect_hops` gives each hop with the run's memory of its logins
@@ -946,7 +946,7 @@ try after the first reaches each hop (`crates/podssh-ssh/src/options.rs:350-358`
 - `scripts/interop.sh:327-337`: `ssh.config.jump_alias`, `-F FILE -J openssh-alias dropbear-alias`
   with podssh and with OpenSSH's `ssh`, each to exit 6 (the floor of ssh is 72). The gate runs it
   at this push.
-- `docs/cli.md:158-164` and `docs/cli.md:6684-6696`, and the manual's file `~/.ssh/config`, say what
+- `docs/cli.md:163-169` and `docs/cli.md:6689-6701`, and the manual's file `~/.ssh/config`, say what
   a hop takes.
 - `cargo test -p podssh-ssh`: 142 passed; `cargo test -p podssh-cli`: 565 passed, 0 failed,
   31 ignored; clippy; rustfmt.

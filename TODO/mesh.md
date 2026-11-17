@@ -5022,7 +5022,7 @@ of podssh's.
 ## Premise
 
 - `crates/podssh-cli/src/man/notes_pair.rs:172` says "Tailscale's free servers for tailcat", and
-  `crates/podssh-cli/src/man/notes_ssh.rs:242` says "Four words name public forwarders".
+  `crates/podssh-cli/src/man/notes_ssh.rs:244` says "Four words name public forwarders".
 - `docs/carriers.md` (the forward road, item 7 and its "Ruled out"; the reverse road, item 2):
   Tailscale's main fleet serves Tailscale's clients; the public Wisp lists come from web proxies
   that serve a network's users against that network's own filter, with no operator, terms or
@@ -5757,7 +5757,7 @@ upterm's host (`upterm host`) opens a reverse tunnel from a machine with no inbo
 uptermd, over a WebSocket on port 443 through `HTTPS_PROXY`; its community server
 `uptermd.upterm.dev` needs no account. A podssh in a cage could reach the user's own machine
 through it, at both ends through 443, but podssh's first hops of `-J` are the relay and three
-tunnels: `crates/podssh-cli/src/ssh/jump.rs:100` says "The first hop's tunnel".
+tunnels: `crates/podssh-cli/src/ssh/jump.rs:109` says "The first hop's tunnel".
 
 ## Premise
 
@@ -8166,7 +8166,7 @@ not wait for TLS. podssh does not use it; Q78 makes it a last fallback, whatever
   account, over raw SSH on 22 or 443", and `docs/carriers.md:1499` says "Serveo's anonymous TCP at
   10 minutes".
 - `crates/podssh-ssh/src/remote.rs:4` says "podssh joins it to the forward's target", and
-  `crates/podssh-cli/src/ssh/jump.rs:100` says "The first hop's tunnel": the remote forward and the
+  `crates/podssh-cli/src/ssh/jump.rs:109` says "The first hop's tunnel": the remote forward and the
   first hop of `-J` exist.
 
 ## Approach
@@ -8256,7 +8256,7 @@ client's alias fails.
   session, not of an alias: its documents name no bound of a private alias. Step 4 is so: no
   renewal before a bound; the node opens a new tunnel after each end, and the layer moves its
   sessions.
-- `crates/podssh-cli/src/ssh/jump.rs:100` is the first hop of `-J` for `cf://`, `iap://` and
+- `crates/podssh-cli/src/ssh/jump.rs:109` is the first hop of `-J` for `cf://`, `iap://` and
   `eice://`, which holds the client's SSH to the target. The Serveo road's hop is a link of the
   resumable layer, so it is an SSH session of its own (`crates/podssh-cli/src/serveo_leg.rs`),
   whose handshake, check of the host key and login with no account are the Pinggy road's
@@ -9395,7 +9395,7 @@ checks of a release (T-251).
 - `docs/decisions.md:43` says "Q78: each service is a last fallback, whatever its terms".
 - `docs/carriers.md:1963-1964` says "a public SSH jump and forwarding server with no account", and
   `docs/carriers.md:1965` says "on port 22 in their own commands".
-- `crates/podssh-cli/src/ssh/jump.rs:100` says "The first hop's tunnel".
+- `crates/podssh-cli/src/ssh/jump.rs:109` says "The first hop's tunnel".
 
 ## Approach
 
@@ -14045,7 +14045,7 @@ role as its relay. Plant: forward a frame to the wrong key; the test fails.
 **Milestone:** M10
 **Priority:** P3
 **Effort:** M
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -14057,7 +14057,7 @@ a hop of a chain, so a person cannot chain a node and a second jump host. `podss
 
 - `crates/podssh-ssh`'s hop code: `crates/podssh-cli/src/ssh/hop.rs:70`-`72` refuses: "a node cannot be a -J
   hop yet".
-- `crates/podssh-cli/src/ssh/jump.rs:96`-`148`: the first hop can be `cf://`, `iap://`, `eice://`,
+- `crates/podssh-cli/src/ssh/jump.rs:105`-`148`: the first hop can be `cf://`, `iap://`, `eice://`,
   `upterm://` as a `Tunnel`; a node is not a variant.
 - `crates/podssh-cli/src/ssh/node.rs:1`-`40`: `node://[user@]NAME[/ROUTE]` already makes a stream through
   the operator's leg (`reach`, T-084), and `docs/relay.md:454` names `-J node://NAME` for IPv6 egress.
@@ -14083,6 +14083,33 @@ cargo test -p podssh-cli --lib mcp::allow -- node
 
 Test: OpenSSH's sshd behind a node, reached with `-J node://box user@inner`; the exit status and the host key
 check pass. Plant: skip the node's pin; a wrong key is accepted and the test fails.
+
+## Correction
+
+2026-11-17: the refusal was in `crates/podssh-cli/src/ssh/hop.rs` (`jump_hop`), and `crates/podssh-cli/src/ssh/node.rs`
+(`transport`) refuses a node as the destination behind a hop, which stays. `podssh_ssh::run::connect_hops` already
+runs each hop over any stream, so the node's roads reach the first hop as `cf://`'s tunnel does. The host key of a hop
+is checked under `Hop::host`, not under its options' destination. `mcp`'s callers keep the destination's words as
+given, so the child gets them unchanged.
+
+## Done
+
+2026-11-17. `Tunnel::Node(label, route)` (`crates/podssh-cli/src/ssh/jump.rs`): `-J node://[user@]NAME[/ROUTE]` as
+the first hop, its transport the node's own (`node::resolved`, which refuses the relay's flags as for a node
+destination). The hop is named `node://NAME` for its key, whatever a `HostName` of a file says. A node as a later hop
+is refused (64) with "a node can only be the first hop". The channel's flags (`--node-key`, `--client-key`, ...) apply
+to such a first hop, as to `cf://`'s. `mcp`: a destination `node://[user@]NAME[/ROUTE]`, which only an `--allow-host`
+pattern that starts with `node://` lets in (`*` names hosts, never a node); the tools' descriptions say it. The
+manual (`podssh ssh`'s note of nodes, `mcp --allow-host`), `docs/cli.md`, and `llms.txt` and `llms-full.txt` say it.
+
+Prove, 2026-11-17: `cargo test -p podssh-cli --test node_jump` passed. OpenSSH's sshd 9.6 sits behind a node of
+`podssh relay serve`, and `-J node://USER@lab USER@127.0.0.1 -p PORT` runs the command. The hop's key is recorded under
+`node://lab`, the destination's under `[127.0.0.1]:PORT`. With another key under `node://lab` the run exits 255
+before the command, and a node as the second hop exits 64. `cargo test -p podssh-cli --lib -- mcp:: man:: ssh::`, 250
+passed, among them `a_node_is_matched_by_a_pattern_of_nodes_alone`. Planted: the hop named `node://lab.planted`
+fails the test (`node_jump.rs:143`), as no key is checked under the node's name. podssh never connects past a changed
+key, so a plant that accepts a wrong key is not one line.
+
 
 # T-725: A one-way carrier through an object store (an S3-compatible bucket)
 

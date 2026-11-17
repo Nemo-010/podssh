@@ -176,11 +176,14 @@ podssh ssh
   and this client's key, as podssh operator does: --node-key, --client-key and
   --no-e2e as there; a changed node key, and a key that the node refuses, exit
   255. iroh:TICKET runs the channel too, to the key that the ticket names. A
-  node has no port, and -J, -W and --direct cannot go with it yet. podssh sends
-  nothing until the node's first bytes (30 s at most), to learn whether the
-  node offers the resumable layer; -v says whether it does. With the layer, a
-  lost link to the relay is replaced by a new one. That goes on for as long as
-  the node keeps the session (10 minutes, or its --resume-deadline; -v says
+  node has no port, and -J, -W and --direct cannot go with it as the
+  destination. -J node://NAME makes the node the first hop of a chain: its
+  roads reach its TARGET, an sshd, whose key is checked under node://NAME. Each
+  later hop is inside that connection, and a node cannot be a later hop. podssh
+  sends nothing until the node's first bytes (30 s at most), to learn whether
+  the node offers the resumable layer; -v says whether it does. With the layer,
+  a lost link to the relay is replaced by a new one. That goes on for as long
+  as the node keeps the session (10 minutes, or its --resume-deadline; -v says
   it), and the SSH session goes on where it was; one line on stderr tells of
   each loss and each resume. --resume-deadline TIME waits at most TIME, never
   longer than the node keeps the session. --no-resume asks the node to end the
@@ -10159,7 +10162,8 @@ podssh mcp
     --allow-host PATTERN
         a host that ssh_exec, health, the job_ tools and the copies may reach:
         [USER@]HOST with * and ?, or !PATTERN to exclude; repeat it (default:
-        none).
+        none). A node is node://[USER@]NAME, and only a pattern that starts
+        with node:// matches one.
     --allow-dir DIR
         a directory of this host that cp_put may read and cp_get may write,
         links followed and held inside it; repeat it (default: none, and no

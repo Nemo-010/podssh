@@ -674,7 +674,7 @@ stdin and stdout gives typed tools, with no shell quoting.
 
 Measured: `podssh mcp` exits 64 (unknown subcommand).
 
-Read: a prompt goes to the controlling terminal or to `SSH_ASKPASS` (`docs/cli.md:6541-6571`),
+Read: a prompt goes to the controlling terminal or to `SSH_ASKPASS` (`docs/cli.md:6546-6576`),
 and the terminal of an agent can be the user's own. The session output goes straight to the
 process's stdout (`crates/podssh-ssh/src/io/msg.rs:78-95`), which an MCP server over stdio uses for
 its protocol. podssh never listens (`docs/architecture.md:284-301`), and stdio needs no listener.
@@ -780,7 +780,7 @@ session at `crates/podssh-cli/src/mcp/tools.rs:185-203`, and its result at
 `crates/podssh-cli/src/mcp/tools.rs:330-372`. The child of a call at
 `crates/podssh-cli/src/mcp/child.rs:63-122`, its streams at
 `crates/podssh-cli/src/mcp/child.rs:125-157`. The patterns of
-`--allow-host` at `crates/podssh-cli/src/mcp/allow.rs:36-124`. The flags in
+`--allow-host` at `crates/podssh-cli/src/mcp/allow.rs:42-152`. The flags in
 `crates/podssh-cli/src/flags/mcp.rs`, the risk and the rest in the manual
 (`crates/podssh-cli/src/man/notes_mcp.rs:4-58`), and `docs/cli.md`.
 

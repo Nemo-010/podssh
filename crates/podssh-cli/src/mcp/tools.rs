@@ -125,7 +125,7 @@ fn ssh_exec(settings: &Settings) -> Value {
             allow.shown()
         ),
         "inputSchema": object_needing(json!({
-            "destination": { "type": "string", "description": format!("[user@]host, a host that matches {}", allow.shown()) },
+            "destination": { "type": "string", "description": format!("[user@]host or node://[user@]NAME, one that matches {}", allow.shown()) },
             "command": { "type": "string", "minLength": 1, "description": "the command line that the remote user's shell runs" },
             "stdin": { "type": "string", "description": "text for the command's stdin; with none, it reads end of input at once" },
             "timeout_seconds": { "type": "integer", "minimum": 1, "maximum": SSH_LIMIT_MAX,

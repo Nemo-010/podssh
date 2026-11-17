@@ -1,7 +1,9 @@
 //! The hosts that `ssh_exec` may reach: the patterns of `--allow-host`, which
 //! the user gives when `podssh mcp` starts, never the agent. A pattern is
 //! `[USER@]HOST` with `*` and `?`, as a `Host` line of `ssh_config` has them,
-//! and `!` before one excludes what it matches.
+//! and `!` before one excludes what it matches. A node is named
+//! `node://[USER@]NAME[/ROUTE]` (T-724), and only a pattern that starts with
+//! `node://` matches one: `*` alone names hosts, never a node.
 
 /// One pattern of `--allow-host`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -22,7 +24,11 @@ pub struct Allow {
     shown: Vec<String>,
 }
 
-/// A destination of `ssh_exec`: `[user@]host`.
+/// The form of a node's destination, as `podssh ssh` takes it.
+const NODE: &str = "node://";
+
+/// A destination of `ssh_exec`: `[user@]host`, or a node, whose host is
+/// `node://NAME[/ROUTE]`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Destination {
     pub user: Option<String>,
@@ -47,14 +53,23 @@ impl Allow {
             if body.chars().any(|c| c.is_whitespace() || c.is_control() || c == ',') {
                 return Err(bad("one pattern for each flag, with no space and no comma"));
             }
+            // A node's pattern: node://[USER@]NAME, its host node://NAME.
+            let (scheme, body) = match body.get(..NODE.len()) {
+                Some(head) if head.eq_ignore_ascii_case(NODE) => (NODE, &body[NODE.len()..]),
+                _ => ("", body),
+            };
             let (user, host) = match body.split_once('@') {
                 Some((user, host)) if user.is_empty() || host.is_empty() || host.contains('@') => {
-                    return Err(bad("expected [USER@]HOST"));
+                    return Err(bad("expected [USER@]HOST or node://[USER@]NAME"));
                 }
                 Some((user, host)) => (Some(user.to_string()), host),
                 None => (None, body),
             };
-            allow.patterns.push(Pattern { negated, user, host: host.to_ascii_lowercase() });
+            if host.is_empty() {
+                return Err(bad("expected [USER@]HOST or node://[USER@]NAME"));
+            }
+            let host = format!("{scheme}{}", host.to_ascii_lowercase());
+            allow.patterns.push(Pattern { negated, user, host });
             allow.shown.push(value.clone());
         }
         Ok(allow)
@@ -83,8 +98,11 @@ impl Allow {
         };
         // An exclusion of a user holds when the destination names no user,
         // and a pattern of a user lets in only a destination that names one.
-        let excluded = self.patterns.iter().any(|p| p.negated && wildcard(&p.host, &host) && user_matches(p, true));
-        let allowed = self.patterns.iter().any(|p| !p.negated && wildcard(&p.host, &host) && user_matches(p, false));
+        // A node and a host never share a pattern: `*` is no node.
+        let node = host.starts_with(NODE);
+        let host_matches = |p: &Pattern| p.host.starts_with(NODE) == node && wildcard(&p.host, &host);
+        let excluded = self.patterns.iter().any(|p| p.negated && host_matches(p) && user_matches(p, true));
+        let allowed = self.patterns.iter().any(|p| !p.negated && host_matches(p) && user_matches(p, false));
         if allowed && !excluded {
             return Ok(dest);
         }
@@ -106,6 +124,16 @@ pub fn parse(destination: &str) -> Result<Destination, String> {
     }
     if destination.chars().any(|c| c.is_whitespace() || c.is_control()) {
         return bad("a space or a control character");
+    }
+    // A node, as `podssh ssh` reads it; the child gets the words unchanged.
+    if destination.starts_with(NODE) {
+        let (user, label, route) = crate::ssh::node::destination(destination)
+            .map_err(|why| format!("destination {why}"))?
+            .ok_or_else(|| format!("destination {destination:?}: expected node://[user@]NAME"))?;
+        if user.as_deref().is_some_and(|u| u.starts_with('-')) {
+            return bad("expected node://[user@]NAME");
+        }
+        return Ok(Destination { user, host: crate::ssh::node::shown(&label, route.as_deref()) });
     }
     let (user, host) = match destination.rsplit_once('@') {
         Some((user, host)) => (Some(user), host),
@@ -130,6 +158,28 @@ fn wildcard(pattern: &str, text: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_node_is_matched_by_a_pattern_of_nodes_alone() {
+        let a = allow(&["*", "node://*", "!node://lab"]);
+        assert_eq!(
+            a.check("node://pi@box").unwrap(),
+            Destination { user: Some("pi".into()), host: "node://box".into() }
+        );
+        assert!(a.check("node://lab").is_err(), "excluded");
+        assert!(a.check("web.example.org").is_ok());
+        let hosts = allow(&["*"]);
+        let why = hosts.check("node://box").unwrap_err();
+        assert!(why.contains("is not allowed"), "* names hosts, never a node: {why}");
+        let one = allow(&["node://deploy@box", "node://box/web"]);
+        assert!(one.check("node://deploy@box").is_ok());
+        assert!(one.check("node://box").is_err(), "a pattern of a user needs the user");
+        assert!(one.check("node://box/web").is_ok(), "a route of the node");
+        for bad in ["node://", "node://a:22", "node://@box", "node://-x@box"] {
+            assert!(one.check(bad).is_err(), "{bad:?}");
+        }
+        assert!(Allow::new(&["node://".to_string()]).is_err());
+    }
 
     fn allow(patterns: &[&str]) -> Allow {
         Allow::new(&patterns.iter().map(|p| p.to_string()).collect::<Vec<_>>()).unwrap()

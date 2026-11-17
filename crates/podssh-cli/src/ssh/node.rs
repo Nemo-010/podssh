@@ -138,7 +138,7 @@ pub(super) fn transport(
     let why = if r.args.direct {
         Some("--direct cannot reach a node: only the relay can")
     } else if r.jumps > 0 {
-        Some("a node cannot be reached through a -J hop yet")
+        Some("a node is no destination behind a -J hop: name it as the first hop, -J node://NAME HOST")
     } else if r.forward {
         Some("-W through a node is not implemented yet")
     } else if r.port {

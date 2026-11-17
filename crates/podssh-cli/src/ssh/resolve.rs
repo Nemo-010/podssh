@@ -182,7 +182,7 @@ pub fn resolve_or_refuse(args: &SshArgs, env: &Env) -> Result<Resolved, Refusal>
     // A cf://HOST name may be a podssh node's quick tunnel (T-300), as the
     // destination or as the first hop of -J, whose node takes the same keys
     // (T-347); an exit's road ends at its node too (T-431).
-    let cf_hop = matches!(jump_tunnel, Some(super::jump::Tunnel::Cloudflare(_)));
+    let cf_hop = matches!(jump_tunnel, Some(super::jump::Tunnel::Cloudflare(_) | super::jump::Tunnel::Node(..)));
     let ends = [node.is_some(), iroh.is_some(), tunnel.is_some(), cf_hop, derp.is_some(), args.exit.is_some()];
     if let Some((flag, _)) = channel.iter().find(|(_, given)| *given).filter(|_| !ends.contains(&true)) {
         return Err(format!(

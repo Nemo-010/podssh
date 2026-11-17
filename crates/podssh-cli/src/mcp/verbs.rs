@@ -39,7 +39,7 @@ const NOT_ENDED: i32 = 75;
 #[rustfmt::skip]
 pub fn list(allow: &Allow) -> Vec<Value> {
     let hosts = allow.shown();
-    let dest = json!({ "type": "string", "description": format!("[user@]host, a host that matches {hosts}") });
+    let dest = json!({ "type": "string", "description": format!("[user@]host or node://[user@]NAME, one that matches {hosts}") });
     let id = json!({ "type": "string", "description": "the job's ID, 8 hex digits, as job_start gave it" });
     let read_only = json!({ "readOnlyHint": true, "openWorldHint": true });
     let changes =

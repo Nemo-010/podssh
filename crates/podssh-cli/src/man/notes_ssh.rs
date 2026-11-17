@@ -50,7 +50,9 @@ const FIRST: &[&str] = &[
      pinned and this client's key, as podssh operator does: --node-key, --client-key and --no-e2e as \
      there; a changed node key, and a key that the node refuses, exit 255. iroh:TICKET runs the channel \
      too, to the key that the ticket names. A node has no port, and -J, -W and --direct cannot go with \
-     it yet. \
+     it as the destination. -J node://NAME makes the node the first hop of a chain: its roads reach its \
+     TARGET, an sshd, whose key is checked under node://NAME. Each later hop is inside that connection, and a node \
+     cannot be a later hop. \
      podssh sends nothing until the node's first bytes (30 s at most), to learn whether the node offers \
      the resumable layer; -v says whether it does. With the layer, a lost link to the relay is replaced by a new one. \
      That goes on for as long as the node keeps the session (10 minutes, or its --resume-deadline; -v \

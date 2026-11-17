@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**762 entries: 34 open, 39 partial, 11 blocked, 678 done.**
+**762 entries: 33 open, 39 partial, 11 blocked, 679 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 1 | 9 | 3 | 81 | 94 |
 | P2 | 0 | 24 | 2 | 288 | 314 |
-| P3 | 33 | 6 | 6 | 308 | 353 |
-| **All** | 34 | 39 | 11 | 678 | 762 |
+| P3 | 32 | 6 | 6 | 309 | 353 |
+| **All** | 33 | 39 | 11 | 679 | 762 |
 
 ## Entries
 
@@ -754,7 +754,7 @@ repository and CI).
 | [T-721](relay.md) | P3 | M | M10 | feature | open | An exit on the reverse road that a Worker calls, with fixed denies and counters |
 | [T-722](relay.md) | P3 | M | M10 | feature | blocked | A lease header `X-Relay-Lease` on the forward and reverse roads |
 | [T-723](relay.md) | P3 | M | M10 | docs | open | The versioned wire document of the relay and the reverse road, with test vectors |
-| [T-724](mesh.md) | P3 | M | M10 | feature | open | `-J node://NAME` and `mcp` destinations that name a node |
+| [T-724](mesh.md) | P3 | M | M10 | feature | done | `-J node://NAME` and `mcp` destinations that name a node |
 | [T-725](mesh.md) | P3 | L | M10 | feature | open | A one-way carrier through an object store (an S3-compatible bucket) |
 | [T-726](machine.md) | P3 | M | M10 | feature | open | A local forward as a service, and the measured rate of the relay role |
 | [T-727](roads.md) | P3 | M | backlog | feature | blocked | SSH login with a short-lived Access certificate over `cf://` |

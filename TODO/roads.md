@@ -381,7 +381,7 @@ sandbox can block what iroh needs, so the fallback is necessary
 6. With `-v`, print the road that won and its time.
 7. Each resume of T-153 runs the same race.
 8. Docs: the rule of the race in `docs/design.md` section 2, and the notes of
-   `ssh` in the manual (`crates/podssh-cli/src/man/notes_ssh.rs:4-491` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`).
+   `ssh` in the manual (`crates/podssh-cli/src/man/notes_ssh.rs:4-493` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`).
 
 ## Decision
 
@@ -4412,7 +4412,7 @@ allows podssh as a client of Cloudflare (`docs/decisions.md:80`).
   (`crates/podssh-cli/src/ssh/hop.rs:58-60`); `jump_hop` refuses a node only (`:68-74`).
 - Read: a `cf://` destination refuses `-J`:
   `crates/podssh-cli/src/ssh/cloudflare.rs:72` says "a Cloudflare tunnel cannot be reached
-  through a -J hop yet", and `docs/cli.md:220-221` says so too.
+  through a -J hop yet", and `docs/cli.md:225-226` says so too.
 - Read: the road of a run is chosen for the first hop's host
   (`crates/podssh-cli/src/ssh/resolve.rs:256`), and each later hop runs in a `direct-tcpip`
   channel of the session before it (`crates/podssh-ssh/src/run.rs:161-173`;
@@ -8538,7 +8538,7 @@ puts the fallback in its `ok` column without a probe.
   measure (`crates/podssh-cli/src/doctor/report.rs:107-109`).
 - Read: the operator's rulings Q56 and Q65 (`docs/decisions.md`) let the binary try the forwarders,
   and the Wisp demo server last, "when each relay host fails", unasked (T-370, T-438); since T-438
-  there are four: mudlet, ssheasy, mudix and wisp (`crates/podssh-cli/src/man/notes_ssh.rs:248-260`).
+  there are four: mudlet, ssheasy, mudix and wisp (`crates/podssh-cli/src/man/notes_ssh.rs:250-262`).
   A default of off is a change of that ruling.
 - Not measured here: #106's times. Inferred from the code: with the direct road's dial refused at
   once by the tester's proxy, the 20.8 s are the forwarders' own dials of a dead address.

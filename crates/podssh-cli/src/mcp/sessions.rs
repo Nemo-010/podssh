@@ -83,7 +83,7 @@ pub fn list(allow: &Allow) -> Vec<Value> {
         tool("session_start", "Start a shell that outlives the call",
             format!("podssh session start on an allowed host ({hosts}): a shell, or command, with a pty, held by a \
                 podssh of this host until session_stop, or until this server ends, which stops it."),
-            json!({ "name": name, "destination": { "type": "string", "description": format!("[user@]host, a host that matches {hosts}") },
+            json!({ "name": name, "destination": { "type": "string", "description": format!("[user@]host or node://[user@]NAME, one that matches {hosts}") },
                 "command": { "type": "string", "description": "the command to run in place of the login shell" },
                 "timeout_seconds": limit_property(LIMIT) }),
             &["name", "destination"], &changes),
