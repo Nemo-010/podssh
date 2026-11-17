@@ -17,15 +17,20 @@
 //! the next pair takes the first one's place, and its end, its renewal, its
 //! lines and its rotation follow it at once (T-620), also where the first
 //! pair's relay renewed none.
+//!
+//! Each of them reads the process's clock (`podssh_relay::clock`) and sleeps
+//! on tokio's, so that a test of months moves both (T-710).
 
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use podssh_relay::pair::renew::Renewed;
 use podssh_relay::pair::{self, Pair, PairError};
 use podssh_relay::reverse::node::RepairHook;
 use podssh_ws::Trust;
+use tokio::time::Instant;
 
+use crate::node_by_stop::ByStop;
 use crate::node_rotate::Held;
 use crate::pairs::{now_ms, utc};
 
@@ -45,7 +50,7 @@ const LOOK: Duration = Duration::from_secs(600);
 const RETRY: Duration = Duration::from_secs(3600);
 
 /// A line for the user, from any task of the node.
-pub(crate) type Say = Arc<dyn Fn(String) + Send + Sync>;
+pub type Say = Arc<dyn Fn(String) + Send + Sync>;
 
 /// `5 h 59 min`, `59 min`, or `less than a minute`.
 pub(crate) fn left_words(left_ms: i64) -> String {
@@ -125,10 +130,14 @@ pub(crate) async fn warn(label: String, held: Held, stored: bool, say: Say, rene
                 }
                 Tried::Refused => {
                     say("the relay refused the renewal of the pair (403): it was stopped, or it ended".into());
+                    learned(&label, &name, stored, false);
                     off = Some(name);
                 }
                 // The relay renews none: the lines of T-395.
-                Tried::NotServed => off = Some(name),
+                Tried::NotServed => {
+                    learned(&label, &name, stored, false);
+                    off = Some(name);
+                }
             }
         }
         let renews = renewer.is_some() && off.as_deref() != Some(held.name().as_str());
@@ -198,10 +207,23 @@ pub(crate) fn watch(
     say: Say,
     trust: &Trust,
 ) -> (Option<RepairHook>, tokio::task::JoinHandle<()>) {
+    watch_by(label, pair, stored, say, ByStop::Relay(trust.clone()))
+}
+
+/// [`watch`], with the requests by the stop token sent `by`: a test of
+/// months (T-710) gives a role of its own process; the binary, the relay.
+#[doc(hidden)]
+pub fn watch_by(
+    label: &str,
+    pair: &Pair,
+    stored: bool,
+    say: Say,
+    by: ByStop,
+) -> (Option<RepairHook>, tokio::task::JoinHandle<()>) {
     let held = Held::of(pair);
-    let renewer = Renewer { pair: held.clone(), trust: trust.clone() };
+    let renewer = Renewer { pair: held.clone(), by: by.clone() };
     let lines = warn(label.to_string(), held.clone(), stored, say.clone(), Some(renewer));
-    let rotation = crate::node_rotate::run(label.to_string(), held.clone(), stored, say.clone(), trust.clone());
+    let rotation = crate::node_rotate::run(label.to_string(), held.clone(), stored, say.clone(), by);
     let task = tokio::spawn(async move {
         tokio::join!(lines, rotation);
     });
@@ -210,10 +232,10 @@ pub(crate) fn watch(
 
 /// The node's renewal of its own pair (T-592): the pair that it holds now,
 /// with the stop token now, which the node holds as the pair's owner does
-/// and rotates (T-615), and the trust of its relay.
+/// and rotates (T-615), and where its requests go.
 pub(crate) struct Renewer {
     pair: Held,
-    trust: Trust,
+    by: ByStop,
 }
 
 /// What one try at a renewal gave.
@@ -232,9 +254,8 @@ impl Renewer {
     /// One renewal of the pair now, which ends at `expires_ms`; with the
     /// relay's name of the pair that it asked for.
     async fn once(&self, expires_ms: i64) -> (String, Tried) {
-        let (pair, context) = (self.pair.pair().with_expiry(expires_ms), podssh_relay::context::process());
-        let ctx = crate::pairs::context(&pair.relay, &self.trust, &context);
-        let tried = match pair::renew::renew(&ctx, &pair).await {
+        let pair = self.pair.pair().with_expiry(expires_ms);
+        let tried = match self.by.renew(&pair).await {
             Ok(Renewed::Until(until)) if until > expires_ms => Tried::Took(until),
             Ok(Renewed::Until(_)) => Tried::Again("the relay kept the same end".into()),
             Ok(Renewed::NotServed) => Tried::NotServed,
@@ -251,6 +272,7 @@ impl Renewer {
         if !self.pair.renewed(name, until) {
             return;
         }
+        learned(label, name, stored, true);
         let unkept = match stored {
             true => match pair::load(label) {
                 Ok(Some(held)) if held.name == name => pair::store(label, &held.with_expiry(until)).err(),
@@ -268,6 +290,14 @@ impl Renewer {
             (true, None) => {}
         }
         say(line);
+    }
+}
+
+/// What the node learned of the renewal of the pair `name`, for `status`
+/// (T-710): only for a pair of the store, whose label `status` lists.
+fn learned(label: &str, name: &str, stored: bool, renews: bool) {
+    if stored {
+        crate::node_renews::record(label, name, renews);
     }
 }
 

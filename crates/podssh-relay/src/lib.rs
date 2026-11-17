@@ -106,6 +106,8 @@ pub mod blocking;
 pub mod bore;
 pub mod cache;
 pub mod cleartext;
+// The wall clock of a node's pairs and the role's, which a test follows (T-710).
+pub mod clock;
 #[cfg(feature = "code")]
 pub mod code;
 // podssh's context of the relay client of pod-relay (T-684).

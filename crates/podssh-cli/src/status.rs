@@ -116,13 +116,15 @@ pub fn run_status(args: &StatusArgs, tty: Tty, out: &mut dyn Write, err: &mut dy
 
 /// The pairs in the store, by label: when each expires, and whether
 /// `podssh relay pair LABEL` makes its next one now, in its last 24 hours
-/// (T-395). Never a token.
+/// (T-395), and whether its relay renews it, as its node learned (T-710).
+/// Never a token.
 fn pairs_state() -> Value {
     let now = crate::pairs::now_ms();
     let window = i64::try_from(crate::node_expiry::RENEW_WINDOW.as_millis()).unwrap_or(i64::MAX);
     let each = podssh_relay::pair::labels().into_iter().filter_map(|label| {
         let pair = podssh_relay::pair::load(&label).ok().flatten()?;
         Some(json!({
+            "renews": crate::node_renews::status_value(&label, &pair.name),
             "label": label,
             "expires_ms": pair.expires_ms,
             "expired": pair.expires_ms <= now,

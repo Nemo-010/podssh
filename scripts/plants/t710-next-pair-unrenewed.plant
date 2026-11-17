@@ -1,0 +1,9 @@
+# T-710: a node whose first pair's relay renewed none never renews the next
+# pair that it goes on with (the defect of T-620), so that pair ends three
+# days after it was made; the test of 120 days on a paused clock must fail on
+# day 6, when the role no longer takes the node's token.
+ENTRY=T-710
+GROUP=cli-tests
+EXPECT='day 6: the role refused the node.s token'
+RUN='cargo test --locked -p podssh-cli --test node_months'
+LIMIT=900

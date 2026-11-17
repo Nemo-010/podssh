@@ -124,6 +124,10 @@ pub mod node_relay;
 pub mod node_expiry;
 // A node's stop token, rotated where its relay rotates one (T-615).
 pub mod node_rotate;
+// Where a node's requests by the stop token go: its relay, or a test's role (T-710).
+pub mod node_by_stop;
+// Whether a pair's relay renews it, as its node learned, for `status` (T-710).
+mod node_renews;
 // `podssh node --install`: the node as a service of this user (T-121).
 pub mod node_install;
 // The flags of `podssh node` that each road reads: the keys, the resume

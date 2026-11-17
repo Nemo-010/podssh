@@ -24,9 +24,9 @@ use std::time::Duration;
 use podssh_relay::pair::rotate::{self, Rotated};
 use podssh_relay::pair::{self, Pair, PairError};
 use podssh_relay::reverse::legs;
-use podssh_ws::Trust;
 use tokio::sync::watch;
 
+use crate::node_by_stop::ByStop;
 use crate::node_expiry::Say;
 
 /// How often a node rotates its stop token.
@@ -162,7 +162,7 @@ pub(crate) enum Turned {
 /// it: at once once a socket heard a role that rotates, then each day; and
 /// so for each next pair that the node goes on with. A pair that is not the
 /// store's, `stored` false, is said once and kept: it has no next pair.
-pub(crate) async fn run(label: String, held: Held, stored: bool, say: Say, trust: Trust) {
+pub(crate) async fn run(label: String, held: Held, stored: bool, say: Say, by: ByStop) {
     let mut moves = held.moves();
     if !stored {
         while !held.heard() {
@@ -177,7 +177,7 @@ pub(crate) async fn run(label: String, held: Held, stored: bool, say: Say, trust
         }
         // The turns of the pair now, until the node moves to its next one.
         loop {
-            let moved = match after(once(&label, &held, &trust).await, &say) {
+            let moved = match after(once(&label, &held, &by).await, &say) {
                 After::Wait(wait) => tokio::select! {
                     () = tokio::time::sleep(wait) => false,
                     Ok(()) = moves.changed() => true,
@@ -250,17 +250,15 @@ async fn offered(held: &Held, moves: &mut watch::Receiver<u64>) -> bool {
 
 /// One rotation of the stop token of the pair that `held` holds, stored
 /// under `label`.
-async fn once(label: &str, held: &Held, trust: &Trust) -> Turned {
+async fn once(label: &str, held: &Held, by: &ByStop) -> Turned {
     let _turn = held.turn().await;
     let before = held.pair();
     let next = match rotate::draw() {
         Ok(next) => next,
         Err(why) => return Turned::Again(why),
     };
-    let context = podssh_relay::context::process();
-    let ctx = crate::pairs::context(&before.relay, trust, &context);
     // The one to come, asked by the token now.
-    match rotate::rotate(&ctx, &before, &next).await {
+    match by.rotate(&before, &next).await {
         Ok(Rotated::Asked) => {}
         Ok(Rotated::NotServed) => return Turned::NotServed,
         Err(PairError::Forbidden) => return Turned::Refused,
@@ -274,7 +272,7 @@ async fn once(label: &str, held: &Held, trust: &Trust) -> Turned {
     // The node's copy, unless it went on with its next pair meanwhile.
     let Some(new) = held.restop(&before.name, &next) else { return Turned::Moved };
     // Its first use makes it the pair's, and ends the one before.
-    match rotate::rotate(&ctx, &new, &next).await {
+    match by.rotate(&new, &next).await {
         Ok(_) => Turned::Done,
         // Another token to come took its place: the one before stays, as the
         // relay may take it still.

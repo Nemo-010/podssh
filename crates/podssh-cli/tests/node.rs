@@ -274,6 +274,9 @@ fn status_names_each_stored_pair_and_its_expiry() {
         "{out}"
     );
     assert_eq!(pair("old")["expired"], true, "{out}");
+    // No node ran: nobody learned whether a relay renews these (T-710).
+    let unlearned = |l: &&str| pair(l).get("renews") == Some(&serde_json::Value::Null);
+    assert!(["lab", "late", "old"].iter().all(unlearned), "{out}");
     assert!(pair("lab")["expires_ms"].as_i64().unwrap() > pair("late")["expires_ms"].as_i64().unwrap(), "{out}");
 }
 

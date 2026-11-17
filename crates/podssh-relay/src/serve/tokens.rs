@@ -186,9 +186,10 @@ impl Tokens {
     }
 }
 
-/// The time in milliseconds since the epoch, as the contract counts it.
+/// The time in milliseconds since the epoch, as the contract counts it: the
+/// process's clock, which a node's pairs read too (T-710).
 pub fn now_ms() -> u64 {
-    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_millis() as u64)
+    u64::try_from(crate::clock::now_ms()).unwrap_or(0)
 }
 
 #[cfg(test)]

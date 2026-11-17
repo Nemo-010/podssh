@@ -3206,7 +3206,7 @@ before anything else; `podssh doctor` is the report that measures.
   relay hosts that each run tries last now, with `ago_s`, the `reason` and the `road` (T-059), and
   `relay_opened`, those that opened lately, with `ago_s` and `opens` (T-563); `relay_rank`, the rank kept, with `age_s`, `this_egress`, `holds`, `named`, `source` (`relay rank`, or `background` for a session's, T-608), `partial`, `first` and `hosts`, null with none (T-606); `relay_rank_auto`, whether a setting asks for a rank in a session's background and which (`asked`, `by`), and when the last was made (`last_ms`, `last_age_s`) and whether it is `partial` (T-608); `open_files`, the limit of open files: podssh raises its soft limit at start to the hard one, at most 65,536 (on macOS within `kern.maxfilesperproc`, then `OPEN_MAX` if the host refuses more), and gives the `soft` limit, the `hard` one (null for none), the soft one `at_start`, whether it was `raised` and the host's `refused` answer, a line at `-v` ("open file limit: 256 -> 10240") and the limit after an error of too many open files; null on Windows (T-564); `pairs`, each stored pair's `label`, `expires_ms`, whether it
   `expired`, and `next_now`, whether `relay pair LABEL` makes its next pair
-  now, in its last 24 hours (T-395).
+  now, in its last 24 hours (T-395); and `renews`, whether its relay renews it, as its node last learned (`true` after a renewal that took, `false` after a relay that renews none or refused the stop token, null when no node learned it of the pair stored now; T-710).
 - It never holds a token: it reads the cache entry without its token field
   (`cache::peek`). It shows no proxy credentials, opens no connection, asks
   no DNS and writes nothing; it reads the signed lists kept, and checks each

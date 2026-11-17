@@ -306,6 +306,6 @@
 298 issue closed
 299 issue closed
 300 issue closed
-301 pull open
+301 pull closed
 302 issue closed
 303 issue open

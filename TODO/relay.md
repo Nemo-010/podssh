@@ -344,7 +344,7 @@ failure at `PodUtils/podssh:crates/podssh-relay/src/failures.rs:289-309`. `open`
 the hosts at `PodUtils/podssh:crates/podssh-relay/src/open.rs:221-227` and keeps the record
 after each round at `PodUtils/podssh:crates/podssh-relay/src/open.rs:266-273`; the race
 gives the silent hosts at `PodUtils/podssh:crates/podssh-relay/src/failover.rs:245-248`.
-`podssh status` at `crates/podssh-cli/src/status.rs:137-144`, `podssh
+`podssh status` at `crates/podssh-cli/src/status.rs:139-146`, `podssh
 doctor` at `crates/podssh-cli/src/doctor/mod.rs:99-109`, THE RELAY in the
 manual at `crates/podssh-cli/src/man/facts/failed.rs:11-27`, and
 `docs/relay.md` and `docs/cli.md`.
@@ -1312,7 +1312,7 @@ with no reason. Each drop read as the end of the TCP stream with no Close frame
 had drops, so the traffic does not cause them.
 
 Read: on the forward path, keepalives every 60 s kept one session for 602 s
-(`docs/STATUS.md:437`). That is one run, before 2026-10-09.
+(`docs/STATUS.md:438`). That is one run, before 2026-10-09.
 
 ## Approach
 
@@ -2842,7 +2842,7 @@ session on 2026-11-03.
   (`crates/podssh-cli/src/proxy.rs:425`) and the relay's end of `podssh pipe` (`carry_opened`)
   tell it at their end (`crates/podssh-cli/src/pipe/relay.rs:221-223`).
 - `podssh status`: `relay_failures` names the road, and `relay_opened` gives the hosts that opened
-  lately (`crates/podssh-cli/src/status.rs:240-250`); `podssh doctor`'s line `failed relays` says
+  lately (`crates/podssh-cli/src/status.rs:242-252`); `podssh doctor`'s line `failed relays` says
   each host tried last, and a line `opened relays` those tried first
   (`crates/podssh-cli/src/doctor/mod.rs:349-377`). THE RELAY in the manual
   (`crates/podssh-cli/src/man/facts/failed.rs:11-27`), `docs/relay.md` (step 5 of the selection) and

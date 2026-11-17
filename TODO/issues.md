@@ -139,7 +139,7 @@ image's digest, sha2 0.11.1 and simple-dns 0.13) are T-597. Dependabot's #149 an
 (trufflehog, the actions group, the minor and patch group, Arti's tor-rtcompat and tor-error 0.48,
 and num-bigint 0.5) are T-754; Dependabot closed them on 2026-11-12. Dependabot's #290 and #291 of 2026-11-17 (the tailscale and
 trufflehog images) and #292 and #293 (the minor and patch group, rsa 0.10) are T-802; Dependabot closed
-the four once `main` held them, and opened #301 for webpki-roots 1.0.12 alone, also T-802 (it waits for `pod-tls`).
+the four once `main` held them, and opened #301 for webpki-roots 1.0.12 alone, also T-802; Dependabot closed it on 2026-11-17 once `main` took podcrates `v0.68.0` with it.
 
 | Issue | Subject | State | Entries |
 | --- | --- | --- | --- |

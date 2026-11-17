@@ -347,7 +347,8 @@ const STATUS: &[&str] = &[
      for a rank in a session's background and which one, and when the last was made: asked, by, last_ms, last_age_s, \
      partial), open_files (soft, hard, at_start, raised, refused: the limit of open files, which podssh raises at \
      start; null on Windows), and pairs: each stored pair's label, when it expires, whether it expired, and \
-     next_now, whether podssh relay pair LABEL makes its next pair now.",
+     next_now. next_now says whether podssh relay pair LABEL makes its next pair now. renews says whether its relay \
+     renews it, as its node last learned: true or false, and null when no node learned it of this pair.",
     super::notes_net::STATUS_NET,
     super::notes_keygen::STATUS_KEYS,
     "It shows no token and no proxy credentials, opens no connection, asks no DNS and writes nothing. A \

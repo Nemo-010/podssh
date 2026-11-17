@@ -17,9 +17,9 @@ use crate::relay_settings::Refusal;
 /// Bound on each request to the relay's control host.
 pub(crate) const REQUEST_LIMIT: std::time::Duration = std::time::Duration::from_secs(30);
 
-/// Milliseconds since the Unix epoch, now.
+/// Milliseconds since the Unix epoch, now: the process's clock, the role's too (T-710).
 pub(crate) fn now_ms() -> i64 {
-    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0)
+    podssh_relay::clock::now_ms()
 }
 
 /// `2026-10-12T08:10:00Z`, for milliseconds since the epoch.

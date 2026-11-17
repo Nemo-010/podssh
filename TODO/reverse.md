@@ -963,7 +963,7 @@ cargo test -p podssh-cli --test node_live -- --ignored ssh_to_a_node
 22. `operator.rs` runs the binary with no stored pair (78, naming `podssh relay pair`), and checks
 that stdout stays empty. The binary line must exit 255, name `podssh relay pair lab`, and open no
 connection. The live test runs `podssh ssh node://lab 'exit 3'` through a node whose TARGET is
-`railway.new:22` (an anonymous SSH service, `docs/STATUS.md:249`), and expects 3. Plant: read `node:`
+`railway.new:22` (an anonymous SSH service, `docs/STATUS.md:250`), and expects 3. Plant: read `node:`
 with no slashes as a node; `node_destinations` must fail.
 
 ## Done
@@ -5019,7 +5019,7 @@ takes no turn. `docs/reverse.md` says it.
 **Milestone:** M10
 **Priority:** P1
 **Effort:** M
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -5054,6 +5054,40 @@ the net's key legs in one run. The beta that has the code (`v1.1.0-beta.2`) has 
    the gate is green at its commit (AGENTS.md section 2, "Releases"). Its notes (`docs/releases/`) name this
    test and the ask. T-446 carries the clause.
 
+## Decision
+
+- **One clock of the process, which a test's thread makes follow tokio's** (`podssh_relay::clock`): `now_ms` is the
+  system's clock, or, on the thread that called the `#[doc(hidden)]` `follow_tokio` and while its guard lives, a base
+  plus the time that tokio's clock went on, so that a paused runtime moves each sleep and each read of the clock
+  together. The node's `pairs::now_ms` and the role's `tokens::now_ms` read it. Lost: a skew of the process in an
+  atomic (the tests of a library run on threads of one process, and one test's skew would move each other's clock;
+  and a skew must be moved by hand beside each step of tokio's); a variable or a file that moves the time (a user of
+  a release would reach it); a clock passed to each call (a change of each caller of `now_ms` in the node and the
+  role, some forty, for no user's gain).
+- **The node's requests by the stop token through one seam** (`podssh_cli::node_by_stop::ByStop`): the relay over
+  HTTPS, as before, or, for a test, a role of the same process (`Here`) that answers as `/v1/renew/<name>` and
+  `/v1/rotate/<name>` do, over the role's own table (`Pairs::find` by the stop token, then `renew` or `rotate`).
+  The renewal and the rotation take it; `watch` gives the relay, `watch_by` (doc hidden) the test's. Lost: HTTPS to
+  an in-process role on the loopback (a paused clock fires each timeout of a request, 30 s, at once while the socket
+  waits, and an unpaused one cannot pass 120 days); the pieces of the decision as pure functions, chained by the test
+  (the defect of T-620 is in the loop's wiring, which pair the loop asks for, and pure functions would not carry it).
+- **A test binary of its own, not a test of the library.** The node's store is the process's cache, which
+  `PODSSH_CACHE_DIR` names: a test of the library that set it would race each other test's read of the environment;
+  the binary of one test sets it before it starts a thread. Its cost: `watch_by`, `Say`, `ByStop` and `Here` are
+  public in the library, hidden from its documentation, and no path of the binary makes a `Here`.
+- **The schedule.** The first pair's relay renews none from day 1.5 (a relay of the contract): the first pair ends on
+  day 3, and the node takes the next pair that its owner made on day 2.5, when the role renews again. That is the
+  case of T-620 where the first pair's relay renewed none, and with it the planted defect fails on day 6 (the next
+  pair, never renewed, ends on day 5.5). The role restarts on day 60 and 20 h, clear of a renewal (each 48 h from day
+  4.5, at 12 h) and of a rotation (each 24 h from day 3, at 1 h); each check is at 2 h of a day.
+- **`renews` from a record of the node** (`renews-LABEL.json` in the cache: the pair's name, no token, and whether its
+  last renewal took): `status` asks no relay, and the store's file of a pair is `pod-relay`'s form (Rule Q3). A record
+  of another pair says nothing (null). Lost: a member in the store's file (a change of `pod-relay`'s form); asking
+  the relay (`status` opens no connection); the relay's name (podssh's role and a relay of the contract cannot be
+  told apart by it).
+- **The retry of a renewal counts on tokio's clock** (`tokio::time::Instant`): the same as before on a running clock,
+  and on a paused one the hour passes.
+
 ## Prove
 
 ```sh
@@ -5064,6 +5098,63 @@ cargo test -p podssh-cli --test node_expiry --test relay_serve_node
 
 Planted: a renewal that does not follow the next pair (the defect of T-620) fails `node_months` on day 6.
 The live part (one node for 5 days on the live relay) waits for the release check of the beta.
+
+## Correction
+
+2026-11-17, the drafting agent:
+
+- The clock: the node's renewal reads the system's clock (`crates/podssh-cli/src/pairs.rs:21`) and the role's pairs
+  read their own (`podssh_relay::serve::tokens::now_ms`), so no test could move them; the test needed the seam of the
+  Decision first. `pod-relay`'s own reads of the clock (`pair::once`, `pair::stored::newest`) do not follow it; the
+  test uses neither.
+- "40 times (120 days)": a pair of 72 h renewed at the start of its last day is renewed each 48 h, so some 58 times
+  from day 4.5 to day 120.
+- "an operator with the first operator file reaches it at each step": the first pair's file ends with that pair at
+  the move (T-395 sends the next pair's file to its operators). The test checks the file of the pair that the node
+  holds each day: the first one's to day 2, the next one's from day 3; each renewal keeps it.
+- "the in-process role": the role's table of pairs and its file are in the process; the HTTP of its paths and the
+  node's sockets are not (Decision): the hook of the expiry is called as the node's socket calls it, and the node's
+  socket joins the table on a pipe, as the role's own tests join it. The sockets keep their tests
+  (`relay_serve_node`, `node_expiry`, `relay_serve_reverse`).
+- Step 3: `pairs` of `status --json` had no `renews`; it has now (`crates/podssh-cli/src/node_renews.rs`).
+- The Prove's commands, and the plant by its id:
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-cli --test node_months
+cargo test -p podssh-relay --lib clock
+cargo test -p podssh-cli --lib node_renews node_expiry node_rotate
+cargo test -p podssh-cli --test node --test node_expiry --test relay_serve_node
+sh scripts/plant-each.sh --here t710-next-pair-unrenewed t620-renewal-off-for-good
+```
+
+The plant `t710-next-pair-unrenewed` is one line of `warn` in `crates/podssh-cli/src/node_expiry.rs`: the renewal is
+asked only while no pair's relay renewed none (`off.is_none()`, in the place of `off` naming the pair now), so the
+next pair is never renewed; `node_months` must fail with `day 6: the role refused the node's token`. The patch of
+`t620-renewal-off-for-good` is made again on the new lines of `warn`.
+
+## Done
+
+Partial, 2026-11-17 (drafted on `draft-t710`, then merged, built and run).
+
+- `crates/podssh-relay/src/clock.rs` (new): `now_ms`, `wall_ms`, and the doc-hidden `follow_tokio` with its guard;
+  two tests. `serve/tokens.rs`'s `now_ms` and `podssh-cli`'s `pairs::now_ms` read it.
+- `crates/podssh-cli/src/node_by_stop.rs` (new): `ByStop` and `Here`; `node_expiry.rs` (`Renewer` by `ByStop`,
+  `watch_by`, the record of `renews`, the retry on tokio's clock) and `node_rotate.rs` (`run` and `once` by
+  `ByStop`) take it.
+- `crates/podssh-cli/src/node_renews.rs` (new): the record and its value; `status.rs` gives `renews` in `pairs`;
+  the manual (`man/notes.rs`) and `docs/cli.md` say it; `tests/node.rs` checks it null with no node.
+- `crates/podssh-cli/tests/node_months.rs` (new): the 120 days.
+- `docs/mesh.md`: what lasts, and what ends a node. `docs/STATUS.md`: the row, UNVERIFIED.
+- `scripts/plants/t710-next-pair-unrenewed.patch` and `scripts/plants/t710-next-pair-unrenewed.plant` (new);
+  `scripts/plants/t620-renewal-off-for-good.patch` made again.
+- Results, 2026-11-17: `cargo test -p podssh-cli --test node_months` 1 passed (0.6 s for 120 days on the paused
+  clock); `--lib -- node_expiry node_rotate node_renews status` and `man::` passed; `-p podssh-relay --lib clock` 2
+  passed; `--test node` 18, `--test node_expiry` 4 and `--test relay_serve_node` 9 passed; clippy (the gate's lints)
+  and rustfmt clean. Planted (`sh scripts/plant-each.sh --here t710-next-pair-unrenewed t620-renewal-off-for-good`):
+  2 caught, 0 missed; `cargo test -p podssh-relay -p podssh-cli` 2951 passed, 0 failed. At the merge the manual's sentence of `status`'s `pairs` had 36 words (the check of 25), and was
+  split; `llms.txt` and `llms-full.txt` written again.
+- Waits: step 4, the beta `v1.1.0-beta.4` with this test in its notes (T-446), and the live part of the Prove.
 
 # T-712: Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s
 

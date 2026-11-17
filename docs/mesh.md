@@ -342,6 +342,24 @@ end-to-end channel and the resumable layer stay above, so that the member
 that relays sees bytes it cannot read ([relay.md](relay.md), "A leg for a
 member of the net").
 
+**What lasts, and what ends a node** (T-710). A node of the role stays
+reachable for months with no person: it renews its pair in the pair's last
+day, by the stop token that it rotates each day, so that the pair's tokens,
+and each operator's file, stay the same from renewal to renewal; at a role
+that restarts, the pairs come back from its file of pairs with their ends
+and their rotated tokens. Where the pair's relay renewed none (a relay of
+the contract), the node takes the next pair that its owner made under its
+label at the expiry, and renews that one from then on where its relay does.
+A member of the net reaches the node by the node's key, through a leg that
+the role draws for it, with no file. What ends a node: a pair that the relay
+refuses (`403`: stopped by its owner, or past its end with no renewal and
+no next pair); and a key that the role no longer mints for: the node's,
+which then makes no next pair there by its key, or a member's, which then
+gets no leg. `podssh status` says, in `pairs`,
+whether the relay renews each stored pair, as its node last learned
+(`renews`). `cargo test -p podssh-cli --test node_months` plays 120 days of
+it on a paused clock.
+
 ## 5. Exit, routes, share and funnel
 
 - **Exit** (T-431). `podssh node NAME --exit` lends the node's egress: an
