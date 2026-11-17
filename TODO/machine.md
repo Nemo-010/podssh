@@ -2133,6 +2133,10 @@ man_flag_parity --test flag_table` passed; clippy and rustfmt clean. Planted, th
 hand in `llms-full.txt` fails `the_repository_s_files_are_the_manual_s`, which names the line and how to write the
 files again.
 
+2026-11-17: the gate's `windows` job at `a4b1436` failed `the_repository_s_files_are_the_manual_s`: the manual names
+paths as the platform writes them (`~\.ssh\id_rsa` on Windows), so the files kept are a Unix build's, and the check
+runs on Unix alone (macOS passed it there).
+
 # T-731: `podssh mcp` for fleet work: a read-only mode and a command allowlist
 
 **Source:** PodUtils/podcrates#35, cfb's ask A-X-20 (COORD-014, PodUtils/podcrates#38)

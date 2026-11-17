@@ -83,22 +83,24 @@ mod tests {
     use pod_manual::check::{self, assert_none};
     use std::path::Path;
 
-    /// A road's feature adds to the manual, so the files that the repository
-    /// keeps are the default build's.
-    const DEFAULT_BUILD: bool = !cfg!(any(
-        feature = "ts",
-        feature = "iroh",
-        feature = "warp",
-        feature = "tor",
-        feature = "zerotier",
-        feature = "devtunnel",
-        feature = "tox",
-        feature = "yggdrasil",
-        feature = "hyperdht",
-        feature = "strelay",
-        feature = "filehost",
-        feature = "gsr"
-    ));
+    /// A road's feature adds to the manual, and Windows writes its paths with
+    /// backslashes, so the files that the repository keeps are the default
+    /// build's on Unix.
+    const DEFAULT_BUILD: bool = cfg!(unix)
+        && !cfg!(any(
+            feature = "ts",
+            feature = "iroh",
+            feature = "warp",
+            feature = "tor",
+            feature = "zerotier",
+            feature = "devtunnel",
+            feature = "tox",
+            feature = "yggdrasil",
+            feature = "hyperdht",
+            feature = "strelay",
+            feature = "filehost",
+            feature = "gsr"
+        ));
 
     fn root(name: &str) -> std::path::PathBuf {
         Path::new(env!("CARGO_MANIFEST_DIR")).join("../..").join(name)
@@ -107,7 +109,7 @@ mod tests {
     #[test]
     fn the_repository_s_files_are_the_manual_s() {
         if !DEFAULT_BUILD {
-            return eprintln!("skipped: a road's feature changes the manual");
+            return eprintln!("skipped: a road's feature, or Windows' paths, change the manual");
         }
         let fix = "write them again: podssh man --llms index > llms.txt; podssh man --llms full > llms-full.txt";
         assert_none(check::generated(&root(llms::INDEX), &index(), fix));
