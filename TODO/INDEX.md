@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**759 entries: 44 open, 36 partial, 11 blocked, 668 done.**
+**759 entries: 43 open, 36 partial, 11 blocked, 669 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 2 | 9 | 3 | 80 | 94 |
-| P2 | 7 | 21 | 2 | 284 | 314 |
+| P2 | 6 | 21 | 2 | 285 | 314 |
 | P3 | 35 | 6 | 6 | 303 | 350 |
-| **All** | 44 | 36 | 11 | 668 | 759 |
+| **All** | 43 | 36 | 11 | 669 | 759 |
 
 ## Entries
 
@@ -828,7 +828,7 @@ repository and CI).
 | [T-795](serve.md) | P1 | S | M10 | defect | done | `podssh serve` as root refused to start in a release build: a thread of ZeroTier's static constructor held its capabilities |
 | [T-796](robustness.md) | P1 | S | M10 | defect | partial | The gate's OpenSSH and Dropbear interop hung past the job's 45 min, and left no line of where |
 | [T-797](robustness.md) | P2 | S | M10 | defect | done | The weekly fuzz run stopped before its first target, two weeks running, on a count of seeds that had moved |
-| [T-798](relay.md) | P2 | M | M10 | feature | open | The resumable layer over the HTTP road, where the way refuses the WebSocket upgrade |
+| [T-798](relay.md) | P2 | M | M10 | feature | done | The resumable layer over the HTTP road, where the way refuses the WebSocket upgrade |
 | [T-799](ssh.md) | P1 | M | M10 | defect | done | russh 0.65.2 and ssh-key 0.7.0-rc.12 in the place of the copies; tailscale-rs v0.7.1 read and held |
 | [T-800](robustness.md) | P1 | S | M10 | defect | done | `node_cut`'s test of podssh's role failed at random: a relay session's id held the digits 1003 |
 | [T-801](relay.md) | P2 | S | M10 | defect | open | The relay role drops a node's socket at once after a reset or a failed write, and says why a node does not open |

@@ -90,8 +90,10 @@ fi
 # connections into the class (to its proxy, else to the relay's port) are
 # destroyed in the middle of a session that prints a line each second; the
 # resumable layer carries it on a new link, each line once and in order.
-# A class whose way refuses the layer (ws-upgrade-refused) has no resume:
-# the lane says so and stops there, as T-791 records.
+# A class whose way refuses the upgrade (ws-upgrade-refused) carries each
+# link on the HTTP road, a session of the road each: the layer resumes on a
+# new one, or the road's own requests go again within its 60 s, so that the
+# layer loses no link. A session that ends at the cut fails the lane.
 if [ -n "${HTTPS_PROXY:-}" ]; then
     hp=${HTTPS_PROXY#*://}; hp=${hp##*@}; hp=${hp%%/*}; P=${hp##*:}
 else
@@ -111,8 +113,8 @@ wait $pid
 rc=$?
 if [ "$rc" = 0 ] && [ "$(cat ticks)" = "$want" ] && grep -q "the session resumed" resume.err; then
     echo "ok   a session outlived a cut of its link: $(grep -o 'the session resumed after [0-9.]* s' resume.err)"
-elif grep -q "no resume" resume.err; then
-    echo "ok   the class refuses the resumable layer, so the cut ended the session (rc=$rc), as T-791 records"
+elif [ "$rc" = 0 ] && [ "$(cat ticks)" = "$want" ] && grep -q "each link goes on the HTTP road" resume.err; then
+    echo "ok   a session on the HTTP road outlived a cut of its connections: the road's requests went again"
 else
     echo "FAIL the session across a cut: rc=$rc, $(wc -l < ticks) lines of 12"; grep -i -E "resum|lost|link" resume.err | tail -8
     exit 1

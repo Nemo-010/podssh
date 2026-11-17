@@ -195,7 +195,9 @@ pub const RELAY: &[&str] = &[
      IPv4 addresses; the loopback is the relay's own; through HTTPS_PROXY the proxy decides. /relays.json says \
      what the relay knows, as egress.ipv6: true, false, or null.",
     "Beside the contract it serves /v1/layer/HOST/PORT, the forward road in the resumable layer, for a \
-     target that speaks no layer, a standard sshd among them: each WebSocket is one link. The relay dials the \
+     target that speaks no layer, a standard sshd among them: each WebSocket is one link. Where a way \
+     refuses the upgrade, a session of its HTTP road carries a link instead, with the same checks: \
+     /v1/http/open-layer/HOST/PORT or /v1/http/one-layer/HOST/PORT. The relay dials the \
      target once, after the layer's handshake of a new session. It keeps the target while the client's link is \
      lost, until a resume on a new link to this relay carries the session on. Else 10 minutes pass and the target \
      is shut. The token, the upgrade and the policy are checked as on /connect/, with the same refusals; the \

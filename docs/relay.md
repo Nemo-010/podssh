@@ -1393,6 +1393,19 @@ serial form, one, is its fallback. The default relay serves none of it
   mark does not come. podssh's client of the form is `pod-relay`'s
   (PodUtils/podcrates); until a tag of it speaks the form, curl does
   (`crates/podssh-relay/tests/http_road_one.rs`).
+- `POST /v1/http/open-layer/HOST/PORT[?family=4|6]` and `POST
+  /v1/http/one-layer/HOST/PORT[?family=4|6]` (T-798) open a session of the
+  split or serial form, or of the one-POST form, whose bytes are one link of
+  the role's resumable layer ("The relay role's resumable layer", below),
+  not a connection to the target: for a way that refuses the upgrade of
+  `/v1/layer/`. The token, its budget, the policy and the bound on sessions
+  at once are checked as for `open`, and a refusal of the token says
+  `layer: missing or wrong token`; the layer dials the target after its
+  handshake, as on `/v1/layer/`. Each link of a session is a new session of
+  the road, so a session of the layer resumes on a new one after the old one
+  is lost. The role's lines say `http open layer` and `http one open layer`.
+  podssh's client is `pod-relay`'s `Dialer::link_or_road` (PodUtils/podcrates
+  `v0.65.0`).
 - Once the session ended, each request gets `410` with `X-Close: CODE
   REASON`, the close codes and reasons of the forward road ("Errors and
   close codes"), for 60 s, then `404`. The target's end is `1000 target
@@ -1410,7 +1423,8 @@ serial form, one, is its fallback. The default relay serves none of it
   its connection, each answer closes its connection.
 - `/relays.json` names the road's own limits in `limits.http`, beside the
   contract's five, a field that a client which does not know it ignores:
-  `paths`, `forms` (`split`, `serial` and `one`), `batch_max_bytes` (32768 behind a quick tunnel's node),
+  `paths`, `forms` (`split`, `serial` and `one`), `layer_paths` (the two
+  opens of a link of the layer), `batch_max_bytes` (32768 behind a quick tunnel's node),
   `window_batches` (8), `hold_ms` (10000, a batch's wait for room before
   `full`), `down_window_bytes` (2 MiB), `down_max_bytes` (1 MiB),
   `wait_max_ms` (25000), `absent_ms` (60000, before `1001 client gone`),
@@ -1481,7 +1495,11 @@ a target that speaks none, as a node is for its TARGET
 (`crates/podssh-relay/src/serve/layer.rs`):
 
 - each WebSocket to the path is one link of a session; the role greets,
-  and the layer's handshake tells a new session from a resume;
+  and the layer's handshake tells a new session from a resume; where a way
+  refuses the upgrade, a session of the HTTP road at
+  `/v1/http/open-layer/HOST/PORT` or `/v1/http/one-layer/HOST/PORT` is a
+  link instead, with the same checks (T-798), and a session may resume on
+  either kind of link;
 - the target is dialed once, after a new session's handshake, so a link
   that never completes one costs no dial; it waits while the client's link
   is lost, until a resume on a new link carries the session on, or the

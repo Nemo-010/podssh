@@ -21,6 +21,11 @@
 //! buffers, which counts the sessions let in whose target is not dialed yet;
 //! one past it is refused in its handshake, before its client sent a byte of
 //! it, so that the client can take `/connect/` instead.
+//!
+//! Where a way refuses the upgrade, a session of the HTTP road carries a
+//! link instead (`super::http_road`, at `/v1/http/open-layer/` and
+//! `/v1/http/one-layer/`), with the same checks: [`link`] gives its bytes to
+//! the same sessions, so a session may resume on either kind of link.
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
@@ -28,9 +33,10 @@ use std::time::Duration;
 
 use podssh_ws::http::request::{self, Request};
 use podssh_ws::server;
-use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
+use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt, DuplexStream};
 use tokio::net::TcpStream;
 
+use super::egress::Plan;
 use super::forward;
 use super::{answer, Config};
 use crate::forward_layer::PATH;
@@ -196,20 +202,26 @@ where
     }
     cfg.event("upgrade layer");
     let session = Arc::new(server::session(stream, pending, None));
+    let theirs = link(&cfg, asked.host, plan);
+    // A link's Close ends the link alone: the layer's `END` is its half-close.
+    forward::pump(session, tokio::io::split(theirs), Vec::new(), cfg, forward::AfterClose::Ends, meter).await;
+}
+
+/// A new link of the layer to `host`, checked and planned by its carrier:
+/// the carrier's end of a pipe whose other end is the layer's, which runs on
+/// its own, as the session that it carries outlives the link. The carrier
+/// is a WebSocket of `/v1/layer/`, or a session of the HTTP road.
+pub fn link(cfg: &Arc<Config>, host: String, plan: Plan) -> DuplexStream {
     let resumes = &cfg.resumes;
     resumes.sweep();
     let (ours, theirs) = tokio::io::duplex(PIPE);
     let (keeper, settings, budget) = (resumes.keeper.clone(), resumes.settings, resumes.budget);
     let (far_cfg, dial_cfg) = (cfg.clone(), cfg.clone());
-    // The layer's end of the link runs on its own: the session that it
-    // carries outlives this link.
     tokio::spawn(async move {
-        let host = asked.host;
         let open = || async move { forward::dial(&host, &plan, &dial_cfg).await };
         serve_link(ours, settings, budget, &keeper, open, &far_cfg).await;
     });
-    // A link's Close ends the link alone: the layer's `END` is its half-close.
-    forward::pump(session, tokio::io::split(theirs), Vec::new(), cfg, forward::AfterClose::Ends, meter).await;
+    theirs
 }
 
 /// The layer on one link: its handshake, then a resume goes on with the

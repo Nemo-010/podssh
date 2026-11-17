@@ -6,7 +6,8 @@
 //! a node's `cf://` road. Each command that reaches its first hop as `podssh
 //! ssh` does takes it the same way; each other case is the contract's
 //! `/connect/`, as before, and so is a run of `--no-resume`, whose session
-//! ends with its link.
+//! ends with its link. Where the way refuses the upgrade of a link, the
+//! links go on the HTTP road (`super::links`), with one line.
 //!
 //! The road runs on a thread of its own, with a runtime of its own, from
 //! the read of the offer to the session's end: the forward opener's future
@@ -146,8 +147,8 @@ async fn carried(road: Road, tell: oneshot::Sender<Begun>) {
         let _ = tell.send(Begun::Contract);
         return;
     };
-    let dialer = dialer.with_family(family);
-    let first = match dialer.link(&mut |note: &str| log.info(note)).await {
+    let (dialer, by_road) = super::links::of(dialer.with_family(family));
+    let first = match super::links::link(&dialer, by_road, &mut |note: &str| log.info(note)).await {
         Ok(link) => link,
         Err(missed) => {
             let lines = missed.lines(dialer.target());
@@ -203,7 +204,7 @@ async fn carried(road: Road, tell: oneshot::Sender<Begun>) {
             Line::Verbose(text) => log.verbose(&format!("{at}: {text}")),
         }
     };
-    let outcome = forward_layer::carry(&dialer, client, layer_end, note).await;
+    let outcome = super::links::carry(&dialer, by_road, client, layer_end, note).await;
     if let Some(why) = layered::why_ended(outcome) {
         log.error(&format!("{at}: {why}"));
     }

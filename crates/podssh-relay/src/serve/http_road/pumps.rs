@@ -3,22 +3,23 @@
 //! it in order, each once; after the last batch, TCP's half-close, which
 //! the WebSocket road cannot give. Each write waits for the target, so a
 //! slow target fills the window up, and the client's next batch waits.
+//! The target may be a link of the resumable layer, whose far end is the
+//! role's: the same pumps carry its records.
 
 use std::sync::Arc;
 
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
-use tokio::net::TcpStream;
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tokio::time::Instant;
 
 use super::sessions::{self, Session, DOWN_WINDOW};
+use super::Far;
 
 /// The bytes asked of the target in each read.
 const READ: usize = 64 * 1024;
 
-/// The tasks of `session`'s target `tcp`, and of its limits.
-pub fn start(session: &Arc<Session>, tcp: TcpStream) {
-    let (from, to) = tcp.into_split();
+/// The tasks of `session`'s target, `far`'s two halves, and of its limits.
+pub fn start(session: &Arc<Session>, far: Far) {
+    let (from, to) = far;
     let writer = tokio::spawn(write_up(session.clone(), to));
     let reader = tokio::spawn(read_down(session.clone(), from));
     tokio::spawn(sessions::watch(session.clone()));
@@ -33,7 +34,7 @@ enum Step {
     Finish,
 }
 
-async fn write_up(session: Arc<Session>, mut to: OwnedWriteHalf) {
+async fn write_up<W: AsyncWrite + Unpin>(session: Arc<Session>, mut to: W) {
     let cap = session.cfg.limits.bytes;
     loop {
         let notified = session.changed.notified();
@@ -82,7 +83,7 @@ async fn write_up(session: Arc<Session>, mut to: OwnedWriteHalf) {
     }
 }
 
-async fn read_down(session: Arc<Session>, mut from: OwnedReadHalf) {
+async fn read_down<R: AsyncRead + Unpin>(session: Arc<Session>, mut from: R) {
     let cap = session.cfg.limits.bytes;
     let mut buf = vec![0u8; READ];
     loop {

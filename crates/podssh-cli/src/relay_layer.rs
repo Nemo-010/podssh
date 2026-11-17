@@ -28,8 +28,13 @@
 //! `END` gone, and the session ends with the target, as an sshd ends at the
 //! end of its input. A role of an older build takes no `END`, and the end of
 //! stdin then stops sending and keeps receiving, as on the contract's road.
+//!
+//! Where the way refuses the WebSocket upgrade of a link, each link goes on
+//! the HTTP road, which the role gives to its layer (`links`), so that the
+//! session still resumes behind a proxy that refuses each upgrade.
 
 mod half;
+pub(crate) mod links;
 pub(crate) mod ssh;
 
 use std::io::Write;
@@ -39,12 +44,11 @@ use std::time::Duration;
 
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
-use podssh_relay::forward_layer::{self, kept, offer, Dialer, Missed};
+use podssh_relay::forward_layer::{self, kept, offer, Dialer, Link, Missed};
 use podssh_relay::relay::{Relay, RelayList};
 use podssh_relay::session::client::{self, Client, Found, Outcome};
 use podssh_relay::session::resume::Note;
 use podssh_relay::session::{half_close, Ask, OsEntropy, Settings};
-use podssh_relay::transit::link::Link;
 use podssh_ws::{ProxyChoice, Trust};
 
 use crate::exitmap::sysexits::EX_UNAVAILABLE;
@@ -191,11 +195,12 @@ pub async fn run(relays: &RelayList, trust: &Trust, (host, port): (&str, u16), e
         return None;
     }
     let (dialer, at) = chosen(relays, trust, (host, port), asked_for, &mut |line: String| say(err, &line)).await?;
+    let (dialer, by_road) = links::of(dialer);
     // Bound first, so that the notes' hold on `err` ends before a refusal
-    // is said.
+    // is said. The line of a link on the HTTP road is one of the notes.
     let linking = &dialer;
     let linked = crate::send_notes::said(
-        |notes| async move { linking.link(&mut |n: &str| crate::send_notes::send(&notes, n)).await },
+        |notes| async move { links::link(linking, by_road, &mut |n: &str| crate::send_notes::send(&notes, n)).await },
         &mut |note: &str| say(err, note),
     )
     .await;
@@ -237,17 +242,18 @@ pub async fn run(relays: &RelayList, trust: &Trust, (host, port): (&str, u16), e
         // A signal fails the reads, so that it still ends the whole session.
         let io = half::EndsWithReply::new(tokio::io::stdin(), tokio::io::stdout());
         let app = crate::hangup::ending_wholly(io, Some(&hangup));
-        return carried(&dialer, client, app, (&at, &hangup), err).await;
+        return carried((&dialer, by_road), client, app, (&at, &hangup), err).await;
     }
     let io = tokio::io::join(KeepsReceiving { read: tokio::io::stdin(), ended: false }, tokio::io::stdout());
     let app = crate::hangup::ending(io, Some(&hangup));
-    carried(&dialer, client, app, (&at, &hangup), err).await
+    carried((&dialer, by_road), client, app, (&at, &hangup), err).await
 }
 
 /// `client`'s session with `app`, the session's stdin and stdout, to its end
-/// or [`crate::hangup::AFTER_SIGNAL`] after a signal: the exit code.
+/// or [`crate::hangup::AFTER_SIGNAL`] after a signal: the exit code. Each
+/// new link goes on the HTTP road where `by_road` lets it.
 async fn carried<A>(
-    dialer: &Dialer,
+    (dialer, by_road): (&Dialer, bool),
     client: Client<Link>,
     app: A,
     (at, hangup): (&str, &crate::hangup::Hangup),
@@ -262,7 +268,7 @@ where
             let _ = writeln!(err, "podssh: {at}: {text}");
         }
     };
-    let session = Box::pin(forward_layer::carry(dialer, client, app, note));
+    let session = Box::pin(links::carry(dialer, by_road, client, app, note));
     // A signal's end: the `CLOSE` went, and nobody reads the bytes any more.
     let Some(outcome) = crate::hangup::bounded(Some(hangup), session).await else { return Some(0) };
     if let Outcome::Layer(ended) = &outcome {
@@ -308,10 +314,14 @@ impl<R: AsyncRead + Unpin> AsyncRead for KeepsReceiving<R> {
 /// A first link whose host answered 404 for the layer's path: it no longer
 /// serves it, so its kept offer goes, and the contract's road carries the
 /// session, with this line. A host that serves neither road refuses that
-/// road too.
+/// road too. A 404 on the HTTP road is a role that serves the layer by the
+/// upgrade alone: its offer stays.
 pub(crate) fn unserved(relays: &RelayList, missed: &Missed, at: &str) -> Option<String> {
     if !missed.not_served() {
         return None;
+    }
+    if matches!(missed, Missed::Road(_)) {
+        return Some(format!("{at} does not carry the resumable layer on its HTTP road (404): {WITHOUT}"));
     }
     kept::forget(relays.primary());
     Some(format!("{at} no longer serves the resumable layer (404): {WITHOUT}"))

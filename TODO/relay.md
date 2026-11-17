@@ -4236,8 +4236,8 @@ Read at `2042200`:
   quick tunnel the same in `crates/podssh-cli/src/node_quick_relay.rs:114`.
 - Each road of the role goes through `Policy::plan`: `/connect/`
   (`crates/podssh-relay/src/serve/forward.rs:100`), the resumable layer
-  (`crates/podssh-relay/src/serve/layer.rs:185`), the HTTP road
-  (`crates/podssh-relay/src/serve/http_road/mod.rs:165`) and `/trace`
+  (`crates/podssh-relay/src/serve/layer.rs:191`), the HTTP road
+  (`crates/podssh-relay/src/serve/http_road/mod.rs:188`) and `/trace`
   (`crates/podssh-relay/src/serve/docs.rs:138`); one change there serves each.
 - podssh has this list already for an exit: `podssh node --exit --routes` takes ranges
   (`crates/podssh-cli/src/node_exit.rs:91`), each a `Range` of `ADDR/BITS` or one address
@@ -6039,7 +6039,7 @@ GitHub #225's author lifts [DEFERRED], or the owner orders it.
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -6052,7 +6052,7 @@ dropped link is most common.
 
 - `scripts/pod-lab-serve-lane.sh`'s command 6 in `ws-upgrade-refused` (2026-11-16): "the class refuses the resumable
   layer, so the cut ended the session (255)", while in `proxy-only` "the session resumed after 0.1 s".
-- `crates/podssh-cli/src/relay_layer.rs:63` says "the session goes on with no resume" when the first link fails.
+- `crates/podssh-cli/src/relay_layer.rs:67` says "the session goes on with no resume" when the first link fails.
 - The client of each link is `pod-relay`'s (`forward_layer::client`, PodUtils/podcrates); the HTTP road's client takes a
   `Target` of a host and a port alone (`pod-relay/src/http_road/client.rs`, `Target`), so it cannot name the layer.
 
@@ -6064,6 +6064,40 @@ dropped link is most common.
 2. podssh's relay role (`crates/podssh-relay/src/serve/http_road`, `serve/layer.rs`) hands such a road session to the
    layer as one link.
 3. `relay_layer.rs` takes that link where the way refused the first link's upgrade, with one line.
+
+## Decision
+
+2026-11-17.
+
+- The role's opens share the checks of `/v1/http/open/` (`checked` in `serve/http_road/mod.rs`): the token, its budget,
+  the target by the policy, the bound of 256 sessions at once. Then, at `OPEN_LAYER` or `ONE_LAYER`, the session's far
+  side is a new link of the layer (`serve/layer.rs`, `link`, factored out of `/v1/layer/`'s `connect`), not a dial.
+  The layer dials the target after its handshake, so a link that never completes one costs no dial, as on
+  `/v1/layer/`. Lost: a dial at the open, as `/v1/http/open/` does, which would dial again at each resume.
+- A refusal of the token says `layer: missing or wrong token`, as `/v1/layer/` does, with the road's `X-Refuse: not
+  allowed`. Lost: the road's `http: ...` words, which do not say which road refused.
+- The pumps of a session of the road take two boxed halves (`Far`), a target's TCP or the layer's pipe. Lost: a second
+  set of pumps for the layer, the same code twice.
+- `limits.http` of `/relays.json` names `layer_paths`. A client that does not know it ignores it, and `pod-relay`'s
+  client does not need it: it takes the road after the way refused an upgrade.
+- `PODSSH_HTTP_ROAD` holds for the layer's links as for the contract's road (`relay_layer/links.rs`): `no` keeps each
+  link an upgrade (`Dialer::link` and a carry of podssh's own over `resume::run`, as `pod-relay`'s `carry` does); a
+  form that it names is each link's form (`with_road_form`). A word that it does not take keeps each link an upgrade,
+  and the contract's road refuses that word where it runs. Lost: `link_or_road` whatever the variable says, which
+  would take a road that the user turned off.
+- The line of a link on the road is `pod-relay`'s note, said once: "the way refused the WebSocket upgrade of the
+  layer's link; each link goes on the HTTP road". Lost: a second line of podssh's own, which would say it twice.
+- A `404` of the road's open (a role of an older build, which serves the layer by the upgrade alone) keeps the kept
+  offer, and the session goes on the contract's road with its own line. Lost: `unserved`'s line "no longer serves the
+  resumable layer", which would forget an offer that still holds.
+- The test of the role cuts a link with `sessions::end_each`, which ends each session of the road of one role, as a
+  role that lost them. The one-POST form keeps no session in the table, so its test is a new session alone. The CLI's
+  test cuts a link at the stand-in proxy: past 6 requests of the road's first session, it answers `404` with
+  `X-Refuse: unknown session`.
+- `scripts/pod-lab-serve-lane.sh` command 6: in `ws-upgrade-refused`, the destroyed TCP connections may be carried by
+  the road's own retries (a request goes again for 60 s), so the layer loses no link and says no resume. The lane
+  passes on "the session resumed", or on a session whose links went on the road with each line once; the old branch
+  "the class refuses the resumable layer" is gone, and a session that ends at the cut fails.
 
 ## Prove
 
@@ -6082,6 +6116,37 @@ road; the wire is `POST /v1/http/open-layer/HOST/PORT` and `/v1/http/one-layer/H
 podssh's: the role serves the two opens (`crates/podssh-relay/src/serve/http_road`) and gives the bytes to its layer as
 one link, and `relay_layer.rs` calls the two. podcrates' `tests/http_road_layer.rs` has a stand-in role that does it.
 
+## Done
+
+Done, 2026-11-17. Drafted on the branch `draft-t798`, then merged, built and run:
+
+- The role: `crates/podssh-relay/src/serve/http_road/mod.rs` (`layer_route`, `reach`, `checked`, `Far`,
+  `layer_paths`), `one.rs` (`ONE_LAYER`, `serve(.., layer)`; its HTTP/2 stream takes the path by `one::serves`),
+  `pumps.rs` (any far side), `sessions.rs` (`end_each`), `serve/layer.rs` (`link`).
+- The client: `crates/podssh-cli/src/relay_layer/links.rs` (`of`, `link`, `carry`), used by `relay_layer.rs` and
+  `relay_layer/ssh.rs`; `unserved` keeps the offer on a `404` of the road.
+- Tests: `crates/podssh-relay/tests/http_road_layer.rs` (split and serial: a new session, the role ends the road's
+  session, the same session resumes on a second one, the target dialed once; the one-POST form; a wrong token final,
+  in the layer's words); `crates/podssh-cli/tests/http_road_layer_cli.rs` (`podssh proxy` with
+  `PODSSH_RELAY_LAYER=yes` through the stand-in proxy that refuses the upgrade and cuts the road's first session:
+  "each link goes on the HTTP road", "the session resumed", two opens of the layer, none of `/v1/http/open/`, 4 MiB
+  each way with equal digests), with `Bench::start_cutting` in `tests/http_road_cli_support/mod.rs`.
+- The manual (`man/facts/http_road.rs`, `man/notes_relay.rs`), `docs/relay.md`, and command 6 of
+  `scripts/pod-lab-serve-lane.sh`.
+
+Results, 2026-11-17: `cargo test -p podssh-relay --features serve,plain-ws --test http_road_layer` 4 passed (a borrow
+of a temporary in the draft's test mended); `--test http_road --test http_road_one --test session_relay_resume` 9, 6
+and 6 passed; `--features serve,plain-ws,quick --test http_road_quick --test http_road_role` 2 and 4; `--features serve
+--lib` 209. `cargo test -p podssh-cli --test http_road_layer_cli --test http_road_cli` 2 and 9 passed, once the road's
+bench sets `PODSSH_RELAY_LAYER=no`: the role offers the layer, which now takes the road too, so the road's own tests
+took the layer. A role's byte cap (`--max-session-mib`) ends one link of the layer, and the session resumes on the
+next: by design, as `serve/layer.rs`'s head says each link keeps the contract's limits, and the WebSocket's links did
+the same before. `cargo test -p podssh-cli` 2390 passed, 0 failed; clippy (the gate's lints, the role's features) and
+rustfmt clean. Planted: the role refuses the layer's open on the road, and
+`podssh_proxy_resumes_its_session_of_the_layer_on_the_http_road_after_a_cut` fails. The Prove: `podlab run --serve 8443
+--serve-ca PKI/ca.pem ws-upgrade-refused -- sh scripts/pod-lab-serve-lane.sh PODSSH PKI` (`podlab` of `v0.63.0`): exit
+0, command 6 "a session outlived a cut of its link: the session resumed after 0.1 s"; the four other classes pass the
+lane too.
 
 # T-801: The relay role drops a node's socket at once after a reset or a failed write, and says why a node does not open
 

@@ -5,7 +5,9 @@
 //! own (given to podssh with `--ca-file`), answers each request that asks
 //! for an upgrade with a page of its own, and carries each other request to
 //! the role over TLS of its own, one request on each connection, its body
-//! held to its end, as proxies that end TLS do; the test's SSH server
+//! held to its end, as proxies that end TLS do; asked to, it loses the
+//! first session of the road after some of its requests, as a role that
+//! lost it, so that a link of the layer on the road is cut; the test's SSH server
 //! (`ssh_harness`, through `throughput_harness::Session`); targets on the
 //! loopback; and a run of podssh with its input, output and time limit.
 
@@ -125,12 +127,38 @@ pub struct Seen {
     pub carried: Mutex<Vec<String>>,
     /// The bodies refused for the proxy's cap.
     pub capped: AtomicUsize,
+    /// With a number, the requests of the road's first session that the
+    /// proxy carries before it answers each later one of it as unknown.
+    pub cut_after: Option<usize>,
+    /// The road's first session, and its requests that came.
+    first: Mutex<Option<(String, usize)>>,
+    /// The requests that the proxy answered as of a session that it lost.
+    pub cuts: AtomicUsize,
 }
 
 impl Seen {
     /// The requests carried whose line holds `word`.
     pub fn count(&self, word: &str) -> usize {
         self.carried.lock().unwrap().iter().filter(|line| line.contains(word)).count()
+    }
+
+    /// Whether the request of `line` is one of the road's first session
+    /// past [`Seen::cut_after`] of its requests: the proxy loses it.
+    fn cut_off(&self, line: &str) -> bool {
+        let Some(after) = self.cut_after else { return false };
+        let path = line.split(' ').nth(1).unwrap_or_default();
+        let Some(id) = path.strip_prefix("/v1/http/s/").and_then(|rest| rest.split('/').next()) else { return false };
+        let mut first = self.first.lock().unwrap();
+        let (known, came) = first.get_or_insert_with(|| (id.to_string(), 0));
+        if known != id {
+            return false;
+        }
+        *came += 1;
+        let lost = *came > after;
+        if lost {
+            self.cuts.fetch_add(1, Ordering::SeqCst);
+        }
+        lost
     }
 }
 
@@ -153,6 +181,18 @@ impl Bench {
     /// [`Bench::start`] with a proxy that refuses each body larger than
     /// `cap` with `413`, as a proxy with a cap on bodies does.
     pub fn start_capped(tag: &str, extra: &[&str], cap: Option<usize>) -> Bench {
+        Bench::start_with(tag, extra, cap, Seen::default())
+    }
+
+    /// [`Bench::start`] with a proxy that carries `after` requests of the
+    /// road's first session, then answers each later one of it `404` with
+    /// `X-Refuse: unknown session`, as a role that lost it: a cut of the
+    /// link that the session carries.
+    pub fn start_cutting(tag: &str, extra: &[&str], after: usize) -> Bench {
+        Bench::start_with(tag, extra, None, Seen { cut_after: Some(after), ..Seen::default() })
+    }
+
+    fn start_with(tag: &str, extra: &[&str], cap: Option<usize>, seen: Seen) -> Bench {
         let s = Session::start(tag);
         let (cert, key, role_ca) = role_certificate(&s.home);
         let (port_file, log) = (s.home.join("role-port"), s.home.join("role.log"));
@@ -179,7 +219,7 @@ impl Bench {
             std::thread::sleep(Duration::from_millis(50));
         };
         let rt = tokio::runtime::Builder::new_multi_thread().worker_threads(4).enable_all().build().unwrap();
-        let seen = Arc::new(Seen::default());
+        let seen = Arc::new(seen);
         let proxy = rt.block_on(Proxy::start(&s.home, handler(role, role_ca, seen.clone(), cap)));
         Bench { s, proxy, seen, rt }
     }
@@ -191,13 +231,16 @@ impl Bench {
     }
 
     /// `podssh ARGS` through the proxy alone, in `form` of the road
-    /// (`PODSSH_HTTP_ROAD`), or the default when `None`.
+    /// (`PODSSH_HTTP_ROAD`), or the default when `None`, with no layer.
     pub fn podssh(&self, args: &[String], form: Option<&str>) -> Command {
         let mut cmd = without_proxy(self.s.command(args));
         for name in ["PODSSH_RELAY", "PODSSH_RELAY_TOKEN", "PODSSH_RELAY_LAYER", "PODSSH_HTTP_ROAD", "SSL_CERT_FILE"] {
             cmd.env_remove(name);
         }
         cmd.env("https_proxy", self.proxy.url());
+        // The road alone: the role offers the layer, which now takes the road
+        // too; the layer's own test turns it on again.
+        cmd.env("PODSSH_RELAY_LAYER", "no");
         if let Some(form) = form {
             cmd.env("PODSSH_HTTP_ROAD", form);
         }
@@ -248,6 +291,12 @@ async fn carry(mut client: Stream, role: u16, role_ca: &Path, seen: &Seen, cap: 
     let mut body = vec![0u8; length];
     client.read_exact(&mut body).await?;
     // Read whole first, so that the refusal is not lost to a reset.
+    if seen.cut_off(&first) {
+        let top = "HTTP/1.1 404 Not Found\r\nX-Refuse: unknown session\r\nContent-Length: 0\r\n\
+                   Connection: close\r\n\r\n";
+        client.write_all(top.as_bytes()).await?;
+        return client.shutdown().await;
+    }
     if cap.is_some_and(|cap| length > cap) {
         seen.capped.fetch_add(1, Ordering::SeqCst);
         let top = "HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\nConnection: close\r\n\r\n";

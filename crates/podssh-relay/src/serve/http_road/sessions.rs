@@ -334,6 +334,21 @@ pub fn live() -> usize {
     table().values().filter(|s| s.ended().is_none()).count()
 }
 
+/// End each session of `cfg`'s role that has not ended, with `code` and
+/// `why`: how many. A session that carries a link of the resumable layer
+/// loses its link alone; its client resumes on a new session of the road,
+/// so a test cuts each link this way, as a role that lost them.
+pub fn end_each(cfg: &Arc<Config>, code: u16, why: &str) -> usize {
+    let mine: Vec<Arc<Session>> = table().values().filter(|s| Arc::ptr_eq(&s.cfg, cfg)).cloned().collect();
+    // Ended outside the table's lock: an end says its line to the role.
+    let mut ended = 0;
+    for session in mine.iter().filter(|s| s.ended().is_none()) {
+        session.end(code, why);
+        ended += 1;
+    }
+    ended
+}
+
 /// The session `id` of `cfg`'s role, when `key` is its key: a wrong key and
 /// an id unknown here are the same to the client. A request found it, so
 /// its client is there.

@@ -7048,3 +7048,10 @@ cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli
 ```
 
 `cargo tree -i rsa` names one version.
+
+## Correction
+
+2026-11-17. #292's own gate (run 43996427213) failed `gate (libs)` and `macos` on
+`roots_version::the_recorded_roots_are_the_ones_built`, as it should: a new webpki-roots needs
+`podssh_ws::tls::ROOTS_VERSION` and `ROOTS_PUBLISHED` (the day crates.io published it) moved with it. Its `windows` job
+failed T-709's seven tests of the system unit, which `5ad75b7` made Unix's alone (the branch is older).

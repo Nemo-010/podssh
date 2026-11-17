@@ -8,6 +8,12 @@
 //! quick tunnel's node, which takes a request's body whole, 32 KiB at most,
 //! and reads an answer to the end of its connection, each answer closes its
 //! connection, and the open names the node's bound on a batch.
+//!
+//! A session of the road may carry a link of the resumable layer instead of
+//! a target's connection (`OPEN_LAYER`, `ONE_LAYER`): where a way refuses
+//! the upgrade of `/v1/layer/`, the client opens one of the road for each
+//! link, with the same checks, and the role gives its bytes to the layer
+//! (`super::layer::link`), which holds the target across links.
 
 pub mod answers;
 pub mod one;
@@ -21,11 +27,14 @@ use podssh_ws::http::request::{read_request, Request};
 use serde_json::json;
 use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
 
-use super::egress::{self, Missed};
+use super::egress::{self, Missed, Plan};
+use super::forward::Asked;
 use super::policy::shown;
 use super::{forward, tokens, Config};
 use crate::http_road::window::Refusal;
-use crate::http_road::{query, route, Kind, Route, BATCH_MAX, DOWN_MAX, KEY, OPEN, PREFIX, WAIT_MAX};
+use crate::http_road::{
+    layer_route, query, route, Kind, Route, BATCH_MAX, DOWN_MAX, KEY, ONE_LAYER, OPEN, OPEN_LAYER, PREFIX, WAIT_MAX,
+};
 use answers::{refusal, refuse, whole, write};
 use sessions::Session;
 
@@ -33,6 +42,10 @@ use sessions::Session;
 const KEEP_IDLE: Duration = Duration::from_secs(60);
 /// The largest body of a request that carries no batch.
 const SMALL_BODY: usize = 4096;
+
+/// The far side of a new session of the road, as two halves: its target's
+/// connection, or a link of the resumable layer.
+pub type Far = (Box<dyn AsyncRead + Send + Unpin>, Box<dyn AsyncWrite + Send + Unpin>);
 
 /// Whether the request-target `target` is one of the road's.
 pub fn serves(target: &str) -> bool {
@@ -64,6 +77,9 @@ pub fn limits() -> serde_json::Value {
     json!({
         "paths": [OPEN, crate::http_road::SESSION, one::ONE],
         "forms": ["split", "serial", "one"],
+        // A link of the resumable layer in each form, where a way refuses
+        // the upgrade of `/v1/layer/`.
+        "layer_paths": [OPEN_LAYER, ONE_LAYER],
         "batch_max_bytes": batch_max(),
         "window_batches": sessions::WINDOW,
         "hold_ms": sessions::HOLD.as_millis() as u64,
@@ -93,10 +109,14 @@ where
     loop {
         let keep = may_keep && head.minor == 1 && !head.has_token("connection", "close");
         let path = head.target.split('?').next().unwrap_or_default().to_string();
-        let asked = route(&path);
+        // A link of the layer opens as a session does, at its own paths.
+        let (asked, layer) = match layer_route(&path) {
+            Some(opened) => (Some(opened), true),
+            None => (route(&path), false),
+        };
         // The one-POST form takes the connection: its body is the way up.
         if asked == Some(Route::One) {
-            one::serve(stream, head, pending, cfg).await;
+            one::serve(stream, head, pending, cfg, layer).await;
             return None;
         }
         let max = match asked {
@@ -114,7 +134,7 @@ where
         };
         let kept = match asked {
             None => write(&mut stream, refuse(404, &format!("{path}: not found"), &[], keep), keep).await,
-            Some(Route::Open) => open(&mut stream, &head, &cfg, keep).await,
+            Some(Route::Open) => open(&mut stream, &head, &cfg, keep, layer).await,
             // Served above, before a body is read.
             Some(Route::One) => Some(false),
             Some(Route::Session(id, kind)) => match sessions::find(&id, head.header(KEY), &cfg) {
@@ -149,13 +169,16 @@ where
 }
 
 /// `POST /v1/http/open/HOST/PORT[?family=4|6]`, with the forward token:
-/// the target checked and dialed, then a new session.
-async fn open<S>(stream: &mut S, head: &Request, cfg: &Arc<Config>, keep: bool) -> Option<bool>
+/// the target checked and dialed, then a new session. With `layer`, `POST
+/// /v1/http/open-layer/HOST/PORT`: the target checked, and the session's
+/// bytes one link of the layer, which dials the target itself.
+async fn open<S>(stream: &mut S, head: &Request, cfg: &Arc<Config>, keep: bool, layer: bool) -> Option<bool>
 where
     S: AsyncWrite + Unpin,
 {
-    let (tcp, meter) = match dial(stream, head, cfg, OPEN, keep).await {
-        Ok(dialed) => dialed,
+    let at = if layer { OPEN_LAYER } else { OPEN };
+    let (far, meter) = match reach(stream, head, cfg, at, keep).await {
+        Ok(reached) => reached,
         Err(kept) => return kept,
     };
     let (session, key) = match Session::open(cfg.clone(), meter) {
@@ -163,8 +186,8 @@ where
         Err(why) => return write(stream, refuse(503, &format!("http: {why}"), &[], keep), keep).await,
     };
     sessions::insert(session.clone());
-    pumps::start(&session, tcp);
-    cfg.event("http open");
+    pumps::start(&session, far);
+    cfg.event(if layer { "http open layer" } else { "http open" });
     let doc = json!({
         "session": session.id,
         "key": key,
@@ -176,31 +199,73 @@ where
     write(stream, whole(200, &[], doc.to_string().as_bytes(), "application/json", keep), keep).await
 }
 
-/// The checks of a new session of the road, of either form, at the path
-/// `path` (its prefix before `HOST/PORT`): the token and its budget, the
-/// target by the policy, the bound on sessions at once; then the target
-/// dialed as the forward road dials it. A refusal is written, and `Err`
-/// holds what its write gave.
-async fn dial<S>(
+/// The far side of a new session of the road, of either form, at the path
+/// `path` (its prefix before `HOST/PORT`), once [`checked`]: the target
+/// dialed as the forward road dials it; at a path of the layer, a new link
+/// of the layer, which dials the target after its handshake, as a link of
+/// `/v1/layer/` does. A refusal is written, and `Err` holds what its write
+/// gave.
+async fn reach<S>(
     stream: &mut S,
     head: &Request,
     cfg: &Arc<Config>,
     path: &str,
     keep: bool,
-) -> Result<(tokio::net::TcpStream, super::usage::Meter), Option<bool>>
+) -> Result<(Far, super::usage::Meter), Option<bool>>
 where
     S: AsyncWrite + Unpin,
 {
+    let (asked, plan, meter) = checked(stream, head, cfg, path, keep).await?;
+    if path == OPEN_LAYER || path == ONE_LAYER {
+        let (from, to) = tokio::io::split(super::layer::link(cfg, asked.host, plan));
+        let far: Far = (Box::new(from), Box::new(to));
+        return Ok((far, meter));
+    }
+    let target = shown(&asked.host, asked.port);
+    // As the forward road dials: through the host's proxy when one is set,
+    // the owner told of the proxy's fault, and the unsent bytes bounded.
+    let tcp = match egress::dial(&asked.host, &plan, &cfg.egress, &cfg.policy.ipv6, cfg.limits.connect).await {
+        Ok((tcp, _)) => tcp,
+        Err(Missed { said, line }) => {
+            if let Some(line) = line {
+                cfg.event(&format!("proxy: {line}"));
+            }
+            let why = format!("relay: cannot reach {target}: {said}");
+            return Err(write(stream, refuse(502, &why, &[], keep), keep).await);
+        }
+    };
+    super::sockets::bound_unsent(&tcp);
+    let (from, to) = tcp.into_split();
+    let far: Far = (Box::new(from), Box::new(to));
+    Ok((far, meter))
+}
+
+/// The checks of a new session of the road at the path `path`: the token
+/// and its budget, the target by the policy, the bound on sessions at once.
+/// The target and the plan of its dial, and the meter of its token's key;
+/// a refusal is written, and `Err` holds what its write gave. A link of the
+/// layer is refused in the layer's words, as on `/v1/layer/`.
+async fn checked<S>(
+    stream: &mut S,
+    head: &Request,
+    cfg: &Arc<Config>,
+    path: &str,
+    keep: bool,
+) -> Result<(Asked, Plan, super::usage::Meter), Option<bool>>
+where
+    S: AsyncWrite + Unpin,
+{
+    let who = if path == OPEN_LAYER || path == ONE_LAYER { "layer" } else { "http" };
     let token_ok = head.header("x-relay-token").is_some_and(|t| cfg.tokens.check(t, tokens::now_ms()));
     if !token_ok {
-        let reply = refusal(Refusal::NotAllowed, "http: missing or wrong token", &[], keep);
+        let reply = refusal(Refusal::NotAllowed, &format!("{who}: missing or wrong token"), &[], keep);
         return Err(write(stream, reply, keep).await);
     }
     // The token's key, and its budget, before anything is dialed (T-636).
     let meter = match super::usage::meter_of(cfg, head) {
         Ok(meter) => meter,
         Err(why) => {
-            let reply = refusal(Refusal::NotAllowed, &format!("http: {why}"), &[], keep);
+            let reply = refusal(Refusal::NotAllowed, &format!("{who}: {why}"), &[], keep);
             return Err(write(stream, reply, keep).await);
         }
     };
@@ -214,7 +279,6 @@ where
         let why = format!("http: {} sessions at once at most", sessions::MOST);
         return Err(write(stream, refuse(503, &why, &[("Retry-After", "5".to_string())], keep), keep).await);
     }
-    let target = shown(&asked.host, asked.port);
     let plan = match cfg.policy.plan(&asked.host, asked.port, asked.family, &cfg.egress).await {
         Ok(plan) => plan,
         Err(refused) => {
@@ -230,20 +294,7 @@ where
             return Err(write(stream, reply, keep).await);
         }
     };
-    // As the forward road dials: through the host's proxy when one is set,
-    // the owner told of the proxy's fault, and the unsent bytes bounded.
-    let tcp = match egress::dial(&asked.host, &plan, &cfg.egress, &cfg.policy.ipv6, cfg.limits.connect).await {
-        Ok((tcp, _)) => tcp,
-        Err(Missed { said, line }) => {
-            if let Some(line) = line {
-                cfg.event(&format!("proxy: {line}"));
-            }
-            let why = format!("relay: cannot reach {target}: {said}");
-            return Err(write(stream, refuse(502, &why, &[], keep), keep).await);
-        }
-    };
-    super::sockets::bound_unsent(&tcp);
-    Ok((tcp, meter))
+    Ok((asked, plan, meter))
 }
 
 #[cfg(test)]
@@ -254,6 +305,7 @@ mod tests {
     fn the_road_s_paths_are_its_own() {
         assert!(serves("/v1/http/open/github.com/22?family=4"));
         assert!(serves("/v1/http/s/0123456789abcdef0123456789abcdef/down?at=0"));
+        assert!(serves("/v1/http/open-layer/github.com/22") && serves("/v1/http/one-layer/github.com/22"));
         assert!(!serves("/v1/httpx") && !serves("/connect/h/22") && !serves("/v1/probe/drip"));
         assert!(super::super::serves("/v1/http/open/github.com/22"), "a quick tunnel's node gives them to the role");
     }
@@ -265,6 +317,7 @@ mod tests {
         let l = limits();
         assert_eq!(l["paths"], json!(["/v1/http/open/", "/v1/http/s/", "/v1/http/one/"]));
         assert_eq!(l["forms"], json!(["split", "serial", "one"]));
+        assert_eq!(l["layer_paths"], json!(["/v1/http/open-layer/", "/v1/http/one-layer/"]));
         assert_eq!(l["batch_max_bytes"], json!(BATCH_MAX), "no node in front of a plain role");
         assert_eq!((&l["window_batches"], &l["hold_ms"]), (&json!(8), &json!(10_000)));
         assert_eq!((&l["down_window_bytes"], &l["down_max_bytes"]), (&json!(2 << 20), &json!(1 << 20)));

@@ -37,7 +37,11 @@ pub(super) fn blocks() -> Vec<Block> {
          POST whose body is the way up and whose answer, after a mark that comes at once, is the way down. It runs \
          on one connection, for a way whose hops pass a body as it comes; a mark that does not come within 2 s \
          means that a hop holds the body. The split form then follows, at once for the rest of the run. The \
-         default relay serves no HTTP road.",
+         resumable layer takes this road too. Where the way refuses the upgrade of a layer's link, that link and \
+         each later one go on the road. Each is a new session of the road, at /v1/http/open-layer/HOST/PORT, or \
+         /v1/http/one-layer/HOST/PORT in the one form. The relay gives its bytes to the layer as one link, so a \
+         cut session resumes on a new one. podssh says so in one line. PODSSH_HTTP_ROAD=no keeps each link an \
+         upgrade, and a form that it names is each link's form. The default relay serves no HTTP road.",
         batch = BATCH_MAX / 1024,
         wait = WAIT_MAX.as_secs(),
         window = sessions::WINDOW,

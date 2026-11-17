@@ -11,6 +11,10 @@
 //! ends the answer with no last chunk, so that the client reads a cut, not
 //! an end. The target's end is the answer's last chunk; the body's last
 //! chunk is TCP's half-close to the target.
+//!
+//! `POST /v1/http/one-layer/HOST/PORT` is the same form for a link of the
+//! resumable layer: the open's checks, then the bytes go to a new link of
+//! the layer, not to a dial of the target.
 
 use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
@@ -26,7 +30,7 @@ use crate::serve::Config;
 /// The form's path, before `HOST/PORT`, and the answer's first bytes, at
 /// once, which tell the client that no hop holds the answer nor the
 /// request's body: the wire's, in `pod-relay`, which its client reads too.
-pub use crate::http_road::{MARK, ONE};
+pub use crate::http_road::{MARK, ONE, ONE_LAYER};
 /// The bytes asked of the target in each read.
 const READ: usize = 64 * 1024;
 /// The longest line of a chunk's size, with its extensions.
@@ -42,9 +46,10 @@ pub fn live() -> usize {
     LIVE.load(Ordering::SeqCst)
 }
 
-/// Whether `path`, with no query, is the form's.
+/// Whether `path`, with no query, is the form's, of a target or of a link
+/// of the layer.
 pub fn serves(path: &str) -> bool {
-    path.starts_with(ONE)
+    path.starts_with(ONE) || path.starts_with(ONE_LAYER)
 }
 
 /// One count in [`LIVE`], given back when the session ends however it ends.
@@ -81,8 +86,9 @@ impl Moved {
 }
 
 /// Serve the form's request `head` on `stream`, `pending` the bytes after
-/// its head. The connection ends with the session.
-pub async fn serve<S>(mut stream: S, head: Request, pending: Vec<u8>, cfg: Arc<Config>)
+/// its head; with `layer`, a link of the resumable layer. The connection
+/// ends with the session.
+pub async fn serve<S>(mut stream: S, head: Request, pending: Vec<u8>, cfg: Arc<Config>, layer: bool)
 where
     S: AsyncRead + AsyncWrite + Unpin + Send + 'static,
 {
@@ -93,7 +99,8 @@ where
         let _ = stream.shutdown().await;
         return;
     }
-    let Ok((tcp, meter)) = super::dial(&mut stream, &head, &cfg, ONE, false).await else {
+    let at = if layer { ONE_LAYER } else { ONE };
+    let Ok(((from_target, to_target), meter)) = super::reach(&mut stream, &head, &cfg, at, false).await else {
         let _ = stream.shutdown().await;
         return;
     };
@@ -107,11 +114,10 @@ where
         meter.settle();
         return;
     }
-    cfg.event("http one open");
+    cfg.event(if layer { "http one open layer" } else { "http one open" });
     let meter = Arc::new(meter);
     let moved = Arc::new(Moved { bytes: AtomicU64::new(0), heard: Mutex::new(Instant::now()) });
     let (from_client, to_client) = tokio::io::split(stream);
-    let (from_target, to_target) = tcp.into_split();
     let reader = BufReader::new(std::io::Cursor::new(pending).chain(from_client));
     let mut up = tokio::spawn(up(reader, to_target, meter.clone(), moved.clone(), cfg.limits.bytes));
     let down = down(from_target, to_client, meter.clone(), moved.clone(), cfg.limits.bytes);
@@ -298,6 +304,7 @@ mod tests {
     #[test]
     fn the_form_s_path_and_its_mark_are_its_own() {
         assert!(serves("/v1/http/one/github.com/22") && !serves("/v1/http/open/github.com/22"));
+        assert!(serves("/v1/http/one-layer/github.com/22") && !serves("/v1/http/open-layer/github.com/22"));
         assert!(super::super::serves("/v1/http/one/github.com/22"), "under the road's prefix");
         assert_eq!(chunk(MARK), b"12\r\npodssh-http-one 1\n\r\n");
     }
