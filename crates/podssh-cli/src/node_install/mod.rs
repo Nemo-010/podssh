@@ -292,6 +292,9 @@ fn prepare(args: &NodeArgs, target: &Target, print: bool) -> Result<(Spec, Vec<S
     if let Some((_, named, why)) = refused.iter().find(|(given, ..)| *given) {
         return Err(Refusal::usage(format!("{flag} with {named}: {why}")));
     }
+    // A relative socket of a Unix route would be read from the service's
+    // own directory (T-714).
+    crate::node_unix::service_sockets(&crate::node::words_of(args))?;
     let mut notes = Vec::new();
     if let Target::System(account) = target {
         // root does not read the user's pair: the service does, as the user.

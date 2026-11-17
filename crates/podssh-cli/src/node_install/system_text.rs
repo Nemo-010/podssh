@@ -240,6 +240,15 @@ fn paths(spec: &Spec, account: &Account, lines: &mut Vec<String>) -> Result<(), 
         }
         *dirs.entry(dir.to_path_buf()).or_default() |= made;
     }
+    // The directory of each socket of a Unix route, which a connect only
+    // reads (T-714); `prepare` refused a relative one.
+    for socket in crate::node_unix::service_sockets(&spec.args)? {
+        let Some(dir) = socket.parent() else { continue };
+        if !path_ok(dir) {
+            return Err(unit_path_refusal("the socket of a Unix route", &socket));
+        }
+        dirs.entry(dir.to_path_buf()).or_default();
+    }
     let mut more = Vec::new();
     for (dir, made) in dirs {
         let hidden = HOMES.iter().any(|home| dir.starts_with(home)) || dir.starts_with(&account.home);

@@ -192,6 +192,21 @@ fn the_directories_of_the_flags_files_are_let_through() {
 }
 
 #[test]
+fn the_socket_of_a_unix_route_under_a_home_is_let_through_read_only() {
+    let hidden = node(&["api=unix-connect:/home/alice/run/api.sock", "db=unix-connect:/run/db.sock"]);
+    let text = unit(&hidden, &alice()).expect("a unit");
+    assert!(text.lines().any(|l| l == "BindReadOnlyPaths=-/home/alice/run"), "{text}");
+    // ProtectSystem=strict leaves /run readable, and a connect only reads.
+    assert!(!text.contains("Paths=-/run\n"), "{text}");
+    let abstract_name = node(&["api=unix-connect:@podssh-api"]);
+    assert!(!unit(&abstract_name, &alice()).expect("a unit").contains("Paths=-@"));
+    let relative = node(&["api=unix-connect:run/api.sock"]);
+    let refused = unit(&relative, &alice()).expect_err("refused");
+    assert_eq!(refused.code, EX_USAGE, "{}", refused.message);
+    assert!(refused.message.contains("absolute PATH"), "{}", refused.message);
+}
+
+#[test]
 fn the_paths_of_a_system_unit_are_root_s_places() {
     assert_eq!(unit_path(Kind::Node, "lab"), Path::new("/etc/systemd/system/podssh-node-lab.service"));
     assert_eq!(state_dir(Kind::Node, "lab"), Path::new("/var/lib/podssh-node-lab"));

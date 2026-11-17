@@ -5421,3 +5421,12 @@ Partial, 2026-11-16 (drafted on `draft-t714`; not built).
   socket on Windows by WinSock. podssh's own opener of a route's socket is gone: `node_unix_open::connect` is that
   function, with a 10 s bound. `--test node_unix_route` passed among `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3619 passed, 0 failed. Still waits: a relative PATH under
   `--install`, a socket under a home that `ProtectHome` hides, and an upgrade in place of a Unix route.
+
+- 2026-11-17: the two checks of `--install`. A Unix route's relative PATH is refused (64), as a service starts in
+  another directory (`node_unix::service_sockets`, called by `node_install::prepare`); `@NAME` has no file. A system
+  unit lets the directory of each socket through read-only (`BindReadOnlyPaths=-DIR`) where `ProtectHome` hides it;
+  elsewhere `ProtectSystem=strict` leaves it readable, and a connect only reads. The manual's note of a Unix route
+  says both. `--lib node_install` 30 passed, among them
+  `the_socket_of_a_unix_route_under_a_home_is_let_through_read_only`; `podssh node lab api=unix-connect:run/api.sock
+  --print-unit` exits 64 with its words. Planted, the socket's directory left out of the unit: caught. Still waits:
+  an upgrade in place that moves a Unix route's session.

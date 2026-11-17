@@ -15,4 +15,6 @@ pub(super) const NODE: &str = "A route may name unix-connect:PATH as its service
      SHA256:..., the route's name, and a newline. The service reads that line, and the rest is the session. \
      The node writes it once its door let the key in: its allowlist, the net's policy, a grant, or the person \
      of --ask. So the line is a fact of the door, and no claim of the caller. A key that the door refuses \
-     never reaches the socket. Without --caller-line, the node writes nothing of its own: a plain bridge.";
+     never reaches the socket. Without --caller-line, the node writes nothing of its own: a plain bridge. \
+     Under --install, PATH is absolute or @NAME, as a service starts in another directory (64 else). A system \
+     unit lets through the directory of a socket that ProtectHome hides, read-only.";

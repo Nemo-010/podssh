@@ -137,6 +137,27 @@ pub(crate) fn parse(words: &[String], caller_line: Option<&str>) -> Result<Vec<U
     Ok(routes)
 }
 
+/// The sockets of the Unix routes of `words`, as a service reaches them: a
+/// relative PATH is refused, as a service starts in another directory; an
+/// abstract `@NAME` has no file, and no directory to let through.
+pub(crate) fn service_sockets(words: &[String]) -> Result<Vec<std::path::PathBuf>, Refusal> {
+    let mut sockets = Vec::new();
+    for word in words.iter().filter(|word| is_unix(word)) {
+        let target = word.split_once('=').map_or(word.as_str(), |(_, target)| target);
+        let path = target.strip_prefix(PREFIX).unwrap_or(target);
+        if path.starts_with('@') {
+            continue;
+        }
+        if !std::path::Path::new(path).is_absolute() {
+            return Err(Refusal::usage(format!(
+                "TARGET {word}: a service starts in another directory, so its socket needs an absolute PATH"
+            )));
+        }
+        sockets.push(std::path::PathBuf::from(path));
+    }
+    Ok(sockets)
+}
+
 /// A path that a socket's address can hold: not empty, and short enough
 /// with its NUL.
 fn check_path(word: &str, path: &str) -> Result<(), Refusal> {

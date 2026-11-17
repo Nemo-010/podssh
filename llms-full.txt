@@ -4969,7 +4969,9 @@ podssh node
   the net's policy, a grant, or the person of --ask. So the line is a fact of
   the door, and no claim of the caller. A key that the door refuses never
   reaches the socket. Without --caller-line, the node writes nothing of its
-  own: a plain bridge.
+  own: a plain bridge. Under --install, PATH is absolute or @NAME, as a service
+  starts in another directory (64 else). A system unit lets through the
+  directory of a socket that ProtectHome hides, read-only.
 
   With --net-url URL --net-owner KEY, the node takes its net from the signed
   document at URL. A change of the net then needs no copy of a file to each
