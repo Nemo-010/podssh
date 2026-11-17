@@ -1211,9 +1211,19 @@ are a floor of the role's own. A release build, on a cloud host of 4 cores and 1
 | 16 runs of 20 cold connects at once | 40.9 connects/s |
 | The role's peak resident memory over the run | 65 MiB |
 
+GitHub's Ubuntu runner of 4 cores, the same release build of `7ae319e`, 2026-11-17 (`relay-measure.yml` with
+`role: yes`, run 44092969731):
+
+| Measure | Rate |
+| --- | --- |
+| One session, 30 MiB each way | 58.4 MiB/s down, 48.8 MiB/s up |
+| 16 sessions at once, 30 MiB each way each | 68.0 MiB/s in all (960 MiB in 14.1 s, 16 of 16 passed) |
+| Cold connects, one at a time | 177 ms p50, 217 ms p95 |
+| 16 runs of 20 cold connects at once | 40.4 connects/s |
+| The role's peak resident memory over the run | 63 MiB |
+
 The rate of one session is SSH's, through the client's and the sshd's ciphers; the relay role copies frames. The
-measured two speeds of the role's bridge (T-803) are above each of these. The runner's numbers come from the
-workflow `relay-measure.yml` with `role: yes`.
+measured two speeds of the role's bridge (T-803) are above each of these.
 
 ## The relay role's mailbox (T-086)
 

@@ -2037,7 +2037,7 @@ Partial, 2026-11-16 (drafted on `draft-t716`; not built).
 **Milestone:** M10
 **Priority:** P3
 **Effort:** M
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -2113,6 +2113,12 @@ What waits: the runner's run of the rate (`relay-measure.yml` with `role: yes`),
 `pod-unit` of podcrates T-102, to which the unit code moves at its take (the Start condition).
 
 2026-11-17: the gate's `windows` job at `7ae319e` (run 44086827732) failed `a_side_of_the_shell_or_a_credential_in_an_address_is_refused`: Windows refuses `fd:3` first ("descriptors are passed on Unix only"), before the service's check of stdin. Still a refusal; the test now takes those words on Windows (`cargo test -p podssh-cli --lib node_install::pipe`: 3 passed here).
+
+2026-11-17: the runner's run. `relay-measure.yml` with `role: yes` at `7ae319e` (run 44092969731, job `role`, passed):
+one session 58.4 MiB/s down and 48.8 up, 16 at once 68.0 MiB/s in all (16 of 16 passed), cold connects 177 ms p50
+and 217 ms p95, 40.4 connects/s, a peak of 63.4 MiB; the table in `docs/relay.md` and a row of `docs/STATUS.md`. The
+move of the unit code to `pod-unit` goes with that crate's take (T-684), as the Start condition says; nothing of this
+entry waits for it.
 
 # T-730: `llms.txt`, `llms-full.txt` and `--help --json`
 

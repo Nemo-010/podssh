@@ -5745,7 +5745,7 @@ Plant: change one byte of a codec; the vector test fails.
   through `podssh_ws::frame`. Only the relay role's tokens are podssh's own code
   (`crates/podssh-relay/src/serve/tokens.rs`).
 - "A test vector exists for iroh's tickets only" (`docs/design.md:1309`) held at the reading of the
-  entry; since T-712, `docs/relay.md:1817` gives vectors of the liveness member too, and
+  entry; since T-712, `docs/relay.md:1827` gives vectors of the liveness member too, and
   `pod-identity`'s tests pin the key of the seed `0x11` (which `grants.json` uses, so both agree).
 - The Approach's `HELLO` is the layer's `GREETING` and `OPEN` (`Hello` in `pod-session`): the page
   names those records.
