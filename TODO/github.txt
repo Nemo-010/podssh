@@ -292,6 +292,11 @@
 284 issue open
 285 issue open
 286 issue open
-287 issue open
-288 issue open
+287 issue closed
+288 issue closed
 289 issue open
+290 pull open
+291 pull open
+292 pull open
+293 pull open
+294 issue open

@@ -287,6 +287,12 @@ pub mod send_notes;
 mod relay_renew;
 // `podssh relay halt NAME` and `resume NAME`: the owner's halt of a pair (T-647).
 mod relay_halt;
+// `podssh relay conform`: whether one relay host keeps the contract, by
+// using it (T-713): its forward checks, its quiet session and its reverse road.
+mod relay_conform;
+mod relay_conform_forward;
+mod relay_conform_quiet;
+mod relay_conform_reverse;
 // `podssh relay rank`: each relay host measured from this host, the rank kept (T-606).
 mod relay_rank;
 // The rank of a session's background, with RelayRank auto alone (T-608).

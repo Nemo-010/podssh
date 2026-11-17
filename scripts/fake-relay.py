@@ -79,6 +79,13 @@ Modes:
                    session gets Close 1011 `target closed before sending
                    anything`, as the default relay did on 2026-10-08; an IPv4
                    target behaves (T-253)
+  wrongclose       behave, but answer a client's Close before the dial of
+                   ?dial=lazy with 1011, a planted fault of the close codes
+                   for podssh relay conform (scripts/fake_conform.py, T-713)
+  querytoken       behave, and mint a token of one session at
+                   /v1/mint?once=1 too, but take a token in the query string
+                   of /connect/ as well as in its header: a planted fault
+                   for podssh relay conform (T-713)
   buffer, bodybuffer, bodycap:BYTES, idle:SECONDS
                    the probes of `podssh doctor --stream` (T-325), served in
                    each mode at /v1/probe/drip and /v1/probe/anything, with a
@@ -101,6 +108,8 @@ import ssl
 import time
 import urllib.parse
 
+import fake_conform
+import fake_diag
 import fake_lazy
 import fake_reverse
 import fake_stream
@@ -154,21 +163,20 @@ async def handle(reader, writer):
             pass
         elif await fake_stream.handle(method, path, headers, reader, writer):
             pass
-        elif method == "POST" and path == "/v1/mint":
+        elif method == "POST" and fake_conform.is_mint(path):
             await reader.readexactly(int(headers.get("content-length", "0")))
             event("mint")
-            body = json.dumps({"token": TOKEN, "expires": int(time.time() * 1000) + 3600_000,
-                               "scope": "forward"}).encode()
+            body = json.dumps(fake_conform.minted(path, TOKEN, int(time.time() * 1000) + 3600_000)).encode()
             writer.write(response(200, "OK", body, [("Content-Type", "application/json")]))
         elif method == "GET" and path == "/health":
             body = json.dumps({"ok": True, "service": "tcp-ssh-relay", "version": "fake",
                                "relay": {"edge_colo": "TEST"}}).encode()
             writer.write(response(200, "OK", body, [("Content-Type", "application/json")]))
         elif method == "GET" and path.split("?")[0] == "/relays.json":
-            body = relays_json(path, headers)
+            body = fake_diag.relays_json(path, headers)
             writer.write(response(200, "OK", body, [("Content-Type", "application/json")]))
         elif method == "GET" and path.split("?")[0] == "/trace":
-            await trace(writer, path, headers)
+            await fake_diag.trace(writer, path, headers, TOKEN)
         elif method == "GET" and path.startswith("/connect/"):
             await connect(reader, writer, path, headers)
         else:
@@ -183,75 +191,8 @@ async def handle(reader, writer):
             pass
 
 
-def relays_json(path, headers):
-    """The live relay's `/relays.json`, with this stand-in as its pool."""
-    query = urllib.parse.parse_qs(urllib.parse.urlsplit(path).query)
-    authority = headers.get("host", "relay.test")
-    name = authority.rsplit(":", 1)[0] if authority.count(":") == 1 else authority
-    target, connect_url = None, None
-    if "host" in query and "port" in query:
-        target = {"host": query["host"][0], "port": int(query["port"][0]), "bucket": None, "source": "explicit"}
-        connect_url = f"wss://{authority}/connect/{target['host']}/{target['port']}"
-    doc = {
-        "service": "tcp-ssh-relay", "version": "fake", "you": {"edge_colo": "TEST", "bucket": None},
-        "target": target, "connect": connect_url, "policy": {"note": "a stand-in relay on the loopback"},
-        "pool": [{"rank": 0, "name": "stand-in", "host": name, "bucket": None, "region": None,
-                  "client_ms": 0, "target_ms": 0, "score_ms": 0}],
-        "limits": {"connect_timeout_ms": 10000, "idle_timeout_ms": 180000, "max_session_ms": 43200000,
-                   "max_session_bytes": 67108864, "max_frame_bytes": 262144, "udp": "unsupported",
-                   "probe": fake_stream.limits()},
-    }
-    return json.dumps(doc).encode()
-
-
-async def trace(writer, path, headers):
-    """`/trace`: public alone; a dial of `target=HOST:PORT` needs the token in
-    its header, never in the URL. The answer has the live relay's shape, and
-    names no address or place of the caller."""
-    query = urllib.parse.parse_qs(urllib.parse.urlsplit(path).query)
-
-    def send(doc):
-        writer.write(response(200, "OK", json.dumps(doc).encode(), [("Content-Type", "application/json")]))
-
-    if "token" in query:
-        writer.write(response(400, "Bad Request", b"trace: a token belongs in the X-Relay-Token header"))
-        return
-    doc = {"request": {"edge_colo": "TEST", "path": "/trace"}, "relay": {"name": "stand-in", "version": "fake"}}
-    if "target" not in query:
-        send(doc)
-        return
-    if headers.get("x-relay-token") != TOKEN:
-        writer.write(response(403, "Forbidden", b"trace: missing or wrong token"))
-        return
-    wanted = query["target"][0]
-    host, _, port = wanted.rpartition(":")
-    host = host.strip("[]")
-    started = time.monotonic()
-    try:
-        t_reader, t_writer = await asyncio.wait_for(asyncio.open_connection(host, int(port)), 10)
-    except (OSError, ValueError, asyncio.TimeoutError) as e:
-        doc["target"] = {"error": f"refused: cannot reach {wanted}: {e}"}
-        send(doc)
-        return
-    connect_ms = int((time.monotonic() - started) * 1000)
-    first_ms, banner, seen = None, None, 0
-    try:
-        data = await asyncio.wait_for(t_reader.read(4096), 5)
-        if data:
-            first_ms, seen = int((time.monotonic() - started) * 1000), len(data)
-            banner = data.split(b"\n")[0].rstrip(b"\r").decode("utf-8", "replace")
-    except asyncio.TimeoutError:
-        pass
-    t_writer.close()
-    doc["target"] = {"host": host, "port": int(port), "ok": True, "road": "loopback", "dialed": host,
-                     "dialed_literal": True, "address_family": "4", "connect_ms": connect_ms,
-                     "first_byte_ms": first_ms, "bytes_seen": seen,
-                     "verdict": "live" if seen else "silent-or-unreachable", "banner": banner}
-    send(doc)
-
-
 async def connect(reader, writer, path, headers):
-    if headers.get("x-relay-token") != TOKEN:
+    if not fake_conform.token_ok(path, headers, TOKEN):
         writer.write(response(403, "Forbidden", b"forward: missing or wrong token"))
         return
     event(f"connect {clock()} {path}")
@@ -273,7 +214,7 @@ async def connect(reader, writer, path, headers):
         return
     parts = path.split("?")[0].split("/")
     host, port = parts[2], int(parts[3])
-    if args.mode == "policy":
+    if args.mode == "policy" or fake_conform.link_local(host):
         writer.write(response(403, "Forbidden", f"forward: {host}:{port} is not in the ALLOW list".encode()))
         return
     query = urllib.parse.parse_qs(urllib.parse.urlsplit(path).query)
@@ -476,6 +417,8 @@ async def main():
     args = parser.parse_args()
     fake_reverse.MODE = args.mode
     fake_stream.MODE = args.mode
+    fake_lazy.MODE = args.mode
+    fake_conform.MODE = args.mode
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     if args.mode == "tls12":
         context.minimum_version = ssl.TLSVersion.TLSv1_2

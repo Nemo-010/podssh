@@ -10,6 +10,10 @@ import asyncio
 
 from fake_ws import close_frame, frame, read_frame, upgraded
 
+# The stand-in's mode: `wrongclose` answers a Close before the dial with
+# 1011, a fault that `podssh relay conform` must find (T-713).
+MODE = "normal"
+
 
 async def serve(reader, writer, headers, target, event, clock, pump):
     """The lazy session: `target` is (host, port), `event` writes a line,
@@ -25,7 +29,8 @@ async def serve(reader, writer, headers, target, event, clock, pump):
                 await writer.drain()
             elif opcode == 0x8:
                 event(f"lazy closed {clock()}")
-                writer.write(close_frame(1000, "client closed"))
+                code = 1011 if MODE == "wrongclose" else 1000
+                writer.write(close_frame(code, "client closed"))
                 await writer.drain()
                 return
             elif opcode in (0x0, 0x2) and data:

@@ -3141,6 +3141,10 @@ Results:
   podssh-cli --all-targets` (the stubs of `system.rs` off Unix): clippy on `x86_64-unknown-linux-gnu` clean, rustfmt
   clean; the musl and Windows builds are the gate's (its `release` and `windows` jobs).
 
+2026-11-17: the gate's `windows` job at `843e3c5` failed 7 tests of the system unit, which build Unix paths
+(`/home/alice`) that Windows does not read as absolute; a system unit is systemd's, so those 7 run on Unix alone
+(`#[cfg(unix)]`), and `a_printed_unit_writes_no_file` with the env's tests still run on each OS.
+
 Waits: a run in the build image with systemd as PID 1 (`scripts/test_in_box.sh`): `--install --system --run-as`
 of a real user, the node online, and `systemd-analyze security podssh-node-NAME.service` under 3.0 (T-251's image
 checks); item 5 (podcrates T-102, `pod-unit`).

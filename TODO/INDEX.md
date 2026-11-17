@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**756 entries: 43 open, 35 partial, 11 blocked, 667 done.**
+**757 entries: 43 open, 35 partial, 11 blocked, 668 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 2 | 9 | 3 | 80 | 94 |
-| P2 | 7 | 20 | 2 | 283 | 312 |
+| P2 | 7 | 20 | 2 | 284 | 313 |
 | P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 43 | 35 | 11 | 667 | 756 |
+| **All** | 43 | 35 | 11 | 668 | 757 |
 
 ## Entries
 
@@ -743,7 +743,7 @@ repository and CI).
 | [T-710](reverse.md) | P1 | M | M10 | measurement | open | A node stays reachable for months: pair renewal and legs by key, proven over 90 days and in a beta |
 | [T-711](mesh.md) | P1 | M | M10 | feature | blocked | One switch `PODSSH_PUBLIC` over each third-party service, and `status --json` gives the set |
 | [T-712](reverse.md) | P2 | M | M10 | feature | open | Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s |
-| [T-713](relay.md) | P2 | M | M10 | feature | open | `podssh relay conform --relay-host HOST [--reverse] --json` |
+| [T-713](relay.md) | P2 | M | M10 | feature | done | `podssh relay conform --relay-host HOST [--reverse] --json` |
 | [T-714](reverse.md) | P2 | M | M10 | feature | open | A node route to a Unix socket, with a first line that names the caller's key and route |
 | [T-715](mesh.md) | P2 | M | M10 | feature | open | A node's door from a signed net document at an HTTPS URL, with a TTL and a stale limit |
 | [T-716](machine.md) | P2 | S | M10 | feature | partial | The public parts of each key of this host as JSON, offline: `podssh status --keys` |
@@ -832,3 +832,4 @@ repository and CI).
 | [T-799](ssh.md) | P1 | M | M10 | defect | done | russh 0.65.2 and ssh-key 0.7.0-rc.12 in the place of the copies; tailscale-rs v0.7.1 read and held |
 | [T-800](robustness.md) | P1 | S | M10 | defect | done | `node_cut`'s test of podssh's role failed at random: a relay session's id held the digits 1003 |
 | [T-801](relay.md) | P2 | S | M10 | defect | open | The relay role drops a node's socket at once after a reset or a failed write, and says why a node does not open |
+| [T-802](repo.md) | P2 | S | none | chore | open | Dependabot's updates of 2026-11-17: the minor and patch group, and rsa 0.10 |

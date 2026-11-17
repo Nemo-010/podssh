@@ -200,7 +200,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 756 entries: 43 open, 35 partial, 11 blocked, 667 done.
+`TODO/INDEX.md` holds 757 entries: 43 open, 35 partial, 11 blocked, 668 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 
@@ -235,7 +235,7 @@ operator interrupts it.
    entries, P1 before any other; their features (those
    which Q74, Q75, Q77, Q78 and Q82 filed) by priority, beside
    M10. Between entries: the `none` entries, the highest priority first, but for the testers'.
-   Dependabot's #123 waits for an iroh-dns that takes simple-dns 0.13.
+   Dependabot closed #123 on 2026-11-17: simple-dns left podssh's tree with `pod-iroh` (`v0.65.0`); podcrates holds that dependency now.
 5. The entries that the studies of osewa filed (Q99, `docs/research/osewa.md`) go ahead of the
    rest of M10, in this order: T-660, T-670 and T-666 (each waits for a run that its
    `## Done` names), their follow-up and what the netem run found (done); then the open

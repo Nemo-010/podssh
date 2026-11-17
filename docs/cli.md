@@ -3606,6 +3606,24 @@ commands. The rules behind them:
   the document against the facts that podssh was built with: exit 0 when
   each holds, 1 when one does not (the relay changed), 69 when the relay
   could not be read (T-060).
+- **`relay conform` checks a relay by using it (T-713).** `--relay-host
+  HOST[:PORT]` is needed, one host, so the default relay is checked only
+  when a person names it. Each check is an object, `id`, `clause` (the
+  head of a section of [relay.md](relay.md)), `verdict` (`pass`, `fail`,
+  `skip`), `detail` and `ms`; a line each, or `--json`. Forward: `/health`,
+  `/relays.json`, the mint and the token's form, an upgrade with no token
+  and with a forged one (403), a token of one session in the query string
+  (refused; skipped where the relay mints none, then spent in a header),
+  `?dial=lazy`, a Ping, the Close before the dial (1000), and
+  `169.254.169.254:80` refused (403). With `--target HOST:PORT`: bytes each
+  way, the Close after them (1000), and on a quiet session beside the
+  others the keepalive and the idle cut of `idle_timeout_ms` (1001), up to
+  300 s. `--reverse`: a pair of the check's own, the node's `hello`, `open`
+  and `ready`, a byte each way, `close {id}`, the status, a wrong stop token
+  (403), `ext.renew` and `ext.halt` from the relay's offers, then the stop
+  (always, after a failure too) and its tokens refused. Exit 0, 1 for a
+  fail, 69 when the host did not answer, 64 for a bad flag; no token is
+  printed.
 - **The relay's own state, with nothing but the binary (T-058).**
   `relay status` with no NAME asks each relay host for its `/health`, one
   after the other, a line for each as it answers (the code that `doctor`

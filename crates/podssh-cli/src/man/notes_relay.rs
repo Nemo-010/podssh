@@ -78,6 +78,20 @@ pub const RELAY: &[&str] = &[
      lines, its digest and the version that the relay serves. Else it prints a FAIL line for each fact that \
      disagrees, and exits 1: the relay changed something that podssh depends on. With --document FILE, it checks \
      FILE and reads nothing from the network.",
+    "podssh relay conform --relay-host HOST[:PORT] checks whether one relay host keeps the contract, by using it. \
+     It never checks the default relay unless you name it, as it mints tokens there. Each check is one line: pass, \
+     fail or skip, its id, the section of the contract, its time and its words. With --json, one object holds \
+     checks, each with id, clause, verdict, detail and ms, and passed, failed, skipped and exit. The forward \
+     checks: /health and /relays.json, a minted token and its form, and an upgrade with no token or a wrong one, \
+     each refused with 403. Then ?dial=lazy, a Ping and its Pong, the Close of a session that dialed nothing \
+     (1000), and the refusal of a link-local target. A token of one session, where the relay mints one, checks \
+     that a token in the query string is refused; then an upgrade spends it. With --target HOST:PORT, best an \
+     echo server of yours: bytes each way, the Close after them, the keepalive, and the idle cut that \
+     /relays.json publishes, up to 300 s. With --reverse: a pair of the check's own, its node's hello, an \
+     operator's leg opened and readied, a byte each way and the leg's close. Then the status, a wrong stop token \
+     refused, the renewal and the halt where the relay offers them, and the pair's stop. The stop comes also \
+     after a failure; the pair's tokens must be refused after it. No token is printed. The exit is 0 with no \
+     fail, 1 with one, and 69 when the host did not answer.",
     "podssh relay status with no NAME asks each relay host for its /health, one after the other. It prints a line \
      for each as it answers: the relay's version, the edge that answered, the time, the TLS version and how the \
      connection was made, or why it failed. It needs one host that answers.",

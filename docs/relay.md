@@ -723,7 +723,9 @@ are `podssh relay`, `podssh node`, `podssh operator` and
   and gives the first banner line. Use it to tell a relay problem from a
   target problem. `podssh relay status`, `podssh relay info [HOST PORT]` and
   `podssh relay trace HOST PORT` ask these three (T-058); `podssh relay rank`
-  times a session through each host from this host (T-606). Measured
+  times a session through each host from this host (T-606); `podssh relay
+  conform --relay-host HOST` checks, by using it, whether one host keeps
+  this contract, each check named by the section that it holds to (T-713). Measured
   2026-10-11: a target trace answers `target` with `ok`, `road`, `dialed`,
   `address_family`, `connect_ms`, `first_byte_ms`, `bytes_seen`, `verdict`
   and `banner`, or with `error` alone for a target that the relay will not

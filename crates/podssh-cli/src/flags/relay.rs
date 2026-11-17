@@ -8,7 +8,7 @@ use super::{row, FlagKind, FlagRow};
 #[rustfmt::skip]
 pub const RELAY_FLAGS: &[FlagRow] = &[
     row(None, "relay-host", Some("HOSTS"), FlagKind::Supported,
-        "relay hosts, HOST[:PORT][,...]: status asks each, and pair, info and trace use the first (default: env PODSSH_RELAY, else the built-in relay and its pool)", None),
+        "relay hosts, HOST[:PORT][,...]: status asks each, and pair, info and trace use the first; conform needs one HOST[:PORT] here (default: env PODSSH_RELAY, else the built-in relay and its pool)", None),
     row(None, "relay-addr", Some("HOST=IP"), FlagKind::Supported,
         "use IP for HOST instead of DNS, HOST=IP[,...]; also env PODSSH_RELAY_ADDR (for hosts with no DNS)", None),
     row(None, "ca-file", Some("FILE"), FlagKind::Supported,
@@ -37,14 +37,17 @@ pub const RELAY_FLAGS: &[FlagRow] = &[
     row(None, "document", Some("FILE"), FlagKind::Supported,
         "spec: check FILE, a copy of the relay's document, and read nothing from the network", None),
     row(None, "json", None, FlagKind::Supported,
-        "status, info, trace and rank: the answer as one JSON object on stdout, when the run ends; for a pair, its label, online, sessions, expires, seconds_left and halted, with halt_reason where its owner gave one", None),
+        "status, info, trace, rank and conform: the answer as one JSON object on stdout, when the run ends; for a pair, its label, online, sessions, expires, seconds_left and halted, with halt_reason where its owner gave one", None),
     // The rank of the relay hosts, measured from this host (T-606).
     row(None, "rounds", Some("N"), FlagKind::Supported,
         "rank: probe each host N times, 1 to 20 (default 3), in a new random order each round", None),
     row(None, "count", Some("N"), FlagKind::Supported,
         "rank: the WebSocket pings of each probe, 1 to 20 (default 5)", None),
     row(None, "target", Some("HOST:PORT"), FlagKind::Supported,
-        "rank: the target of each probe's session, which the relay dials (default github.com:22, never a destination of yours that would count the probes)", None),
+        "rank: the target of each probe's session, which the relay dials (default github.com:22, never a destination of yours that would count the probes); conform: a target for the checks of a session that the relay dials, best an echo server of yours", None),
+    // The reverse road's checks of conform, on a pair that it ends (T-713).
+    row(None, "reverse", None, FlagKind::Supported,
+        "conform: check the reverse road too, on a pair that the check makes, uses and stops at its end, also after a failure", None),
     row(None, "cached", None, FlagKind::Supported,
         "rank: print the rank kept in the cache, its age and whether it holds for this egress; connects nowhere", None),
     row(None, "forget", None, FlagKind::Supported,

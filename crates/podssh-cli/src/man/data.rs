@@ -31,7 +31,7 @@ pub fn exit_codes() -> Vec<(Code, String)> {
         row(
             crate::doctor::EXIT_FAILED,
             "podssh doctor: a check failed. podssh relay spec: a fact of the relay's document disagrees. \
-             podssh keygen: a key could not be made or read. podssh health --preflight: after the login, a \
+             podssh relay conform: a check of the relay failed. podssh keygen: a key could not be made or read. podssh health --preflight: after the login, a \
              check failed or the facts did not come.",
         ),
         row(

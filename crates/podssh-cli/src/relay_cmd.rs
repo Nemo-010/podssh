@@ -12,7 +12,8 @@
 //! by a short code, which `join NAME` takes on the operator's host
 //! (`relay_code.rs`, T-086). `halt NAME` and `resume NAME` keep the stored
 //! pair's operators out at podssh's relay role, and let them in again
-//! (`relay_halt.rs`, T-647).
+//! (`relay_halt.rs`, T-647). `conform` checks whether one host keeps the
+//! contract, by using it (`relay_conform.rs`, T-713).
 
 use std::io::Write;
 
@@ -56,8 +57,12 @@ pub struct RelayArgs {
     /// `spec`: a copy of the relay's document to check, read instead of the
     /// live one.
     pub document: Option<String>,
-    /// `status` with no NAME, `info`, `trace` and `rank`: one JSON object.
+    /// `status` with no NAME, `info`, `trace`, `rank` and `conform`: one
+    /// JSON object.
     pub json: bool,
+    /// `conform`: the reverse road's checks too, on a pair of the checker's
+    /// own that it ends (T-713).
+    pub reverse: bool,
     /// `rank` (T-606): the rounds of probes of each host, the pings of each
     /// probe, the target of its sessions, the rank kept read back, or
     /// forgotten.
@@ -95,6 +100,7 @@ impl RelayArgs {
             pair_file: get("pair-file"),
             document: get("document"),
             json: matches.get_flag("json"),
+            reverse: matches.get_flag("reverse"),
             rounds: get("rounds"),
             count: get("count"),
             target: get("target"),
@@ -105,9 +111,10 @@ impl RelayArgs {
         }
     }
 
-    /// Whether a flag of `rank` alone was given.
+    /// Whether a flag of `rank` alone was given; `--target` goes with
+    /// `conform` too.
     fn rank_flags(&self) -> bool {
-        self.rounds.is_some() || self.count.is_some() || self.target.is_some() || self.cached || self.forget
+        self.rounds.is_some() || self.count.is_some() || self.cached || self.forget
     }
 }
 
@@ -120,15 +127,21 @@ pub fn run_relay(args: &RelayArgs, out: &mut dyn Write, err: &mut dyn Write) -> 
         let _ = writeln!(err, "podssh relay: {extra:?} is one word too many: {takes}");
         return EXIT_USAGE;
     }
-    if args.json && !(target || matches!(sub, Some("status" | "rank"))) {
-        let _ = writeln!(err, "podssh relay: --json goes with status, info, trace and rank");
+    if args.json && !(target || matches!(sub, Some("status" | "rank" | "conform"))) {
+        let _ = writeln!(err, "podssh relay: --json goes with status, info, trace, rank and conform");
         return EXIT_USAGE;
     }
     if args.rank_flags() && sub != Some("rank") {
-        let _ = writeln!(
-            err,
-            "podssh relay: --rounds, --count, --target, --cached and --forget go with `podssh relay rank` only"
-        );
+        let _ =
+            writeln!(err, "podssh relay: --rounds, --count, --cached and --forget go with `podssh relay rank` only");
+        return EXIT_USAGE;
+    }
+    if args.target.is_some() && !matches!(sub, Some("rank" | "conform")) {
+        let _ = writeln!(err, "podssh relay: --target goes with `podssh relay rank` and `podssh relay conform` only");
+        return EXIT_USAGE;
+    }
+    if args.reverse && sub != Some("conform") {
+        let _ = writeln!(err, "podssh relay: --reverse goes with `podssh relay conform` only");
         return EXIT_USAGE;
     }
     if args.operator_file.is_some() && sub != Some("pair") {
@@ -191,6 +204,11 @@ pub fn run_relay(args: &RelayArgs, out: &mut dyn Write, err: &mut dyn Write) -> 
             Err(Refusal::usage(format!("spec takes no NAME, and {word:?} would be dropped: `podssh relay spec`")))
         }
         (Some("rank"), None) => return crate::relay_rank::run(args, out, err),
+        // Whether one host keeps the contract, by using it (T-713).
+        (Some("conform"), None) => return crate::relay_conform::run(args, out, err),
+        (Some("conform"), Some(word)) => Err(Refusal::usage(format!(
+            "conform takes no NAME, and {word:?} would be dropped: `podssh relay conform --relay-host HOST`"
+        ))),
         (Some("rank"), Some(word)) => Err(Refusal::usage(format!(
             "rank takes no NAME, and {word:?} would be dropped: `podssh relay rank`, or --relay-host HOSTS for other hosts"
         ))),
@@ -198,11 +216,11 @@ pub fn run_relay(args: &RelayArgs, out: &mut dyn Write, err: &mut dyn Write) -> 
         (Some("trace"), _) => return crate::relay_diag::trace(args, out, err),
         (Some(other), _) => Err(Refusal::usage(format!(
             "there is no subcommand {other:?}; the subcommands are pair, join, revoke, halt, resume, status, info, \
-             trace, rank, spec and serve"
+             trace, rank, conform, spec and serve"
         ))),
         (None, _) => Err(Refusal::usage(
             "missing SUBCOMMAND: pair NAME, join NAME, revoke NAME, halt NAME, resume NAME, status [NAME], info \
-             [HOST PORT], trace HOST PORT, rank, spec or serve",
+             [HOST PORT], trace HOST PORT, rank, conform, spec or serve",
         )),
     };
     match done {

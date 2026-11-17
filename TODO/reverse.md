@@ -766,7 +766,7 @@ So a local TCP TARGET exists only where the host allows it; `podssh serve` (M5) 
    FILE, and prints only the label and the expiry. `podssh relay revoke NAME` stops the pair and deletes the
    local copies. `podssh relay status NAME` gives presence; agree on the form with T-058, whose `relay status`
    has no NAME.
-4. Exit codes as `podssh proxy` (`docs/cli.md:6378`): 64 usage; 69 the relay or TARGET cannot be reached; 77 a
+4. Exit codes as `podssh proxy` (`docs/cli.md:6396`): 64 usage; 69 the relay or TARGET cannot be reached; 77 a
    refused pair (`403`); 78 no usable pair; 0 after a stop by a signal. Add the rows to
    `crates/podssh-cli/src/man/facts/exit.rs:8`.
 5. `doctor`: one line for each stored pair, with its expiry and its presence, as in
@@ -904,7 +904,7 @@ Read: `parse_hop` strips `ssh://` and reads `host:PORT` (`crates/podssh-cli/src/
 operator leg receives text frames (`docs/relay.md:660-663`). A host key is recorded under the target
 host, never the relay's name (`SECURITY.md:263-273`); `HostKeyAlias` exists
 (`crates/podssh-cli/src/ssh/resolve.rs:360`). `podssh ssh` uses the exit codes of OpenSSH, and
-`podssh proxy` sysexits (`docs/cli.md:6374-6378`).
+`podssh proxy` sysexits (`docs/cli.md:6392-6396`).
 
 ## Approach
 
@@ -3079,12 +3079,12 @@ to go on. A feature.
   issue's claim holds where no pair is stored under NAME, as on an operator's host.
 - Read: it reads the pair from the store alone (`crates/podssh-cli/src/relay_cmd.rs` line 229 at
   `2608b91`, `crates/podssh-cli/src/pairs.rs:36-44`); `relay` takes no `--pair-file`, and `--operator-file`
-  goes with `pair` alone (`crates/podssh-cli/src/relay_cmd.rs:134-137`).
+  goes with `pair` alone (`crates/podssh-cli/src/relay_cmd.rs:147-150`).
 - Read: the relay answers `/v1/status/<name>` to the connect token
   (`PodUtils/podssh:crates/podssh-relay/src/pair.rs:202-206`), which the operator's part holds.
 - Read: `relay pair` prints the label and its expiry and nothing more
-  (`crates/podssh-cli/src/relay_cmd.rs:306`); in the last 24 h of a stored pair it makes the next
-  one, which the node takes at the expiry (T-395, `crates/podssh-cli/src/relay_cmd.rs:234-257`);
+  (`crates/podssh-cli/src/relay_cmd.rs:324`); in the last 24 h of a stored pair it makes the next
+  one, which the node takes at the expiry (T-395, `crates/podssh-cli/src/relay_cmd.rs:252-275`);
   the operator's part of the next pair is a new file, and the default relay renews no pair (T-395's
   Decision, item 2).
 
@@ -3890,8 +3890,8 @@ so the next member's author copies a neighbour, and an `is_some()` reads a `fals
 Read at `2042200`; each reader that exists is right:
 
 - A guarantee asked for: `PodUtils/podssh:crates/podssh-relay/src/pair/once.rs:47-50` takes `"once": true` alone, and
-  `crates/podssh-cli/src/relay_cmd.rs:273-274` stops the pair that a relay made with no such word
-  before it refuses (`crates/podssh-cli/src/relay_cmd.rs:271` says "A relay that does not offer --once
+  `crates/podssh-cli/src/relay_cmd.rs:291-292` stops the pair that a relay made with no such word
+  before it refuses (`crates/podssh-cli/src/relay_cmd.rs:289` says "A relay that does not offer --once
   made a pair whose token takes each").
 - A grant's markings: `PodUtils/podssh:crates/podssh-relay/src/grant/door.rs:94` says "it has no end, and a grant needs
   one", `PodUtils/podssh:crates/podssh-relay/src/grant/door.rs:118` says "it has no critical option", and
@@ -4168,7 +4168,7 @@ Read at `2042200`:
   486 lines, so the state goes in a module beside it.
 - The client: `PodUtils/podssh:crates/podssh-relay/src/pair/renew.rs:70-83` and the line and JSON of
   `crates/podssh-cli/src/relay_status.rs:49-66`; `relay` has no subcommand for it
-  (`crates/podssh-cli/src/relay_cmd.rs:160-167`).
+  (`crates/podssh-cli/src/relay_cmd.rs:173-180`).
 - A `503` is no refusal on the way (crates/podssh-relay/src/piping/probe.rs:27-33 at `b9c04657`), so no other road
   starts on it.
 

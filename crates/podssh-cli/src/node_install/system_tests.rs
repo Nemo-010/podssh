@@ -3,6 +3,8 @@
 //! line named, no secret), the checks of a system install with each probe
 //! given (no root, no systemd, no passwd entry, no cache), the flags, and a
 //! printed unit that writes no file.
+// The system unit's tests run on Unix alone; their imports go unused elsewhere.
+#![cfg_attr(not(unix), allow(unused_imports, dead_code))]
 
 use std::path::{Path, PathBuf};
 
@@ -63,6 +65,8 @@ const HARDENED: &[&str] = &[
     "MemoryDenyWriteExecute=yes",
 ];
 
+// A system unit is systemd's: its paths are Unix paths.
+#[cfg(unix)]
 #[test]
 fn a_system_unit_runs_as_its_user_in_its_places_with_each_line_of_the_hardening() {
     let text = unit(&node(&[]), &alice()).expect("a unit");
@@ -103,6 +107,8 @@ fn a_system_unit_runs_as_its_user_in_its_places_with_each_line_of_the_hardening(
     }
 }
 
+// A system unit is systemd's: its paths are Unix paths.
+#[cfg(unix)]
 #[test]
 fn no_secret_is_in_a_unit_of_either_kind() {
     for spec in [node(&["--exit"]), node(&[]), serve(&[])] {
@@ -115,6 +121,8 @@ fn no_secret_is_in_a_unit_of_either_kind() {
     }
 }
 
+// A system unit is systemd's: its paths are Unix paths.
+#[cfg(unix)]
 #[test]
 fn an_exit_routes_and_iroh_add_netlink_with_a_comment_and_a_roost_relaxes_nothing() {
     for flag in ["--exit", "--routes", "--iroh"] {
@@ -132,6 +140,8 @@ fn an_exit_routes_and_iroh_add_netlink_with_a_comment_and_a_roost_relaxes_nothin
     assert_eq!(Needs::of(&node(&[])), Needs::default());
 }
 
+// A system unit is systemd's: its paths are Unix paths.
+#[cfg(unix)]
 #[test]
 fn serve_s_unit_leaves_out_each_line_that_a_session_needs_and_names_it() {
     let text = unit(&serve(&["--authorized-keys", "/home/alice/.ssh/keys"]), &alice()).expect("a unit");
@@ -150,6 +160,8 @@ fn serve_s_unit_leaves_out_each_line_that_a_session_needs_and_names_it() {
     assert!(text.contains("systemctl disable --now podssh-serve-lab.service"), "{text}");
 }
 
+// A system unit is systemd's: its paths are Unix paths.
+#[cfg(unix)]
 #[test]
 fn the_directories_of_the_flags_files_are_let_through() {
     let spec = node(&[
@@ -196,6 +208,8 @@ fn probes<'a>(
     Probes { euid, systemd, account, owner }
 }
 
+// A system unit is systemd's: its paths are Unix paths.
+#[cfg(unix)]
 #[test]
 fn each_missing_part_of_a_system_install_is_refused_with_its_words() {
     let root = || Some(0u32);
@@ -259,6 +273,8 @@ fn the_flags_of_a_system_unit_go_together() {
     }
 }
 
+// A system unit is systemd's: its paths are Unix paths.
+#[cfg(unix)]
 #[test]
 fn a_passwd_entry_is_read_as_the_c_library_reads_it() {
     let text = "# a comment\n+nis:x:1:1::/:/bin/sh\nroot:x:0:0:root:/root:/bin/bash\n\

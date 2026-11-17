@@ -160,7 +160,7 @@ token header (`PodUtils/podssh:crates/podssh-ws/src/client.rs:294-305`); `https_
 ## Decision
 
 Recommendation: remove the `--timeout` and `--jsonl` rows of `relay`
-(`crates/podssh-cli/src/flags/relay.rs:9-123`), and bound each request in the code, as `doctor`
+(`crates/podssh-cli/src/flags/relay.rs:9-126`), and bound each request in the code, as `doctor`
 does. With the row, the gate of `crates/podssh-cli/src/dispatch.rs:376-397` stops
 `podssh relay status` in each script that leaves `--timeout` out. Keeping the gate lost for that
 reason: the command is bounded anyway.
@@ -3166,7 +3166,7 @@ URL written into each result, and a download target that is no test target of `A
   (`crates/podssh-cli/src/ping/mod.rs:172-177`), with `--json`.
 - Read: `doctor`'s `forward` proves both legs by one of GitHub's published host keys
   (`crates/podssh-cli/src/doctor/relay_checks.rs:218-254`); `--quick` keeps the relay's sections and
-  `--jobs 1` runs them one at a time (`crates/podssh-cli/src/flags/relay.rs:183-188`).
+  `--jobs 1` runs them one at a time (`crates/podssh-cli/src/flags/relay.rs:186-191`).
 - Read: `podssh relay trace` asks the relay to dial a target and gives its own times
   (`crates/podssh-cli/src/relay_diag.rs:182-185`); `relay info` gives the pool
   (`crates/podssh-cli/src/relay_diag.rs:133-135`).
@@ -3323,8 +3323,8 @@ working hosts, which a measurement can make.
 - Read: the record of failures is a file of the cache, `PodUtils/podssh:crates/podssh-relay/src/failures.rs:27`
   says "pub const FILE: &str", and `order` keeps the list's order within each of its groups
   (`PodUtils/podssh:crates/podssh-relay/src/failures.rs:231-255`).
-- Read: the subcommands of `podssh relay` (`crates/podssh-cli/src/relay_cmd.rs:158-189`), and
-  `--json` goes with `status`, `info` and `trace` alone (`crates/podssh-cli/src/relay_cmd.rs:118-121`).
+- Read: the subcommands of `podssh relay` (`crates/podssh-cli/src/relay_cmd.rs:171-202`), and
+  `--json` goes with `status`, `info` and `trace` alone (`crates/podssh-cli/src/relay_cmd.rs:125-128`).
 - Read: rule 2 of `AGENTS.md`, section 5: one outbound connection, through `HTTPS_PROXY` when it is
   set; its exceptions name no measurement of hosts.
 - Read in the archive (`docs/research/relay-measurement.md`, section 4): 37 of 37 pool hosts opened
@@ -3926,8 +3926,8 @@ info` with `--relay-host` reads the order named, and `--json` has `relay_order` 
 - `crates/podssh-cli/src/relay_diag.rs:167-172`: `relay info` reads the order before it prints,
   and `--json` adds `relay_order` and `relay_list` (each `host` and `port`) beside `info`,
   `pool_order` and `signed_list`, which stay as they were.
-- The manual's note of `relay info` (`crates/podssh-cli/src/man/notes_relay.rs:91-103`) and of the
-  default list's rank (`:124-125`), `docs/cli.md` and `docs/relay.md` say the same; the interop
+- The manual's note of `relay info` (`crates/podssh-cli/src/man/notes_relay.rs:105-117`) and of the
+  default list's rank (`:138-139`), `docs/cli.md` and `docs/relay.md` say the same; the interop
   check `relay.info` (`scripts/interop-relay.sh`) greps the line of the measures with `relay rank`
   and the line of the order named.
 - Tests: `the_text_names_relay_rank_and_the_order_that_a_run_takes` (each of `rank`, `samples`,
@@ -4231,7 +4231,7 @@ Read at `2042200`:
   unchecked; else `:94` refuses the first address that is not public.
 - `crates/podssh-relay/src/serve/policy.rs:107-109` hands a name to the host's proxy unresolved only with
   `private`, so a role without `--allow-private` checks each address that it dials.
-- The flag: `crates/podssh-cli/src/flags/relay.rs:66` (the row `allow-private`),
+- The flag: `crates/podssh-cli/src/flags/relay.rs:69` (the row `allow-private`),
   `crates/podssh-cli/src/relay_serve.rs:165` says "private: s.allow_private", and the role behind a
   quick tunnel the same in `crates/podssh-cli/src/node_quick_relay.rs:114`.
 - Each road of the role goes through `Policy::plan`: `/connect/`
@@ -4754,7 +4754,7 @@ holds. Its Approach, item 3, now follows the Decision of 2026-11-05.
   `TCP_NODELAY` and says its end; another start goes to the cleartext road, or to TLS with
   `--cleartext no`. An sshd that does not answer gets the client one line
   (`crates/podssh-relay/src/serve/sshd.rs:119`). The binary: `--sshd ADDR:PORT`
-  (`crates/podssh-cli/src/flags/relay.rs:103`), read at `crates/podssh-cli/src/relay_serve.rs:116`
+  (`crates/podssh-cli/src/flags/relay.rs:106`), read at `crates/podssh-cli/src/relay_serve.rs:116`
   (an address, else 64) and named in the first line; with another subcommand, 64. The manual (the
   row and a note of `relay serve`), `docs/relay.md` ("SSH on the relay role's port"),
   `docs/cli.md`, `docs/mesh.md` and `SECURITY.md` say it. The gate runs `relay_serve_sshd` in its
@@ -5344,7 +5344,7 @@ A unit test for each parser (the bounds and the refusal). A test of the role wit
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -5378,6 +5378,34 @@ document and compares facts; it does not use the relay.
 5. No credential in the output or in argv. The token is minted and discarded in the process.
 6. Refuse `HOST` that is the default relay unless `--relay-host` names it (a person's choice).
 
+## Decision
+
+- **The host must be named.** `conform` needs `--relay-host`, one host; `PODSSH_RELAY` and the default
+  list are not read for it. Step 6 then holds by construction: the default relay is checked only when a
+  person names it. Lost: refusing the default host by its name (a list that changes), and taking
+  `PODSSH_RELAY` (a variable that a script sets is no person's choice).
+- **A token in a URL.** The check of the query string uses a token of one session (`POST
+  /v1/mint?once=1`, `"once": true`), then spends it in a header, so that no log keeps a token of
+  worth. A relay that mints none (the default relay) gets `skip`. Lost: a token of 72 h in the URL (a
+  credential in logs, against AGENTS.md section 4), and `fail` for each relay that takes `?token=`
+  (the contract allows it, so the default relay would fail a check of its own contract).
+- **The target with no `--target`.** The sessions of `?dial=lazy` that send no byte go to `--target`,
+  else to `github.com:22` (`ping::relay::REFERENCE`, which `rank` uses too); no byte is sent, so
+  nothing is dialed. The private target is `169.254.169.254:80`, the metadata address, link-local in
+  every policy. Lost: an address of a public party hardcoded here.
+- **The idle cut** is waited for when `/relays.json` publishes `idle_timeout_ms` of 300 s or less; it
+  runs on a quiet session beside the other checks, so that a run takes about the cut. Longer is `skip`.
+  Lost: a flag to wait for any cut (a run of 3 min against the default relay is fine; hours are not).
+- **The stand-in's faults.** `scripts/fake-relay.py` gets the modes `wrongclose` (a Close before the
+  dial answered 1011, in `fake_lazy.py`) and `querytoken` (`scripts/fake_conform.py`); its diagnostics
+  moved to `scripts/fake_diag.py` to keep it under 500 lines, and it refuses a link-local target in
+  each mode, so that the check of a private target never makes the stand-in dial the metadata address.
+- **Extensions** come from the relay's offers: `ext.renew` (`/v1/renew/`, 404 or 405 is `skip`),
+  `ext.halt` (`reverse.halt` of `/relays.json` or `halt` of the `hello`), `ext.liveness` (T-712, open:
+  read from the `hello`, always `skip` until its contract is written) and `ext.layer` (`forward` of
+  `/relays.json`, `skip`: the layer's own tests check it). Nothing of this belongs in podcrates: the
+  command uses `pod-ws` and `pod-relay`'s public calls only (Rule Q3).
+
 ## Prove
 
 ```sh
@@ -5388,6 +5416,41 @@ cargo test -p podssh-cli --test relay_conform
 New test: the command against podssh's own role (in-process) passes each check; against a stand-in relay
 with a planted fault (a wrong close code, a token that works in a query string) it fails that check and
 exits 1.
+
+## Correction
+
+- The role sends no keepalive and keeps no idle cut on a session of `?dial=lazy` before its dial
+  (`crates/podssh-relay/src/serve/forward.rs`, `first_then_dial`): it only reads the client's frames. So
+  the keepalive and the idle cut (Approach step 2) are checked on a session that the relay dialed, to
+  `--target`, and are a `skip` with no `--target`.
+- `?token=` is in the contract ("Tokens": the query and `/t/<token>/` forms are for clients that cannot
+  set headers), and podssh's role takes the header alone on `/connect/` (`serve/forward.rs`). The check
+  of a token in the query string (the Prove's plant) is podssh's rule against credentials in URLs; see
+  the Decision.
+- The private target goes with no `--target` too: it takes a token alone and dials nothing.
+
+## Done
+
+Done, 2026-11-17. The draft The code: `crates/podssh-cli/src/relay_conform.rs` (the report, the
+exit, the plan), `relay_conform_forward.rs` (documents, mint, upgrades, lazy, Ping, Closes, private
+target, target bytes), `relay_conform_quiet.rs` (keepalive, idle cut), `relay_conform_reverse.rs` (the
+pair, node, operator, status, wrong stop token, extensions, stop); `relay_cmd.rs` (the verb, `--reverse`,
+`--target` and `--json` with it), the flag rows (`flags/relay.rs`), the positional help, the manual
+(`man/notes_relay.rs`, the exit row of `man/data.rs`), `docs/cli.md`, `docs/relay.md`
+("Diagnostics"); the stand-in's modes. Tests: `crates/podssh-cli/tests/relay_conform.rs` (the role
+passes each check; `wrongclose` and `querytoken` fail theirs with exit 1 where the stand-in that
+behaves does not; usage 64; a host that does not answer 69), and unit tests in the three modules.
+
+Merged and run the same day: `cargo test -p podssh-cli --test relay_conform` 6 passed (the role passes each check;
+the stand-in's `wrongclose` and `querytoken` each fail their check, exit 1); `--lib` 1207 passed; `cargo test -p
+podssh-cli` whole 2379 passed, 0 failed (the stand-in relay's scripts changed with it); the manual's tests, clippy (the
+gate's lints) and rustfmt clean. Live, against the default relay `tcp.ssh.relay.ajam.dev`: the run found two checks
+stricter than the contract, both repaired. `private-target` wanted `403`, where the default relay refuses a blocked
+range with `400` before any dial (`TODO/roads.md:8528` knew it): either refusal passes now, a `502` fails. And
+`ext.renew` failed on the default relay's `400` that lists its reverse paths, where `pod-relay`'s `renew` reads only
+`404` and `405` as no renewal: the check reads that `400` as "no renewal" (podcrates asked to read it the same in
+`renew`, COORD-098). Then `podssh relay conform --relay-host tcp.ssh.relay.ajam.dev --reverse --target github.com:22`:
+22 passed, 0 failed, 5 skipped (a token of one session, renewal, halt, liveness and the layer, none offered), exit 0.
 
 # T-721: An exit on the reverse road that a Worker calls, with fixed denies and counters
 
@@ -5745,7 +5808,7 @@ belongs in `pod-tls`, not in a road.
   podssh took (`TODO/PROGRESS.md`, state item 7), whose work is done in PodUtils/podcrates (Rule
   Q3, `docs/decisions.md`).
 - The role takes its certificate from `--cert` and `--key` or from ACME
-  (`crates/podssh-cli/src/flags/relay.rs:54-59`), proven by TLS-ALPN-01 on the listener
+  (`crates/podssh-cli/src/flags/relay.rs:57-62`), proven by TLS-ALPN-01 on the listener
   (`crates/podssh-relay/src/serve/listener.rs:76`).
 - A published name's key is the node's, never the role's
   (`crates/podssh-relay/src/serve/published.rs:5-8`), as DELEG-1 asks.
@@ -5930,7 +5993,7 @@ and that a name whose node is gone fail closed.
 ## Premise
 
 - `--acme NAME` gives one name from a public CA, renewed in the role; `--cert FILE` takes any chain
-  (`crates/podssh-cli/src/flags/relay.rs:54-59`), with no check of a wildcard.
+  (`crates/podssh-cli/src/flags/relay.rs:57-62`), with no check of a wildcard.
 - A published name is refused with a wildcard (`crates/podssh-relay/src/serve/published.rs:67`).
 - CERT-2 holds for a published name: a pair that ended, or none of that name, closes the
   connection, and no TLS of the role answers for it

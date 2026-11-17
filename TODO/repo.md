@@ -7001,3 +7001,43 @@ signature of `SHA256SUMS` where `cosign` is on the host and the run is not offli
 `target/debug/podssh` as the x86_64 asset: stamped, bundled, then under `dash`, `bash --posix` and `sh` a first
 `--offline` install (exit 0, the self-check ok) and a second that said "already installed" (exit 0). UNVERIFIED: the
 installer of a published release, with its signature checked, which the next beta gives.
+
+
+# T-802: Dependabot's updates of 2026-11-17: the minor and patch group, and rsa 0.10
+
+**Source:** Dependabot's PodUtils/podssh#292 (rustls-pki-types 1.16.0, webpki-roots, cc) and #293 (rsa 0.9.10 to
+0.10.0), 2026-11-17; `docs/decisions.md`, "Dependabot's updates reach `main` through a session".
+**Category:** chore
+**Milestone:** none
+**Priority:** P2
+**Effort:** S
+**Status:** open
+
+## Problem
+
+Two updates wait. rustls-pki-types 1.16.0 changes behaviour: a `DnsName` whose last label is a hex number
+(`0x7f000001`) is refused, and a trailing dot is taken off; podssh names relay hosts and targets through it. rsa 0.10
+renames its types (`RsaPrivateKey` is `PrivateKey`) and is the version that russh 0.65.2 already takes, so podssh's own
+use of 0.9 keeps a second copy in the tree.
+
+## Premise
+
+- #292 changes `Cargo.lock` alone; #293 changes the root `Cargo.toml`'s `rsa = { version = "0.9", ... }` and the lock.
+- podssh's own use of the crate `rsa` is in `podssh-ws` (`crates/podssh-ssh/tests/no_rsa_private_op.rs` names
+  `podssh-ws/src/crypto/rsa_sig.rs` for it).
+
+## Approach
+
+1. Each update applied on `main` (`cargo update` of the three crates; the root's `rsa` to 0.10 and its code moved to
+   the new names), with the tests of each crate that reads a name or an RSA key.
+2. A name with a trailing dot, and one whose last label is hex, each through podssh's own path to a relay host: the
+   result as podssh means it (the dot taken; the hex refused with podssh's words), with a test where it changes.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli
+```
+
+`cargo tree -i rsa` names one version.

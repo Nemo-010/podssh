@@ -1222,7 +1222,7 @@ Lifted on 2026-11-02 by Q63: see below.
 
 The Premise is stale in one sentence: the stand-in serves more than "the forward path,
 `/v1/mint` and `/health` only". At `scripts/fake-relay.py:167-171` it also serves `/relays.json`
-and `/trace`, and `scripts/fake-relay.py:153` hands the whole reverse road to
+and `/trace`, and `scripts/fake-relay.py:162` hands the whole reverse road to
 `scripts/fake_reverse.py`, which is as strict as the live relay for an id that it forgot, and
 tells a frame in flight apart (`scripts/fake_reverse.py:293-305`). The rest holds; the ruling of
 2026-10-08 that it cites is changed.
