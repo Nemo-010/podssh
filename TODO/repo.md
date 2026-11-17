@@ -5941,6 +5941,13 @@ pipe_iroh --test pipe_iroh_record --test pinggy_road --test opentunnel_road --te
 passed; rustfmt; podcrates' `check-consumer-toolchains.py` and `check-consumer-tests.py` passed. The static musl
 binary with the feature is the gate's `release` job.
 
+2026-11-17, podcrates `v0.66.0` (`b3171179`, COORD-126, PodUtils/podcrates#216): no public API changed; for podssh,
+`pod-devtunnel`'s management of tunnels (list, create, delete, add a port; the next steps of T-378). A bump of the
+tag: each dependency and `issue-sync.yml` name `v0.66.0`; `get-core.sh` keeps its pins (`core.sh` did not change).
+`cargo clippy -p podssh-cli -p podssh-relay -p podssh-ws -p podssh-ssh --all-targets` with the gate's lints clean;
+`cargo test -p podssh-cli -p podssh-relay -p podssh-ws --lib` 1212, 399 and 81 passed; `--features devtunnel --lib
+devtunnel` 3 passed.
+
 Next: `pod-cloudflare` and `pod-ts` as podcrates names them, then `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
 
