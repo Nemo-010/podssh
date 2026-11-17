@@ -302,9 +302,10 @@
 294 issue closed
 295 issue closed
 296 issue open
-297 issue open
-298 issue open
+297 issue closed
+298 issue closed
 299 issue closed
-300 issue open
+300 issue closed
 301 pull open
-302 issue open
+302 issue closed
+303 issue open
