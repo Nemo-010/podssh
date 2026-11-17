@@ -167,7 +167,7 @@ access is by an allowlist of keys or a relay token (`docs/design.md:1431-1432`).
 Read in the reports, not verified here: iroh-ssh warns when a server's key is
 ephemeral (`rustonbsd/iroh-ssh:src/ssh.rs`); zuko hands over a ticket out of
 band (`adonm/zuko:docs/protocol.md`). Read: `podssh ts` keeps its node key in
-the file that `--ts-state` names (`crates/podssh-cli/src/flags.rs:375-376`,
+the file that `--ts-state` names (`crates/podssh-cli/src/flags.rs:378-379`,
 `crates/podssh-cli/src/ts.rs:182`). Credentials never go on argv
 (`AGENTS.md`, section 4).
 
@@ -10637,6 +10637,16 @@ not named gets none, and a road in cleartext none. A 401 or 403 of `ConnectError
 headers for each host, caught); `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3619 passed, 0 failed. Still waits: `--access-host` on `ssh`, `node` and `operator`, `Headers::in_cleartext`
 for `cf://` and `pipe --access-host` on `ws:`, a stand-in of the relay's road that demands the headers, and the live
 step with a Cloudflare account.
+
+2026-11-17, later: `podssh ssh --access-host HOST[,...]` (repeatable), in the place of `AccessHost` of the settings:
+`access::take_flags` sets the hosts of the process before any road, and refuses a host named with no credential (78,
+the variables named). The process's hosts can be set again (`podssh_ws::access::set_process`, a lock in the place of a
+cell set once), so the flag wins over the settings. `podssh-ws --lib access` 6 passed, among them
+`the_way_of_the_process_carries_the_hosts_that_were_set` (`client::way` gives a named host the headers, another host
+none, and none once unset; planted, the way without the process's headers, caught); `podssh ssh --access-host
+edge.example me@host true` with no credential exits 78 with its words. Still waits: the flag on `node` and `operator`
+(their own arguments), `Headers::in_cleartext` for `cf://` and `pipe --access-host` on `ws:`, a stand-in of the relay's
+road that demands the headers, and the live step with a Cloudflare account.
 
 
 # T-727: SSH login with a short-lived Access certificate over `cf://`

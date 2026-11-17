@@ -151,6 +151,18 @@ pub fn install() {
     }
 }
 
+/// The hosts of `--access-host` of a command whose roads are pod-ws's
+/// (`ssh`, T-718), with their credentials, in the place of the settings';
+/// none given changes nothing. A host named with no credential is refused
+/// (78), as nothing would go to it.
+pub fn take_flags(flags: &[String]) -> Result<(), Refusal> {
+    if flags.is_empty() {
+        return Ok(());
+    }
+    podssh_ws::access::set_process(named(flags)?);
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

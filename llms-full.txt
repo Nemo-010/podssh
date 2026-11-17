@@ -2001,6 +2001,10 @@ podssh ssh
     --take
         with --attach NAME: take the shell from the client that has it, whose
         session ends.
+    --access-host HOST
+        the relay's roads to HOST carry the credentials of Cloudflare Access in
+        their headers, in the place of AccessHost of the settings; HOST[,...],
+        repeatable; no other host gets them.
     --expect TEXT
         with a pty: wait for TEXT in the output, then send the --send after it;
         repeatable, the rules in order.

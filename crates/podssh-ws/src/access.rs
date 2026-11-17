@@ -65,18 +65,22 @@ impl Named {
 /// The hosts and credentials of this process, which [`client::way`] gives
 /// each road that pod-ws builds (pod-ws's `Headers`, podcrates `v0.68.0`):
 /// none until the command line sets them.
-static PROCESS: std::sync::OnceLock<Named> = std::sync::OnceLock::new();
+static PROCESS: std::sync::Mutex<Option<&'static Named>> = std::sync::Mutex::new(None);
 
-/// Set the hosts and credentials of this process, once; `false` when they
-/// were set before.
-pub fn set_process(named: Named) -> bool {
-    PROCESS.set(named).is_ok()
+/// Set the hosts and credentials of this process: the settings' at the
+/// start, then a command line's flags in their place. Each is kept for
+/// the process's life (at most a few), as each road built before still
+/// reads the one it took.
+pub fn set_process(named: Named) {
+    let named: &'static Named = Box::leak(Box::new(named));
+    *PROCESS.lock().unwrap_or_else(|e| e.into_inner()) = Some(named);
 }
 
 /// The headers of each road of this process: the credentials for a host
 /// that the user named, and nothing for any other host.
 pub fn process_headers() -> pod_ws::Headers {
-    match PROCESS.get().filter(|named| !named.hosts.is_empty() && !is_empty(&named.access)) {
+    let named = *PROCESS.lock().unwrap_or_else(|e| e.into_inner());
+    match named.filter(|named| !named.hosts.is_empty() && !is_empty(&named.access)) {
         Some(named) => headers_of(named),
         None => pod_ws::Headers::default(),
     }
@@ -237,6 +241,19 @@ mod tests {
         let other = format!("{:?}", headers.for_host("relay.example").unwrap());
         assert!(!other.contains(CLIENT_ID), "{other}");
         assert!(format!("{:?}", headers.for_cleartext("edge.example").unwrap()).ends_with("([])"), "TLS alone");
+    }
+
+    /// The one test that sets the process's hosts: each way that
+    /// `client::way` builds then gives the named host the headers alone.
+    #[test]
+    fn the_way_of_the_process_carries_the_hosts_that_were_set() {
+        set_process(Named::new(["edge.example".to_string()], service("id", "s")));
+        let way = crate::client::way(&ProxyChoice::Direct);
+        assert!(format!("{:?}", way.extra("edge.example").unwrap()).contains(CLIENT_ID));
+        assert!(!format!("{:?}", way.extra("relay.example").unwrap()).contains(CLIENT_ID));
+        set_process(Named::default());
+        let way = crate::client::way(&ProxyChoice::Direct);
+        assert!(!format!("{:?}", way.extra("edge.example").unwrap()).contains(CLIENT_ID), "none set, none sent");
     }
 
     #[test]

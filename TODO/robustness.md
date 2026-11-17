@@ -1701,7 +1701,7 @@ Read at `2042200`:
 - podssh writes text with no level past its own process: `crates/podssh-ssh/src/line.rs:22-24` writes a
   line to stderr, and `crates/podssh-ssh/src/log.rs:32-37` holds a level and stderr or a file; the
   level stops in the process.
-- `crates/podssh-cli/src/flags.rs:291` says "podssh does not write to syslog", for `-y`.
+- `crates/podssh-cli/src/flags.rs:294` says "podssh does not write to syslog", for `-y`.
 - The unit that the install writes restarts the node (`crates/podssh-cli/src/node_install/text.rs:162`)
   and stops on 64 and 78 (`crates/podssh-cli/src/node_install/text.rs:164` says
   "RestartPreventExitStatus=64 78"): a fault of the journal must never become one of those.

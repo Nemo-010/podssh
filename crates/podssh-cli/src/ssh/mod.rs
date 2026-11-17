@@ -107,6 +107,10 @@ pub fn run_ssh(args: &SshArgs, tty: Tty, err: &mut dyn Write) -> i32 {
     if let Some(code) = crate::node_install::ssh::first(args, err) {
         return code;
     }
+    // The hosts of Cloudflare Access on the relay's roads (T-718).
+    if let Err(refusal) = crate::access::take_flags(&args.access_hosts) {
+        return refusal.report("ssh", err);
+    }
     let (started, start_ms) = (std::time::Instant::now(), crate::pairs::now_ms());
     if args.result_file.as_deref() == Some("-") {
         let _ = writeln!(err, "podssh ssh: --result-file -: stdout carries the command's output; name a file");

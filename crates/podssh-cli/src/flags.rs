@@ -215,6 +215,9 @@ pub const SSH_FLAGS: &[FlagRow] = &[
     row(None, "persist-forever", None, FlagKind::Supported,
         "with --persist: connect again after each loss, and after a first connection that failed, with no limit of attempts or of time", None),
     node::SSH_INSTALL, node::SSH_UNINSTALL, node::SSH_ENV_FILE, attach::ATTACH, attach::TAKE,
+    // The hosts that get the headers of Cloudflare Access on the relay's roads (T-718).
+    row(None, "access-host", Some("HOST"), FlagKind::Supported,
+        "the relay's roads to HOST carry the credentials of Cloudflare Access in their headers, in the place of AccessHost of the settings; HOST[,...], repeatable; no other host gets them", None),
     expect::EXPECT, expect::SEND, expect::EXPECT_TIMEOUT,
     row(None, "upgrade", None, FlagKind::Supported,
         "log in, then move the session to a temporary node that the server's podssh starts, which resumes after a lost link; with no podssh there, the session stays", None),
