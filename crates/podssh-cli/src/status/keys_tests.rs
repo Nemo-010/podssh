@@ -168,3 +168,76 @@ fn the_net_owner_is_found_by_its_pub_file() {
     let _ = std::fs::remove_dir_all(&dir);
     let _ = std::fs::remove_dir_all(&home);
 }
+
+/// A P-256 key of p256 that signs rcgen's certificate, as WARP's device key
+/// is one.
+struct DeviceKey {
+    signing: p256::ecdsa::SigningKey,
+    point: Vec<u8>,
+}
+
+impl rcgen::PublicKeyData for DeviceKey {
+    fn der_bytes(&self) -> &[u8] {
+        &self.point
+    }
+
+    fn algorithm(&self) -> &'static rcgen::SignatureAlgorithm {
+        &rcgen::PKCS_ECDSA_P256_SHA256
+    }
+}
+
+impl rcgen::SigningKey for DeviceKey {
+    fn sign(&self, message: &[u8]) -> Result<Vec<u8>, rcgen::Error> {
+        use p256::ecdsa::signature::Signer;
+        let signature: p256::ecdsa::Signature = self.signing.sign(message);
+        Ok(signature.to_der().as_bytes().to_vec())
+    }
+}
+
+fn pem_of(label: &str, der: &[u8]) -> String {
+    let text = base64::engine::general_purpose::STANDARD.encode(der);
+    let lines: Vec<&str> = text.as_bytes().chunks(64).map(|c| std::str::from_utf8(c).unwrap()).collect();
+    format!("-----BEGIN {label}-----\n{}\n-----END {label}-----\n", lines.join("\n"))
+}
+
+/// A WARP record of pod-warp's form (`store.rs`: `device`, `cert_pem`,
+/// `key_pem`) whose certificate is a real one of a P-256 key: its row
+/// is the key's SubjectPublicKeyInfo, which P-256's fixed head and the point
+/// make apart from the certificate's parser, and its SHA-256; neither the
+/// private key nor the token is shown.
+#[test]
+fn a_warp_record_shows_its_certificate_s_public_key() {
+    use base64::Engine as _;
+    use p256::elliptic_curve::Generate;
+    let signing = p256::ecdsa::SigningKey::generate();
+    let point = signing.verifying_key().to_sec1_point(false).as_bytes().to_vec();
+    let key = DeviceKey { signing, point };
+    let mut params = rcgen::CertificateParams::new(Vec::<String>::new()).unwrap();
+    params.serial_number = Some(rcgen::SerialNumber::from_slice(&[1, 2, 3, 4]));
+    let cert = params.self_signed(&key).unwrap();
+    let private_body = base64::engine::general_purpose::STANDARD.encode(key.signing.to_bytes().as_slice());
+    let record = serde_json::json!({
+        "key_pem": pem_of("PRIVATE KEY", key.signing.to_bytes().as_slice()),
+        "cert_pem": pem_of("CERTIFICATE", cert.der()),
+        "device": { "id": "a-device-of-the-test", "token": "PLANTED-TOKEN-OF-THE-TEST" },
+    });
+    let dir = scratch("warp-real");
+    private(&dir.join(crate::ssh::cloud::warp::DEVICE_FILE), &record.to_string());
+    let rows = super::rows(&dirs(&dir, None), None);
+    let _ = std::fs::remove_dir_all(&dir);
+    let w = role(&rows, "warp");
+    assert_eq!(w[0]["state"], "present", "{rows:?}");
+    let mut spki = hex_bytes("3059301306072a8648ce3d020106082a8648ce3d030107034200");
+    spki.extend_from_slice(&key.point);
+    let engine = &base64::engine::general_purpose::STANDARD;
+    assert_eq!(w[0]["public"].as_str(), Some(engine.encode(&spki).as_str()), "{rows:?}");
+    let digest = sha2::Sha256::digest(&spki);
+    let fingerprint = format!("SHA256:{}", base64::engine::general_purpose::STANDARD_NO_PAD.encode(digest));
+    assert_eq!(w[0]["fingerprint"].as_str(), Some(fingerprint.as_str()));
+    let text = Value::Array(rows).to_string();
+    assert!(!text.contains(&private_body) && !text.contains("PLANTED-TOKEN"), "{text}");
+}
+
+fn hex_bytes(hex: &str) -> Vec<u8> {
+    hex.as_bytes().chunks(2).map(|p| u8::from_str_radix(std::str::from_utf8(p).unwrap(), 16).unwrap()).collect()
+}

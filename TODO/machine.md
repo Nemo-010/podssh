@@ -1920,7 +1920,7 @@ unchanged, and no line goes to stderr.
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -2021,6 +2021,14 @@ Partial, 2026-11-16 (drafted on `draft-t716`; not built).
   `load` in `identity_row` alone changes nothing, as a row has a path only for a file that is there.
 - Not tested: a WARP record with a real certificate (it needs `--features warp` to make one); so the entry stays
   partial for that row.
+
+- 2026-11-17: the WARP row with a real certificate. `a_warp_record_shows_its_certificate_s_public_key`
+  (`status/keys_tests.rs`) writes a record of pod-warp's form (`device`, `cert_pem`, `key_pem`, as
+  `PodUtils/podcrates:crates/pod-warp/src/store.rs` writes it) with a certificate that rcgen made and a P-256 key of p256
+  signed, with no `--features warp` needed. The row's public key equals the SubjectPublicKeyInfo built apart from the
+  parser (P-256's fixed head, then the point), and its fingerprint is that key's SHA-256; neither the private key nor
+  the device's token is in the output. `cargo test -p podssh-cli --lib status::`: 9 passed. Planted, the row showing the
+  bare point in place of the SubjectPublicKeyInfo: caught.
 
 # T-726: A local forward as a service, and the measured rate of the relay role
 
