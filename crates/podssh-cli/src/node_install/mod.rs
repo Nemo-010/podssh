@@ -30,6 +30,7 @@ mod env;
 #[cfg(unix)]
 mod launchd;
 pub(crate) mod lock;
+pub(crate) mod pipe;
 pub(crate) mod print;
 pub(crate) mod ssh;
 pub(crate) mod system;
@@ -59,6 +60,8 @@ pub(crate) enum Kind {
     Ssh,
     /// `podssh serve NAME`, whose unit is printed alone (`--print-unit`).
     Serve,
+    /// `podssh pipe --install NAME A B` (T-726).
+    Pipe,
 }
 
 impl Kind {
@@ -67,6 +70,7 @@ impl Kind {
             Kind::Node => "node",
             Kind::Ssh => "ssh",
             Kind::Serve => "serve",
+            Kind::Pipe => "pipe",
         }
     }
 
@@ -76,6 +80,7 @@ impl Kind {
             Kind::Node => format!("node {name} --install"),
             Kind::Ssh => format!("ssh --install {name}"),
             Kind::Serve => format!("serve {name} --print-unit"),
+            Kind::Pipe => format!("pipe --install {name}"),
         }
     }
 
@@ -87,6 +92,7 @@ impl Kind {
             // serve's unit is printed, never installed: no word of podssh
             // removes it, and [`Kind::removal`] names systemctl's.
             Kind::Serve => format!("serve {name} --print-unit"),
+            Kind::Pipe => format!("pipe --uninstall {name}"),
         }
     }
 

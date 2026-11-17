@@ -53,7 +53,7 @@ pub(crate) fn first(args: &SshArgs, err: &mut dyn Write) -> Option<i32> {
 }
 
 /// NAME as the name of a service: as a pair's label, which names files.
-fn checked(name: &str, flag: &str) -> Result<(), Refusal> {
+pub(super) fn checked(name: &str, flag: &str) -> Result<(), Refusal> {
     podssh_ws::names::check_node_name(name).map_err(|_| {
         Refusal::usage(format!(
             "{flag} {name:?}: a name of letters, digits, '.', '-' and '_', 128 at most, that starts with neither \

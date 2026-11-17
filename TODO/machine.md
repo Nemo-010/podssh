@@ -674,7 +674,7 @@ stdin and stdout gives typed tools, with no shell quoting.
 
 Measured: `podssh mcp` exits 64 (unknown subcommand).
 
-Read: a prompt goes to the controlling terminal or to `SSH_ASKPASS` (`docs/cli.md:6546-6576`),
+Read: a prompt goes to the controlling terminal or to `SSH_ASKPASS` (`docs/cli.md:6558-6588`),
 and the terminal of an agent can be the user's own. The session output goes straight to the
 process's stdout (`crates/podssh-ssh/src/io/msg.rs:78-95`), which an MCP server over stdio uses for
 its protocol. podssh never listens (`docs/architecture.md:284-301`), and stdio needs no listener.
@@ -2086,11 +2086,23 @@ down and 43.2 up; 16 at once 85.4 MiB/s in all; cold connects 191 ms p50; 40.9 c
 peak memory. The debug build gave 4.7 and 5.2 MiB/s for one session. `python3 scripts/relay-measure.py --self-test`
 passes.
 
-Next: the runner's run (`relay-measure.yml` with `role: yes`), its row in `docs/STATUS.md`; then part 2, `podssh pipe
---install NAME` and `--print-unit` on `node_install/` (a `Kind` of its own beside `Ssh`), with the test that greps a
-unit for a credential and its plant.
+Part 2, 2026-11-17: `podssh pipe --install NAME A B`, `--uninstall NAME` and `--env-file FILE`
+(`crates/podssh-cli/src/node_install/pipe.rs`, new, and `Kind::Pipe` of `node_install`; the flag rows of
+`flags/pipe.rs`; `run_pipe` takes them first). The service runs the typed words but `--install NAME`, after `-o
+BatchMode=yes`, `--env-file` and `--keep-listening` where a side listens. A side of `stdio` or `fd:` is refused; so
+is a URL with a user and a password. A defect found and repaired: `pipe`'s own refusal of such a `ws://` or `wss://`
+URL said the URL whole, the password on stderr; it now shows the user part as `<not shown>` (`pipe/web.rs`,
+`masked_user`). `docs/cli.md` says it ("A pipe as a service").
 
+Prove, 2026-11-17: `cargo test -p podssh-cli --lib -- node_install:: man:: pipe::` 143 passed, among them the three of
+`node_install/pipe_tests.rs` (the words, the refused sides and a credential, a unit with no credential on its
+`ExecStart`) and the masked URL of `pipe::web`. `podssh pipe --install x stdio tcp:127.0.0.1:1`, a name with a
+space, and `--install` with `--uninstall` each exit 64 with their words. Clippy (the gate's lints) and rustfmt clean.
+Planted: the URL's user part left unmasked fails
+`pipe::web::tests::a_websocket_is_its_url_and_ws_listen_a_port_or_a_socket`.
 
+What waits: the runner's run of the rate (`relay-measure.yml` with `role: yes`), its row in `docs/STATUS.md`; and
+`pod-unit` of podcrates T-102, to which the unit code moves at its take (the Start condition).
 # T-730: `llms.txt`, `llms-full.txt` and `--help --json`
 
 **Source:** PodUtils/podcrates#35, cfb's ask A-X-19 (COORD-014, PodUtils/podcrates#38)

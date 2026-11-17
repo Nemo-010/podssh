@@ -4001,6 +4001,18 @@ podssh pipe
     --grant FILE
         node:: a grant used once, as operator --grant takes it, for the first
         session of the side alone.
+    --install NAME
+        make this pipe a service of this user named NAME, which starts it again
+        whenever it ends: the ways of podssh node --install, with these words
+        but --install NAME. A side of stdio or fd: is refused, and so is a URL
+        with a user and a password.
+    --uninstall NAME
+        remove the service that --install NAME made, its file of variables and
+        its lock, and nothing else.
+    --env-file FILE
+        read the variables of FILE, a private file of NAME=VALUE lines, before
+        anything else; hold FILE.lock while it runs, so that a second start
+        ends at once: the file that --install writes.
     --help
         Print help for this subcommand and exit.
 

@@ -2994,7 +2994,7 @@ without a user manager gets a cron line. The unit has no hardening.
 ## Premise
 
 - Read: the ways are a user unit, a LaunchAgent, cron and a Windows task
-  (`crates/podssh-cli/src/node_install/mod.rs:151-160`); the probe is `systemctl --user show-environment`
+  (`crates/podssh-cli/src/node_install/mod.rs:157-166`); the probe is `systemctl --user show-environment`
   (`crates/podssh-cli/src/node_install/unix.rs:19-27`); the units go to `~/.config/systemd/user`
   (`unix.rs:29-36`).
 - Read: the unit has `Restart=always` and no `User=`, `NoNewPrivileges` or `ProtectSystem`

@@ -39,8 +39,19 @@ pub(super) fn listening_at(kind: &str, rest: &str) -> Result<Address, Refusal> {
 /// The form `wss:HOST:PORT/PATH` is refused with the URL's; a line shows the
 /// address without its query, which may hold a secret.
 pub fn ws_url(text: &str) -> Result<Address, Refusal> {
-    let shown = text.split(['?', '#']).next().unwrap_or_default();
+    let shown = masked_user(text.split(['?', '#']).next().unwrap_or_default());
     podssh_ws::url::WsUrl::parse(text).map(Address::Ws).map_err(|why| Refusal::usage(format!("{shown}: {why}")))
+}
+
+/// `url` with its user part, which can hold a password, as `<not shown>`:
+/// a refusal of such a URL says why without the credential (T-726).
+fn masked_user(url: &str) -> String {
+    let Some((scheme, rest)) = url.split_once("://") else { return url.to_string() };
+    let end = rest.find(['/', '?', '#']).unwrap_or(rest.len());
+    match rest[..end].rfind('@') {
+        Some(at) => format!("{scheme}://<not shown>@{}", &rest[at + 1..]),
+        None => url.to_string(),
+    }
 }
 
 /// `ws-listen:[ADDR:]PORT`, or `ws-listen:PATH` for a socket.
@@ -262,6 +273,9 @@ mod tests {
 
     #[test]
     fn a_websocket_is_its_url_and_ws_listen_a_port_or_a_socket() {
+        let refused = address::parse("wss://me:pw-of-this-test@example.org/x").expect_err("a user in the URL");
+        assert!(!refused.message.contains("pw-of-this-test"), "{}", refused.message);
+        assert!(refused.message.starts_with("wss://<not shown>@example.org/x: "), "{}", refused.message);
         let Address::Ws(url) = address::parse("wss://example.org/socket?k=v").unwrap() else { panic!("not ws") };
         assert_eq!((url.tls, url.port, url.target.as_str()), (true, 443, "/socket?k=v"));
         let refusal = address::parse("wss:example.org:443/socket?token=SECRET").unwrap_err();

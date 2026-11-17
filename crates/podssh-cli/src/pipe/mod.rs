@@ -67,6 +67,10 @@ pub struct PipeArgs {
 
 /// Run the verb; returns the process exit code.
 pub fn run_pipe(args: &PipeArgs, err: &mut dyn Write) -> i32 {
+    // --env-file, --install and --uninstall first (T-726).
+    if let Some(code) = crate::node_install::pipe::first(args, err) {
+        return code;
+    }
     if args.ssh.verbose > 0 {
         pump::say_ends();
     }

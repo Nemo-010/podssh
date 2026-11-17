@@ -3959,6 +3959,18 @@ commands. The rules behind them:
   keeps a service down, as a file of a pid can. A file system that takes
   no lock is said, and the run goes on without one: a service that does
   not start is worse than two.
+- **A pipe as a service (T-726).** `podssh pipe --install NAME A B` makes
+  the same service of a pipe (`podssh-pipe-NAME.service`,
+  `dev.podssh.pipe.NAME`, the crontab's lines, or the task
+  `podssh-pipe-NAME`), for a local forward (`tcp-listen:PORT` to a road) or
+  a gateway that outlives the shell. It runs the words that the user typed
+  but `--install NAME`, in the directory where they were typed; after the
+  verb come `-o BatchMode=yes`, `--env-file` with `pipe-NAME.env`, and
+  `--keep-listening` where a side listens and the words lack it. A side of
+  `stdio` or `fd:` is refused (a service has neither), and so is a URL with
+  a user and a password, which would sit in the unit's command line; the
+  refusal of such a URL shows its user part as `<not shown>`. `--uninstall
+  NAME` and `--env-file FILE` are as for `ssh`.
 - **A tunnel of `podssh ssh` as a service (T-393).** `podssh ssh --install
   NAME -N -R ... --persist DEST` makes the same service of a reverse
   tunnel to a standard sshd (`podssh-ssh-NAME.service`,
