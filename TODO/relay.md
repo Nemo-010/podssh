@@ -5673,7 +5673,7 @@ bytes in a binding); the codecs refused no vector. `python3 -I scripts/check-wir
 gate's lints, with `pair,serve,grant` and with `serve,plain-ws,quick,quic`) clean; rustfmt applied. The draft's hand-moved
 citations were put back and moved by `cargo todo remap` instead.
 
-Step 4: the COORD issue to podcrates, opened from this text with the commit of the merge:
+Step 4: COORD-107 (#304), opened from this text with the commit of the merge, `04f141b`:
 
 > **COORD-NNN: the wire document of podssh, for T-120 (to podcrates)**
 >
