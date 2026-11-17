@@ -64,6 +64,8 @@ pub enum Parsed {
         roff: bool,
         /// `--json`: the tables as JSON.
         json: bool,
+        /// `--llms index|full`: `llms.txt` or `llms-full.txt` of the manual.
+        llms: Option<String>,
         refused: Vec<(String, &'static str, &'static str)>,
     },
     /// `podssh proxy`: the positionals and options the byte pipe needs.

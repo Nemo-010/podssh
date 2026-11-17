@@ -96,9 +96,12 @@ pub fn run_with(p: &Parsed, s: &mut Streams<'_>, tty: Tty) -> i32 {
         }
         // Refusals are read first, so a `Refused` row added to `MAN_FLAGS`
         // later refuses rather than being dropped.
-        Parsed::Man { section, no_pager, roff, json, refused } => {
+        Parsed::Man { section, no_pager, roff, json, llms, refused } => {
             if refusals("man", refused, s.err) {
                 return EXIT_USAGE;
+            }
+            if let Some(which) = llms {
+                return crate::man::llms::run(which, section.is_some() || *roff || *json, s.out, s.err);
             }
             let stdin = std::io::stdin();
             let mut keys = stdin.lock();

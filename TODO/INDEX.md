@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**759 entries: 41 open, 36 partial, 11 blocked, 671 done.**
+**759 entries: 40 open, 36 partial, 11 blocked, 672 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 2 | 8 | 3 | 81 | 94 |
 | P2 | 4 | 22 | 2 | 286 | 314 |
-| P3 | 35 | 6 | 6 | 303 | 350 |
-| **All** | 41 | 36 | 11 | 671 | 759 |
+| P3 | 34 | 6 | 6 | 304 | 350 |
+| **All** | 40 | 36 | 11 | 672 | 759 |
 
 ## Entries
 
@@ -760,7 +760,7 @@ repository and CI).
 | [T-727](roads.md) | P3 | M | backlog | feature | blocked | SSH login with a short-lived Access certificate over `cf://` |
 | [T-728](repo.md) | P1 | L | M10 | measurement | open | Windows (x86_64, aarch64) and macOS smoke tests of each operator command, and `ProxyCommand` with Windows OpenSSH |
 | [T-729](roads.md) | P1 | M | M10 | feature | blocked | The Access TCP client on `cf://`: the login of a user, on Windows, macOS and Linux |
-| [T-730](machine.md) | P3 | S | none | feature | open | `llms.txt`, `llms-full.txt` and `--help --json` |
+| [T-730](machine.md) | P3 | S | none | feature | done | `llms.txt`, `llms-full.txt` and `--help --json` |
 | [T-731](machine.md) | P3 | M | none | feature | done | `podssh mcp` for fleet work: a read-only mode and a command allowlist |
 | [T-732](relay.md) | P2 | S | M10 | defect | done | The relay role's byte cap let a fast target carry any amount past it, until the next tick |
 | [T-733](mesh.md) | P3 | L | M10 | feature | done | ZeroTier's TCP relay and an ad-hoc network as a last road of a podssh pair |

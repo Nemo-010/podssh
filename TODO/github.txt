@@ -272,7 +272,7 @@
 264 issue closed
 265 issue closed
 266 issue closed
-267 issue open
+267 issue closed
 268 issue open
 269 issue open
 270 issue closed

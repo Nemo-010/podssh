@@ -173,22 +173,42 @@ fn proxy_jsonl_is_the_specific_refusal() {
 #[test]
 fn man_carries_its_section_its_pager_choice_and_its_format() {
     let bare = parse(args(&["man"]));
-    assert_eq!(bare, Parsed::Man { section: None, no_pager: false, roff: false, json: false, refused: vec![] });
+    assert_eq!(
+        bare,
+        Parsed::Man { section: None, no_pager: false, roff: false, json: false, llms: None, refused: vec![] }
+    );
     assert!(!bare.needs_refusal(), "man has behaviour and must not refuse");
 
     let paged_off = parse(args(&["man", "--no-pager"]));
-    assert_eq!(paged_off, Parsed::Man { section: None, no_pager: true, roff: false, json: false, refused: vec![] });
+    assert_eq!(
+        paged_off,
+        Parsed::Man { section: None, no_pager: true, roff: false, json: false, llms: None, refused: vec![] }
+    );
 
     let section = parse(args(&["man", "ssh"]));
     assert_eq!(
         section,
-        Parsed::Man { section: Some("ssh".to_string()), no_pager: false, roff: false, json: false, refused: vec![] }
+        Parsed::Man {
+            section: Some("ssh".to_string()),
+            no_pager: false,
+            roff: false,
+            json: false,
+            llms: None,
+            refused: vec![]
+        }
     );
 
     let roff = parse(args(&["man", "--roff", "proxy"]));
     assert_eq!(
         roff,
-        Parsed::Man { section: Some("proxy".to_string()), no_pager: false, roff: true, json: false, refused: vec![] }
+        Parsed::Man {
+            section: Some("proxy".to_string()),
+            no_pager: false,
+            roff: true,
+            json: false,
+            llms: None,
+            refused: vec![]
+        }
     );
 
     // `podssh man --help` is still help, not a page: the flag is checked
@@ -233,8 +253,20 @@ fn the_top_level_help_drops_no_word() {
     assert_eq!(parse(args(&["--help", "ssh"])), Parsed::Help("ssh"));
     assert_eq!(parse(args(&["-h", "scp"])), Parsed::Help("scp"));
     assert_eq!(parse(args(&["--version"])), Parsed::Version);
+    // `--json` after `--help` is answered too: the manual's JSON (T-730).
+    let json = |section: Option<&str>| Parsed::Man {
+        section: section.map(str::to_string),
+        no_pager: true,
+        roff: false,
+        json: true,
+        llms: None,
+        refused: Vec::new(),
+    };
+    assert_eq!(parse(args(&["--help", "--json"])), json(None));
+    assert_eq!(parse(args(&["--help", "ssh", "--json"])), json(Some("ssh")));
+    assert_eq!(parse(args(&["ssh", "--help", "--json"])), json(Some("ssh")));
     let refused: [&[&str]; 5] = [
-        &["--help", "--json"],
+        &["--help", "--jsonl"],
         &["--help", "ssh", "extra"],
         &["--help", "--help"],
         &["--version", "--json"],

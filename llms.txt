@@ -1,0 +1,64 @@
+# podssh
+
+> no-privilege SSH over a WebSocket relay. Version 1.1.0-beta.3.
+
+podssh carries SSH, or another TCP stream, through a WebSocket relay on port 443. It is one static binary for hosts whose only way out is HTTPS, often through an HTTP CONNECT proxy. It needs no installed ssh, no root, no pty, no DNS and no user database entry.
+Answers go to stdout. Diagnostics go to stderr, so stdout can carry a protocol.
+A question (a host key, a password, a passphrase) goes to the controlling terminal or to SSH_ASKPASS. With neither, podssh refuses at once and names the remedy. When stdin, stdout and stderr are all redirected, a question on the terminal waits 60 s at most.
+With no command, podssh lists the commands on stderr and exits 64. It never takes a word as a host: podssh example.org prints the line to type, podssh ssh example.org.
+podssh COMMAND --help gives the section of one command, as podssh man COMMAND does. This manual is generated from the tables of this binary, so it describes this binary and no other version.
+
+Run `podssh man` for the manual, `podssh man --json` for the manual as JSON,
+and `podssh COMMAND --help --json` for one command as JSON.
+llms-full.txt has the manual and the documents in one file.
+
+## Commands
+
+- `podssh ssh`: the OpenSSH-compatible client, over the relay
+- `podssh each`: one command on many hosts at once: each line with its host, and the worst status as the exit
+- `podssh containers`: the containers of a host, of docker, podman or kubectl, each with the command that enters it
+- `podssh run`: copy a project to a host, only the files that changed, then run a command in it, with its exit status
+- `podssh job`: jobs on a host that outlive the connection, each in its tmux, and a queue of them: start, submit, list, log, wait, fetch, stop; an ID is the 8 hex digits that start or submit printed
+- `podssh proxy`: ProxyCommand form: a byte pipe, not an SSH client; node://NAME reaches a node, as operator NAME does
+- `podssh pipe`: join two byte streams, as socat does: stdio, fd:N, exec:CMD, with no listener unless one side is tcp-listen:, unix-listen:, http-listen: or ws-listen:
+- `podssh node`: reverse mode: expose a local service to operators
+- `podssh operator`: reverse mode, operator side: raw bytes to a named node
+- `podssh net`: your own nodes as one net: their names and keys, signed by your key, kept by each
+- `podssh exit`: a SOCKS5 and HTTP CONNECT proxy here, whose connections start at an exit node of your net
+- `podssh share`: a running node's local services by name, for its net: add, rm and ls, each reached as node://NODE/NAME
+- `podssh funnel`: a local HTTP service at a public https:// name, through a quick tunnel (TLS ends at Cloudflare's edge) or OpenTunnel (TLS ends here)
+- `podssh chat`: messages and files with another podssh, end to end encrypted
+- `podssh cp`: copy files to or from a remote host
+- `podssh scp`: copy files with the command line of OpenSSH's scp
+- `podssh sftp`: file commands on a host, from a batch or at a prompt, as OpenSSH's sftp
+- `podssh mv`: move files; across hosts this is a copy and a delete
+- `podssh edit`: edit a file of a host in an editor here; it goes back only when the host's file did not change meanwhile
+- `podssh man`: this manual: each command, flag, variable, file and exit code
+- `podssh relay`: the relay's hosts, pool and view of a target; the pairs of the reverse road; its document
+- `podssh status`: the state of this host as one line of JSON: relays, token, proxy, terminal, a host key
+- `podssh doctor`: what this host allows and whether the relay works: ok, FAIL or ???? per check
+- `podssh keygen`: make an SSH key pair, or print a key's public key or fingerprint
+- `podssh ts`: the tailnet node and byte pipe, over DERP (not in this build)
+- `podssh agent`: an SSH agent inside podssh, and add, list, remove and lock its keys
+- `podssh ping`: a short check of the path: each step to the relay, pings, and with a host the echo and throughput; with node://NAME, each of its roads and the one that answered first; with --nodes or --net, those of each node
+- `podssh health`: the far host's load, CPUs, memory, uptime, network, disks and processes, read over one exec
+- `podssh play`: play a recording of podssh ssh --record again, with its timing
+- `podssh config`: ssh_config blocks from the host list of another tool: import
+- `podssh mcp`: the commands as tools for an agent: a Model Context Protocol server on stdin and stdout
+- `podssh session`: a session that outlives each call, for an agent: start it, send keys, wait until the output stops, read the screen
+- `podssh serve`: an SSH server here: one connection on stdin and stdout, as sshd -i, or the node of a pair through the relay; with a host key kept and authorized keys
+- `podssh detached`: the runs that --detach and -f sent into the background, by their names: list them, the state of one, stop one
+- `podssh update`: this binary from the newest release, its signature and its sum checked first; only when asked
+
+## Documents
+
+- [README.md](https://github.com/PodUtils/podssh/blob/main/README.md): what podssh is, how to install it, and the first session
+- [SECURITY.md](https://github.com/PodUtils/podssh/blob/main/SECURITY.md): the security model and how to report a fault
+- [docs/target-environment.md](https://github.com/PodUtils/podssh/blob/main/docs/target-environment.md): the hosts that podssh is for: HTTPS alone, often through a proxy
+- [docs/relay.md](https://github.com/PodUtils/podssh/blob/main/docs/relay.md): the relay's contract, and podssh's relay role
+- [docs/mesh.md](https://github.com/PodUtils/podssh/blob/main/docs/mesh.md): the mesh of a user's own nodes
+- [docs/cli.md](https://github.com/PodUtils/podssh/blob/main/docs/cli.md): the command line, flag by flag, with the reasons
+
+## Manual
+
+- [llms-full.txt](llms-full.txt): the manual and the documents.

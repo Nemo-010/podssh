@@ -180,6 +180,9 @@ where
 /// `podssh --help` alone, or with one word that names a verb: that verb's
 /// help, as `podssh VERB --help` gives it. Any other word is refused.
 fn top_help(flag: &str, rest: &[std::ffi::OsString]) -> Parsed {
+    if let Some(json) = crate::help::json::of_top(&flag.into(), rest) {
+        return json;
+    }
     let mut words = rest.iter().map(|w| w.to_string_lossy().into_owned());
     let Some(word) = words.next() else { return Parsed::Help("") };
     let Some(verb) = crate::flags::verb_for(&word) else {
@@ -198,6 +201,9 @@ fn top_help(flag: &str, rest: &[std::ffi::OsString]) -> Parsed {
 /// **The per-verb half.** This is where `-P` means port on `cp` and a Tag
 /// on `ssh`, because the two verbs have different `clap` commands.
 pub fn parse_verb(verb: &'static Verb, rest: &[std::ffi::OsString]) -> Parsed {
+    if let Some(json) = crate::help::json::of_verb(verb.name, rest) {
+        return json;
+    }
     // `--jsonl` under `proxy` never reaches `clap`: it is refused here with
     // the reason, because the generic unknown-flag text cannot say why JSON
     // cannot go where the SSH byte stream goes. Exact spellings only — a
@@ -251,6 +257,7 @@ pub fn parse_verb(verb: &'static Verb, rest: &[std::ffi::OsString]) -> Parsed {
             no_pager: matches.get_flag("no-pager"),
             roff: matches.get_flag("roff"),
             json: matches.get_flag("json"),
+            llms: matches.get_one::<String>("llms").cloned(),
             refused,
         };
     }

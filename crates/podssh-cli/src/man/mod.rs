@@ -21,6 +21,7 @@
 pub mod data;
 pub mod examples;
 pub mod facts;
+pub mod llms;
 pub mod model;
 pub mod notes;
 // The manual as the model of pod-manual, whose writers make each form.

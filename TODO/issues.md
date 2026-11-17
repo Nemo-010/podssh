@@ -354,7 +354,7 @@ trufflehog images) and #292 and #293 (the minor and patch group, rsa 0.10) are T
 | #295 | COORD-099: pod-relay: a route of a node to a Unix socket, as a target kind of Route (to podcrates) | open 2026-11-17: until podcrates answers | T-714 |
 | #296 | COORD-100: podssh took podcrates v0.66.0 at ae9cf1b (to podcrates) | open 2026-11-17: until podcrates records the take | T-684 |
 | #297 | COORD-101: pod-tls: webpki-roots 1.0.12 with its ROOTS_VERSION, and rsa 0.10 (to podcrates) | open 2026-11-17: until podcrates answers | T-802 |
-| #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
+| #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | closed 2026-11-17: T-790 and T-730 done; podnet closed its COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |
 | #270 | COORD-083: a watcher of each repository's Actions runs, so that no session waits in the dark for a run (to all) | closed 2026-11-15: podcrates took its logic into the one watcher, PodUtils/podcrates:scripts/agent/watch.py (COORD-112, PodUtils/podcrates#186), and podssh dropped its own | T-684 |

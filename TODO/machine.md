@@ -44,7 +44,7 @@ failed (lines 156-168). The sections are "this host", "egress" and "relay" (line
 3. One model and two renderers, as `podssh man` has (`crates/podssh-cli/src/man/model.rs`).
 4. Add the row to `DOCTOR_FLAGS` (`crates/podssh-cli/src/flags/relay.rs:173-231`), read it into
    `Parsed::Doctor` (`crates/podssh-cli/src/tree.rs` lines 172-181 and 384-392 at `c6f09a8`), and pass it on in
-   `crates/podssh-cli/src/dispatch.rs:237-290`. `tree.rs` has 454 lines and `dispatch.rs` 448:
+   `crates/podssh-cli/src/dispatch.rs:240-293`. `tree.rs` has 454 lines and `dispatch.rs` 448:
    keep the additions small, or split first.
 5. The JSON carries the same detail strings as the text, which hide proxy credentials and
    tokens today (`crates/podssh-cli/tests/doctor.rs:142-167`).
@@ -146,8 +146,8 @@ manual do not keep the kind and the `instead` of a flag.
    (`crates/podssh-cli/src/man/mod.rs` lines 73-78 at `332ee58`).
 5. The JSON is the same on each host: no path from `HOME` (`docs/cli.md:57-58`).
 6. Add the row to `MAN_FLAGS` (`crates/podssh-cli/src/flags.rs:396-403`), the field to
-   `man::Request` (`crates/podssh-cli/src/man/mod.rs:125-132`), and the parse
-   (`crates/podssh-cli/src/tree.rs:248-256`). JSON for `--help` stays with T-010.
+   `man::Request` (`crates/podssh-cli/src/man/mod.rs:126-133`), and the parse
+   (`crates/podssh-cli/src/tree.rs:254-263`). JSON for `--help` stays with T-010.
 
 ## Prove
 
@@ -2075,7 +2075,7 @@ until then, write it on the unit code of `node_install/`, and move it at the tak
 **Milestone:** none
 **Priority:** P3
 **Effort:** S
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -2099,6 +2099,17 @@ An agent that meets podssh finds no `llms.txt`. `podssh man --json` gives the ta
 3. `scripts/check-repo.py` fails when the files differ from the manual.
 4. Shared tools use the same shape; tell podnet and podvm in a COORD issue `(to all)`.
 
+## Decision
+
+2026-11-17. The files are held by a test of the model, `pod_manual::check::generated` in `man::llms`'s tests, not by
+`scripts/check-repo.py` (step 3): the check needs the binary's model, which a Python script cannot read without a
+build, and it is the crate's own check that T-790 named for a generated file. Lost: a check in `check-repo.py`,
+which would parse the manual a second time. `podssh man --llms index|full` prints one file each to stdout (lost: one
+flag that writes two files, as a command that writes files in the working directory is a surprise). `llms-full.txt`
+holds the text of the short documents (README, SECURITY, the target environment), and the index links the long ones
+(`docs/relay.md`, `docs/mesh.md`, `docs/cli.md`) by their URL: `docs/cli.md` alone is 480 KB. Step 4 holds by the
+crate: podnet and podvm get the same shape from `pod_manual::llms`.
+
 ## Prove
 
 ```sh
@@ -2108,6 +2119,19 @@ python scripts/check-repo.py
 ```
 
 Plant: edit a flag's text in `llms-full.txt` by hand; the repository check fails.
+
+## Done
+
+Done, 2026-11-17. `podssh COMMAND --help --json` and `podssh --help [COMMAND] --json` print that command's section of
+`podssh man --json` (or the whole manual), `crates/podssh-cli/src/help/json.rs`; the pair in either order, `-h` too,
+and nothing else (`podssh --help --json` was a usage error since T-010, which kept each word answered or refused: it is
+answered now, and `tests/tree.rs`'s test of it says so, with `--jsonl` in its place among the refused). `podssh man
+--llms index|full` (`crates/podssh-cli/src/man/llms.rs`) writes `llms.txt` (5,884 bytes) and `llms-full.txt` (844 KB),
+kept at the repository's root. `cargo test -p podssh-cli --lib` 1213 passed, `man::llms` 3 (the files are the model's;
+the index links each document; a wrong word is 64); `--test tree --test man_page --test man_json --test
+man_flag_parity --test flag_table` passed; clippy and rustfmt clean. Planted, the entry's own: a flag's text edited by
+hand in `llms-full.txt` fails `the_repository_s_files_are_the_manual_s`, which names the line and how to write the
+files again.
 
 # T-731: `podssh mcp` for fleet work: a read-only mode and a command allowlist
 

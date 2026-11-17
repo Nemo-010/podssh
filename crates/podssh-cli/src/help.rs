@@ -53,6 +53,7 @@ pub fn availability_note(verb: &Verb) -> &'static str {
 
 // The notes that the flags of a verb cannot say, in a file of their own for
 // the length of this one.
+pub mod json;
 mod notes;
 pub use notes::{verb_notes, PROXY_OF_SSH};
 

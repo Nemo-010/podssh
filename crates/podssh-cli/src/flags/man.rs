@@ -12,4 +12,6 @@ pub const MAN_FLAGS: &[FlagRow] = &[
         "write the manual as a man(7) page instead of text, for man -l; never paged", None),
     row(None, "json", None, FlagKind::Supported,
         "write the tables (commands, flags, keywords, variables, files, exit codes) as JSON; never paged", None),
+    row(None, "llms", Some("WHICH"), FlagKind::Supported,
+        "write llms.txt (index) or llms-full.txt (full) of this binary's manual to stdout; never paged", None),
 ];

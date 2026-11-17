@@ -565,7 +565,7 @@ that client: bytes captured from the real program (`AGENTS.md`, section 6, rule 
 6. The output must read with the reader of T-043 and with OpenSSH.
 7. Add the verb to the tables: `VERBS`, and `VERB_OWNER` or a dispatch arm
    (`crates/podssh-cli/src/flags.rs:381-461`), the arguments, `usage_tail`
-   (`crates/podssh-cli/src/help.rs:62-89`), the manual's notes and examples, and
+   (`crates/podssh-cli/src/help.rs:63-90`), the manual's notes and examples, and
    `DISPATCHED` (`crates/podssh-cli/tests/flag_table.rs:110-146`).
 
 ## Decision
@@ -626,8 +626,8 @@ output. Planted defect: copy the password field into a comment; the secret test 
 `crates/podssh-cli/src/config_import/mod.rs:177-230`; the verb in the
 tables at `crates/podssh-cli/src/flags.rs:443-444`,
 `crates/podssh-cli/src/positionals.rs:241-246`,
-`crates/podssh-cli/src/tree.rs:345-351` and
-`crates/podssh-cli/src/dispatch.rs:200-201`.
+`crates/podssh-cli/src/tree.rs:352-358` and
+`crates/podssh-cli/src/dispatch.rs:203-204`.
 - `cargo test -p podssh-cli --test config_import`: 5 passed. The fixture
   `crates/podssh-cli/tests/fixtures/ansible/inventory.ini`, read by
   ansible-core 2.21.0 in the build image (`inventory.list.json` and

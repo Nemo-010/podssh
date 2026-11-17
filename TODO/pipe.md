@@ -39,10 +39,10 @@ the verb, the address grammar, the copy loop, and the local addresses `-`,
 
 1. The verb: a `pipe` row in `crates/podssh-cli/src/flags.rs:383-453`, two
    required positionals (`crates/podssh-cli/src/positionals.rs:7-281`), a
-   `Parsed::Pipe` variant (`crates/podssh-cli/src/parsed.rs:10-244`), a
+   `Parsed::Pipe` variant (`crates/podssh-cli/src/parsed.rs:10-246`), a
    dispatch arm, and `pipe` in `DISPATCHED`
    (`crates/podssh-cli/tests/flag_table.rs:110-146`). No `--timeout` row: the
-   gate at `crates/podssh-cli/src/dispatch.rs:376-397` would require it.
+   gate at `crates/podssh-cli/src/dispatch.rs:379-400` would require it.
 2. The grammar, in a new crates/podssh-cli/src/pipe/address.rs: `KIND:REST`.
    An unknown kind exits 64 and lists the kinds. `-` is `stdio`; `stdio` on
    both sides exits 64. Invariant: both addresses are valid before anything
