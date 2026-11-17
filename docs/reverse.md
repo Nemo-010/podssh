@@ -447,6 +447,9 @@ each:
 - **A hint**, such as `hello`'s `maxSessions` and `maxFrameBytes`: absent,
   or zero, keeps podssh's own floor (16 sessions, the published cap of a
   frame), and never refuses; a value over the published cap is clamped.
+  `hello`'s `liveness` (T-712, [relay.md](relay.md), "A relay that sleeps
+  between frames") is one: absent, or one that podssh cannot take, keeps
+  its Ping each 10 s, and the latter is said once.
 - **An offer of a feature**, such as `hello`'s `legTokens`,
   `stopRotation` and `spares` (T-650): only
   `true` offers. Absent, `false`, `"true"` and `1` are

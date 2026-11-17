@@ -185,6 +185,16 @@ pub fn spawn<S>(session: RelaySession<S>) -> (DuplexStream, RelayStatus)
 where
     S: AsyncRead + AsyncWrite + Send + 'static,
 {
+    spawn_paced(session, podssh_ws::LIVENESS_EVERY, podssh_ws::LIVENESS_ALLOWED)
+}
+
+/// [`spawn`], pinging the relay each `every` and allowing `allowed` silent
+/// checks: the pace that a relay offers, which lets a hibernating relay
+/// sleep (T-712).
+pub fn spawn_paced<S>(session: RelaySession<S>, every: Duration, allowed: u32) -> (DuplexStream, RelayStatus)
+where
+    S: AsyncRead + AsyncWrite + Send + 'static,
+{
     let (ours, theirs) = tokio::io::duplex(PIPE);
     let status = RelayStatus::default();
     let session = Arc::new(session);
@@ -239,8 +249,8 @@ where
     let down_status = status.clone();
     tokio::spawn(async move {
         // A link that dies without a word is found by pinging, in about 30 s
-        // instead of at the 90 s idle read limit.
-        let liveness = session.watch_liveness(podssh_ws::LIVENESS_EVERY, podssh_ws::LIVENESS_ALLOWED);
+        // at podssh's own pace, instead of at the 90 s idle read limit.
+        let liveness = session.watch_liveness(every, allowed);
         tokio::pin!(liveness);
         loop {
             let frame = tokio::select! {
@@ -484,3 +494,7 @@ mod tests {
         drop(ssh_read);
     }
 }
+
+#[cfg(test)]
+#[path = "relay_stream_pace_tests.rs"]
+mod pace_tests;

@@ -135,6 +135,8 @@ pub mod hostc;
 pub mod http_road;
 pub mod identity;
 pub mod keyed;
+// The pace of the Pings that a relay asks of its clients (T-712).
+pub mod liveness;
 #[cfg(feature = "localtunnel")]
 pub mod localtunnel;
 pub mod open;

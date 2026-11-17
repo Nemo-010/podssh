@@ -1747,3 +1747,61 @@ rustls writes, and `serve_publish` of
 `crates/podssh-cli/tests/relay_serve_node.rs`, through the binary with an
 HTTPS server and a client of Python's `ssl`) passed on 2026-11-05
 (T-649).
+
+## A relay that sleeps between frames (T-712)
+
+A relay that runs as a Durable Object with WebSocket hibernation sleeps
+while its sockets are quiet; its runtime answers a WebSocket Ping without
+waking it. podssh pings each 10 s on each road, which keeps such a relay
+from its sleep. Beside the contract, a relay offers a slower pace, as
+podssh's extension:
+
+```json
+"liveness": {"pingMs": 60000, "frame": "ws-ping"}
+```
+
+- **Where.** A member of the node's `hello`, a member of the operator's
+  `ready`, and `forward.liveness` of `/relays.json` for the forward road,
+  read where the client reads the offer of the resumable layer (T-173),
+  never by a read of its own.
+- **What a client does.** It sends WebSocket Ping frames at that pace, and
+  no text or data frame of its own while its socket is idle; it allows 3
+  silent checks in a row, as at its own pace. A relay of the contract
+  states nothing, and the client keeps 10 s.
+- **A hint, read by one rule** (T-633, [reverse.md](reverse.md), "A member
+  that an answer leaves out"): `frame` must be `"ws-ping"`, the one kind;
+  `pingMs` a whole number of milliseconds from 30000 to 60000. Above
+  60000, the client takes 60000, as its forward road's idle read limit is
+  90 s; under 30000, or a member of a wrong type, and it keeps 10 s. A
+  member that it did not take as it stood is said once for the process.
+- **Who reads it.** `crates/podssh-relay/src/liveness.rs` reads the member;
+  the forward road of `podssh ssh` takes a pace by
+  `relay_stream::spawn_paced`. The node's and the operator's sockets are
+  `pod-relay`'s of PodUtils/podcrates, which reads the offer in its port
+  (its T-111); until then they ping each 10 s. The relay role of podssh
+  offers none: it pings each reverse socket each 20 s itself, so no
+  socket of it sleeps.
+
+The test vectors, a member as a relay writes it and the pace that a client
+takes (`liveness::VECTORS`):
+
+| Member | Pace |
+| --- | --- |
+| `{"pingMs":60000,"frame":"ws-ping"}` | 60 s |
+| `{"pingMs":30000,"frame":"ws-ping"}` | 30 s |
+| `{"pingMs":45000,"frame":"ws-ping","later":1}` | 45 s |
+| `{"pingMs":120000,"frame":"ws-ping"}` | 60 s, said |
+| `{"pingMs":29999,"frame":"ws-ping"}` | 10 s, said |
+| `{"pingMs":"60000","frame":"ws-ping"}` | 10 s, said |
+| `{"pingMs":60000.5,"frame":"ws-ping"}` | 10 s, said |
+| `{"pingMs":-60000,"frame":"ws-ping"}` | 10 s, said |
+| `{"pingMs":60000,"frame":"text"}` | 10 s, said |
+| `{"pingMs":60000}` | 10 s, said |
+| `60000` | 10 s, said |
+| `null`, or no member | 10 s |
+
+The tests: the unit tests of `liveness.rs`, the forward road's
+(`relay_stream_pace_tests.rs` of `podssh-ssh`: an idle session pings a
+relay that offered 60 s once in a minute, and else six times, with no frame
+else), and `crates/podssh-relay/tests/liveness_offer.rs` for an idle node
+and an idle operator's leg, whose tests of an offer wait for the port.

@@ -5072,7 +5072,7 @@ The live part (one node for 5 days on the live relay) waits for the release chec
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -5105,6 +5105,42 @@ relay needs to say that it wants a slower, protocol-level ping.
    the vectors).
 5. Tell the podcrates session: T-111 of podcrates ports it to `pod-relay`.
 
+## Decision
+
+- **The operator's leg reads the offer in `ready`.** The contract gives an operator's socket no `hello`; its
+  first text frame is `ready`, so the member rides there, with the same words. Lost: `/relays.json` for the
+  operator (a read beside the leg, which rule 2 allows only once a day, and a relay of one name whose
+  hosts differ would answer for another process).
+- **A pace from 30 s to 60 s; over 60 s is held to 60 s, under 30 s is ignored.** Over 60 s, a Pong would
+  not come within the forward road's 90 s idle read limit (`pod_ws::DEFAULT_IDLE_TIMEOUT`), and pinging
+  more often than asked costs the relay a little and never the link; under 30 s is a relay's mistake that
+  10 s already serves. Lost: ignoring each value out of range (a relay that offers 120 s would get six
+  wakes a minute in place of one); clamping under 30 s up to 30 s (pinging less often than a relay asked can
+  lose its socket).
+- **`frame` is required, and only `"ws-ping"`.** A kind that podssh does not send is no offer it can keep;
+  an absent kind would bind podssh to a guess when a second kind comes. Lost: an absent `frame` read as
+  `ws-ping`.
+- **A hint of its own range, not `answer::hint`.** The member is an object with two words, and `hint` reads
+  one number whose zero is absent; the reader keeps the rule of a hint (absent keeps the floor, never a
+  refusal), as `docs/reverse.md` now says.
+- **One line for the process** (`liveness::say_once`): a relay says the same at each socket.
+- **The relay role offers no pace.** It pings each reverse socket each 20 s itself (the Premise), so no
+  socket of it sleeps; an offer from it would change nothing that it bills.
+- **podssh's part, and the rest asked of podcrates** (Rule Q3). The node's and the operator's sockets,
+  their watch of liveness, `Hello`, `ready` and the forward `Offer` are `pod-relay`'s; podssh writes the
+  reader (`crates/podssh-relay/src/liveness.rs`, the reference for the port), the forward road's paced
+  pump (`podssh_ssh::relay_stream::spawn_paced`), the words and vectors in `docs/relay.md`, and the tests,
+  whose tests of an offer on a reverse socket are ignored until the port. Lost: a wrapper of the node's
+  stream that drops Pings (a dropped Ping gets no Pong, and the watch ends a live socket).
+
+The ask of podcrates (a COORD issue `(to podcrates)` at the merge, its T-111): `pod-relay`'s node (`serve`)
+and operator (`exchange`) read `liveness` of `hello` and of `ready` by podssh's rule, and restart their
+watch at the new pace, which starts before either frame now (`PodUtils/podcrates:crates/pod-relay/src/reverse/serve.rs:198`,
+`PodUtils/podcrates:crates/pod-relay/src/reverse/operator.rs:195` at `v0.67.0`); `forward_layer::offer::of` keeps `forward.liveness` in `Offer`, so
+that podssh's forward road takes it by `spawn_paced`; `pod-session`'s layer sends no frame of its own on an
+idle link while the offer holds (its heartbeat is payload, `docs/relay.md`, "The relay role's resumable
+layer"), the check of step 3; and the vectors go to its T-120.
+
 ## Prove
 
 ```sh
@@ -5116,6 +5152,52 @@ cargo test -p podssh-relay --test e2e
 New test on a paused clock: a stand-in relay with the offer sees one Ping frame in 60 s from an idle node and
 from an idle operator leg, and no frame else; a relay with no offer sees 6. Planted: a node that ignores the
 offer fails the first count.
+
+## Correction
+
+2026-11-17, the drafting agent: the code of the Premise moved to PodUtils/podcrates (T-684), at `v0.67.0`:
+the pace of 10 s and its 3 checks are `PodUtils/podcrates:crates/pod-ws/src/client.rs:41-42` (`podssh-ws`
+re-exports them); the node's and the operator's limits are
+`PodUtils/podcrates:crates/pod-relay/src/reverse/serve.rs:59-63` (default at `:118-119`, the watch at
+`:198`, before `hello` is read) and `PodUtils/podcrates:crates/pod-relay/src/reverse/operator.rs:40-43`
+(`:75-76`, the watch at `:195`, before `ready`); `Hello` keeps each other member in `extra`
+(`PodUtils/podcrates:crates/pod-relay/src/reverse/control.rs:71-85`), and `stopRotation` is
+`PodUtils/podcrates:crates/pod-relay/src/reverse/legs.rs:29`. The role's 20 s holds
+(`crates/podssh-relay/src/serve/reverse/mod.rs:59`). The forward road's pump is podssh's
+(`crates/podssh-ssh/src/relay_stream.rs`), but its offer is `pod-relay`'s `Offer`
+(`PodUtils/podcrates:crates/pod-relay/src/forward_layer/offer.rs:27-40`), which keeps no member beside its
+own. An operator's socket has no `hello`: the offer rides in its `ready` (Decision). So steps 1 to 3 on the
+reverse sockets and the forward offer are asked of podcrates (Decision), and podssh does the rest. The
+Prove's `reverse::control reverse::legs` have no test here, and there is no `--test e2e`; its commands
+are:
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-relay --lib liveness
+cargo test -p podssh-relay --features pair --test liveness_offer
+cargo test -p podssh-ssh --lib relay_stream
+```
+
+## Done
+
+Partial, 2026-11-17 (drafted on `draft-t712`; not built).
+
+- `crates/podssh-relay/src/liveness.rs` (new): the words, `Pace`, `Heard`, `of`, `of_frame`, `of_hello`,
+  `of_relays`, `say_once` and `VECTORS`; `liveness_tests.rs` its unit tests, each vector among them.
+  UNVERIFIED.
+- `crates/podssh-ssh/src/relay_stream.rs`: `spawn_paced`, which `spawn` calls with 10 s and 3;
+  `relay_stream_pace_tests.rs`: on a paused clock, an idle session sends one Ping in a minute at 60 s and
+  six at podssh's pace, with no frame else. UNVERIFIED.
+- `crates/podssh-relay/tests/liveness_offer.rs` (new): a stand-in relay counts an idle node's and an idle
+  operator leg's frames in a minute; with no offer, and with an offer under 30 s, six Pings (UNVERIFIED);
+  with the offer, one, ignored until `pod-relay`'s port. The planted defect (a node that ignores the offer
+  fails the first count) is that test today.
+- `docs/relay.md`: "A relay that sleeps between frames", the words and the vectors; `docs/reverse.md`: the
+  member is a hint.
+- Waits: the ask of podcrates (Decision), as a COORD issue at the merge; then the ignored tests run, and the
+  forward road's callers in `crates/podssh-cli/src/ssh/` take the pace of the kept offer by `spawn_paced`.
+  `cargo todo remap docs/reverse.md` (3 lines added at line 448). The measure of what an idle session of
+  the layer sends (the Premise's last item) is podcrates' check of step 3.
 
 # T-714: A node route to a Unix socket, with a first line that names the caller's key and route
 
