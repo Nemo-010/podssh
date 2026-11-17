@@ -2983,7 +2983,7 @@ tested; the two entries waited on each other, so the call now lives in T-107 alo
 **Milestone:** M10
 **Priority:** P1
 **Effort:** M
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -3153,8 +3153,14 @@ checks); item 5 (podcrates T-102, `pod-unit`).
 `service-live.yml`. A user made for the run pairs on the live relay; root runs `podssh node NAME 127.0.0.1:PORT
 --install --system --run-as USER` with the binary in `/usr/local/bin` (ProtectHome hides the runner's home); the job
 asks that the relay sees the node online, that `systemd-analyze security` scores the unit under 3.0, that no token of
-the pair is in the unit or its file of variables, and that `--uninstall --system` leaves neither. UNVERIFIED: its
-first run.
+the pair is in the unit or its file of variables, and that `--uninstall --system` leaves neither.
+
+Done, 2026-11-17: `service-live.yml` at `8a22c79` (run 44099438455, job `system`, passed): `--install --system
+--run-as podnode` exited 0; the unit was active, ran as `podnode`, and the relay saw the node online ("online: the
+relay takes this pair's sessions" in its journal); `systemd-analyze security` scored it 1.5 (OK), under the Prove's 3.0;
+no token of the pair was in the unit or its file of variables; `--uninstall --system` exited 0 and left neither.
+Item 5, the move of the unit's text to `pod-unit`, goes with that crate's take (T-684), as the Approach says ("when
+it is released and taken"); this entry's command stays as it is.
 
 # T-774: `podssh serve` checks the user-presence flag of a security key's signature, as sshd does by default
 
