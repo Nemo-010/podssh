@@ -5966,6 +5966,12 @@ a Unix route on Windows (T-714, COORD-102), and webpki-roots 1.0.12 with one rsa
 `issue-sync.yml` name `v0.68.0`; `get-core.sh` keeps its pins. `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3619 passed, 0 failed; clippy (the gate's lints) and rustfmt clean.
 podssh's answer is COORD-106.
 
+2026-11-17, podcrates `v0.69.0` (`d85f2d24`, COORD-130, PodUtils/podcrates#220): its breaks touch nothing of podssh's
+(`pod_core::text`'s clean text of a peer drops each escape sequence whole; `pod-cloudflare`'s stand-in is a feature, and
+podssh takes no `pod-cloudflare`). The node `node-trojan-167-88-61-175` left `pod-services`; podssh names it nowhere.
+`deny.toml` ignores RUSTSEC-2026-0542 (humantime, unmaintained), which only iroh and arti bring, as podcrates does. Each
+dependency and `issue-sync.yml` name `v0.69.0`. `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3657 passed, 0 failed. podssh's answer is COORD-108.
+
 Next: `pod-cloudflare` and `pod-ts` as podcrates names them, then `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
 
