@@ -352,6 +352,50 @@ jobs:
       # checks and no other, or those checks prove nothing.
       - name: the console checks catch a planted podssh
         run: python scripts/interop-conpty-msys2.py --plant
+      # Each operator command once (T-728): MSYS2's sshd on 127.0.0.1, the
+      # relay role on the loopback, and Windows' own OpenSSH client with
+      # ProxyCommand podssh proxy. A byte that podssh proxy wrote before the
+      # relay's must fail the row proxy and no other.
+      - name: each operator command (scripts/smoke-operator.py)
+        timeout-minutes: 20
+        run: python scripts/smoke-operator.py --install target/debug/podssh.exe
+      - name: the operator commands catch a planted byte of podssh proxy
+        timeout-minutes: 20
+        run: python scripts/smoke-operator.py --plant target/debug/podssh.exe
+
+  # T-728: the operator commands on Windows for Arm (aarch64), the same rows
+  # as on windows. Outside `all` until a run proves the runner and its
+  # tools: its result is read in docs/STATUS.md.
+  windows-arm:
+    name: windows-arm
+    needs: plan
+    if: needs.plan.outputs.code == 'true'
+    runs-on: windows-11-arm
+    timeout-minutes: 60
+    env:
+      CARGO_BUILD_JOBS: 4
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Rust, where the image has none
+        shell: pwsh
+        run: |
+          if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
+            Invoke-WebRequest https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+            .\rustup-init.exe -y --profile minimal
+            Add-Content $env:GITHUB_PATH "$env:USERPROFILE\.cargo\bin"
+          }
+      - name: the tools, named
+        shell: pwsh
+        run: |
+          rustc -Vv; cargo -V
+          Test-Path C:\msys64\usr\bin\bash.exe
+          Test-Path C:\Windows\System32\OpenSSH\ssh.exe
+          Get-Command openssl -ErrorAction SilentlyContinue
+      - name: podssh
+        run: cargo build --locked -p podssh-cli
+      - name: each operator command (scripts/smoke-operator.py)
+        timeout-minutes: 20
+        run: python scripts/smoke-operator.py --install target/debug/podssh.exe
 
   # The default tests on a Mac with Apple silicon, each push, as on Windows
   # (T-218): code that reads facts of Linux must do without them there. The
@@ -383,6 +427,14 @@ jobs:
           cat "$RUNNER_TEMP/doctor.out"
           grep -Eq "system stores +the user's trust settings: [0-9]+ root.*; the administrator's trust settings: [0-9]+ root" \
             "$RUNNER_TEMP/doctor.out" || { echo "FAIL doctor named no trust settings"; exit 1; }
+      # Each operator command once (T-728), against the system's sshd on
+      # 127.0.0.1 and the relay role on the loopback; and the planted byte.
+      - name: each operator command (scripts/smoke-operator.py)
+        timeout-minutes: 20
+        run: python3 scripts/smoke-operator.py target/debug/podssh
+      - name: the operator commands catch a planted byte of podssh proxy
+        timeout-minutes: 20
+        run: python3 scripts/smoke-operator.py --plant target/debug/podssh
 
   # T-353: the Tor road against a Tor network of C tor on the loopback,
   # chutney's, whose relays know no other network. On the runner, not in

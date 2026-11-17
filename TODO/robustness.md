@@ -2337,7 +2337,7 @@ within 600 s (Bootstrapping)"; in the runs that pass it is published in 0 s.
 ## Premise
 
 - The job starts chutney's network, then runs `private_network`, `tor_private` and `onion_service`
-  (`.github/workflows/build.yml:421-429`); the time between the start and the onion test is the build's, shorter
+  (`.github/workflows/build.yml:473-481`); the time between the start and the onion test is the build's, shorter
   with a warm cache.
 - Arti 0.48 calls a service `Running` only once its descriptor went to both rings of HSDirs, the current time
   period's and the second one (`upload_result_state` in `tor-hsservice` 0.48.0, `src/publish/reactor.rs`); until

@@ -6392,7 +6392,7 @@ is `75a0596` (this entry's aes 0.9.4 and its pins) with v2.90.0; the three pins 
 **Milestone:** M10
 **Priority:** P1
 **Effort:** L
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -6404,7 +6404,7 @@ test runs each operator command there (`ssh`, `each`, `run`, `job`, `session`, `
 
 ## Premise
 
-- `.github/workflows/build.yml:296` (`windows`, `windows-2025`) and `:359` (`macos`, `macos-15`): tests, the
+- `.github/workflows/build.yml:296` (`windows`, `windows-2025`) and `:403` (`macos`, `macos-15`): tests, the
   system stores, repository checks, the console checks against MSYS2's sshd. No step per command.
 - `scripts/release-short.sh`: the check of a release's binary; it runs on Linux.
 - T-383 (done): `--detach` measured on Windows and macOS. T-678 (open): a node on Windows ends its sessions
@@ -6424,6 +6424,21 @@ test runs each operator command there (`ssh`, `each`, `run`, `job`, `session`, `
 4. Each failure found is a defect entry (rule 8 of AGENTS.md section 5), or a repair in this session.
 5. The Access TCP client waits for podcrates T-117: see T-729.
 
+## Decision
+
+2026-11-17 (main session).
+
+- **The plant is a wrapper on the ProxyCommand line** (`smoke_servers.plant_wrapper`) that writes one byte, then runs
+  `podssh proxy`. It is what a `podssh proxy` that wrote the byte would put on OpenSSH's stdin. No hook goes into the
+  binary for a test. Lost: a variable that podssh reads to write the byte (code of a test in each released binary).
+- **The relay's certificate comes from openssl's command line**, which each runner has (Git for Windows' or MSYS2's
+  on Windows, LibreSSL on macOS). Lost: a binary of the test's to make one (more to build on each runner).
+- **A row allows the documented refusal of a host that lacks a tool**: `job list` with no tmux (69) and
+  `containers` with no docker, podman or kubectl (69). `net ls` with no net held is 78. The row checks that the
+  command runs and ends as the manual says on that host.
+- **`windows-arm` (the runner `windows-11-arm`) stays outside `all`** until a run proves the runner, MSYS2 and the
+  toolchain there; its first result is read in `docs/STATUS.md`.
+
 ## Prove
 
 ```sh
@@ -6434,6 +6449,19 @@ python scripts/check-repo.py
 
 Plant: make `podssh proxy` write one extra byte at its start on Windows; the OpenSSH client's banner check
 fails and the table names the command.
+
+## Done
+
+Partial, 2026-11-17. Written: `scripts/smoke-operator.py` (the table of 22 rows, `--list`, `--only`, `--install`,
+`--plant`) and `scripts/smoke_servers.py` (the sshd, the relay role with a throwaway CA, the environment of a run
+in `.work/`). Steps in `build.yml`: `windows` and `macos` run the rows and the plant; the new job `windows-arm`
+runs the rows. Windows' own `ssh.exe` with `ProxyCommand podssh proxy` is the row `proxy` on Windows.
+
+Measured here (Linux, 2026-11-17): `python scripts/smoke-operator.py target/debug/podssh`, 22 passed, each row
+under 2 s. `--plant`: the row `proxy` alone fails ("banner exchange: ... invalid format"), as it must.
+
+Next: read the steps of `windows`, `macos` and `windows-arm` in the gate's run; each failure there is a defect
+entry or a repair (Approach 4). Then add `windows-arm` to `all`.
 
 # T-754: Dependabot's updates of 2026-11-12: trufflehog, two actions, four crates of the minor and patch group, Arti's tor-rtcompat and tor-error 0.48, and num-bigint 0.5
 
