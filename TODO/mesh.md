@@ -14158,6 +14158,15 @@ draft: a member that reads `meet` of its net's relay host and lists it first as 
 DERP home (the net's document already names the relay host, T-617); iroh's QUIC address discovery,
 which the role does not serve.
 
+2026-11-17, the gate at `abebb7c`: `gate (libs)` failed `relay_meet`'s
+`two_clients_of_iroh_relay_meet_through_the_role_and_carry_1_mib_each_way` ("the two clients never met through the
+role"), and it failed here once in three runs too. The cause was the test's: the role's registry of iroh's clients is
+the process's (`meet_iroh::relay`), and two tests that ran at once registered the same keys (seeds 1, 2 and 3), so the
+second client of a key took the first one's place, as iroh's server does. Each test has keys of its own now (1 and 2;
+11 to 13; 21 and 22), and `meet` keeps one read of the client pending beside its hellos (a read dropped at its timeout
+could lose a frame). `--features serve,iroh-serve --test relay_meet` passed 10 runs in 10.
+
+
 # T-724: `-J node://NAME` and `mcp` destinations that name a node
 
 **Source:** PodUtils/podcrates#35, cfb's ask A-S-16 (COORD-014, PodUtils/podcrates#38)

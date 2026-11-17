@@ -93,16 +93,28 @@ async fn datagram(client: &mut Client) -> (EndpointId, Vec<u8>) {
 }
 
 /// Until `to` hears `from`: a hello each 50 ms, as `to` may not be
-/// registered when its handshake ends.
+/// registered when its handshake ends. One read of `to` stays pending
+/// beside the hellos: a read dropped midway can lose its frame, which a
+/// slow host met (the gate's `libs` at `abebb7c`).
 async fn meet(from: &mut Client, to: &mut Client, to_id: EndpointId) {
     let deadline = tokio::time::Instant::now() + LIMIT;
+    let mut tick = tokio::time::interval(Duration::from_millis(50));
     loop {
-        assert!(tokio::time::Instant::now() < deadline, "the two clients never met through the role");
-        send(from, to_id, HELLO).await;
-        if let Ok(Some(Ok(RelayToClientMsg::Datagrams { .. }))) =
-            tokio::time::timeout(Duration::from_millis(50), to.next()).await
-        {
-            return;
+        let next = to.next();
+        tokio::pin!(next);
+        let got = loop {
+            tokio::select! {
+                got = &mut next => break got,
+                _ = tick.tick() => {
+                    assert!(tokio::time::Instant::now() < deadline, "the two clients never met through the role");
+                    send(from, to_id, HELLO).await;
+                }
+            }
+        };
+        match got {
+            Some(Ok(RelayToClientMsg::Datagrams { .. })) => return,
+            Some(Ok(_)) => {}
+            other => panic!("the relay ended the client: {other:?}"),
         }
     }
 }
@@ -133,18 +145,20 @@ async fn two_clients_of_iroh_relay_meet_through_the_role_and_carry_1_mib_each_wa
     assert_eq!(said.iter().filter(|l| l.starts_with("iroh: the endpoint ") && l.ends_with(" is up")).count(), 2);
 }
 
+// Each test its own keys: the role's registry of iroh's clients is the
+// process's, and a key that comes again takes the place of the first.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn of_three_clients_a_datagram_reaches_the_key_that_it_names_alone() {
     let (url, _) = role(Mint::Anyone).await;
-    let mut a = client(&url, 1).await.expect("a");
-    let mut b = client(&url, 2).await.expect("b");
-    let mut c = client(&url, 3).await.expect("c");
-    meet(&mut a, &mut b, id(2)).await;
-    meet(&mut a, &mut c, id(3)).await;
-    send(&mut a, id(3), b"for c").await;
-    send(&mut a, id(2), b"for b").await;
-    assert_eq!(datagram(&mut b).await, (id(1), b"for b".to_vec()), "B got a datagram that named another key");
-    assert_eq!(datagram(&mut c).await, (id(1), b"for c".to_vec()), "C got a datagram that named another key");
+    let mut a = client(&url, 11).await.expect("a");
+    let mut b = client(&url, 12).await.expect("b");
+    let mut c = client(&url, 13).await.expect("c");
+    meet(&mut a, &mut b, id(12)).await;
+    meet(&mut a, &mut c, id(13)).await;
+    send(&mut a, id(13), b"for c").await;
+    send(&mut a, id(12), b"for b").await;
+    assert_eq!(datagram(&mut b).await, (id(11), b"for b".to_vec()), "B got a datagram that named another key");
+    assert_eq!(datagram(&mut c).await, (id(11), b"for c".to_vec()), "C got a datagram that named another key");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -152,13 +166,13 @@ async fn a_role_that_mints_for_a_list_admits_its_keys_alone_with_iroh_s_denial()
     let dir = std::env::temp_dir().join(format!("podssh-relay-meet-{}", std::process::id()));
     podssh_relay::cache::private_dir(&dir).unwrap();
     let path = dir.join("allow");
-    let listed = Identity::from_seed(&[1; 32]).public().fingerprint();
+    let listed = Identity::from_seed(&[21; 32]).public().fingerprint();
     std::fs::write(&path, format!("{listed} the listed endpoint\n")).unwrap();
     let (url, events) = role(Mint::Keys(List::File(path))).await;
-    client(&url, 1).await.expect("a listed key");
-    let why = client(&url, 2).await.expect_err("a key off the list is refused");
+    client(&url, 21).await.expect("a listed key");
+    let why = client(&url, 22).await.expect_err("a key off the list is refused");
     assert!(why.contains("not authorized"), "{why}");
-    let refused = Identity::from_seed(&[2; 32]).public().fingerprint();
+    let refused = Identity::from_seed(&[22; 32]).public().fingerprint();
     let said = events.lock().unwrap().clone();
     assert!(said.iter().any(|l| l.starts_with(&format!("iroh: refused the endpoint {refused}"))), "{said:?}");
     let _ = std::fs::remove_dir_all(&dir);
