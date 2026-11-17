@@ -6339,7 +6339,7 @@ entry 829); data for podssh's record, not an ask.
 **Milestone:** M10
 **Priority:** P3
 **Effort:** S
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -6361,3 +6361,92 @@ for each that fits, or the reason in this entry where it does not.
 ## Prove
 
 `cargo todo check`: an entry for each idea that fits, each with its Premise read.
+
+## Done
+
+Done, 2026-11-17. Each idea against the role of `main`:
+- **A ban after 20 strikes in 60 s, for 300 s** (each source): the role's brake counts `/v1/mint` and `/v1/pair`, 120 a
+  minute for each address, then `429` with `Retry-After` (`crates/podssh-relay/src/serve/brake.rs:1-8`), and its slots
+  cap the sockets of an address (`crates/podssh-relay/src/serve/slots.rs:22`, 256). An upgrade with a wrong token is
+  refused with `403` and counted nowhere: a token is a MAC, so guessing one is hopeless, but each try costs the role a
+  handshake for free. Fits: T-806.
+- **PROXY protocol's trusted ranges**: the role reads the visitor of Cloudflare's edge alone (`EDGE_VISITOR`,
+  `crates/podssh-relay/src/serve/brake.rs:29`); behind a balancer of the user's own (haproxy, nginx's stream), the brake
+  and the slots count the balancer as one address. Fits: T-807.
+- **A STUN responder**: no road of podssh finds a UDP path through the role; the iroh road brings its own relays and
+  their address discovery, and the role's UDP is QUIC's alone (`--quic`). Does not fit the role, and no entry.
+- **Deadlines of liveness (30 s, 90 s, 120 s, 10 s)**: the role has its own, each with its reason: a handshake within 30
+  s (`crates/podssh-relay/src/serve/listener.rs:26`), a ping of each reverse socket each 20 s, a silent node let go in
+  30 to 40 s (T-801), the forward road's idle cut of the contract. No change: the study's numbers are another server's.
+- **A check of an advertised address against the observed source**: no member of the role advertises an address (a
+  node is known by its pair's name, a net's members by the owner's signed document). Nothing to check, and no entry.
+
+
+# T-806: An upgrade of the relay role with a wrong token counts against its address
+
+**Source:** T-804, the dig study's idea of a ban after strikes (COORD-127).
+**Category:** feature
+**Milestone:** M10
+**Priority:** P3
+**Effort:** S
+**Status:** open
+
+## Problem
+
+The role refuses an upgrade whose token is missing or wrong with `403` and counts it nowhere: guessing a token is
+hopeless (a MAC), but each try costs the role a TLS handshake and a check, for free, as often as a client likes.
+
+## Premise
+
+- The brake counts `/v1/mint` and `/v1/pair` alone (`crates/podssh-relay/src/serve/brake.rs:1-8`).
+
+## Approach
+
+Each refused upgrade (`403` for its token, on either road) counts in the brake of its address, so that an address
+that sends more than the brake's minute gets `429` with `Retry-After` before any other check; a refusal of a good
+token by policy (a target not allowed) does not count.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-relay --features serve --lib serve::brake
+```
+
+Past 120 wrong tokens in a minute, an address gets `429`, and another address is not braked. Planted: the refusal not
+counted, and the test fails.
+
+# T-807: The relay role reads the client's address from PROXY protocol's header of a trusted balancer
+
+**Source:** T-804, the dig study's idea of the trusted ranges of the PROXY protocol (COORD-127).
+**Category:** feature
+**Milestone:** M10
+**Priority:** P3
+**Effort:** M
+**Status:** open
+
+## Problem
+
+Behind a TCP balancer of the user's own (haproxy, nginx's stream module), each connection comes from the balancer, so
+the role's brake and slots count every client as one address, and its log names the balancer.
+
+## Premise
+
+- The role reads the visitor from Cloudflare's header alone (`crates/podssh-relay/src/serve/brake.rs:29`).
+
+## Approach
+
+`podssh relay serve --proxy-protocol RANGES`: a connection from an address in RANGES must open with a PROXY protocol
+header (v1 or v2), whose source is then the client's address for the brake, the slots and the log; a connection from
+elsewhere with such a header, or from RANGES without one, is closed. With no flag, nothing changes.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-relay --features serve --lib serve::listener
+```
+
+A header of v1 and of v2 from a trusted address gives the client's address to the brake; one from another address is
+refused; haproxy's bytes captured once are a test's input. Planted: the source not checked, and the test fails.
+
