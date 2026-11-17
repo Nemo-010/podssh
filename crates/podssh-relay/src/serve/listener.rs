@@ -9,7 +9,9 @@
 //! `SSH-` goes to it, peeked too ([`super::sshd`], T-644). Where the owner
 //! publishes names, a ClientHello that names one goes to its pair's node
 //! before any handshake, peeked whole, so that the node's own TLS answers it
-//! ([`super::published`], T-649).
+//! ([`super::published`], T-649). Behind a balancer that the owner named,
+//! the PROXY header that it writes first names the client
+//! ([`super::proxy_header`], T-807).
 
 use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
@@ -19,7 +21,9 @@ use podssh_ws::tls_server::{TlsAcceptor, ACME_TLS_1};
 use tokio::io::AsyncWriteExt as _;
 use tokio::net::TcpStream;
 
+use super::proxy_header::{self, Trusted};
 use super::published::Published;
+use super::slots::Slots;
 use super::Config;
 
 /// How long a client has to begin, and to finish, TLS.
@@ -38,10 +42,45 @@ pub struct Door {
     /// The names that the owner publishes, each to a pair's node (T-649);
     /// none unless named.
     pub published: Arc<Published>,
+    /// The balancers whose PROXY header names the client (T-807); none
+    /// unless named.
+    pub proxy: Arc<Trusted>,
 }
 
-/// Serve `tcp`, of a client at `peer`, as `door` says.
-pub async fn connection(tcp: TcpStream, peer: IpAddr, door: Door, cfg: Arc<Config>) {
+/// Serve `tcp`, of a client at `peer`, as `door` says. A peer that is no
+/// balancer of the owner's and begins with a PROXY header is closed.
+pub async fn connection(mut tcp: TcpStream, peer: IpAddr, door: Door, cfg: Arc<Config>) {
+    let Some(peer) = client(&mut tcp, peer, &door, &cfg).await else { return };
+    served(tcp, peer, door, cfg).await
+}
+
+/// A connection of a balancer that the owner named: its PROXY header first,
+/// then a slot of the client that it names, so that the slots count each
+/// client apart (T-807). A slot refused is said in the role's log.
+pub async fn balanced(mut tcp: TcpStream, balancer: IpAddr, door: Door, cfg: Arc<Config>, slots: Slots) {
+    let Some(peer) = client(&mut tcp, balancer, &door, &cfg).await else { return };
+    let slot = match slots.admit(peer) {
+        Ok(slot) => slot,
+        Err(line) => return line.into_iter().for_each(|line| cfg.event(&line)),
+    };
+    super::sockets::bound_unsent(&tcp);
+    slot.holding(served(tcp, peer, door, cfg)).await
+}
+
+/// The client of `tcp` from `peer`, by the PROXY header where `peer` is a
+/// balancer of the owner's; none once the connection is to close.
+async fn client(tcp: &mut TcpStream, peer: IpAddr, door: &Door, cfg: &Config) -> Option<IpAddr> {
+    match proxy_header::client_of(tcp, peer, &door.proxy, HANDSHAKE_WAIT).await {
+        Ok(client) => Some(client),
+        Err(why) => {
+            cfg.event(&format!("closed a connection: {why}"));
+            None
+        }
+    }
+}
+
+/// Serve `tcp` of a client at `peer`, its PROXY header read.
+async fn served(tcp: TcpStream, peer: IpAddr, door: Door, cfg: Arc<Config>) {
     if door.cleartext || door.sshd.is_some() {
         // One bound for the first byte and for the start of SSH after it.
         let deadline = tokio::time::Instant::now() + HANDSHAKE_WAIT;

@@ -8611,6 +8611,14 @@ podssh relay
         the relay and a shell: a shell for each client that reaches the port,
         behind that sshd's own authentication; each other start goes to TLS or
         the cleartext road, as before.
+    --proxy-protocol RANGES
+        serve: the TCP balancers of the owner (haproxy's send-proxy, nginx's
+        proxy_protocol), as ADDR/BITS or addresses, separated by commas. A
+        connection from one of them must begin with a PROXY header of version 1
+        or 2. Its source is then the client for the brake, the slots and the
+        log. A connection from a balancer without the header is closed. So is
+        one from any other address that begins with a header, since anyone can
+        write one.
     --publish NAME=PAIR
         serve: send each TLS connection whose ClientHello names NAME, a DNS
         name, to the node of PAIR; PAIR is a pair of this relay (its name

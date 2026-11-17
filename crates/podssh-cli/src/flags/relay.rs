@@ -105,6 +105,9 @@ pub const RELAY_FLAGS: &[FlagRow] = &[
     // An SSH client of the listener, to the owner's sshd (T-644).
     row(None, "sshd", Some("ADDR:PORT"), FlagKind::Supported,
         "serve: send each connection of the listener whose first four bytes are SSH- (an SSH client's version line) to the sshd at ADDR:PORT; ADDR is an address, not a name; its bytes go untouched, so that one port serves the relay and a shell: a shell for each client that reaches the port, behind that sshd's own authentication; each other start goes to TLS or the cleartext road, as before", None),
+    // The PROXY header of the owner's TCP balancer (T-807).
+    row(None, "proxy-protocol", Some("RANGES"), FlagKind::Supported,
+        "serve: the TCP balancers of the owner (haproxy's send-proxy, nginx's proxy_protocol), as ADDR/BITS or addresses, separated by commas. A connection from one of them must begin with a PROXY header of version 1 or 2. Its source is then the client for the brake, the slots and the log. A connection from a balancer without the header is closed. So is one from any other address that begins with a header, since anyone can write one", None),
     // A name published to a pair's node, by its ClientHello (T-649).
     row(None, "publish", Some("NAME=PAIR"), FlagKind::Supported,
         "serve: send each TLS connection whose ClientHello names NAME, a DNS name, to the node of PAIR; PAIR is a pair of this relay (its name p-..., which the pair's file holds); the connection goes before any handshake, with its bytes untouched; this way, the node's own TLS answers it with its own certificate (podssh node --publish-tls); repeatable; the relay reads the name, never the bytes; a CA's validation of NAME (acme-tls/1) goes to the node too; NAME is never the name of --acme", None),

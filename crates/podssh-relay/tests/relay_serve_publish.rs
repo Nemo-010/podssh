@@ -110,7 +110,7 @@ async fn start(tag: &str, online: bool, pair: Option<&str>) -> Rig {
     let table = Published::of(&[format!("{SITE}={name}")]).unwrap().waiting(HELLO_WAIT);
     let served = Certs::served(&certs.role, ROLE, &certs.role_challenge);
     let acceptor = acceptor_for(served, &[HTTP1, ACME_TLS_1]).unwrap();
-    let door = Door { acceptor, cleartext: true, sshd: None, published: Arc::new(table) };
+    let door = Door { acceptor, cleartext: true, sshd: None, published: Arc::new(table), proxy: Default::default() };
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let port = listener.local_addr().unwrap().port();
     let cfg = role.cfg.clone();

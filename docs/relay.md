@@ -1183,6 +1183,14 @@ and the signed one.
   whose minute is full gets `429` before its next upgrade's token is read.
   A good token that a later check refuses (the policy, the road) counts
   nothing.
+- Behind a TCP balancer of the owner's, `--proxy-protocol RANGES` names it
+  (T-807). A connection from RANGES must begin with a PROXY header of
+  version 1 or 2 (haproxy's `send-proxy` and `send-proxy-v2`), whose source
+  is then the address of the brake, of the slots (T-748) and of the log. A
+  connection from RANGES without the header is closed. So is one from any
+  other address that begins with a header, as anyone can write one. A
+  header of `LOCAL` or `UNKNOWN` (the balancer's own check) leaves the
+  balancer's address.
 - The first refusal of an address is a line on stdout,
   `/v1/mint: braked, an address past 120 requests in a minute`, which does
   not name the address; the next ones until it is let through again say

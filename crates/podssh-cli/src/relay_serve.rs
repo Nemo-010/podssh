@@ -114,6 +114,12 @@ fn prepare(s: &ServeArgs, ca_file: Option<&str>) -> Result<Prepared, Refusal> {
     let asked_quic = quic::asked(s.quic.as_deref())?;
     // The owner's sshd on the listener's port, when named (T-644).
     let owner_sshd = sshd::of(s.sshd.as_deref())?;
+    // The owner's TCP balancers, by their PROXY header (T-807).
+    let proxy = match s.proxy_protocol.as_deref() {
+        None => Default::default(),
+        Some(text) => serve::proxy_header::Trusted::parse(text)
+            .map_err(|why| Refusal::usage(format!("--proxy-protocol: {why}")))?,
+    };
     // The names published to nodes, never the one of --acme (T-649).
     let published = publish::of(&s.publish, &source)?;
     // DERP for a node of `podssh ts`, for the keys of a file (T-106).
@@ -187,7 +193,7 @@ fn prepare(s: &ServeArgs, ca_file: Option<&str>) -> Result<Prepared, Refusal> {
         certs.shown
     );
     let port_file = s.port_file.clone().map(|path| (path, bound.port()));
-    let door = Door { acceptor, cleartext, sshd: owner_sshd, published };
+    let door = Door { acceptor, cleartext, sshd: owner_sshd, published, proxy: Arc::new(proxy) };
     Ok(Prepared { listener, door, cfg: Arc::new(cfg), certs, shown, port_file, quic: udp })
 }
 
@@ -368,6 +374,13 @@ fn serve_until_stopped(prepared: Prepared, err: &mut dyn Write) -> i32 {
                             continue;
                         }
                     };
+                    // A balancer's connection: its PROXY header names the
+                    // client, whose slot it takes once read (T-807).
+                    if door.proxy.holds(peer.ip()) {
+                        let balanced = serve::listener::balanced(tcp, peer.ip(), door.clone(), cfg.clone(), slots.clone());
+                        tokio::spawn(balanced);
+                        continue;
+                    }
                     let slot = match slots.admit(peer.ip()) {
                         Ok(slot) => slot,
                         Err(line) => {

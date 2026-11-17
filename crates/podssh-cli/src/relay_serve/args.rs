@@ -54,6 +54,8 @@ pub struct ServeArgs {
     pub list_stale: Option<String>,
     /// The owner's sshd, for an SSH client of the listener (T-644).
     pub sshd: Option<String>,
+    /// The owner's balancers, whose PROXY header names the client (T-807).
+    pub proxy_protocol: Option<String>,
     /// Each name published to a pair's node, `NAME=PAIR` (T-649).
     pub publish: Vec<String>,
     /// The file of the node keys that DERP at `/derp` admits (T-106).
@@ -99,6 +101,7 @@ impl ServeArgs {
             list_ttl: get("list-ttl"),
             list_stale: get("list-stale"),
             sshd: get("sshd"),
+            proxy_protocol: get("proxy-protocol"),
             publish: publish::args(matches),
             derp_keys: get("derp-keys"),
         }

@@ -50,6 +50,7 @@ pub mod mailbox;
 pub mod policy;
 pub mod probe;
 // The names published to nodes, routed by the ClientHello (T-649).
+pub mod proxy_header;
 pub mod published;
 // QUIC on UDP beside the listener, each stream a connection (T-667).
 #[cfg(feature = "quic")]
