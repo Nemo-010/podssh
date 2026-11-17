@@ -7378,3 +7378,69 @@ podssh-ssh -e normal --depth 1 | grep -c chrono` prints 0. `cargo test -p podssh
 keygen_sign --test serve_sftp_openssh --test sftp_near_cap` 14 passed; clippy (the gate's lints) and rustfmt clean.
 Planted: the local zone read as UTC fails the new test.
 
+
+# T-809: What the release gate proves, and the gaps that podnet's QA round found: examples, error paths, a black-box pass
+
+**Source:** PodUtils/podnet#649 (COORD-102 of podnet, 2026-11-17, to all): external testers opened 40 issues on
+podnet's `v0.4.0-beta.15` in an hour, where its gate measured reach, not correctness; it asks each project to check its
+own release gate for the same gap.
+**Category:** chore
+**Milestone:** M10
+**Priority:** P2
+**Effort:** M
+**Status:** partial
+
+## Problem
+
+podssh's gate holds the help, the manual and the flag table to one another, and it runs many error paths. But no check
+parses the manual's EXAMPLES, the lane of `pod-lab` (T-791) runs success paths alone, and no reader runs a black-box
+pass with the documents alone before a beta. podnet's testers found their defects in those three places.
+
+## Premise
+
+- `crates/podssh-cli/tests/man_flag_parity.rs:1`: `--help`, the manual and the flag table show the same flags; it
+  checks no example.
+- `crates/podssh-cli/tests/man_page.rs:42`: EXAMPLES is checked as a heading, not as commands.
+- `scripts/pod-lab-serve-lane.sh`: the lane's commands are each a success path (T-791).
+- What the gate already proves on error paths: `crates/podssh-cli/tests/faults.rs` (a cut, a stall, a refusal of the
+  stand-in relay, each with its exit code), the `doctor_*` tests, `exit.rs` and `ssh_exit_status.rs`.
+
+## Approach
+
+1. A test that reads each example of the manual (`podssh man --json`'s model) and parses it with podssh's own parser:
+   each verb, flag and value named exists and is accepted; an example that only a live host could run is parsed, not run.
+2. Error-path rows in the lane of T-791, beside its success rows: a dead relay, a refused connect, a node that is not
+   online, an unreachable target, a name with no answer. Each ends within a limit, with its documented exit code and
+   one line of its cause.
+3. A black-box pass before each beta (T-446): an agent with the documents alone (README, `podssh man`, the testers'
+   guide), no source, runs each command's documented forms and files what differs. Its findings are entries.
+4. At each take of podcrates, the workflows and scripts are searched for each line of a moved crate that they read
+   (podnet's lesson 4), as a step of "A take of podcrates" in `docs/HANDOFF.md`.
+
+## Prove
+
+```sh
+export CARGO_BUILD_JOBS=4
+cargo test -p podssh-cli --test man_examples
+```
+
+Planted: an example that names a flag that the parser refuses fails the test. The lane's error rows pass in `pod-lab`;
+the black-box pass's report is in the beta's issue.
+
+## Start condition
+
+Items 1 and 4 start now; item 2 with T-791's lane; item 3 before the next beta (T-446).
+
+## Correction
+
+2026-11-17. Item 1 is in place already: the manual's EXAMPLES and its first steps all come from
+`crates/podssh-cli/src/man/examples.rs`, and its tests parse each podssh command line of an example with the
+binary's parser (`crate::tree::parse`), the variables of an example against ENVIRONMENT and a ProxyCommand's inner
+command too. The Premise's "no check parses the manual's EXAMPLES" is wrong. The Prove's test is that module's:
+`cargo test -p podssh-cli --lib man::examples`.
+
+## Done
+
+Partial, 2026-11-17. Item 1 was there (Correction). Item 4: `docs/HANDOFF.md`, "A take of podcrates", says to search
+the workflows and scripts for each moved line after a take. Waits: item 2 with T-791's lane, item 3 before the next
+beta.

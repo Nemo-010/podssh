@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**763 entries: 27 open, 37 partial, 11 blocked, 688 done.**
+**764 entries: 27 open, 38 partial, 11 blocked, 688 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 0 | 9 | 3 | 82 | 94 |
-| P2 | 0 | 21 | 2 | 291 | 314 |
+| P2 | 0 | 22 | 2 | 291 | 315 |
 | P3 | 27 | 7 | 6 | 314 | 354 |
-| **All** | 27 | 37 | 11 | 688 | 763 |
+| **All** | 27 | 38 | 11 | 688 | 764 |
 
 ## Entries
 
@@ -839,3 +839,4 @@ repository and CI).
 | [T-806](relay.md) | P3 | S | M10 | feature | done | An upgrade of the relay role with a wrong token counts against its address |
 | [T-807](relay.md) | P3 | M | M10 | feature | done | The relay role reads the client's address from PROXY protocol's header of a trusted balancer |
 | [T-808](repo.md) | P3 | S | none | chore | done | podssh-ssh's dates without chrono, which RUSTSEC-2026-0543 calls unmaintained |
+| [T-809](repo.md) | P2 | M | M10 | chore | partial | What the release gate proves, and the gaps that podnet's QA round found: examples, error paths, a black-box pass |

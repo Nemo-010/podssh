@@ -132,7 +132,9 @@ T-200). cfb's asks, T-708 to T-731, stay behind podssh's own work order.
   --3way`, take main's side of each citation conflict (podcrates' where a file it cites was removed),
   `cargo todo remap` each changed file, then each line of the `.run` with `PODCRATES` at a checkout of
   the tag; its static build wants zig (`scripts/fetch-zig.sh` with `release.yml`'s version and sum) and
-  cargo-zigbuild (its release binary, checked against its `.sha256`).
+  cargo-zigbuild (its release binary, checked against its `.sha256`). Then search `.github/workflows/` and
+  `scripts/` for each line of a moved crate that they read (`grep -rn` of each changed message of the take's
+  diff): a check that greps an old line passes on any output (podnet's lesson, PodUtils/podnet#649, T-809).
 - **ZeroTier's C++ core** needs Alpine's `g++` and `linux-headers` in the build image (the gate has
   them since `78220a35`).
 - **A cloud session's proxy** passes HTTPS alone: raw SSH and other ports go through GitHub Actions.

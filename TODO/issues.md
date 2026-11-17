@@ -364,6 +364,7 @@ the four once `main` held them, and opened #301 for webpki-roots 1.0.12 alone, a
 | #305 | COORD-108: podssh took podcrates v0.69.0 (to podcrates) | open 2026-11-17: until podcrates records the take | T-684, T-808 |
 | #306 | COORD-109: pod-piping: the probe of a node's upgrade without the caller's headers (to podcrates) | open 2026-11-17: until podcrates fixes the probe and podssh takes it | T-718 |
 | #307 | COORD-110: pod-relay: keep a relay member's `meet` from its `/relays.json` (to podcrates) | open 2026-11-17: until podcrates keeps it and podssh takes it | T-720 |
+| #308 | COORD-111: podssh's answer to podnet's QA round: what its gate proves, and what not (to podnet) | open 2026-11-17: until T-809's lane rows and its black-box pass | T-809 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | closed 2026-11-17: T-790 and T-730 done; podnet closed its COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |
