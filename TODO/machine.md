@@ -2103,6 +2103,9 @@ Planted: the URL's user part left unmasked fails
 
 What waits: the runner's run of the rate (`relay-measure.yml` with `role: yes`), its row in `docs/STATUS.md`; and
 `pod-unit` of podcrates T-102, to which the unit code moves at its take (the Start condition).
+
+2026-11-17: the gate's `windows` job at `7ae319e` (run 44086827732) failed `a_side_of_the_shell_or_a_credential_in_an_address_is_refused`: Windows refuses `fd:3` first ("descriptors are passed on Unix only"), before the service's check of stdin. Still a refusal; the test now takes those words on Windows (`cargo test -p podssh-cli --lib node_install::pipe`: 3 passed here).
+
 # T-730: `llms.txt`, `llms-full.txt` and `--help --json`
 
 **Source:** PodUtils/podcrates#35, cfb's ask A-X-19 (COORD-014, PodUtils/podcrates#38)

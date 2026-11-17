@@ -41,7 +41,9 @@ fn the_service_runs_the_words_but_install_with_batch_mode_and_each_client() {
 fn a_side_of_the_shell_or_a_credential_in_an_address_is_refused() {
     for (a, b) in [("stdio", "relay:h:22"), ("fd:3", "tcp-listen:9000"), ("tcp-listen:9000", "-")] {
         let why = prepare(&args(a, b), "x", &words(&["pipe"])).err().expect("refused");
-        assert!(why.message.contains("no stdin"), "{a} {b}: {}", why.message);
+        // Windows refuses a descriptor first, as it passes none.
+        let words = if cfg!(windows) && a.starts_with("fd:") { "on Unix only" } else { "no stdin" };
+        assert!(why.message.contains(words), "{a} {b}: {}", why.message);
     }
     let secret = "wss://me:the-secret-of-this-test@edge.example/x";
     let why = prepare(&args("tcp-listen:9000", secret), "x", &words(&["pipe"])).err().expect("refused");
