@@ -30,6 +30,8 @@ pub mod lookup;
 pub mod mint;
 pub mod policy;
 mod policy_cmd;
+// A node's net from a signed document at an https:// URL (T-715).
+pub mod remote;
 // A destination tag:NAME, each member of the tag in turn (T-750).
 pub mod tag;
 // What a policy changes, and its expectations (T-749).
@@ -294,7 +296,7 @@ pub(super) fn owner_named(text: &str) -> Result<KeyName, Refusal> {
 }
 
 /// An OpenSSH public key line, as the name of its fingerprint.
-fn owner_key_name(text: &str) -> Option<KeyName> {
+pub(super) fn owner_key_name(text: &str) -> Option<KeyName> {
     let key = podssh_ssh::russh::keys::PublicKey::from_openssh(text.trim()).ok()?;
     KeyName::parse(&podssh_ssh::known_hosts::fingerprint(&key))
 }
