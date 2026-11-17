@@ -111,11 +111,15 @@ fn ca_and_leaf() -> (String, String, String) {
     (pem("CERTIFICATE", ca_cert.der()), pem("CERTIFICATE", leaf.der()), leaf_key.pem())
 }
 
+/// An answer of the document's server: a status, a body, and a Location or
+/// none.
+type Answer = (u16, Vec<u8>, Option<String>);
+
 /// The document's server: one answer for each connection, as the test sets
-/// it now (a status, a body, and a Location or none); each request counted.
+/// it now; each request counted.
 struct Server {
     port: u16,
-    answer: Arc<Mutex<(u16, Vec<u8>, Option<String>)>>,
+    answer: Arc<Mutex<Answer>>,
     asked: Arc<Mutex<Vec<String>>>,
 }
 
