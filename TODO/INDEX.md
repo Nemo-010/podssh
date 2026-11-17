@@ -835,4 +835,4 @@ repository and CI).
 | [T-802](repo.md) | P2 | S | none | chore | partial | Dependabot's updates of 2026-11-17: the minor and patch group, and rsa 0.10 |
 | [T-803](relay.md) | P2 | S | M10 | measurement | open | `podssh relay serve` moved 16 MiB at two speeds on the loopback, 75 or 330 MiB/s |
 | [T-804](relay.md) | P3 | S | M10 | research | open | The ideas of the dig study for the relay server: a ban, PROXY's ranges, STUN, deadlines, an address check |
-| [T-805](repo.md) | P3 | S | M10 | chore | open | podssh's private files written by `pod_core::files::replace_private` |
+| [T-805](repo.md) | P3 | S | M10 | chore | partial | podssh's private files written by `pod_core::files::replace_private` |

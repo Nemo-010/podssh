@@ -184,10 +184,11 @@ fn keep(offer: &Offer, key: &file::Key, bytes: &[u8], err: &mut dyn Write) -> Re
     }
     let owner = KeyName::parse(&offer.fingerprint());
     match store::take(&signed, owner.as_ref(), now()) {
-        Ok(Taken::Kept { path, before }) => {
+        Ok(Taken::Kept { path, before, note }) => {
             let before = before.map(|serial| format!(", in place of serial {serial}")).unwrap_or_default();
             let (name, serial, path) = (&doc.name, doc.serial, path.display());
             let _ = writeln!(err, "podssh net: took the net {name}, serial {serial}{before}, in {path}");
+            super::edit::warn(note, err);
             Ok(())
         }
         Ok(Taken::Same) => {

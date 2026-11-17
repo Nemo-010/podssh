@@ -32,8 +32,9 @@ use crate::relay_settings::Refusal;
 
 /// What this host did with the device's key.
 enum Admitted {
-    /// A new serial that names it, kept here in this file.
-    Signed(Box<Signed>, PathBuf),
+    /// A new serial that names it, kept here in this file; the warning of a
+    /// replace that is not proved on disk.
+    Signed(Box<Signed>, PathBuf, Option<String>),
     /// The document held, which names it already as NAME.
     Held(Box<Signed>),
     /// Nothing: the words for the device, this host's line, and the exit.
@@ -102,7 +103,7 @@ pub(super) fn run(args: &NetArgs, out: &mut dyn Write, err: &mut dyn Write) -> R
             Answer::Key(key) => {
                 let done = admit(name, &roles, &key, days, &signing);
                 let words = match &done {
-                    Admitted::Signed(signed, _) => {
+                    Admitted::Signed(signed, ..) => {
                         let said = format!("added as {name}, serial {}", signed.doc.serial);
                         invitation::last_words(true, &said, Some(signed.to_bytes().as_slice()))
                     }
@@ -128,7 +129,7 @@ pub(super) fn run(args: &NetArgs, out: &mut dyn Write, err: &mut dyn Write) -> R
         (Some((key, done)), Ok(_)) => (key, done),
         // Kept before it was sent: the member is in, and the device may
         // hold nothing.
-        (Some((key, Admitted::Signed(signed, path))), Err(failed)) => {
+        (Some((key, Admitted::Signed(signed, path, _))), Err(failed)) => {
             let lost = invitation::refused(failed, way);
             let message = format!(
                 "added the member {name} with the key {key}, serial {}, in {}, but the device may not have its \
@@ -143,7 +144,7 @@ pub(super) fn run(args: &NetArgs, out: &mut dyn Write, err: &mut dyn Write) -> R
         (None, Ok(_)) => return Err(Refusal::config("the exchange ended with no answer")),
     };
     match done {
-        Admitted::Signed(signed, path) => {
+        Admitted::Signed(signed, path, note) => {
             let until = crate::pairs::utc(signed.doc.expires * 1000);
             let _ = writeln!(
                 err,
@@ -153,6 +154,7 @@ pub(super) fn run(args: &NetArgs, out: &mut dyn Write, err: &mut dyn Write) -> R
                 path.display()
             );
             let _ = writeln!(out, "{name}: joined the net {net} with the key {key}, serial {}", signed.doc.serial);
+            super::edit::warn(note, err);
             Ok(0)
         }
         Admitted::Held(signed) => {
@@ -212,7 +214,7 @@ fn admit(name: &str, roles: &[String], key: &PublicKey, days: i64, signing: &Sig
         Err(why) => return not("the owner's host could not sign the document", why, EX_CONFIG),
     };
     match store::keep_own(&signed) {
-        Ok(path) => Admitted::Signed(Box::new(signed), path),
+        Ok((path, note)) => Admitted::Signed(Box::new(signed), path, note),
         Err(why) => not("the owner's host could not keep the document", why, sysexits::EX_CANTCREAT),
     }
 }

@@ -52,7 +52,8 @@ pub(super) fn run(word: &str, args: &NetArgs, err: &mut dyn Write) -> Result<i32
     }
     let signing = sign::signing_for(&before.owner, key).map_err(Refusal::config)?;
     let signed = sign::sign_with(&next, &signing).map_err(Refusal::config)?;
-    let path = store::keep_own(&signed).map_err(|why| Refusal { message: why, code: sysexits::EX_CANTCREAT })?;
+    let (path, note) =
+        store::keep_own(&signed).map_err(|why| Refusal { message: why, code: sysexits::EX_CANTCREAT })?;
     let until = crate::pairs::utc(next.expires * 1000);
     let _ = writeln!(
         err,
@@ -62,7 +63,15 @@ pub(super) fn run(word: &str, args: &NetArgs, err: &mut dyn Write) -> Result<i32
         next.serial,
         path.display()
     );
+    warn(note, err);
     Ok(0)
+}
+
+/// The one warning of a replace that is not proved on disk (T-805).
+pub(super) fn warn(note: Option<String>, err: &mut dyn Write) {
+    if let Some(note) = note {
+        let _ = writeln!(err, "podssh net: warning: {note}");
+    }
 }
 
 /// `--days N`: 1 to [`MAX_DAYS`], else [`DAYS`].
@@ -102,7 +111,8 @@ fn init(name: &str, key: Option<&Path>, issued: i64, expires: i64, err: &mut dyn
     let (owner, signing) = sign::owner_of(&key).map_err(Refusal::config)?;
     let first = Doc::new(name, &owner, issued, expires).map_err(Refusal::usage)?;
     let signed = sign::sign_with(&first, &signing).map_err(Refusal::config)?;
-    let path = store::keep_own(&signed).map_err(|why| Refusal { message: why, code: sysexits::EX_CANTCREAT })?;
+    let (path, note) =
+        store::keep_own(&signed).map_err(|why| Refusal { message: why, code: sysexits::EX_CANTCREAT })?;
     let _ = writeln!(
         err,
         "podssh net: the net {name}, serial 1, of the owner {}, until {}, in {}; add its members with podssh net add \
@@ -111,6 +121,7 @@ fn init(name: &str, key: Option<&Path>, issued: i64, expires: i64, err: &mut dyn
         crate::pairs::utc(expires * 1000),
         path.display()
     );
+    warn(note, err);
     Ok(0)
 }
 

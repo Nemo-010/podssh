@@ -207,25 +207,27 @@ fn a_keys_totals_come_back_from_the_file_after_a_restart() {
 #[test]
 fn a_write_that_fails_leaves_the_file_of_before_whole() {
     let dir = Scratch::new("failed-write");
-    let file = dir.0.join("usage.json");
+    let (here, away) = (dir.0.join("here"), dir.0.join("away"));
+    crate::cache::private_dir(&here).unwrap();
+    let file = here.join("usage.json");
     let (_, clock) = clock(LATE);
     let usage = Usage::open_on(None, Some(file.clone()), clock.clone()).unwrap();
     assert!(usage.minted("ephm1.a", KEY_A, ENDS));
     session(&usage, "ephm1.a", &[1], &[1]);
     assert_eq!(usage.save(), Ok(true));
     let before = std::fs::read(&file).unwrap();
-    // The writer's private file beside it cannot be made: a directory holds
-    // its name.
-    let tmp = dir.0.join(format!(".usage.json.{}.tmp", std::process::id()));
-    std::fs::create_dir(&tmp).unwrap();
+    // The writer's private file beside it cannot be made: its directory is
+    // gone, with the file of before in it. pod-core's replace names its
+    // temporary file with a count of its own, which a test cannot block.
+    std::fs::rename(&here, &away).unwrap();
     session(&usage, "ephm1.a", &[5], &[5]);
     let failed = usage.save().expect_err("the write fails");
     assert!(failed.starts_with(&file.display().to_string()), "{failed}");
+    std::fs::rename(&away, &here).unwrap();
     assert_eq!(std::fs::read(&file).unwrap(), before, "the file of before, whole");
     let kept = Usage::open_on(None, Some(file.clone()), clock.clone()).unwrap();
     assert_eq!(kept.totals(KEY_A).unwrap().today.sessions, 1, "it reads as it was");
     // The next write takes each count that the failed one held.
-    std::fs::remove_dir(&tmp).unwrap();
     assert_eq!(usage.save(), Ok(true), "tried again");
     let after = Usage::open_on(None, Some(file), clock).unwrap();
     assert_eq!(after.totals(KEY_A).unwrap().today.sessions, 2);

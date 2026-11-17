@@ -308,10 +308,13 @@ impl Docs for Net {
             }
         };
         match store::take(&signed, None, super::now()) {
-            Ok(Taken::Kept { path, before }) => {
+            Ok(Taken::Kept { path, before, note }) => {
                 let before = before.map(|serial| format!(", in place of serial {serial}")).unwrap_or_default();
                 let doc = &signed.doc;
                 self.say(format!("{}'s serial {} from {from}{before}, in {}", doc.name, doc.serial, path.display()));
+                if let Some(note) = note {
+                    self.say(format!("warning: {note}"));
+                }
                 Ok(())
             }
             Ok(Taken::Same) => Ok(()),

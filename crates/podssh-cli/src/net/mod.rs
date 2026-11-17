@@ -264,7 +264,7 @@ fn take(file: &str, owner: Option<&str>, err: &mut dyn Write) -> Result<i32, Ref
     let doc = &signed.doc;
     let owner_shown = sign::owner_fingerprint(&doc.owner);
     match store::take(&signed, owner.as_ref(), now()) {
-        Ok(store::Taken::Kept { path, before }) => {
+        Ok(store::Taken::Kept { path, before, note }) => {
             let before = match before {
                 Some(serial) => format!(" in place of serial {serial}"),
                 None => format!(", the first of this host: its owner {owner_shown} signs each later one"),
@@ -276,6 +276,7 @@ fn take(file: &str, owner: Option<&str>, err: &mut dyn Write) -> Result<i32, Ref
                 doc.serial,
                 path.display()
             );
+            edit::warn(note, err);
             Ok(0)
         }
         Ok(store::Taken::Same) => {

@@ -90,6 +90,30 @@ fn a_refused_cache_dir_is_named_and_the_next_one_takes_the_file() {
     assert_eq!(chosen_note(&Chosen::Dir(next), &followed), None);
 }
 
+/// A file of the cache stored again is replaced whole (pod-core's replace,
+/// T-805): the new body, private, and no temporary file beside it; and only
+/// a commit that is not proved on disk has a warning.
+#[test]
+fn a_file_stored_again_is_replaced_whole_and_no_temporary_file_stays() {
+    use podssh_relay::cache::{commit_note, load_file_from, Commit};
+    let root = scratch("replace");
+    let dir = root.join("cache");
+    store_noting(std::slice::from_ref(&dir), "pool.example", b"old").unwrap();
+    let stored = store_noting(std::slice::from_ref(&dir), "pool.example", b"new").unwrap();
+    assert_eq!(load_file_from(std::slice::from_ref(&dir), "pool.example").as_deref(), Some("new"));
+    let names: Vec<_> = std::fs::read_dir(&dir).unwrap().map(|e| e.unwrap().file_name()).collect();
+    assert_eq!(names, [std::ffi::OsString::from("pool.example")], "no temporary file stays");
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        assert_eq!(std::fs::metadata(&stored.path).unwrap().permissions().mode() & 0o777, 0o600);
+    }
+    assert_eq!(commit_note(&stored.path, &Commit::Durable), None);
+    let failed = std::io::Error::other("no sync");
+    let note = commit_note(&stored.path, &Commit::InstalledUnconfirmed(failed)).expect("a warning");
+    assert!(note.contains("pool.example") && note.contains("no sync") && !note.contains('\n'), "{note}");
+}
+
 /// With no variable that names the temporary directory, the fixed places
 /// of Unix come last, after each place that the environment gives.
 #[cfg(unix)]

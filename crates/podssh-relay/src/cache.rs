@@ -15,8 +15,11 @@
 //! A usual place in another user's tree is passed over, and only read
 //! (T-593).
 
-use std::io::Write;
 use std::path::{Path, PathBuf};
+
+// One durable replace of a private file (T-805): written and synced, renamed,
+// its directory synced.
+pub use pod_core::files::{replace_private, Commit};
 
 #[cfg(any(windows, test))]
 mod closed;
@@ -230,19 +233,27 @@ fn read_trusted(path: &Path) -> Option<String> {
 fn write_private(dir: &Path, name: &str, body: &[u8]) -> std::io::Result<PathBuf> {
     make_private_dir(dir)?;
     let final_path = dir.join(name);
-    let tmp = dir.join(format!(".{name}.{}.tmp", std::process::id()));
-    let _ = std::fs::remove_file(&tmp);
-    let result = (|| {
-        let mut file = create_new_private(&tmp)?;
-        file.write_all(body)?;
-        file.sync_all()?;
-        drop(file);
-        std::fs::rename(&tmp, &final_path)
-    })();
-    if result.is_err() {
-        let _ = std::fs::remove_file(&tmp);
+    // A cache file is made again when lost: a sync of its directory that
+    // failed is no failure, as pod-core's own cache takes it. A file of the
+    // cache is never bind-mounted, so no write in place.
+    replace_private(&final_path, body, 0o600, false).map(|_| final_path)
+}
+
+/// The one warning line of a replace whose new file is in place but not
+/// proved on disk; none for a durable one. Each caller says it on its own
+/// path, as pod-core asks.
+pub fn commit_note(path: &Path, commit: &Commit) -> Option<String> {
+    match commit {
+        Commit::Durable => None,
+        Commit::InstalledUnconfirmed(e) => Some(format!(
+            "{} is written, but its directory could not be synced ({e}): a power cut may undo the change",
+            path.display()
+        )),
+        Commit::InPlace(e) => Some(format!(
+            "{} could not be replaced by a rename ({e}), so it was written in place",
+            path.display()
+        )),
     }
-    result.map(|()| final_path)
 }
 
 #[cfg(unix)]

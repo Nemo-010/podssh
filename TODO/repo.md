@@ -7154,7 +7154,7 @@ both asked of podcrates (COORD-101, #297). Then each Dependabot pull request clo
 **Milestone:** M10
 **Priority:** P3
 **Effort:** S
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -7167,6 +7167,31 @@ hold (`Commit::Durable`, `InstalledUnconfirmed`, `InPlace`), and changes nothing
 
 - To be read: podssh's two copies of the replace and the `sync_dir` of the spent-grant record, as podcrates names them
   (`crates/podssh-cli/src/grants.rs` and the files that write a private file through a temporary one).
+- Read at `b09b803` (2026-11-17), with `crates/pod-core/src/files/replace.rs` of podcrates at `v0.67.0`:
+  `replace_private(path: &Path, body: &[u8], mode: u32, in_place_fallback: bool) -> io::Result<Commit>`, re-exported
+  as `pod_core::files::{replace_private, Commit}`; its temporary file is `.NAME.PID.COUNT.tmp` beside the path, made
+  with `O_NOFOLLOW` and `create_new` and given `mode` whatever the umask; `Err` leaves the path as it was and no
+  temporary file. pod-core's own cache write calls it with `0o600, false` and takes any `Ok` as written.
+- podssh's writes of a whole private file through a temporary one and a rename (five, not two):
+  - `crates/podssh-cli/src/net/store.rs:110` `fn replace` (the file of `PODSSH_NET`): `let tmp =
+    path.with_file_name(format!(".{name}.{}.tmp", std::process::id()));` ... `std::fs::rename(&tmp, path)` (line 121).
+  - `crates/podssh-cli/src/share/file.rs:305` `fn replace` (a node's share file): the same body, the rename at line
+    315.
+  - `crates/podssh-relay/src/cache.rs:230` `fn write_private` (each file of the cache: the pool, `store_file`, the net's
+    document in the cache): `let tmp = dir.join(format!(".{name}.{}.tmp", std::process::id()));` ...
+    `std::fs::rename(&tmp, &final_path)` (line 240).
+  - `crates/podssh-relay/src/serve/reverse/pairs.rs:455` `pub(crate) fn write_private` (the relay role's file of pairs,
+    and through `crates/podssh-relay/src/serve/usage.rs:305` its file of counts): the rename at line 466.
+  - `crates/podssh-cli/src/detach/lock.rs:321` `fn write_record` (`detached/NAME.json`, mode 0600): `if
+    written.is_err() || std::fs::rename(&part, path).is_err()` (line 333), with no sync at all.
+  None of the five syncs the directory after the rename.
+- The others that write through a new file, or sync a directory, are not such a replace (see `## Decision`):
+  `crates/podssh-cli/src/keygen_cert.rs:138`, `crates/podssh-cli/src/keygen_change.rs:131`,
+  `crates/podssh-cli/src/node_install/system_install.rs:98` and `:134`, `crates/podssh-cli/src/update/replace.rs:116`
+  with `crates/podssh-cli/src/update/keep.rs:149` (`pub fn sync_dir`), `crates/podssh-cli/src/chat/files.rs:68`,
+  `crates/podssh-cli/src/cp/clobber.rs:322`, `crates/podssh-ssh/src/known_hosts/edit.rs:253`,
+  `crates/podssh-relay/src/cache/own.rs:67` (`create_private`, a hard link), `crates/podssh-cli/src/relay_code.rs:151`
+  (an append), `crates/podssh-cli/src/pinggy_cert.rs:56` (`create_new_private`, never a replace).
 
 ## Approach
 
@@ -7178,7 +7203,71 @@ each file stay.
 ```sh
 export CARGO_BUILD_JOBS=4
 cargo test -p podssh-cli --lib grants
+cargo test -p podssh-cli --lib net::store
+cargo test -p podssh-cli --lib share
+cargo test -p podssh-cli --lib detach::lock
+cargo test -p podssh-relay --lib serve::usage
+cargo test -p podssh-relay --lib serve::reverse
+cargo test -p podssh-relay --test cache
 ```
 
 The same tests pass, and no copy of the replace is left (a search for the temporary file's rename).
 
+## Decision
+
+Moved to `replace_private`, each with mode `0o600` and `in_place_fallback` false:
+
+- `net/store.rs` `replace`: the owner's signed document at `PODSSH_NET`, private, written whole. No write in place: a
+  node reads it for each session and half a document is none; a bind-mounted one is changed on its host. The warning
+  goes up as `Taken::Kept { note }` and as the second value of `keep_own`, and each caller says it on its own path:
+  `podssh net take`, `join`, `init`/`add`/`rm`/`renew`, `invite` on their `err` ("podssh net: warning: ..."), a node's
+  gossip by its `say` line.
+- `share/file.rs` `replace`: the share file, private, written whole under its lock. No write in place, for the reason
+  of the net's document. `file::edit` takes the caller's `err` (the API forced the share tests to pass a sink).
+- `podssh-relay` `cache::write_private`: each file of the cache. As pod-core's own cache: any `Ok` is written, and no
+  warning, since a file of the cache is made again; never bind-mounted.
+- `pairs::write_private` (the role's pairs and its counts): returns the warning. `Usage::save` says it once through its
+  `say` (a write comes each 2 s); `Pairs::save` has no line path and takes it as written, as the rename was before.
+  Alternatives that lost: a `say` in `Pairs` (pairs.rs is at 489 lines of 500, and `relay serve` and the quick
+  relay's node each open it), a warning on each save (a line each pair).
+- `detach/lock.rs` `write_record`: a failure is already no failure of the run, so an unconfirmed commit says nothing
+  either; it now syncs the record, which it did not.
+
+`cache::commit_note(path, &Commit)` words the one warning line for each caller (none for `Durable`).
+
+Left alone, each for its reason:
+
+- `keygen_cert.rs` `replace`: a `-cert.pub`, a public file whose mode follows the umask as `ssh-keygen`'s does.
+- `keygen_change.rs` `replace`: the new key file is read back and opened with the passphrase before the rename;
+  `replace_private` has no step between the write and the rename.
+- `node_install/system_install.rs` `write_env`: run as root, the file is `fchown`ed to the service account before it is
+  written; `write_unit`: a unit of mode 0644 as root, not private.
+- `update/replace.rs` and `update/keep.rs` (`sync_dir`): the binary's own replace, with its file kept aside and an
+  undo; its directory sync belongs to those renames.
+- `chat/files.rs` `finish`, `cp/clobber.rs`, `cp/byexec/files.rs`, `cp/delta.rs`, `podssh-ssh` `zmodem/files.rs`: the
+  destination of a copy, never over a file that came meanwhile (a hard link) or by the copy's own clobber rules.
+- `podssh-ssh` `known_hosts/edit.rs` `rewrite`: OpenSSH's file, whose symbolic link is followed, with a `.old` copy and
+  the caller's `create` (its mode or access list), under the lock of the old file.
+- `cache/own.rs` `create_private`: a new file by a hard link, never over one that is there; not a replace.
+- `relay_code.rs` `add_line` (an append) and `pinggy_cert.rs` (a new file): no replace.
+
+## Correction
+
+- The spent-grant record is not podssh's: `crates/podssh-cli/src/grants.rs:156` `spent_of` only names its place,
+  and `Spent::at` is `pod-relay`'s (`crates/pod-relay/src/grant/spent.rs` of podcrates, its `sync_dir` at line 110),
+  which makes a new file for each grant (`create_new`) and fails when its directory's sync fails: not a replace, and
+  not podssh's to change (Rule Q3). `cargo test -p podssh-cli --lib grants` stays in the Prove, untouched.
+- podssh had five copies of the replace, not two (`## Premise`); each moved. The Prove adds the tests of each.
+
+## Done
+
+Partial, 2026-11-17 (a draft, built by no one yet):
+
+- The five writes call `pod_core::files::replace_private` (re-exported as `podssh_relay::cache::replace_private`);
+  `cache::commit_note` words the warning.
+- Tests: new `a_file_stored_again_is_replaced_whole_and_no_temporary_file_stays` (`crates/podssh-relay/tests/cache.rs`)
+  and `a_named_file_is_replaced_whole_and_no_temporary_file_stays` (`net/store.rs`); the share edit test checks that no
+  temporary file stays; `a_write_that_fails_leaves_the_file_of_before_whole` (`serve/usage_tests.rs`) blocks the write
+  by moving the directory away, since pod-core's temporary name has a count that a test cannot predict.
+- UNVERIFIED: the build, clippy, and each command of the Prove.
+- UNVERIFIED: the search `rg 'rename\(&(tmp|part)' crates` finds none.
