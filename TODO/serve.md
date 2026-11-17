@@ -3149,6 +3149,13 @@ Waits: a run in the build image with systemd as PID 1 (`scripts/test_in_box.sh`)
 of a real user, the node online, and `systemd-analyze security podssh-node-NAME.service` under 3.0 (T-251's image
 checks); item 5 (podcrates T-102, `pod-unit`).
 
+2026-11-17: the run with systemd as PID 1 goes to GitHub's Ubuntu runner, whose PID 1 is systemd: the job `system` of
+`service-live.yml`. A user made for the run pairs on the live relay; root runs `podssh node NAME 127.0.0.1:PORT
+--install --system --run-as USER` with the binary in `/usr/local/bin` (ProtectHome hides the runner's home); the job
+asks that the relay sees the node online, that `systemd-analyze security` scores the unit under 3.0, that no token of
+the pair is in the unit or its file of variables, and that `--uninstall --system` leaves neither. UNVERIFIED: its
+first run.
+
 # T-774: `podssh serve` checks the user-presence flag of a security key's signature, as sshd does by default
 
 **Source:** the draft of T-114 (2026-11-13): serve does not read the flags of a security key's signature.

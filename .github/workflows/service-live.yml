@@ -177,3 +177,72 @@ jobs:
           rm -f "$RUNNER_TEMP"/user_ed25519* "$RUNNER_TEMP/authorized_keys"
           sudo rm -f "$RUNNER_TEMP"/host_ed25519*
           exit "$rc"
+
+  # T-709: the node as a hardened system unit of a named user. A user made
+  # for the run pairs on the live relay; root installs the unit with
+  # --install --system --run-as; systemd starts it; the relay sees the node
+  # online; `systemd-analyze security` scores the unit under 3.0; no token
+  # of the pair is in the unit or its file of variables; --uninstall
+  # --system removes both, and the pair is stopped.
+  system:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: build podssh
+        env:
+          CARGO_BUILD_JOBS: "4"
+        run: cargo build --locked -p podssh-cli
+
+      - name: the node as a system unit of a named user
+        run: |
+          set -u
+          # ProtectHome hides the runner's home, so the unit runs a copy in /usr/local/bin.
+          sudo install -m 0755 target/debug/podssh /usr/local/bin/podssh
+          bin=/usr/local/bin/podssh
+          user=podnode
+          sudo useradd --create-home --shell /bin/sh "$user"
+          as_user() { sudo -u "$user" -H "$@"; }
+          python3 -m http.server 8769 --bind 127.0.0.1 >/dev/null 2>&1 &
+          label="sys-$GITHUB_RUN_ID"
+          unit="podssh-node-$label.service"
+          vars="/var/lib/podssh-node-$label/node-$label.env"
+          as_user "$bin" relay pair "$label"
+          rc=0
+          sudo "$bin" node "$label" 127.0.0.1:8769 --install --system --run-as "$user" || rc=$?
+          echo "install: exit $rc"
+          leaked=0
+          sudo python3 - "/home/$user/.cache/podssh/pair-$label.json" "/etc/systemd/system/$unit" "$vars" <<'EOF' || leaked=$?
+          import json, os, sys
+          pair = json.load(open(sys.argv[1]))
+          tokens = [str(v) for k, v in pair.items() if k.endswith("token") and v]
+          found = [f for f in sys.argv[2:] if os.path.exists(f) and any(t in open(f).read() for t in tokens)]
+          print("a token in the unit or its variables:", "yes" if found else "no")
+          sys.exit(1 if found else 0)
+          EOF
+          online=no
+          score=none
+          if [ "$rc" = 0 ] && [ "$leaked" = 0 ]; then
+            systemctl cat "$unit"
+            for _ in $(seq 1 30); do
+              state=$(as_user "$bin" relay status "$label" || true)
+              case $state in *": online"*) online=yes; break ;; esac
+              sleep 2
+            done
+            echo "active: $(systemctl is-active "$unit" || true); runs as: $(systemctl show -p User --value "$unit"); the relay: $state"
+            sudo journalctl -u "$unit" --no-pager -n 20 || true
+            systemd-analyze security "$unit" --no-pager | tail -25 || true
+            score=$(systemd-analyze security "$unit" --no-pager 2>/dev/null | sed -n 's/.*Overall exposure level for [^:]*: \([0-9.]*\).*/\1/p' | tail -1)
+            echo "the exposure score: ${score:-none}"
+          fi
+          low=no
+          [ -n "$score" ] && [ "$score" != none ] && awk -v s="$score" 'BEGIN { exit !(s < 3.0) }' && low=yes
+          urc=0
+          sudo "$bin" node "$label" --uninstall --system || urc=$?
+          left=no
+          [ -e "/etc/systemd/system/$unit" ] && left=yes
+          sudo test -e "$vars" && left=yes
+          echo "uninstall: exit $urc; anything left: $left; score under 3.0: $low"
+          as_user "$bin" relay revoke "$label" || true
+          [ "$rc" = 0 ] && [ "$online" = yes ] && [ "$leaked" = 0 ] && [ "$low" = yes ] && [ "$urc" = 0 ] && [ "$left" = no ]
