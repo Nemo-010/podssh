@@ -8270,6 +8270,23 @@ podssh relay
   Each login and each end is a line on stdout, with the key's first 8 hex
   digits.
 
+  --relay-roads WORDS makes the relay the meeting point of a net, on its one
+  listener. A net whose hosts let only port 443 in then needs neither n0's iroh
+  relays nor Tailscale's DERP fleet. WORDS is iroh, derp, or both, separated by
+  a comma. iroh serves iroh's relay protocol at /relay, with iroh-relay's own
+  server code. An iroh endpoint whose relay URL is https://HOST:PORT/ meets
+  other endpoints here. It admits the endpoints whose keys --mint admits:
+  anyone, the keys of its list, or the members of its net. With --mint nobody
+  it admits none, so the start stops (64). A refused endpoint gets iroh's
+  denial, not authorized. /ping answers an empty 200, as iroh's relays answer.
+  derp serves DERP at /derp, as --derp-keys does. With no --derp-keys, it
+  admits each node key, and only with --mint anyone (64 otherwise). Each road
+  serves /generate_204, the probe of a captive portal, with the answer to an
+  iroh or Tailscale challenge. /relays.json names each road as meet, null where
+  it is off. Each endpoint that comes and goes is a line on stdout. The
+  datagrams are sealed end to end: the relay sees keys, sizes and times. A
+  build with no iroh road refuses iroh (70).
+
   The relay's TLS offers h2 before http/1.1 (RFC 8441): a client that chooses
   it gets SETTINGS that offer extended CONNECT and 16 streams at once. Each
   stream has a window of 1 MiB in one of 16 MiB for the connection. So the
@@ -8640,6 +8657,12 @@ podssh relay
         operator's relay closes it; this way, podssh ts --ts-mode relay
         --ts-relay HOST:PORT pins this relay. The packets are WireGuard's,
         sealed end to end: the relay sees keys, sizes and times.
+    --relay-roads WORDS
+        serve: also be the meeting point of a net on this listener. WORDS is
+        iroh, derp, or iroh,derp. iroh serves iroh's relay protocol at /relay,
+        with /ping. derp serves DERP at /derp for the node keys of --derp-keys;
+        with no such file and --mint anyone, for each key. Each serves
+        /generate_204. /relays.json names each as meet.
     --deployment NAME=HOSTS
         serve: a deployment that /relays.json names in its signed list,
         NAME=HOST[:PORT][,HOST[:PORT]...], repeatable, in order; a client that

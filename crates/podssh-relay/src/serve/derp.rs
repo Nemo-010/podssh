@@ -63,6 +63,18 @@ pub fn enable(keys: &Path) -> Result<usize, String> {
     Ok(listed.len())
 }
 
+/// Serve DERP at `/derp` for each node key, as derper with no
+/// `--verify-clients` (T-720): `--relay-roads derp` of a role that mints for
+/// anyone. A second call keeps the first hub, as [`enable`] does.
+pub fn enable_open() {
+    let _ = HUB.set(Arc::new(Hub::open(Secret::from_bytes(rand::random()))));
+}
+
+/// Whether DERP is served, which `/relays.json` says (T-720).
+pub fn enabled() -> bool {
+    HUB.get().is_some()
+}
+
 /// Whether `path` is DERP's, once [`enable`] was called.
 pub fn serves(path: &str) -> bool {
     HUB.get().is_some() && (path == PATH || PROBES.contains(&path))

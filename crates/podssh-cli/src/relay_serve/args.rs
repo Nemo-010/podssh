@@ -60,6 +60,8 @@ pub struct ServeArgs {
     pub publish: Vec<String>,
     /// The file of the node keys that DERP at `/derp` admits (T-106).
     pub derp_keys: Option<String>,
+    /// The meeting points that it serves, `iroh` and `derp` (T-720).
+    pub relay_roads: Option<String>,
 }
 
 impl ServeArgs {
@@ -104,6 +106,7 @@ impl ServeArgs {
             proxy_protocol: get("proxy-protocol"),
             publish: publish::args(matches),
             derp_keys: get("derp-keys"),
+            relay_roads: get("relay-roads"),
         }
     }
 

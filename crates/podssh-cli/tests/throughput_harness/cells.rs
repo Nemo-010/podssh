@@ -302,10 +302,28 @@ impl Cell {
     }
 }
 
+#[cfg(feature = "iroh")]
+impl Cell {
+    /// The iroh road through podssh's own relay role (T-720): `relay serve
+    /// --relay-roads iroh` on the loopback, each end's iroh relay at
+    /// `https://localhost:PORT/`, trusted by the test CA.
+    pub fn iroh_through_role(s: &Session) -> Result<Cell, Skipped> {
+        let name = "iroh road, podssh's relay role".to_string();
+        let role = Cell::podssh_relay(s, &name, &["--relay-roads", "iroh"])?;
+        let at = role.args.iter().position(|a| a == "--relay-host").map(|i| role.args[i + 1].clone());
+        let Some(port) = at.and_then(|at| at.rsplit(':').next().map(str::to_string)) else {
+            return Err((name, "the role's cell names no port".into()));
+        };
+        let ca = s.home.join("fake-relay").join("ca.pem");
+        iroh::cell(s, name, &format!("https://localhost:{port}/"), Some(&ca))
+    }
+}
+
 /// `make CA and leaf`: a test CA and a certificate of `relay-a.test` signed
 /// by it, as `scripts/interop-faults.sh` makes them; it names the built-in
 /// relay too, which a test reaches through a stand-in proxy's map, for a run
-/// that names no relay (T-253), and which only that test's runs trust.
+/// that names no relay (T-253), and which only that test's runs trust; and
+/// `localhost`, which an iroh endpoint dials as the role's relay (T-720).
 fn certificates(dir: &std::path::Path) -> Result<(), String> {
     let p = |name: &str| dir.join(name).display().to_string();
     std::fs::write(dir.join("req.cnf"), "[req]\ndistinguished_name = dn\n[dn]\n").map_err(|e| e.to_string())?;
@@ -313,7 +331,7 @@ fn certificates(dir: &std::path::Path) -> Result<(), String> {
     std::fs::write(
         dir.join("ext"),
         format!(
-            "subjectAltName=DNS:relay-a.test,DNS:relay-b.test,DNS:{builtin}\nbasicConstraints=CA:FALSE\n\
+            "subjectAltName=DNS:relay-a.test,DNS:relay-b.test,DNS:{builtin},DNS:localhost\nbasicConstraints=CA:FALSE\n\
              keyUsage=critical,digitalSignature\nextendedKeyUsage=serverAuth\n"
         ),
     )

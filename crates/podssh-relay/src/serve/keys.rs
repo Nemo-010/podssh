@@ -76,7 +76,7 @@ impl<'a> Whom<'a> {
 
     /// Whether `key` is let in: `Ok` with the net's words for its member
     /// (none for a key of the list), `Err` with why not.
-    fn admits(&self, key: &PublicKey) -> Result<Option<String>, String> {
+    pub(crate) fn admits(&self, key: &PublicKey) -> Result<Option<String>, String> {
         let mut refused = Vec::new();
         if let Some(list) = self.list {
             match list.read() {

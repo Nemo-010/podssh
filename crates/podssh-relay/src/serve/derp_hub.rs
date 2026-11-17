@@ -32,11 +32,11 @@ pub(super) struct Client {
     queue: mpsc::Sender<Vec<u8>>,
 }
 
-/// The DERP server: its key, the file of the keys that it admits, and the
-/// clients that are up, one for each key.
+/// The DERP server: its key, the file of the keys that it admits (none:
+/// each key, T-720), and the clients that are up, one for each key.
 pub struct Hub {
     secret: Secret,
-    keys: PathBuf,
+    keys: Option<PathBuf>,
     pub(super) clients: Mutex<HashMap<Key, Client>>,
     next: AtomicU64,
 }
@@ -47,7 +47,13 @@ pub(super) fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 
 impl Hub {
     pub fn new(secret: Secret, keys: PathBuf) -> Hub {
-        Hub { secret, keys, clients: Mutex::default(), next: AtomicU64::new(0) }
+        Hub { secret, keys: Some(keys), clients: Mutex::default(), next: AtomicU64::new(0) }
+    }
+
+    /// A hub that admits each node key, as derper with no
+    /// `--verify-clients`: for a role whose owner mints for anyone (T-720).
+    pub fn open(secret: Secret) -> Hub {
+        Hub { secret, keys: None, clients: Mutex::default(), next: AtomicU64::new(0) }
     }
 
     /// The server's public key, which its first frame and its 101 name.
@@ -56,8 +62,17 @@ impl Hub {
     }
 
     /// Whether the file admits `key`, read now; `Err` when it cannot be read.
+    /// An open hub admits each key.
     pub(super) fn admits(&self, key: &Key) -> Result<bool, String> {
-        Ok(read_keys(&self.keys)?.contains(key))
+        match &self.keys {
+            Some(keys) => Ok(read_keys(keys)?.contains(key)),
+            None => Ok(true),
+        }
+    }
+
+    /// Whether it admits each node key.
+    pub fn is_open(&self) -> bool {
+        self.keys.is_none()
     }
 
     /// `key` up on a new connection: an older one of the same key loses its
@@ -116,7 +131,7 @@ impl Hub {
         let refused = match self.admits(&key) {
             Ok(true) => None,
             // The whole key, which is public, so that its owner can list it.
-            Ok(false) => Some(format!("nodekey:{}, not in {}", key.hex(), self.keys.display())),
+            Ok(false) => Some(format!("nodekey:{}, not in {}", key.hex(), self.file())),
             Err(why) => Some(format!("nodekey:{}: {why}", key.hex())),
         };
         if let Some(why) = refused {
@@ -151,6 +166,13 @@ impl Hub {
         writer.abort();
         self.leave(&key, id);
         cfg.event(&format!("derp: the node key {} is down", key.short()));
+    }
+}
+
+impl Hub {
+    /// The file of its keys, in words.
+    fn file(&self) -> String {
+        self.keys.as_ref().map_or_else(|| "no file".to_string(), |keys| keys.display().to_string())
     }
 }
 

@@ -1,0 +1,7 @@
+# T-720: the DERP hub of the relay role sends each packet to a key other
+# than its sender and the one that it names; the test of three keys must
+# fail.
+ENTRY=T-720
+GROUP=resume
+EXPECT='test serve::derp::tests::of_three_keys_a_packet_reaches_the_named_one_alone \.\.\. FAILED'
+RUN='cargo test --locked -p podssh-relay --features serve,derp --lib -- serve::derp::tests::of_three_keys_a_packet_reaches_the_named_one_alone'

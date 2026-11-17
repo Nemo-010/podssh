@@ -1,0 +1,7 @@
+# T-720: the relay role registers each iroh client under the key of the
+# client before it, so a datagram that names one key reaches another
+# client's connection; the test of three clients of n0's own code must fail.
+ENTRY=T-720
+GROUP=resume
+EXPECT='never met through the role|named another key'
+RUN='cargo test --locked -p podssh-relay --features serve,iroh-serve --test relay_meet -- of_three_clients_a_datagram_reaches_the_key_that_it_names_alone'

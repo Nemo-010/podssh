@@ -1,0 +1,15 @@
+--- a/crates/podssh-relay/src/serve/derp_hub.rs
++++ b/crates/podssh-relay/src/serve/derp_hub.rs
+@@ -102,7 +102,11 @@
+         }
+         let mut to = [0u8; KEY];
+         to.copy_from_slice(&body[..KEY]);
+-        let Some(queue) = lock(&self.clients).get(&Key(to)).map(|c| c.queue.clone()) else { return };
++        // Planted: the packet goes to a key other than its sender and the one that it names.
++        let clients = lock(&self.clients);
++        let other = clients.iter().find(|(key, _)| **key != Key(to) && *key != from).map(|(_, c)| c.queue.clone());
++        drop(clients);
++        let Some(queue) = other else { return };
+         let _ = queue.try_send(framed(kind::RECV_PACKET, &[&from.0[..], &body[KEY..]].concat()));
+     }
+ 

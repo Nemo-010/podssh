@@ -26,7 +26,9 @@
 //! that the owner publishes goes to its pair's node by the ClientHello, before
 //! the role's own TLS ([`published`], [`sni`], T-649). With a file of node
 //! keys, it serves DERP at `/derp` for them, which a node of `podssh ts` in
-//! `relay` mode pins (`derp`, T-106).
+//! `relay` mode pins (`derp`, T-106). Where its owner names them, iroh's
+//! relay protocol and the probes of iroh's and Tailscale's reports of the
+//! network share the same listener ([`meet`], T-720).
 
 #[cfg(feature = "quick")]
 pub mod behind;
@@ -47,6 +49,8 @@ pub mod layer;
 pub mod leg;
 pub mod listener;
 pub mod mailbox;
+// iroh's relay protocol and the probes of a net's meeting point (T-720).
+pub mod meet;
 pub mod policy;
 pub mod probe;
 // The names published to nodes, routed by the ClientHello (T-649).
@@ -207,6 +211,7 @@ pub fn serves(path: &str) -> bool {
     matches!(path, "/health" | "/v1/mint" | "/relays.json" | "/trace" | "/llms-full.txt")
         || path.starts_with("/connect/")
         || path.starts_with("/v1/")
+        || meet::serves(path)
 }
 
 /// Serve the one request of `stream`, which closes after it as each request
@@ -282,6 +287,8 @@ where
         // DERP for a node of `podssh ts`, where its owner named the keys (T-106).
         #[cfg(feature = "derp")]
         (_, p) if derp::serves(p) => derp::request(stream, head, pending, cfg).await,
+        // iroh's relay protocol and the probes of a meeting point (T-720).
+        (_, p) if meet::serves(p) => meet::request(stream, head, pending, cfg).await,
         (_, p) => answer(&mut stream, request::refusal(404, &format!("{p}: not found"), &[])).await,
     }
 }

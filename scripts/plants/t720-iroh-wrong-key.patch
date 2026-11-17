@@ -1,0 +1,14 @@
+--- a/crates/podssh-relay/src/serve/meet_iroh.rs
++++ b/crates/podssh-relay/src/serve/meet_iroh.rs
+@@ -93,7 +93,10 @@
+         Ok(Err(why)) => return cfg.event(&format!("iroh: a handshake failed: {why}")),
+         Err(_) => return cfg.event("iroh: a handshake took more than 10 s"),
+     };
+-    let asked = ClientRequest::new(proven.client_key, version, parts_of(&head));
++    // Planted: each connection is registered under the key of the one before it.
++    static BEFORE: std::sync::Mutex<Option<iroh_base::EndpointId>> = std::sync::Mutex::new(None);
++    let before = BEFORE.lock().unwrap().replace(proven.client_key).unwrap_or(proven.client_key);
++    let asked = ClientRequest::new(before, version, parts_of(&head));
+     let door: Arc<dyn DynAccessControl> = Arc::new(Door { cfg: cfg.clone() });
+     // A key that the door refused got iroh's denial; the door said why.
+     let Ok(guard) = proven.authorize_with(&asked, &door, &mut frames).await else { return };

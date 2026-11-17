@@ -64,7 +64,7 @@ Read on 2026-11-15.
    `acme/mod.rs` of `podssh-cli`). Nothing is frozen now (2026-11-15). Taken on 2026-11-17 (`v0.65.0`): `pod-tor` and `pod-iroh`.
    Next, as podcrates names them: `pod-cloudflare` and `pod-ts`; then
    `pod-relay-serve` last.
-8. **Drafts.** Waiting (2026-11-17), each on its branch in `.claude/worktrees/`: T-720 (`draft-t720`, iroh's relay protocol on the role's listener) and T-723 (`draft-t723`, the wire document and its vectors); merge them in that order. Merged on 2026-11-16 and 17: T-709, T-710, T-712, T-713, T-714, T-715, T-716, T-717, T-718, T-790 (its writers), T-798, T-801 and T-805; their `draft/*` branches on GitHub are each in `main` (the owner deletes them by hand). Superseded: `draft/t791-lane` (its commands 5 and 6 are in `scripts/pod-lab-serve-lane.sh`, 2026-11-16; the owner deletes the branch by hand). Merged on 2026-11-16: T-790's model on pod-manual and the five drafts of its long sentences. Merged on 2026-11-15: T-790's sentences of the manual at 25 words or fewer. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
+8. **Drafts.** Waiting (2026-11-17), on its branch in `.claude/worktrees/`: T-723 (`draft-t723`, the wire document and its vectors); merge it next. Merged on 2026-11-16 and 17: T-709, T-710, T-712, T-713, T-714, T-715, T-716, T-717, T-718, T-720, T-790 (its writers), T-798, T-801 and T-805; their `draft/*` branches on GitHub are each in `main` (the owner deletes them by hand). Superseded: `draft/t791-lane` (its commands 5 and 6 are in `scripts/pod-lab-serve-lane.sh`, 2026-11-16; the owner deletes the branch by hand). Merged on 2026-11-16: T-790's model on pod-manual and the five drafts of its long sentences. Merged on 2026-11-15: T-790's sentences of the manual at 25 words or fewer. Merged on 2026-11-14: T-707's (`c2c0097`, the GSRN road; partial for Q106), T-532's (with a repair of the OpenTunnel road's end of a connection). Merged on 2026-11-13: T-567's, T-566's, T-611's, T-774's, T-248's study (its entries T-775 to T-778 filed),
    T-118's, T-117's, T-114's, T-112's,
    T-110's, T-109's, T-108's with T-222, T-107's, T-771's, T-773's, T-738's second and third, T-321's
    CLI test of `podssh each`, T-319's item 2, and the takes of podcrates v0.36.0 to v0.39.0 and
@@ -201,7 +201,7 @@ Measured on 2026-10-09 after T-060, on Windows 11 with native cargo 1.98.0 and
 
 ## Counts
 
-`TODO/INDEX.md` holds 763 entries: 33 open, 38 partial, 11 blocked, 681 done.
+`TODO/INDEX.md` holds 763 entries: 32 open, 39 partial, 11 blocked, 681 done.
 
 Open includes parked work. `cargo todo check` verifies this line.
 

@@ -25,8 +25,9 @@ default = []
 ts = ["dep:podssh-ts"]
 # The iroh road between two podssh ends (T-162), over pod-iroh of
 # PodUtils/podcrates. Off by default: iroh adds about 200 crates, and the
-# road is one that the user selects.
-iroh = ["dep:pod-iroh", "dep:iroh", "dep:pod-ws"]
+# road is one that the user selects. With it, `podssh relay serve
+# --relay-roads iroh` serves iroh's relay protocol too (T-720).
+iroh = ["dep:pod-iroh", "dep:iroh", "dep:pod-ws", "podssh-relay/iroh-serve"]
 # The iroh road with a relay server on the loopback, for the test of the
 # command line from end to end (`tests/iroh_road.rs`); never in a release.
 iroh-test = ["iroh", "pod-iroh/test-relay"]

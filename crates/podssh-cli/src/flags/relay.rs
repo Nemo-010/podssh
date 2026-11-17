@@ -114,6 +114,9 @@ pub const RELAY_FLAGS: &[FlagRow] = &[
     // DERP over a WebSocket for the node keys of a file (T-106).
     row(None, "derp-keys", Some("FILE"), FlagKind::Supported,
         "serve: serve DERP at /derp, over a WebSocket of the subprotocol derp, as Tailscale's derper does; for the node keys in FILE, one a line (nodekey:HEX, as the status of tailscale and of podssh's ts_echo example write them; # starts a comment), read again at each login; a node key that is not in it is closed with 1008 not authorized, as the operator's relay closes it; this way, podssh ts --ts-mode relay --ts-relay HOST:PORT pins this relay. The packets are WireGuard's, sealed end to end: the relay sees keys, sizes and times", None),
+    // iroh's relay protocol and DERP as a net's meeting point (T-720).
+    row(None, "relay-roads", Some("WORDS"), FlagKind::Supported,
+        "serve: also be the meeting point of a net on this listener. WORDS is iroh, derp, or iroh,derp. iroh serves iroh's relay protocol at /relay, with /ping. derp serves DERP at /derp for the node keys of --derp-keys; with no such file and --mint anyone, for each key. Each serves /generate_204. /relays.json names each as meet", None),
     // The signed list of deployments of /relays.json (T-346).
     row(None, "deployment", Some("NAME=HOSTS"), FlagKind::Supported,
         "serve: a deployment that /relays.json names in its signed list, NAME=HOST[:PORT][,HOST[:PORT]...], repeatable, in order; a client that trusts the list's key (PODSSH_RELAY_KEYS, RelayKeys, a member of its net with the role relay) tries those hosts after its default list; each with a token of its own", None),

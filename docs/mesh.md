@@ -28,7 +28,7 @@ This page is the design. Each part names its entry, and
 | MagicDNS | A member's name: `podssh ssh NAME`, `node://NAME` | T-429 |
 | ACLs and grants | The net's policy, signed by the owner, checked at each node; a grant used once, checked at the node | T-430, T-226 |
 | Auth keys, a device's approval | Pairing by a short code over a public mailbox, with a PAKE; a new device's join of the net by one, its owner checked at the device | T-086, T-616 |
-| DERP and peer relays | The roads race (iroh, DERP, pairs, quick tunnel, the carriers of Q65); the relay as a role of a node; a member that relays for two others | T-169, T-427, T-428, T-434 |
+| DERP and peer relays | The roads race (iroh, DERP, pairs, quick tunnel, the carriers of Q65); the relay as a role of a node, and as the net's iroh relay and DERP server; a member that relays for two others | T-169, T-427, T-428, T-434, T-720 |
 | Exit nodes | `podssh node --exit`: the node's egress for its owner's forward road, and a local SOCKS5 or HTTP proxy when the user asks | T-431 |
 | Subnet routers | `--routes CIDR,...`: the private networks that the node reaches, for the net | T-432 |
 | `tailscale serve` | `podssh share`: a node's local services, by name, for the net | T-433 |
@@ -321,7 +321,16 @@ which `--pairs FILE` keeps across a restart:
   certificate, and the role reads the name, never the bytes; the role's
   form of funnel, with TLS at the node, where T-180 is TLS at the quick
   tunnel's edge ([relay.md](relay.md), "A name published on the relay
-  role's port", T-649).
+  role's port", T-649);
+- as the meeting point of its own net, on the same listener, when asked
+  (`--relay-roads iroh,derp`): iroh's relay protocol at `/relay`, with
+  iroh-relay's own server code, for the endpoints whose keys `--mint`
+  admits, and DERP at `/derp` for the keys of `--derp-keys FILE` (T-106) or
+  each key where the role mints for anyone; with `/ping` and
+  `/generate_204`, and each road named in `/relays.json` as `meet`, so that
+  a net whose hosts let only port 443 in needs neither n0's relays nor
+  Tailscale's DERP fleet ([relay.md](relay.md), "The relay role as a
+  meeting point", T-720).
 
 The role does what the default deployment does not do, which were the items
 of [relay-operator.md](relay-operator.md): bounded queues for a slow client

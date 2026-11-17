@@ -10,8 +10,9 @@
 //! ssh` take when asked, across cuts of their link, and its budget (T-173,
 //! `serve_layer`), what each of its threads holds after its bind (T-629,
 //! `serve_caps`), its limit flags (T-704, `serve_limits`), its list of keys at
-//! a URL (T-646, `serve_list`), and an SSH client on its port to the owner's
-//! sshd (T-644, `serve_sshd`). The
+//! a URL (T-646, `serve_list`), an SSH client on its port to the owner's
+//! sshd (T-644, `serve_sshd`), and iroh's relay protocol on its listener
+//! (T-720, `serve_meet`). The
 //! suite of the stand-in also runs against the role with
 //! `PODSSH_RELAY_UNDER_TEST=podssh`.
 
@@ -21,6 +22,7 @@ mod serve_certs;
 mod serve_layer;
 mod serve_limits;
 mod serve_list;
+mod serve_meet;
 mod serve_net;
 mod serve_proxy;
 mod serve_slots;

@@ -105,3 +105,29 @@ fn the_file_admits_its_keys_alone_and_a_key_added_without_a_restart() {
     assert_eq!(hub.admits(&Key([2; 32])), Ok(true), "read again at each login");
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn an_open_hub_admits_each_key_and_says_so() {
+    let hub = Hub::open(Secret::from_bytes([7; 32]));
+    assert!(hub.is_open());
+    assert_eq!(hub.admits(&Key([1; 32])), Ok(true));
+    assert_eq!(hub.admits(&Key([0xfe; 32])), Ok(true));
+    assert!(!self::hub().is_open(), "a hub of a file admits its keys alone");
+}
+
+#[tokio::test]
+async fn of_three_keys_a_packet_reaches_the_named_one_alone() {
+    // T-720's plant forwards to another key than the named one: B must then
+    // get a packet that names C.
+    let hub = Hub::open(Secret::from_bytes([7; 32]));
+    let (a, b, c) = (Key([1; 32]), Key([2; 32]), Key([3; 32]));
+    let (_, _a_waits) = hub.join(a);
+    let (_, mut b_waits) = hub.join(b);
+    let (_, mut c_waits) = hub.join(c);
+    hub.forward(&a, &[&c.0[..], b"for c"].concat());
+    hub.forward(&a, &[&b.0[..], b"for b"].concat());
+    assert_eq!(b_waits.recv().await.unwrap(), framed(kind::RECV_PACKET, &[&a.0[..], b"for b"].concat()));
+    assert_eq!(c_waits.recv().await.unwrap(), framed(kind::RECV_PACKET, &[&a.0[..], b"for c"].concat()));
+    assert!(b_waits.try_recv().is_err(), "B got a packet that named another key");
+    assert!(c_waits.try_recv().is_err(), "C got a packet that named another key");
+}

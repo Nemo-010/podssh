@@ -72,6 +72,9 @@ pub fn relays(cfg: &Config, head: &Request) -> Value {
         // (T-173), beside the contract: a client asks for it only here, and
         // sends each link to the name of this process, when it has one.
         "forward": cfg.resumes.offer(),
+        // The meeting points that it serves, iroh's relay and DERP, each
+        // `null` when off (T-720): a member of its net lists this host first.
+        "meet": super::meet::doc(&authority),
         "pool": [{ "rank": 0, "name": "podssh", "host": name, "bucket": null, "region": null,
                    "client_ms": 0, "target_ms": 0, "score_ms": 0 }],
         "limits": {

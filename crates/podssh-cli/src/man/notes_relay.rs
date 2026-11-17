@@ -346,6 +346,19 @@ pub const RELAY: &[&str] = &[
      a receiver at most; /derp/probe and /derp/latency-check answer an empty 200. The packets are WireGuard's, \
      sealed end to end: the relay sees keys, sizes and times. Each login and each end is a line on stdout, with \
      the key's first 8 hex digits.",
+    // iroh's relay protocol and DERP as a net's meeting point (T-720).
+    "--relay-roads WORDS makes the relay the meeting point of a net, on its one listener. A net whose hosts \
+     let only port 443 in then needs neither n0's iroh relays nor Tailscale's DERP fleet. WORDS is iroh, derp, \
+     or both, separated by a comma. iroh serves iroh's relay protocol at /relay, with iroh-relay's own server \
+     code. An iroh endpoint whose relay URL is https://HOST:PORT/ meets other endpoints here. It admits the \
+     endpoints whose keys --mint admits: anyone, the keys of its list, or the members of its net. With --mint \
+     nobody it admits none, so the start stops (64). A refused endpoint gets iroh's denial, not authorized. \
+     /ping answers an empty 200, as iroh's relays answer. derp serves DERP at /derp, as --derp-keys does. With \
+     no --derp-keys, it admits each node key, and only with --mint anyone (64 otherwise). Each road serves \
+     /generate_204, the probe of a captive portal, with the answer to an iroh or Tailscale challenge. \
+     /relays.json names each road as meet, null where it is off. Each endpoint that comes and goes is a line \
+     on stdout. The datagrams are sealed end to end: the relay sees keys, sizes and times. A build with no iroh \
+     road refuses iroh (70).",
     "The relay's TLS offers h2 before http/1.1 (RFC 8441): a client that chooses it gets SETTINGS that offer \
      extended CONNECT and 16 streams at once. Each stream has a window of 1 MiB in one of 16 MiB for the \
      connection. So the sessions of a client's process are streams of one connection. A CONNECT whose :protocol is \

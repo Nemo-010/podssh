@@ -3709,10 +3709,10 @@ The draft's calls, 2026-11-02:
    each socket of both roads, which needs a token or a pair that the brake let through and is
    checked with a MAC or a digest and no state. Lost: a brake of the upgrades with no token, as
    the default relay counts them: the role's refusal of one costs less than the count.
-4. The address: the listener's TCP peer (`crates/podssh-cli/src/relay_serve.rs:365`), never a
+4. The address: the listener's TCP peer (`crates/podssh-cli/src/relay_serve.rs:369`), never a
    header, which each client of a listener writes, and would make up anew for each request.
    Behind the quick tunnel (T-428) the peer is Cloudflare's edge, so the hook for T-428 is
-   `serve::serve_from(stream, cfg, sni, from)` (`crates/podssh-relay/src/serve/mod.rs:217`),
+   `serve::serve_from(stream, cfg, sni, from)` (`crates/podssh-relay/src/serve/mod.rs:222`),
    with `from` read by `brake::edge_visitor` (`crates/podssh-relay/src/serve/brake.rs:71`) from
    the `cf-connecting-ip` of the edge's own request, which reaches the node only on the
    connection that podssh dialed to the edge. Lost: the role reading that header itself when a
@@ -3767,7 +3767,7 @@ name. `/v1/pair` is answered in the reverse road, where `serve/mod.rs` routes it
 address to count by: at `33ccb11`,
 `podssh relay serve` dropped the peer of each connection that it accepted
 (`let Ok((tcp, _)) = accepted` in `crates/podssh-cli/src/relay_serve.rs`). So the brake stands in
-the role's dispatch, before both paths (`crates/podssh-relay/src/serve/mod.rs:230`), and
+the role's dispatch, before both paths (`crates/podssh-relay/src/serve/mod.rs:235`), and
 `serve_from` takes the address, which the listener gives. The Prove that runs, in place of the
 one above:
 
@@ -4083,7 +4083,7 @@ nothing, works.
 ## Premise
 
 - `crates/podssh-relay/src/serve/forward.rs:159` dials the resolved addresses with
-  `TcpStream::connect`, and `crates/podssh-relay/src/serve/docs.rs:150` does the same for
+  `TcpStream::connect`, and `crates/podssh-relay/src/serve/docs.rs:153` does the same for
   `/trace`; neither reads `HTTPS_PROXY`.
 - Rule 2 of `AGENTS.md`: one outbound connection, through `HTTPS_PROXY` when it is set.
 
@@ -13699,7 +13699,7 @@ output that lists what is on.
 - Read: `podssh status` is JSON already (`crates/podssh-cli/src/status.rs:84-111`); it has `offline` and no
   public set.
 - Read: the lists of other parties' hosts moved to `pod-services` (v0.7.0 is taken,
-  `crates/podssh-cli/Cargo.toml:101`); no host is named in this entry or in the new code.
+  `crates/podssh-cli/Cargo.toml:102`); no host is named in this entry or in the new code.
 - Not read: the party field of a service in `pod-services`. Podcrates T-112 adds the party filter and the
   effective set as JSON.
 
@@ -13997,7 +13997,7 @@ clean; the citations moved by `cargo todo remap`. Planted: the exit of a partial
 **Milestone:** M10
 **Priority:** P3
 **Effort:** L
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -14008,7 +14008,7 @@ cannot be the meeting point of its own net. The ask: the same listener also spea
 
 ## Premise
 
-- `crates/podssh-relay/src/serve/mod.rs:207`-`256`: the routes are `/health`, `/v1/*`, `/relays.json`,
+- `crates/podssh-relay/src/serve/mod.rs:211`-`256`: the routes are `/health`, `/v1/*`, `/relays.json`,
   `/trace`, `/llms-full.txt` and `/connect/`. No route speaks DERP or iroh's relay protocol.
 - `PodUtils/podcrates:crates/pod-derp/src/conn.rs`: podssh's DERP code is a client and the node's end of a link.
   It never forwards a frame between two other keys.
@@ -14016,27 +14016,147 @@ cannot be the meeting point of its own net. The ask: the same listener also spea
 
 ## Approach
 
+(Changed by the Correction below.)
+
 1. Read the DERP server of Tailscale and the relay server of iroh-relay (use the services of
-   <https://web.pkgforge.dev/llms.txt>). Write each fact in this entry.
-2. Add `serve/derp_server.rs`: the upgrade on `/derp`, the key exchange, frames between keys, mesh of one
-   host only. Add `/derp/probe` and `/generate_204`.
-3. Add the iroh relay route with iroh-relay's own server code if its feature builds statically; else write
-   the protocol from its source. The route is off until `--relay-roads iroh,derp` (a flag of `relay serve`).
-4. The role advertises both in `/relays.json` and in the net document, so a member lists the host first.
-   No host name is written into the code (pod-services owns the lists).
-5. Rule 2: no new listener. The two roads share the listener of `relay serve`.
+   <https://web.pkgforge.dev/llms.txt>). Write each fact in this entry (the Correction holds them).
+2. DERP is served already (T-106). Keep `crates/podssh-relay/src/serve/derp.rs` and its hub; add an
+   open hub, which admits each node key, for a role that mints for anyone; add the three-key test of the
+   hub's forward.
+3. Add `crates/podssh-relay/src/serve/meet.rs`: `/generate_204` (both challenges), `/ping`, and the
+   iroh route at `/relay` (`meet_iroh.rs`, feature `iroh-serve` of podssh-relay, which `iroh` of
+   podssh-cli turns on), with iroh-relay's own server code over the role's upgrade.
+4. The routes are off until `--relay-roads iroh,derp` (a flag of `relay serve`,
+   `crates/podssh-cli/src/relay_serve/roads.rs`). Whom each admits follows the role's other flags.
+5. The role advertises both in `/relays.json` as `meet`. No host name is written into the code
+   (pod-services owns the lists). A member's use of `meet` (its endpoint lists the net's relay host
+   first as its iroh relay and its DERP home) is the step after the draft.
+6. Rule 2: no new listener. The two roads share the listener of `relay serve`.
+
+## Decision
+
+- **iroh-relay's own server code over the role's upgrade (a).** iroh-relay 1.4.1 exposes an entry for
+  an embedder that brings its own WebSocket: `protos::handshake::serverside` over any
+  `BytesStreamSink + ExportKeyingMaterial`, `SuccessfulAuthentication::authorize_with` with a hook of
+  access (`server::AccessControl`), `server::streams::RelayedStream::new` ("the primary constructor for
+  external integrations using custom WebSocket implementations") and `server::clients::Clients::register`;
+  its own test `tests/relay_axum.rs` embeds it so in axum. The role answers the upgrade itself and
+  bridges the session's binary messages to that entry (`Frames`: two queues of `futures-channel`, a task
+  each way). The forwarding, the replacement of an older connection of one key, `EndpointGone`, the pings
+  and the versions are n0's code, not a copy that drifts.
+- Lost: **`RelayService::handle_connection`**. It takes a raw `TcpStream` and runs its own TLS and hyper;
+  the role reads TLS, the SNI and the head itself (`listener.rs`, `serve_from`), so the route could not
+  share the listener.
+- Lost: **(b) the protocol written from iroh-relay's source.** The frames are simple (a QUIC varint and
+  a body), but their encoders are `pub(crate)`, and the handshake (postcard of `ClientAuth`, blake3's
+  key derivation of the challenge, Ed25519) and the registry would be a second copy to keep in step with
+  each iroh release. Kept as the fallback if the `server` feature does not build statically in the
+  build image: then this draft's tests stay, and `meet_iroh.rs` is rewritten under them.
+- Lost: **(c) a COORD issue to podcrates for a new entry.** Not needed: the entry above is public in
+  the vendored 1.4.1 as it stands, and podssh changes nothing of podcrates (Rule Q3). The route is
+  podssh's.
+- **The cost of (a).** iroh-relay's `server` feature brings clap, rcgen, tokio-rustls-acme (with
+  reqwest and ring), toml, dashmap, tracing-subscriber, rustls-platform-verifier and hyper's server. Each
+  is in `Cargo.lock` already (pod-iroh's `test-relay` builds them); each is pure Rust or ring, which the
+  iroh road builds already. They come into a release with `iroh` (`RELEASE_FEATURES`); a build with no
+  `iroh` has none of them. Rule 7 (fallbacks over minimal code) and rule 4 (whatever is necessary, each
+  binary static) both allow it; the static build is the one check, and it waits for the build image.
+- **Whom iroh admits follows `--mint`**: anyone; the keys of its list and the members of its net (an
+  endpoint's key is a key of podssh's identity, so the same list serves both); `--mint nobody` stops the
+  start (64). Lost: a file of endpoint keys of its own (a flag more, and a second list of the same
+  keys); an open relay with `--mint nobody` (a stranger's traffic on the owner's host, with no word).
+- **DERP with no `--derp-keys`** admits each node key, and only with `--mint anyone`, as derper with no
+  `--verify-clients`. Node keys are Curve25519 keys of WireGuard, not podssh's identities, so a list of
+  `--mint` cannot name them. `--derp-keys FILE` alone keeps turning DERP on (T-106).
+- **No keying material.** The bridge exports none (`ExportKeyingMaterial` returns `None`): the role's
+  TLS is not reachable from the session, so a client's header never matches, and iroh's challenge
+  proves its key, one round trip more. The handshake is given no header, so no check is tried in vain.
+- **No brake on `/relay`.** An endpoint keeps one connection; many endpoints behind one address would
+  meet the brake of mints. The listener's slots (T-748) bound the connections.
+- **A browser's iroh client** (an `Origin`) is refused (403), as each WebSocket of the role refuses one.
 
 ## Prove
 
 ```sh
 export CARGO_BUILD_JOBS=4
-cargo test -p podssh-relay --features serve --lib serve::derp_server
-cargo test -p podssh-cli --features iroh --test relay_serve -- derp iroh_relay
+cargo test -p podssh-relay --features serve,derp,iroh-serve --lib -- serve::meet serve::derp
+cargo test -p podssh-relay --features serve,iroh-serve --test relay_meet
+cargo test -p podssh-cli --features iroh --test relay_serve -- serve_meet
+cargo test -p podssh-cli --test relay_serve -- serve_meet
+cargo test -p podssh-cli --lib relay_serve::roads
+sh scripts/plant-each.sh t720-iroh-wrong-key t720-derp-wrong-key
 ```
 
-Tests: two podssh DERP clients meet through `relay serve` and move 1 MiB each way; Tailscale's own
-`derper` client, if the build image has it, does the same; an iroh endpoint of the vendored crate uses the
-role as its relay. Plant: forward a frame to the wrong key; the test fails.
+Tests: two clients of n0's iroh-relay (`ClientBuilder`) meet through the role and move 1 MiB each way;
+of three, a datagram reaches the key that it names alone; a role that mints for a list admits its keys
+alone, with iroh's denial; `/ping`, `/generate_204` and a bad upgrade answer as iroh-relay's server;
+`/relays.json` names the road. Two podssh endpoints of the iroh road (`podssh node --iroh` and `podssh
+ssh iroh:TICKET`) carry 1 MiB each way through the role alone. DERP's hub of three keys forwards to the
+named one alone. Plants: a registry that takes the key of the connection before
+(`t720-iroh-wrong-key`), and a hub that forwards to another key (`t720-derp-wrong-key`); each test fails.
+Tailscale's own `derper` client, if the build image has it, waits for the build image (T-251).
+
+## Correction
+
+2026-11-17, read in the worktree of the draft:
+
+- The first Premise is out of date. Since T-106 the role serves DERP at `/derp` for the node keys of a
+  file (`podssh relay serve --derp-keys FILE`, `crates/podssh-relay/src/serve/derp.rs`, behind the
+  feature `derp`), over a WebSocket of the subprotocol `derp` and over derper's `Upgrade: DERP`, with its
+  probes `/derp/probe` and `/derp/latency-check`. What remained of DERP: an open hub for a role that
+  mints for anyone, `/generate_204`, and its advertisement in `/relays.json`. What remained whole:
+  iroh's relay protocol (`/relay`, `/ping`, `/generate_204`).
+- The second Premise holds for `PodUtils/podcrates:crates/pod-derp/`, and the role's own hub
+  (`crates/podssh-relay/src/serve/derp.rs`) forwards between keys since T-106.
+- The third Premise holds: iroh-relay is a client only in a release. Its `server` feature is built only
+  by pod-iroh's `test-relay` (the tests of the iroh road).
+- iroh-relay 1.4.1's server, read in the vendored copy: `/relay` takes `Upgrade: websocket`, version 13
+  and `Sec-WebSocket-Protocol` with `iroh-relay-v2` and/or `iroh-relay-v1`; it picks the newest and names
+  it in its 101 (else 400). After the upgrade: the server's `ServerChallenge` (16 random bytes), the
+  client's `ClientAuth` (its key and its signature of blake3's key derived from the challenge, in
+  postcard), or the header `x-iroh-relay-client-auth-v1` signed over TLS's exported keying material; then
+  `ServerConfirmsAuth` or `ServerDeniesAuth`. Each frame is a QUIC varint of its type and its body;
+  datagrams name 32 bytes of key, an ECN byte and the packet (64 KiB at most). `/ping` is an empty 200
+  with `Access-Control-Allow-Origin: *`; `/generate_204` a 204 that answers `X-Iroh-Challenge` as
+  `X-Iroh-Response: response CHALLENGE` (fewer than 64 characters of `[A-Za-z0-9._-]`).
+- Tailscale's derper (v1.104.4, `cmd/derper/derper.go` and `derp/derpserver/handler.go`, read through
+  fetch.web.pkgforge.dev): `/derp`, `/derp/probe`, `/derp/latency-check` (an empty 200 with
+  `Access-Control-Allow-Origin: *`), and `/generate_204`, a 204 with `Cache-Control: no-cache, no-store,
+  must-revalidate, no-transform, max-age=0` that answers `X-Tailscale-Challenge` as
+  `X-Tailscale-Response: response CHALLENGE` (64 characters at most of `[A-Za-z0-9._:-]`).
+- The Prove named a module `serve::derp_server` and a filter `derp iroh_relay`; the routes are
+  `serve::derp` and `serve::meet`, and the CLI's tests `serve_meet`. The Approach and the Prove above
+  are changed to match.
+
+## Done
+
+Partial, 2026-11-17 (drafted on `draft-t720`, then merged, built and run). Written:
+
+- `crates/podssh-relay/src/serve/meet.rs` (the routes, the probes, `meet` of `/relays.json`),
+  `meet_iroh.rs` (iroh-relay's server over the role's upgrade, the hook of access, the bridge),
+  their unit tests `meet_tests.rs` and `meet_iroh_tests.rs`; the open DERP hub (`derp.rs`,
+  `derp_hub.rs`) and its tests; `Whom::admits` made `pub(crate)` (`keys.rs`); the route in `mod.rs`
+  and `serves`; `meet` in `docs.rs`.
+- The feature `iroh-serve` of podssh-relay and its dependencies; `iroh` of podssh-cli turns it on.
+- `--relay-roads WORDS` (`relay_serve/roads.rs`, `args.rs`, the flag's row, the manual's note, the
+  list of `relay_cmd.rs`).
+- Tests: `crates/podssh-relay/tests/relay_meet.rs`; `crates/podssh-cli/tests/serve_meet/mod.rs` with
+  `Cell::iroh_through_role` (the test CA's leaf names `localhost` too); two lanes of `scripts/gate.sh`;
+  the plants `t720-iroh-wrong-key` and `t720-derp-wrong-key`.
+- `docs/relay.md` ("The relay role as a meeting point"), `docs/mesh.md` (section 4 and the table),
+  `docs/STATUS.md`.
+
+Results, 2026-11-17: `cargo test -p podssh-relay --features serve,derp,iroh-serve --lib -- serve::meet serve::derp`
+19 passed; `--features serve,iroh-serve --test relay_meet` 4 passed (two n0 clients meet through the role, a key off
+the list refused); `cargo test -p podssh-cli --test relay_serve -- serve_meet` 2 passed, and with `--features iroh` 3
+passed (an iroh endpoint of pod-iroh uses the role as its relay); `cargo test -p podssh-relay --features serve,plain-ws,derp` 396 passed and `-p podssh-cli --test relay_serve --test
+relay_serve_node` 41 passed; clippy (the gate's lints, with `iroh-serve` and
+`iroh`) and rustfmt clean after one lint at the merge (`.err().expect()` for `expect_err`). Planted (`sh
+scripts/plant-each.sh --here t720-iroh-wrong-key t720-derp-wrong-key`): 2 caught. `Cargo.lock` takes iroh-relay's
+`server` crates. Waits: the static build of the release with them, read in the gate's `release` lane. Open, after the
+draft: a member that reads `meet` of its net's relay host and lists it first as its iroh relay and its
+DERP home (the net's document already names the relay host, T-617); iroh's QUIC address discovery,
+which the role does not serve.
 
 # T-724: `-J node://NAME` and `mcp` destinations that name a node
 
@@ -16105,12 +16225,4 @@ Partial (2026-11-13): drafted (DRAFT T-773), not built, not run.
 - The plant `scripts/plants/t773-no-inline-note.plant` (group `resume`): `send` puts only an empty write in a
   note, every other on a host; caught by `a_write_that_fits_a_note_rides_in_it_and_no_host_sees_it`.
 - The manual (`crates/podssh-cli/src/man/notes_filehost.rs`, `crates/podssh-cli/src/man/facts/turn.rs`) and
-  `docs/carriers.md` (T-738's reading of the board) say that a small write rides in its note.
-- Merged, built and run by the main session the same day: `cargo test -p podssh-relay --features filehost --lib
-  filehost::`, 37 passed; the relay's `--lib` with `filehost`, 149; `--test filehost_board` against Mosquitto, 2.
-  `PODSSH_MOSQUITTO_TEST_BIN=/usr/sbin/mosquitto cargo test -p podssh-cli --features filehost --test
-  carrier_filehost`: 2 passed, its `#[ignore]` gone: `podssh ssh node://tester@lab cat` moved 256 KiB each way
-  through the stand-ins of tmpfiles.org and 0x0.st at the catalog's pace and Mosquitto in 177 s, equal digests,
-  where before the change it failed with 255 after 665 s. The plant `t773-no-inline-note`: caught
-  (`a_write_that_fits_a_note_rides_in_it_and_no_host_sees_it`). `--lib man::`: 60 passed; clippy with
-  `podssh-relay/filehost,podssh-cli/filehost` and rustfmt: clean.
+  `docs/carriers.md` (T-738's re

@@ -17,7 +17,9 @@
 //! list of keys at an `https://` URL, `relay_serve/keys_url.rs`'s (T-646);
 //! an SSH client of the listener to the owner's sshd, `relay_serve/sshd.rs`'s (T-644);
 //! a name published to a pair's node by its ClientHello, `relay_serve/publish.rs`'s (T-649);
-//! DERP for the node keys of a file, `relay_serve/derp.rs`'s (T-106).
+//! DERP for the node keys of a file, `relay_serve/derp.rs`'s (T-106);
+//! iroh's relay protocol and DERP as a net's meeting point,
+//! `relay_serve/roads.rs`'s (T-720).
 
 mod args;
 mod certs;
@@ -29,6 +31,7 @@ mod publish;
 mod quic;
 mod quota;
 mod resumes;
+mod roads;
 mod sshd;
 mod stopped;
 
@@ -122,8 +125,9 @@ fn prepare(s: &ServeArgs, ca_file: Option<&str>) -> Result<Prepared, Refusal> {
     };
     // The names published to nodes, never the one of --acme (T-649).
     let published = publish::of(&s.publish, &source)?;
-    // DERP for a node of `podssh ts`, for the keys of a file (T-106).
-    let derp = derp::of(s.derp_keys.as_deref())?;
+    // DERP for a node of `podssh ts`, for the keys of a file (T-106), and
+    // iroh's relay protocol, as --relay-roads names them (T-720).
+    let derp = roads::of(s.relay_roads.as_deref(), s.derp_keys.as_deref(), &mint)?;
     let limits = limits::of(s)?;
     // The resumable sessions of the forward road (T-173).
     let (sessions, resumable) = resumes::of(s)?;

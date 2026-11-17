@@ -1761,6 +1761,49 @@ rustls writes, and `serve_publish` of
 HTTPS server and a client of Python's `ssl`) passed on 2026-11-05
 (T-649).
 
+## The relay role as a meeting point (T-720)
+
+`podssh relay serve --relay-roads iroh,derp` makes the role the meeting
+point of its own net, on its one listener (rule 2: no listener of its own).
+A net whose hosts let only port 443 in then meets at a host of its owner's,
+where its members used n0's iroh relays and Tailscale's DERP fleet.
+
+- **iroh** (`crates/podssh-relay/src/serve/meet_iroh.rs`, the feature
+  `iroh-serve`, which `iroh` of podssh-cli turns on): iroh's relay protocol
+  at `/relay`, with iroh-relay's own server code (the vendored 1.4.1 of
+  PodUtils/podcrates, its feature `server`): its handshake, its hook of
+  access and its registry of clients, which forwards each datagram to the
+  key that it names. iroh-relay serves its route with hyper on a listener
+  of its own; here the role's listener already read TLS and the head, so
+  the role answers the upgrade (`Sec-WebSocket-Protocol` of `iroh-relay-v2`
+  or `iroh-relay-v1`, the newest offered; none is 400) and hands the
+  session's binary messages to iroh-relay, as iroh-relay's own embedding
+  test with axum does. The role's TLS exporter is not reachable there, so
+  a client proves its key by the challenge, one round trip more. Whom it
+  admits follows `--mint`: anyone, the keys of its list, the members of its
+  net (an endpoint's key is a key of podssh's identity); `--mint nobody`
+  stops the start (64). A refused endpoint gets iroh's denial, `not
+  authorized`, and the role's line names its fingerprint. `/ping` answers
+  an empty 200 with `Access-Control-Allow-Origin: *`, as iroh's relays do.
+  A build with no iroh road refuses `--relay-roads iroh` (70).
+- **derp**: DERP at `/derp` (T-106) for the keys of `--derp-keys FILE`;
+  with no file, for each node key, and only where the role mints for
+  anyone, as derper with no `--verify-clients`. `--derp-keys FILE` alone
+  turns DERP on, as before.
+- **Probes.** Each road serves `/generate_204` with a 204 and the answer
+  to Tailscale's (`X-Tailscale-Challenge`) and iroh's (`X-Iroh-Challenge`)
+  challenges, as derper and iroh-relay answer them, so that a client tells
+  a captive portal apart.
+- **`/relays.json`** names the roads as `meet`: `{"iroh":
+  "https://HOST:PORT/", "derp": "HOST:PORT", "probe": "/generate_204"}`,
+  each `null` when off. The use of `meet` by a member of the net, to list
+  this host first as its iroh relay and its DERP home, is the open step of
+  T-720.
+
+What it does not do: iroh's QUIC address discovery (QAD, a UDP port of its
+own), and rate limits of each client, which iroh-relay's own server has;
+the role's slots and its log bound and name each connection.
+
 ## A relay that sleeps between frames (T-712)
 
 A relay that runs as a Durable Object with WebSocket hibernation sleeps

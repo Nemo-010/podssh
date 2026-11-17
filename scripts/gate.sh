@@ -242,6 +242,14 @@ step_libs() {
     tests "the relay role's cleartext road (feature serve)" \
         cargo test --locked --no-fail-fast -p podssh-relay --features serve \
             --test relay_serve_cleartext
+    # The meeting points at the role's listener (T-720): the probes, DERP's
+    # hub of three keys and iroh's route, then clients of n0's own
+    # iroh-relay that meet through the role.
+    tests "the relay role's meeting points (features serve, derp, iroh-serve)" \
+        cargo test --locked --no-fail-fast -p podssh-relay --features serve,derp,iroh-serve \
+            --lib -- serve::meet serve::derp
+    tests "iroh's relay protocol at the relay role (features serve, iroh-serve)" \
+        cargo test --locked --no-fail-fast -p podssh-relay --features serve,iroh-serve --test relay_meet
     # The relay role behind a quick tunnel (T-428): through the stand-in edge
     # and its front over HTTP/2, and as the origin of a QUIC stream on pipes.
     tests "the relay role behind a quick tunnel (features quick, serve, plain-ws)" \
