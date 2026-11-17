@@ -2885,6 +2885,14 @@ sh scripts/release-check.sh v1.1.0
 
 The release check passes on the published files, with M10's rows.
 
+## Start condition
+
+2026-11-17, after podnet's QA round (PodUtils/podnet#649: 40 issues from testers within an hour of a beta that its
+gate called ready). No beta goes to testers, and none is called ready, until T-809 is done: error-path rows in
+T-791's lane (a dead relay, a refused connect, a node not online, an unreachable target, a name with no answer),
+and a black-box pass with the documents alone whose findings are fixed or filed. A beta's notes say what the checks
+prove and what they do not; a green gate is not readiness.
+
 ## Correction
 
 2026-11-05. Two statements changed with the move to PodUtils (`docs/decisions.md`, 2026-11-05, "No
