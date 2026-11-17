@@ -7261,7 +7261,7 @@ The same tests pass, and no copy of the replace is left (a search for the tempor
 
 ## Done
 
-Done, 2026-11-17 (a draft, built by no one yet):
+Done, 2026-11-17 (drafted, then merged, built and run):
 
 - The five writes call `pod_core::files::replace_private` (re-exported as `podssh_relay::cache::replace_private`);
   `cache::commit_note` words the warning.
