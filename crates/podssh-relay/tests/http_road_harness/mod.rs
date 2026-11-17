@@ -57,6 +57,8 @@ pub fn road(port: u16, authority: &str) -> Road {
         user_agent: podssh_ws::dial::user_agent(),
         forms: None,
         learned: Default::default(),
+        // No header of the caller on the loopback's road.
+        extra: Ok(Default::default()),
     }
 }
 
