@@ -1,0 +1,210 @@
+{
+  "wire": 1,
+  "part": "reverse",
+  "about": "The frames of the reverse road's legs, and the node's control messages.",
+  "vectors": [
+    {
+      "name": "node frame",
+      "kind": "node-frame",
+      "id": "0123456789abcdef0123456789abcdef",
+      "payload": "5353482d322e302d4f70656e5353485f392e360d0a",
+      "hex": "30313233343536373839616263646566303132333435363738396162636465665353482d322e302d4f70656e5353485f392e360d0a"
+    },
+    {
+      "name": "node frame with no payload",
+      "kind": "node-frame",
+      "id": "0123456789abcdef0123456789abcdef",
+      "payload": "",
+      "hex": "3031323334353637383961626364656630313233343536373839616263646566"
+    },
+    {
+      "name": "operator frame",
+      "kind": "operator-frame",
+      "payload": "5353482d322e302d4f70656e5353485f392e360d0a",
+      "hex": "5353482d322e302d4f70656e5353485f392e360d0a"
+    },
+    {
+      "name": "operator frame that starts with an id",
+      "kind": "operator-frame",
+      "payload": "303132333435363738396162636465663031323334353637383961626364656678",
+      "hex": "303132333435363738396162636465663031323334353637383961626364656678"
+    },
+    {
+      "name": "node frame under 32 bytes",
+      "kind": "node-frame-refused",
+      "hex": "30313233343536373839616263646566303132333435363738396162636465",
+      "error": "frame-too-short",
+      "close": 1009
+    },
+    {
+      "name": "node frame with an upper-case id",
+      "kind": "node-frame-refused",
+      "hex": "303132333435363738394142434445463031323334353637383941424344454678",
+      "error": "id-not-lowercase-hex",
+      "close": 1003
+    },
+    {
+      "name": "node frame with a byte out of hex",
+      "kind": "node-frame-refused",
+      "hex": "6731323334353637383961626364656630313233343536373839616263646566",
+      "error": "id-not-lowercase-hex",
+      "close": 1003
+    },
+    {
+      "name": "node payload over 65536 bytes",
+      "kind": "too-long",
+      "leg": "node",
+      "payload_len": 65537,
+      "error": "frame-too-long",
+      "close": 1009
+    },
+    {
+      "name": "operator payload over 65536 bytes",
+      "kind": "too-long",
+      "leg": "operator",
+      "payload_len": 65537,
+      "error": "operator-payload-too-long",
+      "close": 1009
+    },
+    {
+      "name": "node bytes in chunks",
+      "kind": "chunks",
+      "id": "0123456789abcdef0123456789abcdef",
+      "bytes_len": 70000,
+      "frame_lens": [
+        65568,
+        4496
+      ]
+    },
+    {
+      "name": "node bytes of none",
+      "kind": "chunks",
+      "id": "0123456789abcdef0123456789abcdef",
+      "bytes_len": 0,
+      "frame_lens": [
+        32
+      ]
+    },
+    {
+      "name": "ready",
+      "kind": "control-out",
+      "message": {
+        "type": "ready",
+        "id": "0123456789abcdef0123456789abcdef"
+      },
+      "text": "{\"type\":\"ready\",\"id\":\"0123456789abcdef0123456789abcdef\"}"
+    },
+    {
+      "name": "reject",
+      "kind": "control-out",
+      "message": {
+        "type": "reject",
+        "id": "0123456789abcdef0123456789abcdef",
+        "reason": "connect 127.0.0.1:22: connection refused"
+      },
+      "text": "{\"type\":\"reject\",\"id\":\"0123456789abcdef0123456789abcdef\",\"reason\":\"connect 127.0.0.1:22: connection refused\"}"
+    },
+    {
+      "name": "reject with a quote",
+      "kind": "control-out",
+      "message": {
+        "type": "reject",
+        "id": "0123456789abcdef0123456789abcdef",
+        "reason": "say \"no\""
+      },
+      "text": "{\"type\":\"reject\",\"id\":\"0123456789abcdef0123456789abcdef\",\"reason\":\"say \\\"no\\\"\"}"
+    },
+    {
+      "name": "close of one session",
+      "kind": "control-out",
+      "message": {
+        "type": "close",
+        "id": "0123456789abcdef0123456789abcdef"
+      },
+      "text": "{\"type\":\"close\",\"id\":\"0123456789abcdef0123456789abcdef\"}"
+    },
+    {
+      "name": "close with a reason",
+      "kind": "control-out",
+      "message": {
+        "type": "close",
+        "id": "0123456789abcdef0123456789abcdef",
+        "reason": "target closed"
+      },
+      "text": "{\"type\":\"close\",\"id\":\"0123456789abcdef0123456789abcdef\",\"reason\":\"target closed\"}"
+    },
+    {
+      "name": "reject of a reason too long",
+      "kind": "control-cut",
+      "id": "0123456789abcdef0123456789abcdef",
+      "reason_len": 5000,
+      "cut_len": 2500
+    },
+    {
+      "name": "hello",
+      "kind": "control-in",
+      "text": "{\"type\":\"hello\",\"version\":1,\"maxFrameBytes\":65536,\"maxSessions\":64}",
+      "message": {
+        "type": "hello",
+        "version": 1,
+        "maxFrameBytes": 65536,
+        "maxSessions": 64
+      }
+    },
+    {
+      "name": "hello with no version and a field of later",
+      "kind": "control-in",
+      "text": "{\"type\":\"hello\",\"maxSessions\":8,\"laterField\":true}",
+      "message": {
+        "type": "hello",
+        "maxSessions": 8,
+        "laterField": true
+      }
+    },
+    {
+      "name": "open",
+      "kind": "control-in",
+      "text": "{\"type\":\"open\",\"id\":\"0123456789abcdef0123456789abcdef\"}",
+      "message": {
+        "type": "open",
+        "id": "0123456789abcdef0123456789abcdef"
+      }
+    },
+    {
+      "name": "close",
+      "kind": "control-in",
+      "text": "{\"type\":\"close\",\"id\":\"0123456789abcdef0123456789abcdef\"}",
+      "message": {
+        "type": "close",
+        "id": "0123456789abcdef0123456789abcdef"
+      }
+    },
+    {
+      "name": "close with a reason",
+      "kind": "control-in",
+      "text": "{\"type\":\"close\",\"id\":\"0123456789abcdef0123456789abcdef\",\"reason\":\"operator left\"}",
+      "message": {
+        "type": "close",
+        "id": "0123456789abcdef0123456789abcdef",
+        "reason": "operator left"
+      }
+    },
+    {
+      "name": "spent",
+      "kind": "control-in",
+      "text": "{\"type\":\"spent\",\"digest\":\"abababababababababababababababababababababababababababababababab\"}",
+      "message": {
+        "type": "spent",
+        "digest": "abababababababababababababababababababababababababababababababab"
+      }
+    },
+    {
+      "name": "a type of later",
+      "kind": "control-in",
+      "text": "{\"type\":\"later\",\"id\":\"0123456789abcdef0123456789abcdef\"}",
+      "message": {
+        "type": "unknown"
+      }
+    }
+  ]
+}

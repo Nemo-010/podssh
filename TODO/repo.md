@@ -329,7 +329,7 @@ Read:
   members with `CC=/nonexistent`, and the release too (lines 339-342). The
   gate builds the library crates with `CC` and `CXX` set to `/nonexistent`,
   and the release with neither (`scripts/gate.sh:193-209`,
-  `scripts/gate.sh:375-378`). The help omits the work record, interop, the man
+  `scripts/gate.sh:378-381`). The help omits the work record, interop, the man
   page, the C++ plant, and the subcommand `gate` (line 602 at `912acd0`).
 - Stale comments, at `912acd0`: `scripts/dev.sh` lines 69-73 ("the default
   build"), lines 397-404 ("links the fork since 4b", "steps 4-5") and line
@@ -349,7 +349,7 @@ Read:
    comment. Invariant: the text of the bridge does not change by one byte;
    compare the old and the new text with `cmp`.
 3. Correct the help and the stale comments to the gate as it is
-   (`scripts/gate.sh:137-412`).
+   (`scripts/gate.sh:137-415`).
 4. Extend the size check of `scripts/check-repo.py` to the shell and Python
    files under `scripts/`, with a floor (T-223).
 5. Drop the sentence on the exception from `docs/decisions.md`, and move it
@@ -2136,7 +2136,7 @@ Read:
 3. A plant in the same script: a mode `--plant-empty` runs the checks on an
    empty temporary directory and must exit 1. The control is the real tree,
    which must exit 0. CI runs both, as it does for the relay check
-   (`.github/workflows/build.yml:242-267`).
+   (`.github/workflows/build.yml:251-276`).
 4. With T-207: the size check also reads `scripts/`, with its own floor.
 5. The checker of `TODO/` gets its own floor in its own change; this entry
    does not plan it.
@@ -2600,7 +2600,7 @@ Read:
 - The record's checker reads `AGENTS.md` for ids, and drops a missing file
   with no word (`PodUtils/podssh:crates/podssh-todo/src/refs.rs:43-48`). It accepts
   `AGENTS.md` as a cited root file (line 20). The gate runs the checker in the
-  container (`scripts/gate.sh:283-290`). 22 lines of `TODO/` cite `AGENTS.md`.
+  container (`scripts/gate.sh:286-293`). 22 lines of `TODO/` cite `AGENTS.md`.
 - The area file that was TODO/agents.md is `TODO/machine.md` now.
 
 Not known: whether `wsl-toolkit run --exclude` matches a pattern at any depth,
@@ -5989,7 +5989,7 @@ compiled binary, has no check of its own beside the release's.
 
 - Read: `scripts/gate.sh:21` lists the steps `msrv`, `msrv_ssh`, `msrv_ts`, `msrv_iroh`,
   `msrv_warp` and `msrv_tor`, each a check of crates at a declared minimum Rust
-  (`scripts/gate.sh:307` and after); CI's matrix is `sh scripts/gate.sh --list`
+  (`scripts/gate.sh:310` and after); CI's matrix is `sh scripts/gate.sh --list`
   (`.github/workflows/build.yml:92`), so a step removed from the list leaves CI.
 - Read: `scripts/gate.sh` runs 17 commands under `env CC=/nonexistent CXX=/nonexistent`, which
   refuse a crate that builds C (`scripts/gate.sh:128` tells why).
@@ -6411,7 +6411,7 @@ test runs each operator command there (`ssh`, `each`, `run`, `job`, `session`, `
 
 ## Premise
 
-- `.github/workflows/build.yml:296` (`windows`, `windows-2025`) and `:402` (`macos`, `macos-15`): tests, the
+- `.github/workflows/build.yml:305` (`windows`, `windows-2025`) and `:411` (`macos`, `macos-15`): tests, the
   system stores, repository checks, the console checks against MSYS2's sshd. No step per command.
 - `scripts/release-short.sh`: the check of a release's binary; it runs on Linux.
 - T-383 (done): `--detach` measured on Windows and macOS. T-678 (open): a node on Windows ends its sessions

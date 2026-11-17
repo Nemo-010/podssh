@@ -395,7 +395,7 @@ Read on `3ee70dc`, the defect holds. No source, test or example of `podssh-cli` 
 declares `libc` (`crates/podssh-probe/Cargo.toml` line 11 at `f8a94ca`), which none of its sources uses.
 `crates/podssh-probe/src/facts.rs` lines 3-6 at `f8a94ca` name a "startup assertion" that no command runs;
 `crates/podssh-probe/src/relay_facts.rs` lines 261-289 at `f8a94ca` are that unused startup part. CI runs
-`scripts/check-relay-spec.py` live, with three plants (`.github/workflows/build.yml:237-267`).
+`scripts/check-relay-spec.py` live, with three plants (`.github/workflows/build.yml:246-276`).
 The gate runs the crate's tests with no C compiler (`scripts/gate.sh:193-209`). The build image
 has no Python (`crates/podssh-probe/src/facts.rs:14-19`), so the crate is the only form of the
 check that the container gate can run.
@@ -1957,7 +1957,7 @@ Nothing watches the expiry of the relay's domain, on which each road but `--dire
   document: "Exact addresses" (`:9`), "Reverse close codes" (`:160`) and "Protocol (for other
   clients)" (`:205`).
 - Read: the job `checks` runs the live check, and fails on exit 1 (a changed fact) and on exit 2
-  (a relay that cannot be read) alike (`.github/workflows/build.yml:237-267`);
+  (a relay that cannot be read) alike (`.github/workflows/build.yml:246-276`);
   the gate's step `release` asks the binary and the script for one verdict, live (`:125-130`).
 - Read: each of the eight build jobs of the release runs `podssh proxy github.com 22` through the
   live relay (`scripts/release-short.sh:109-115`, run at `.github/workflows/release.yml:153`, `:215`,
@@ -5551,7 +5551,7 @@ both at one tag.) Until then, write the Approach step 1 only.
 **Milestone:** M10
 **Priority:** P3
 **Effort:** M
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -5577,16 +5577,115 @@ Podcrates T-120 takes the document at its import; podssh writes it first.
 3. A test of each codec reads the vectors. A change of a vector needs a change of the version.
 4. Tell podcrates T-120 (COORD issue `(to podcrates)`) which commit holds the document.
 
+## Decision
+
+1. **Six files of vectors, one for each part of the page**: `forward.json` (the WebSocket frames of the
+   forward road), `tokens.json` (`/v1/mint`), `reverse.json` (the legs' frames and the control
+   messages), `closes.json` (the reverse road's close table), `layer.json` (the records, the decoder's
+   refusals, the secret and the proofs) and `grants.json`. Lost: one file for all, whose diff of a
+   change names no part; one file for each record, 60 files for a reader to open.
+2. **Every byte comes from a reading of the codecs' source** at podcrates `v0.67.0` (`1d7e983`):
+   the modules `record`, `decode` and `secret` of `pod-session`; `reverse::framing`, `reverse::control`,
+   `reverse::closes` and `grant::cert` of `pod-relay`; `frame` and `close` of `pod-ws`; and podssh's
+   `crates/podssh-relay/src/serve/tokens.rs`. A script of the
+   session's scratchpad wrote them (not committed: the Rust test is the codecs' own check of each).
+   No layout was guessed. Left out, each for want of a deterministic encoder or of a codec in podssh:
+   the forward upgrade's request (its `Sec-WebSocket-Key` is drawn), a pair's tokens and the tokens of
+   one session and the challenges (drawn), the end-to-end channel (Noise, `pod-e2e`), and a forward
+   close's classification (`pod-ws`'s `forward_close`; the page points to `docs/relay.md`).
+3. **A token's parts, never a whole token, in `tokens.json`**: `expiry` and `mac`, and the test joins
+   them. A whole token of the contract's form is what `scripts/check-repo.py` flags as a live
+   credential. Lost: an allowance in that check for the file, a hole in a scan of secrets.
+4. **The second reader is three files**: `scripts/check-wire-vectors.py`, with `scripts/wire_check_parts.py`
+   (the layer, the grants and the versions) and `scripts/wire_ed25519.py` (RFC 8032, as the standard
+   library has no Ed25519), each under 500 lines. It reads the close table, the node's refusals and the
+   versions from `docs/wire.md` itself, so a row changed on the page and not in the vectors fails.
+   `--plant` changes one character of the first vector of each file in memory and passes only when each
+   is found.
+5. **"A change of a vector needs a change of the version"** is held by a digest: section 8 of the page
+   lists each version with the SHA-256 of the vector files, and the script fails when the newest row's
+   digest is not the files'. Lost: a test that compares the files with git's `HEAD` (no history in a
+   shallow checkout), and a version in each vector (a change of one vector would not touch the others').
+6. **The Prove takes the feature `grant`** beside `pair,serve`: the grants' codec is behind it, and
+   without it `grants.json` would be read by the script alone. The test's file is gated on `pair` and
+   `serve`, and its module of grants on `grant`.
+7. **The gate and CI run both readers**: a line of `scripts/gate.sh` (the step `libs`, beside the relay
+   role's tests) runs the test, and a step of `.github/workflows/build.yml` runs the script and its
+   plants. The citations of both files that the insertions moved were moved by hand (no `cargo todo
+   remap` in a draft): `TODO/relay.md`, `TODO/repo.md` and `TODO/robustness.md`.
+8. **No row in `AGENTS.md`, section 3**: one row there moves about 25 citations of `AGENTS.md` in
+   `TODO/`, which a draft cannot remap. The main session may add it with `cargo todo remap AGENTS.md`:
+   "Change the bytes of a road (a frame, a record, a token, a close, a grant), or read them in another
+   program | `docs/wire.md`, its vectors in `crates/podssh-relay/tests/vectors/`".
+
 ## Prove
 
 ```sh
 export CARGO_BUILD_JOBS=4
-cargo test -p podssh-relay --features pair,serve --test wire_vectors
+cargo test -p podssh-relay --features pair,serve,grant --test wire_vectors
 python scripts/check-wire-vectors.py
+python scripts/check-wire-vectors.py --plant
 python scripts/check-repo.py
 ```
 
 Plant: change one byte of a codec; the vector test fails.
+
+## Correction
+
+- The codecs are no longer podssh's (Rule Q3, T-684): the layer's records, decoder and secrets are
+  `pod-session`'s, and the reverse road's framing, control messages, close table and grants are
+  `pod-relay`'s, of PodUtils/podcrates at the tag that podssh pins (`v0.67.0`). podssh-relay re-exports
+  them (`podssh_relay::session`, `podssh_relay::reverse`, `podssh_relay::grant`), and the test calls them
+  through those re-exports; podssh changes no codec here. The forward road's frames are `pod-ws`'s,
+  through `podssh_ws::frame`. Only the relay role's tokens are podssh's own code
+  (`crates/podssh-relay/src/serve/tokens.rs`).
+- "A test vector exists for iroh's tickets only" (`docs/design.md:1309`) held at the reading of the
+  entry; since T-712, `docs/relay.md:1798` gives vectors of the liveness member too, and
+  `pod-identity`'s tests pin the key of the seed `0x11` (which `grants.json` uses, so both agree).
+- The Approach's `HELLO` is the layer's `GREETING` and `OPEN` (`Hello` in `pod-session`): the page
+  names those records.
+- The vectors' path is this repository's: `crates/podssh-relay/tests/vectors/`.
+
+## Done
+
+2026-11-17 (drafted on `draft-t723`, then merged, built and run). Written:
+
+- `docs/wire.md`: wire version 1; conventions, the forward road, `/v1/mint`, the reverse road (pairs,
+  sockets, frames of each leg, control messages, close codes with retry and resume), the layer (records,
+  handshake, secret, proofs), grants, the form of each vector file, and the versions with the digest.
+- `crates/podssh-relay/tests/vectors/`: 117 vectors: `forward.json` 12, `tokens.json` 8,
+  `reverse.json` 24, `closes.json` 35, `layer.json` 33, `grants.json` 5.
+- `crates/podssh-relay/tests/wire_vectors.rs` with `crates/podssh-relay/tests/wire/` (`common.rs`,
+  `forward.rs`, `tokens.rs`, `reverse.rs`, `closes.rs`, `layer.rs`, `grants.rs`): 15 tests.
+- `scripts/check-wire-vectors.py`, `scripts/wire_check_parts.py`, `scripts/wire_ed25519.py`.
+- `scripts/gate.sh` (step `libs`) and `.github/workflows/build.yml` (job `checks`) run them.
+
+Measured in the draft (the one run that a draft may make): `python3 -I scripts/check-wire-vectors.py`:
+"117 vectors of 6 files, wire version 1: ok", exit 0; `--plant`: each of the six planted changes
+found, exit 0; a changed name in `tokens.json` fails on the digest, exit 1. `wire_ed25519.py` passes
+RFC 8032's test 1 and gives the key of seed `0x11` that `pod-identity`'s test pins.
+
+Results at the merge, 2026-11-17: `cargo test -p podssh-relay --features pair,serve,grant --test wire_vectors` 15 passed
+after one repair of the test (a temporary dropped while its decoded frame still borrowed it: `reverse.rs` keeps the
+bytes in a binding); the codecs refused no vector. `python3 -I scripts/check-wire-vectors.py`: 117 vectors, ok;
+`--plant`: each planted change found. Planted in a codec: the MAC's input of `serve/tokens.rs` changed by one byte fails
+`tokens::each_minted_token_is_the_page_s` and `tokens::each_token_is_taken_or_refused_as_the_page_says`. Clippy (the
+gate's lints, with `pair,serve,grant` and with `serve,plain-ws,quick,quic`) clean; rustfmt applied. The draft's hand-moved
+citations were put back and moved by `cargo todo remap` instead.
+
+Step 4: the COORD issue to podcrates, opened from this text with the commit of the merge:
+
+> **COORD-NNN: the wire document of podssh, for T-120 (to podcrates)**
+>
+> podssh's `docs/wire.md` (wire version 1) is at commit COMMIT of PodUtils/podssh: the forward road,
+> `/v1/mint`, the reverse road (pairs, frames of each leg, control messages, close codes), the
+> resumable layer (records, handshake, secret, proofs) and grants, each rule one sentence. Its 117
+> test vectors are `crates/podssh-relay/tests/vectors/*.json`; podssh's test reads them through
+> `pod-session`, `pod-relay` and `pod-ws` at `v0.67.0`, and `scripts/check-wire-vectors.py` reads them
+> from the page alone. For podcrates' T-120 (A-S-15, PodUtils/podcrates#35): take the page and the
+> vectors at that commit; a change of a vector needs a new version of the page (its section 8).
+>
+> state: open at TIME (UTC)
 
 # T-732: The relay role's byte cap let a fast target carry any amount past it, until the next tick
 

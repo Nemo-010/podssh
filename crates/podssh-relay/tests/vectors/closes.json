@@ -1,0 +1,357 @@
+{
+  "wire": 1,
+  "part": "closes",
+  "about": "The closes of the reverse road: the payload of each, and what a client does.",
+  "vectors": [
+    {
+      "name": "1001 operator stopped reverse relay",
+      "kind": "close",
+      "code": 1001,
+      "reason": "operator stopped reverse relay",
+      "payload": "03e96f70657261746f722073746f7070656420726576657273652072656c6179",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1001 pair expired",
+      "kind": "close",
+      "code": 1001,
+      "reason": "pair expired",
+      "payload": "03e9706169722065787069726564",
+      "matched": true,
+      "retry": "new-pair",
+      "resumes": false
+    },
+    {
+      "name": "1003 unknown session id",
+      "kind": "close",
+      "code": 1003,
+      "reason": "unknown session id",
+      "payload": "03eb756e6b6e6f776e2073657373696f6e206964",
+      "matched": true,
+      "retry": "new-session",
+      "resumes": true
+    },
+    {
+      "name": "1003 invalid control JSON",
+      "kind": "close",
+      "code": 1003,
+      "reason": "invalid control JSON",
+      "payload": "03eb696e76616c696420636f6e74726f6c204a534f4e",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1003 invalid session id",
+      "kind": "close",
+      "code": 1003,
+      "reason": "invalid session id",
+      "payload": "03eb696e76616c69642073657373696f6e206964",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1003 unknown control type",
+      "kind": "close",
+      "code": 1003,
+      "reason": "unknown control type",
+      "payload": "03eb756e6b6e6f776e20636f6e74726f6c2074797065",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1003 bad multiplex id",
+      "kind": "close",
+      "code": 1003,
+      "reason": "bad multiplex id",
+      "payload": "03eb626164206d756c7469706c6578206964",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1003 data before ready",
+      "kind": "close",
+      "code": 1003,
+      "reason": "data before ready",
+      "payload": "03eb64617461206265666f7265207265616479",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1003 binary frames required",
+      "kind": "close",
+      "code": 1003,
+      "reason": "binary frames required",
+      "payload": "03eb62696e617279206672616d6573207265717569726564",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1008 unknown role",
+      "kind": "close",
+      "code": 1008,
+      "reason": "unknown role",
+      "payload": "03f0756e6b6e6f776e20726f6c65",
+      "matched": true,
+      "retry": "reconnect",
+      "resumes": true
+    },
+    {
+      "name": "1008 wait for ready",
+      "kind": "close",
+      "code": 1008,
+      "reason": "wait for ready",
+      "payload": "03f07761697420666f72207265616479",
+      "matched": true,
+      "retry": "new-session",
+      "resumes": false
+    },
+    {
+      "name": "1009 control frame byte cap",
+      "kind": "close",
+      "code": 1009,
+      "reason": "control frame byte cap",
+      "payload": "03f1636f6e74726f6c206672616d65206279746520636170",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1009 bad multiplex frame",
+      "kind": "close",
+      "code": 1009,
+      "reason": "bad multiplex frame",
+      "payload": "03f1626164206d756c7469706c6578206672616d65",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1009 session byte cap",
+      "kind": "close",
+      "code": 1009,
+      "reason": "session byte cap",
+      "payload": "03f173657373696f6e206279746520636170",
+      "matched": true,
+      "retry": "new-session",
+      "resumes": true
+    },
+    {
+      "name": "1009 frame byte cap",
+      "kind": "close",
+      "code": 1009,
+      "reason": "frame byte cap",
+      "payload": "03f16672616d65206279746520636170",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1011 relay backpressure",
+      "kind": "close",
+      "code": 1011,
+      "reason": "relay backpressure",
+      "payload": "03f372656c6179206261636b7072657373757265",
+      "matched": true,
+      "retry": "never",
+      "resumes": true
+    },
+    {
+      "name": "1011 node unavailable",
+      "kind": "close",
+      "code": 1011,
+      "reason": "node unavailable",
+      "payload": "03f36e6f646520756e617661696c61626c65",
+      "matched": true,
+      "retry": "reconnect",
+      "resumes": true
+    },
+    {
+      "name": "1011 node offline",
+      "kind": "close",
+      "code": 1011,
+      "reason": "node offline",
+      "payload": "03f36e6f6465206f66666c696e65",
+      "matched": true,
+      "retry": "reconnect",
+      "resumes": true
+    },
+    {
+      "name": "1011 node disconnected",
+      "kind": "close",
+      "code": 1011,
+      "reason": "node disconnected",
+      "payload": "03f36e6f646520646973636f6e6e6563746564",
+      "matched": true,
+      "retry": "reconnect",
+      "resumes": true
+    },
+    {
+      "name": "1011 socket error",
+      "kind": "close",
+      "code": 1011,
+      "reason": "socket error",
+      "payload": "03f3736f636b6574206572726f72",
+      "matched": true,
+      "retry": "reconnect",
+      "resumes": true
+    },
+    {
+      "name": "1013 node open timeout",
+      "kind": "close",
+      "code": 1013,
+      "reason": "node open timeout",
+      "payload": "03f56e6f6465206f70656e2074696d656f7574",
+      "matched": true,
+      "retry": "new-session",
+      "resumes": true
+    },
+    {
+      "name": "1013 reverse message rate cap",
+      "kind": "close",
+      "code": 1013,
+      "reason": "reverse message rate cap",
+      "payload": "03f572657665727365206d657373616765207261746520636170",
+      "matched": true,
+      "retry": "reconnect",
+      "resumes": true
+    },
+    {
+      "name": "1000 node-supplied",
+      "kind": "close",
+      "code": 1000,
+      "reason": "node-supplied",
+      "payload": "03e86e6f64652d737570706c696564",
+      "matched": true,
+      "retry": "never",
+      "resumes": true
+    },
+    {
+      "name": "1011 node-supplied",
+      "kind": "close",
+      "code": 1011,
+      "reason": "node-supplied",
+      "payload": "03f36e6f64652d737570706c696564",
+      "matched": true,
+      "retry": "never",
+      "resumes": true
+    },
+    {
+      "name": "1000 session ended",
+      "kind": "close",
+      "code": 1000,
+      "reason": "session ended",
+      "payload": "03e873657373696f6e20656e646564",
+      "matched": true,
+      "retry": "never",
+      "resumes": true
+    },
+    {
+      "name": "1011 connection refused",
+      "kind": "close",
+      "code": 1011,
+      "reason": "connection refused",
+      "payload": "03f3636f6e6e656374696f6e2072656675736564",
+      "matched": true,
+      "retry": "never",
+      "resumes": true
+    },
+    {
+      "name": "1000 target closed",
+      "kind": "close",
+      "code": 1000,
+      "reason": "target closed",
+      "payload": "03e874617267657420636c6f736564",
+      "matched": true,
+      "retry": "never",
+      "resumes": true
+    },
+    {
+      "name": "1000 Session Ended",
+      "kind": "close",
+      "code": 1000,
+      "reason": "Session Ended",
+      "payload": "03e853657373696f6e20456e646564",
+      "matched": true,
+      "retry": "never",
+      "resumes": true
+    },
+    {
+      "name": "1009 a later cap",
+      "kind": "close",
+      "code": 1009,
+      "reason": "a later cap",
+      "payload": "03f161206c6174657220636170",
+      "matched": true,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1013 try later",
+      "kind": "close",
+      "code": 1013,
+      "reason": "try later",
+      "payload": "03f5747279206c61746572",
+      "matched": true,
+      "retry": "new-session",
+      "resumes": true
+    },
+    {
+      "name": "1001 going away",
+      "kind": "close",
+      "code": 1001,
+      "reason": "going away",
+      "payload": "03e9676f696e672061776179",
+      "matched": false,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1003 a later fault",
+      "kind": "close",
+      "code": 1003,
+      "reason": "a later fault",
+      "payload": "03eb61206c61746572206661756c74",
+      "matched": false,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1012 service restart",
+      "kind": "close",
+      "code": 1012,
+      "reason": "service restart",
+      "payload": "03f4736572766963652072657374617274",
+      "matched": false,
+      "retry": "never",
+      "resumes": true
+    },
+    {
+      "name": "4001 an application's code",
+      "kind": "close",
+      "code": 4001,
+      "reason": "an application's code",
+      "payload": "0fa1616e206170706c69636174696f6e277320636f6465",
+      "matched": false,
+      "retry": "never",
+      "resumes": false
+    },
+    {
+      "name": "1011 Connection refused",
+      "kind": "close",
+      "code": 1011,
+      "reason": "Connection refused",
+      "payload": "03f3436f6e6e656374696f6e2072656675736564",
+      "matched": false,
+      "retry": "never",
+      "resumes": true
+    }
+  ]
+}

@@ -237,6 +237,9 @@ step_libs() {
             --test relay_serve_contract --test relay_serve_reverse --test relay_serve_backpressure \
             --test relay_serve_ipv6 --test reverse_restart --test session_relay_resume --test relay_serve_sshd \
             --test relay_serve_publish
+    # The wire vectors of docs/wire.md through the codecs (T-723).
+    tests "the wire vectors (features pair, serve, grant)" \
+        cargo test --locked --no-fail-fast -p podssh-relay --features pair,serve,grant --test wire_vectors
     # The cleartext road at the role's listener and from the client (T-326),
     # through a stand-in proxy that intercepts TLS.
     tests "the relay role's cleartext road (feature serve)" \

@@ -1,0 +1,319 @@
+{
+  "wire": 1,
+  "part": "layer",
+  "about": "The records of the resumable layer, the decoder's refusals, and the secret and proofs.",
+  "vectors": [
+    {
+      "name": "greeting of a relay role",
+      "kind": "record",
+      "record": "GREETING",
+      "fields": {
+        "version": 1,
+        "role": 3,
+        "nonce": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "features": [
+          "replay.v1",
+          "heartbeat.v1",
+          "move.v1",
+          "end.v1",
+          "deadline.600"
+        ]
+      },
+      "hex": "0100000064706f647373682d73657373696f6e0103000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f05097265706c61792e76310c6865617274626561742e7631076d6f76652e763106656e642e76310c646561646c696e652e363030"
+    },
+    {
+      "name": "greeting with no feature",
+      "kind": "record",
+      "record": "GREETING",
+      "fields": {
+        "version": 1,
+        "role": 2,
+        "nonce": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "features": []
+      },
+      "hex": "0100000031706f647373682d73657373696f6e0102000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f00"
+    },
+    {
+      "name": "open of a new session",
+      "kind": "record",
+      "record": "OPEN",
+      "fields": {
+        "version": 1,
+        "role": 1,
+        "nonce": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+        "opening": "new",
+        "public": "c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1",
+        "features": [
+          "replay.v1",
+          "heartbeat.v1",
+          "move.v1",
+          "keep.v1"
+        ]
+      },
+      "hex": "0200000079706f647373682d73657373696f6e0101202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f00c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c104097265706c61792e76310c6865617274626561742e7631076d6f76652e7631076b6565702e7631"
+    },
+    {
+      "name": "open of a resume",
+      "kind": "record",
+      "record": "OPEN",
+      "fields": {
+        "version": 1,
+        "role": 1,
+        "nonce": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+        "opening": "resume",
+        "id": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+        "features": [
+          "replay.v1",
+          "once.v1"
+        ]
+      },
+      "hex": "0200000054706f647373682d73657373696f6e0101202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f01a0a1a2a3a4a5a6a7a8a9aaabacadaeaf02097265706c61792e7631076f6e63652e7631"
+    },
+    {
+      "name": "accept of a new session",
+      "kind": "record",
+      "record": "ACCEPT",
+      "fields": {
+        "acceptance": "new",
+        "id": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+        "public": "f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"
+      },
+      "hex": "030000003100a0a1a2a3a4a5a6a7a8a9aaabacadaeaff1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"
+    },
+    {
+      "name": "accept of a resume",
+      "kind": "record",
+      "record": "ACCEPT",
+      "fields": {
+        "acceptance": "resume",
+        "offset": 1048576,
+        "proof": "404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f"
+      },
+      "hex": "0300000029010000000000100000404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f"
+    },
+    {
+      "name": "proof",
+      "kind": "record",
+      "record": "PROOF",
+      "fields": {
+        "offset": 4096,
+        "proof": "404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f"
+      },
+      "hex": "04000000280000000000001000404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f"
+    },
+    {
+      "name": "refuse of an unknown session",
+      "kind": "record",
+      "record": "REFUSE",
+      "fields": {
+        "code": 1,
+        "reason": "unknown session"
+      },
+      "hex": "050000001001756e6b6e6f776e2073657373696f6e"
+    },
+    {
+      "name": "refuse of a later code with no reason",
+      "kind": "record",
+      "record": "REFUSE",
+      "fields": {
+        "code": 9,
+        "reason": ""
+      },
+      "hex": "050000000109"
+    },
+    {
+      "name": "data",
+      "kind": "record",
+      "record": "DATA",
+      "fields": {
+        "offset": 0,
+        "bytes": "5353482d322e302d4f70656e5353485f392e360d0a"
+      },
+      "hex": "060000001d00000000000000005353482d322e302d4f70656e5353485f392e360d0a"
+    },
+    {
+      "name": "data with no byte",
+      "kind": "record",
+      "record": "DATA",
+      "fields": {
+        "offset": 9007199254740991,
+        "bytes": ""
+      },
+      "hex": "0600000008001fffffffffffff"
+    },
+    {
+      "name": "ack",
+      "kind": "record",
+      "record": "ACK",
+      "fields": {
+        "offset": 65536
+      },
+      "hex": "07000000080000000000010000"
+    },
+    {
+      "name": "ping",
+      "kind": "record",
+      "record": "PING",
+      "fields": {
+        "value": 42
+      },
+      "hex": "0800000008000000000000002a"
+    },
+    {
+      "name": "pong",
+      "kind": "record",
+      "record": "PONG",
+      "fields": {
+        "value": 42,
+        "offset": 131072
+      },
+      "hex": "0900000010000000000000002a0000000000020000"
+    },
+    {
+      "name": "close",
+      "kind": "record",
+      "record": "CLOSE",
+      "fields": {
+        "reason": "target closed"
+      },
+      "hex": "0a0000000d74617267657420636c6f736564"
+    },
+    {
+      "name": "close in UTF-8",
+      "kind": "record",
+      "record": "CLOSE",
+      "fields": {
+        "reason": "fin à la ligne"
+      },
+      "hex": "0a0000000f66696e20c3a0206c61206c69676e65"
+    },
+    {
+      "name": "retire",
+      "kind": "record",
+      "record": "RETIRE",
+      "fields": {},
+      "hex": "0b00000000"
+    },
+    {
+      "name": "end",
+      "kind": "record",
+      "record": "END",
+      "fields": {
+        "offset": 777
+      },
+      "hex": "0c000000080000000000000309"
+    },
+    {
+      "name": "type 0x00",
+      "kind": "refused",
+      "hex": "0000000000",
+      "error": "unknown-type"
+    },
+    {
+      "name": "type 0x0d",
+      "kind": "refused",
+      "hex": "0d00000000",
+      "error": "unknown-type"
+    },
+    {
+      "name": "an SSH server's first line is no record",
+      "kind": "refused",
+      "hex": "5353482d322e302d4f70656e5353485f392e360d0a",
+      "error": "unknown-type"
+    },
+    {
+      "name": "a length over 65536",
+      "kind": "refused",
+      "hex": "0600010001",
+      "error": "too-long"
+    },
+    {
+      "name": "a greeting with no magic",
+      "kind": "refused",
+      "hex": "0100000031706f647373682d73657373696f4e0103000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f00",
+      "error": "malformed"
+    },
+    {
+      "name": "an ack with a byte after its body",
+      "kind": "refused",
+      "hex": "0700000009000000000000000100",
+      "error": "malformed"
+    },
+    {
+      "name": "an ack cut short",
+      "kind": "refused",
+      "hex": "070000000700000000000000",
+      "error": "malformed"
+    },
+    {
+      "name": "a feature name out of its alphabet",
+      "kind": "refused",
+      "hex": "010000003b706f647373682d73657373696f6e0103000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f01095265706c61792e7631",
+      "error": "malformed"
+    },
+    {
+      "name": "seventeen feature names",
+      "kind": "refused",
+      "hex": "0100000031706f647373682d73657373696f6e0103000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f11",
+      "error": "malformed"
+    },
+    {
+      "name": "an open that is neither new nor a resume",
+      "kind": "refused",
+      "hex": "0200000052706f647373682d73657373696f6e0101202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f02c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c100",
+      "error": "malformed"
+    },
+    {
+      "name": "a reason that is not UTF-8",
+      "kind": "refused",
+      "hex": "0a00000001ff",
+      "error": "malformed"
+    },
+    {
+      "name": "a reason over 1024 bytes",
+      "kind": "refused",
+      "hex": "0a000004017878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878",
+      "error": "malformed"
+    },
+    {
+      "name": "a header cut short",
+      "kind": "partial",
+      "hex": "06000000"
+    },
+    {
+      "name": "a body cut short",
+      "kind": "partial",
+      "hex": "070000000800000000000000"
+    },
+    {
+      "name": "secret and proofs",
+      "kind": "secret",
+      "fields": {
+        "shared": "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+        "far_nonce": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "client_nonce": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+        "id": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+        "client_public": "c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1",
+        "far_public": "f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"
+      },
+      "secret": "0cf7f89d689cad4142348b8e4d29aacdb7587aa0e35fb1511f81622d0c89dad2",
+      "proofs": [
+        {
+          "offset": 0,
+          "client": "f2ee8b0f804c1b1bc91a0aff954effc2573f57e60912df03013bde2d9f544a25",
+          "far": "8599e58f230eb9e83062e65635d4c7308fe94084acfe2fee7f6dae9fe6565ea5"
+        },
+        {
+          "offset": 4096,
+          "client": "f5b5e148c188d2a2ed5e319905afc858f25dd7986d536dddd7ea514d5a0dfbe8",
+          "far": "d3ad68bc44e24cea2d4e774ffe62a6c89fefdd193cd71e8efebc408abfca3ddf"
+        },
+        {
+          "offset": 9007199254740991,
+          "client": "b1e54a7877d041178d419a92a959d4829b275692af7b4336c54e965b19f76f14",
+          "far": "5c7951fef3a11ad2ff8cd1234f1e38ecd154fd0f7ffb0d73f94b57916ba5a244"
+        }
+      ]
+    }
+  ]
+}

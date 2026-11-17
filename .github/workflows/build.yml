@@ -234,6 +234,15 @@ jobs:
             dash -n "$f"
           done
 
+      # The wire vectors (T-723), read from docs/wire.md alone, with no code
+      # of the codecs. A changed byte in each file must be found, or the check
+      # proves nothing.
+      - name: the wire vectors agree with docs/wire.md
+        run: |
+          set -eu
+          "$PY" scripts/check-wire-vectors.py
+          "$PY" scripts/check-wire-vectors.py --plant
+
       # The relay's published contract, checked live. Exit 1 means the relay
       # changed something podssh depends on: read the diff, update
       # crates/podssh-probe/facts/relay-facts.toml and docs/relay.md together.
