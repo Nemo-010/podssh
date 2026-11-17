@@ -29,13 +29,15 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use podssh_relay::pair::Pair;
-use podssh_relay::reverse::routes::{Route, Routed};
+use podssh_relay::reverse::routes::Route;
 use podssh_relay::reverse::{self, E2e, Exit, Layered, NodeConfig, Wire};
 use podssh_ws::dial::ProxyChoice;
 use podssh_ws::Trust;
 
 use crate::exitmap::Fault;
 pub(crate) use crate::node_target::{probe, routes_of, serving};
+// The routes with those to a Unix socket beside them (T-714).
+use crate::node_unix_open::Routed;
 // Ctrl-C and SIGTERM, with the upgrade's own signal beside them (T-668).
 use crate::node_upgrade as upgrade;
 pub(crate) use crate::node_upgrade::stop_signal;
@@ -57,8 +59,10 @@ pub use crate::node_args::NodeArgs;
 pub fn run_node(args: &NodeArgs, err: &mut dyn Write) -> i32 {
     // The sessions of the binary before this one, before anything connects (T-668).
     crate::node_upgrade::start(err);
-    // How long it keeps a lost session (T-306), those readied ahead (T-650); its exit (T-431).
-    if let Err(refusal) = crate::node_flags::sessions(args).and_then(|()| crate::node_exit::check(args)) {
+    // How long it keeps a lost session (T-306), those readied ahead (T-650); its exit (T-431);
+    // its routes to a Unix socket (T-714), which each road then finds.
+    let checked = crate::node_flags::sessions(args).and_then(|()| crate::node_exit::check(args));
+    if let Err(refusal) = checked.and_then(|()| crate::node_unix::check(args)) {
         return refusal.report("node", err);
     }
     // A site that podssh's relay role publishes by its name, before any other road (T-649).
@@ -250,7 +254,8 @@ pub(crate) fn targets_of(words: &[String], no_e2e: bool) -> Result<Vec<Route>, R
         return Err("missing TARGET: the HOST:PORT that each session reaches, or ROUTE=HOST:PORT".into());
     }
     let mut targets: Vec<Route> = Vec::new();
-    for word in words {
+    // A route to a Unix socket is `node_unix`'s, which `run_node` checked (T-714).
+    for word in &crate::node_unix::tcp_words(words) {
         let (name, target) = match word.split_once('=') {
             Some((route, target)) => {
                 podssh_ws::names::check_node_name(route).map_err(|_| {

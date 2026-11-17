@@ -4259,7 +4259,7 @@ roots must be exactly three, and a refusal of the edge does not say which releas
 - Read: two fixed regions, port 7844 and the TLS name `h2.cftunnel.com`
   (`crates/podssh-relay/src/quick/edge.rs:22-29`); the roots must give 3 anchors and no invalid
   one (`:66-70`); the API's host is fixed (`crates/podssh-relay/src/quick/api.rs:28`). The node
-  registers as `podssh` and the package's version (`crates/podssh-cli/src/node_quick.rs:348-349`),
+  registers as `podssh` and the package's version (`crates/podssh-cli/src/node_quick.rs:350-351`),
   `1.0.0-beta.2` today (`Cargo.toml:48`).
 - Read: the three roots end on 2029-08-15, 2029-08-15 and 2029-11-01
   (`PodUtils/podssh:crates/podssh-relay/src/quick/cloudflare-roots.pem:6`, `:25`, `:51`).
@@ -7157,7 +7157,7 @@ ask, and nothing does so.
 
 - Read: the node of the iroh road serves the pair's road beside it, with one keeper for both
   (`crates/podssh-cli/src/node_iroh.rs:384-385`), and `podssh node` sends `--iroh` there
-  (`crates/podssh-cli/src/node.rs:123-125`).
+  (`crates/podssh-cli/src/node.rs:127-129`).
 - Read: `podssh ssh` resolves its destination into an enum of transports
   (`crates/podssh-cli/src/ssh/transport_kind.rs:10-72`), in a file of 488 of its 500 lines.
 - Read: the race of T-164 orders two roads (`PodUtils/podssh:crates/podssh-relay/src/session/race.rs:59-61`), and

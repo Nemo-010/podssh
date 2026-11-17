@@ -3082,7 +3082,7 @@ node at its next line, often "online again" after a reconnect. A server then has
 ## Premise
 
 - Read: `panic = "abort"` in the release profile (`Cargo.toml:211`).
-- Read: the node's lines are `eprintln!` (`crates/podssh-cli/src/node.rs:356`,
+- Read: the node's lines are `eprintln!` (`crates/podssh-cli/src/node.rs:361`,
   `crates/podssh-cli/src/node_derp.rs:334`, `crates/podssh-cli/src/node_iroh.rs:342`), as are 40
   more sites in `crates/podssh-cli/src` and 4 in `crates/podssh-ssh/src` (2026-11-01, a search for
   `eprintln!`, `println!`, `eprint!` and `print!`).
@@ -3379,7 +3379,7 @@ each check of T-390 and T-392, and serves nothing.
 ## Premise
 
 - Read: neither T-380 nor a unit of T-121 has a watchdog; a unit restarts only a process that ended
-  (`crates/podssh-cli/src/node_install/text.rs:153`).
+  (`crates/podssh-cli/src/node_install/text.rs:155`).
 
 ## Approach
 
@@ -3429,7 +3429,7 @@ T-390 is done: a supervisor exists.
 
 Read on 2026-11-01: the line that the Premise cites in `crates/podssh-cli/src/node_install/text.rs`
 is the unit's `ExecStart`; its `Restart=always`, which restarts only a process that ended, is at
-`crates/podssh-cli/src/node_install/text.rs:155`, and the unit has no `WatchdogSec`. The Premise
+`crates/podssh-cli/src/node_install/text.rs:157`, and the unit has no `WatchdogSec`. The Premise
 holds.
 
 ## Done

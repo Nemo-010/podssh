@@ -104,6 +104,8 @@ mod notes_ssh_more;
 mod notes_tuic;
 // A unit read before it is installed, and a system unit (T-709).
 mod notes_unit;
+// A node's route to a Unix socket, and the caller's line (T-714).
+mod notes_unix_route;
 mod notes_update;
 // A node's upgrade in place (T-668).
 mod notes_upgrade;

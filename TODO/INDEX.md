@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**757 entries: 43 open, 35 partial, 11 blocked, 668 done.**
+**759 entries: 44 open, 36 partial, 11 blocked, 668 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 2 | 9 | 3 | 80 | 94 |
-| P2 | 7 | 20 | 2 | 284 | 313 |
-| P3 | 34 | 6 | 6 | 303 | 349 |
-| **All** | 43 | 35 | 11 | 668 | 757 |
+| P2 | 7 | 21 | 2 | 284 | 314 |
+| P3 | 35 | 6 | 6 | 303 | 350 |
+| **All** | 44 | 36 | 11 | 668 | 759 |
 
 ## Entries
 
@@ -744,7 +744,7 @@ repository and CI).
 | [T-711](mesh.md) | P1 | M | M10 | feature | blocked | One switch `PODSSH_PUBLIC` over each third-party service, and `status --json` gives the set |
 | [T-712](reverse.md) | P2 | M | M10 | feature | open | Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s |
 | [T-713](relay.md) | P2 | M | M10 | feature | done | `podssh relay conform --relay-host HOST [--reverse] --json` |
-| [T-714](reverse.md) | P2 | M | M10 | feature | open | A node route to a Unix socket, with a first line that names the caller's key and route |
+| [T-714](reverse.md) | P2 | M | M10 | feature | partial | A node route to a Unix socket, with a first line that names the caller's key and route |
 | [T-715](mesh.md) | P2 | M | M10 | feature | open | A node's door from a signed net document at an HTTPS URL, with a TTL and a stale limit |
 | [T-716](machine.md) | P2 | S | M10 | feature | partial | The public parts of each key of this host as JSON, offline: `podssh status --keys` |
 | [T-717](mesh.md) | P2 | M | M10 | feature | done | Probe each road to a list of nodes as JSON: `podssh ping --nodes` |
@@ -833,3 +833,5 @@ repository and CI).
 | [T-800](robustness.md) | P1 | S | M10 | defect | done | `node_cut`'s test of podssh's role failed at random: a relay session's id held the digits 1003 |
 | [T-801](relay.md) | P2 | S | M10 | defect | open | The relay role drops a node's socket at once after a reset or a failed write, and says why a node does not open |
 | [T-802](repo.md) | P2 | S | none | chore | open | Dependabot's updates of 2026-11-17: the minor and patch group, and rsa 0.10 |
+| [T-803](relay.md) | P2 | S | M10 | measurement | open | `podssh relay serve` moved 16 MiB at two speeds on the loopback, 75 or 330 MiB/s |
+| [T-804](relay.md) | P3 | S | M10 | research | open | The ideas of the dig study for the relay server: a ban, PROXY's ranges, STUN, deadlines, an address check |

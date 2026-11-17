@@ -245,6 +245,8 @@ pub(super) const NODE: &[&str] = &[
     super::notes_spares::NODE,
     // The unit printed, and a system unit of a named user (T-709).
     super::notes_unit::NODE,
+    // A route to a Unix socket, and the caller's line (T-714).
+    super::notes_unix_route::NODE,
     // A node's upgrade in place, its sessions with it (T-668).
     super::notes_upgrade::NODE,
     // The dialect of the reverse road (T-643).

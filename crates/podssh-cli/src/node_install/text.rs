@@ -42,6 +42,8 @@ pub(super) fn service_args(args: &NodeArgs, name: &str, env_file: &Path) -> Resu
         ("--routes", &args.routes),
         // The sessions that its relay readies ahead (T-650).
         ("--spares", &args.spares),
+        // The caller's line on a route to a Unix socket (T-714).
+        ("--caller-line", &args.caller_line),
     ];
     for (flag, value) in values {
         if let Some(value) = value {

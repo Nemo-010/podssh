@@ -6123,3 +6123,70 @@ cargo test -p podssh-relay --features serve --lib serve::reverse
 ```
 
 A planted hold of the dead socket makes the test's second socket get `409`.
+
+
+# T-803: `podssh relay serve` moved 16 MiB at two speeds on the loopback, 75 or 330 MiB/s
+
+**Source:** COORD-127 (PodUtils/podcrates#217), from the owner's dig study of 2026-11-16 (`PodUtils/podcrates:docs/research/dig-study.md`):
+podcrates' entry 813.
+**Category:** measurement
+**Milestone:** M10
+**Priority:** P2
+**Effort:** S
+**Status:** open
+
+## Problem
+
+The study ran a local `podssh relay serve` (1.1.0-beta.3, `--mint anyone --cleartext yes --allow-private`, plain
+`ws://` on the loopback): 16 MiB in chunks of 49,152 bytes, 64 in flight, five runs. Some runs went at 74.7 MiB/s,
+the others at about 330 MiB/s (median 328.6), with no cause named. podcrates measured `pod-ws`'s bridge the same way at
+521 to 1165 MiB/s, with no split, so the slow mode is in the role's own loop (its brake, its queue between the two
+legs), its mint or session setup, or the study's client (tokio-tungstenite 0.24).
+
+## Premise
+
+- To be measured: the study's matrix (`poc/run-matrix.sh` of its archive) against podssh's role of `main`, in a release
+  build, twenty runs.
+
+## Approach
+
+1. Run the study's shape twenty times against the role, and against the role with its brake off; record each rate.
+2. If the slow mode comes back, find its part (the brake, the queue, the setup, the client) by a profile of a slow run
+   beside a fast one, and repair it where it is podssh's; else ask podcrates where it is a shared crate's.
+3. Answer COORD-127 with the numbers.
+
+## Prove
+
+The twenty runs' rates in `docs/STATUS.md`, with no run under half the median, or the slow mode's cause named and
+repaired.
+
+# T-804: The ideas of the dig study for the relay server: a ban, PROXY's ranges, STUN, deadlines, an address check
+
+**Source:** COORD-127 (PodUtils/podcrates#217), from the owner's dig study of 2026-11-16, its report 01 (podcrates'
+entry 829); data for podssh's record, not an ask.
+**Category:** research
+**Milestone:** M10
+**Priority:** P3
+**Effort:** S
+**Status:** open
+
+## Problem
+
+The study names five ideas for a relay server, checked against PodUtils' code: a ban after 20 strikes in 60 s, for
+300 s, for each source; the trusted ranges of the PROXY protocol, so that a source behind a load balancer is the real
+one; a STUN responder (5 answers each second for each source, 1,000 in all); deadlines of liveness (30 s, 90 s, 120 s,
+10 s: a ping, a dead link, a session, a handshake); and a check of an advertised address against the observed source.
+podssh's role has some of these already (its brake of mint and pair, T-801's 30 to 40 s for a silent node).
+
+## Premise
+
+- To be read: what podssh's role does today for each idea (`crates/podssh-relay/src/serve/`).
+
+## Approach
+
+For each idea: what the role does now, whether it fits Q63's role and the rules of `AGENTS.md`, and a P2 or P3 entry
+for each that fits, or the reason in this entry where it does not.
+
+## Prove
+
+`cargo todo check`: an entry for each idea that fits, each with its Premise read.

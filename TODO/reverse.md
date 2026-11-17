@@ -1765,12 +1765,12 @@ operator's at `PodUtils/podssh:crates/podssh-relay/src/e2e/ends.rs` at `cbaa806`
 `PodUtils/podssh:crates/podssh-relay/src/identity/allow.rs:33-64` and
 `PodUtils/podssh:crates/podssh-relay/src/identity/allow.rs:114-122`. The routes of a node,
 their check and their dial in `PodUtils/podssh:crates/podssh-relay/src/reverse/routes.rs:1-178`.
-The command line: the targets at `crates/podssh-cli/src/node.rs:243-279`,
-`NAME/ROUTE` at `crates/podssh-cli/src/node.rs:281-296`, the dial of each
+The command line: the targets at `crates/podssh-cli/src/node.rs:247-284`,
+`NAME/ROUTE` at `crates/podssh-cli/src/node.rs:286-301`, the dial of each
 target at `crates/podssh-cli/src/node_target.rs:18-43`, the routes at
-`crates/podssh-cli/src/node.rs:296-304`; the channel's glue at
+`crates/podssh-cli/src/node.rs:301-309`; the channel's glue at
 `crates/podssh-cli/src/channel.rs:370-379` and
-`crates/podssh-cli/src/channel.rs:424-443`; `node://NAME/ROUTE` at
+`crates/podssh-cli/src/channel.rs:424-446`; `node://NAME/ROUTE` at
 `crates/podssh-cli/src/ssh/node.rs:36-67`, and `iroh:TICKET/ROUTE` at
 `crates/podssh-cli/src/ssh/iroh.rs:59-80`. The manual's notes of `node`
 and `operator`, the file of `--allow`, `docs/cli.md` and
@@ -2231,7 +2231,7 @@ session through a node loses a link that it need not lose.
 - Measured: CI's step `m6` at `a220c13` failed in that test with `relay close 1011: node
   unavailable`; the step had passed at each push since T-156.
 - Read: `podssh node` prints its `serving` line after its probe of TARGET, before its socket to
-  the relay opens (`crates/podssh-cli/src/node.rs:339-344`), and the tests waited for that line
+  the relay opens (`crates/podssh-cli/src/node.rs:344-349`), and the tests waited for that line
   (`crates/podssh-cli/tests/m6_exit.rs:99`, `crates/podssh-cli/tests/node_plain.rs:41`,
   `crates/podssh-cli/tests/pipe_remote.rs:194`).
 - Measured, native, 2026-10-10: on a host at 42 % of its CPU, the control lost a link in each of
@@ -2312,8 +2312,8 @@ podssh knew in advance, and said nowhere.
 
 ## Premise
 
-- Read, at `ea2bd4f`: a unit of T-121 does not restart after 77 (`crates/podssh-cli/src/node_install/text.rs:124`).
-- Read: the node's hook for a new pair is unset (`crates/podssh-cli/src/node.rs:370`, `repair:
+- Read, at `ea2bd4f`: a unit of T-121 does not restart after 77 (`crates/podssh-cli/src/node_install/text.rs:126`).
+- Read: the node's hook for a new pair is unset (`crates/podssh-cli/src/node.rs:375`, `repair:
   None`).
 
 ## Approach
@@ -2679,7 +2679,7 @@ documents works; the form that a user expects is missing.
   (`crates/podssh-ws/src/names.rs:41`). The issue's prefix `podssh ssh:` is not this code's,
   which writes `podssh proxy:` (`crates/podssh-cli/src/proxy.rs:161`); not reproduced.
 - Read: `operator NAME` is "the ProxyCommand of OpenSSH for a node"
-  (`crates/podssh-cli/src/man/notes_pair.rs:336-338`), and `pipe` takes `node:NAME`
+  (`crates/podssh-cli/src/man/notes_pair.rs:338-340`), and `pipe` takes `node:NAME`
   (`crates/podssh-cli/src/pipe/address.rs:32-33`); the about of `proxy` is "ProxyCommand form: a
   byte pipe, not an SSH client" (`crates/podssh-cli/src/flags.rs:397`), with no word of a node.
 - Read: `proxy` takes other schemes of its own, each with no PORT: `cf://HOST`, and the roads of
@@ -4753,7 +4753,7 @@ which `piping.yml` installs, and the second's API and edge are Cloudflare's alon
   key at its server (`crates/podssh-cli/src/node_derp.rs:186` says "let (secret, dial) =
   (Arc::new(Secret::of_node(identity)), dial::tls(trust.clone(), proxy.clone()));"): a new key is a new ticket. A quick tunnel's name is new at each
   request (`crates/podssh-cli/src/node_quick.rs:4` says "The name is new each run"), which the node made
-  at each start before (`crates/podssh-cli/src/node_quick.rs:258` says "asked = api::request(&trust,
+  at each start before (`crates/podssh-cli/src/node_quick.rs:260` says "asked = api::request(&trust,
   &proxy, &*say) => asked,"). Both pass as parts of the run (Decision, items 2 and 3).
 - The Approach's "the road's own connection is made again" needs nothing more on two roads: the Piping
   Server's door comes from the pair's secret (`crates/podssh-cli/src/node_piping.rs:233` says "let secret
@@ -5124,7 +5124,7 @@ offer fails the first count.
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -5152,6 +5152,32 @@ a TCP `HOST:PORT` only, so the service needs a TCP bridge, and the bridge cannot
 4. A Unix route is refused with `--roost` (a roost is an sshd on TCP) and with `--exit` routes.
 5. `docs/reverse.md`, the manual, the role's contract text for the line.
 
+## Decision
+
+- **podssh's own opener beside `pod-relay`'s routes, not a change of `pod-relay`** (Rule Q3). A
+  `ROUTE=unix-connect:PATH` is kept by `crates/podssh-cli/src/node_unix.rs` for the process (one node to a
+  process, as `node_exit`'s plan and the shares are), and `crates/podssh-cli/src/node_unix_open.rs` opens a
+  Unix route itself (the grant checked with `pod-relay`'s words, then the budget's `admit`, then the
+  connect and the line) and hands any other ask to `Routes::open_with`. Its `Routed` is `pod-relay`'s with
+  this opener, and `channel::piped_by` calls it, so each road of a node serves a Unix route. Lost: a
+  `Target::Unix` in `pod-relay`'s `Route` (the right home, but work in a crate that podssh took; asked of
+  podcrates below); a TCP bridge inside podssh (a listener, against rule 2, and it loses the caller).
+- **The Unix socket is handed on as a `TcpStream` of its descriptor**, as `pipe`'s AF_UNIX of Windows is. A
+  boxed stream of either kind would break the upgrade in place for every routed session: `pod-e2e`'s
+  `Holds::move_out` downcasts the target to `TcpStream`. One type keeps TCP routes as they were and moves
+  a Unix route's socket too. So a named pipe of Windows, which is no socket, is refused for a node route.
+- **`--caller-line ROUTES`, names by commas, of Unix routes alone.** A value with commas needs no change of
+  the parser's repeated flags; a TCP route keeps its bytes as they are, as the Approach scopes the line to
+  the socket's service. Lost: a suffix of the TARGET word (`+line`), which a path could hold.
+- **No probe of a Unix route at start.** A probe would be a connection with no line, which a service that
+  reads the line would take for a caller; a share is not probed either. Each session's failure names the
+  path and its cause.
+- **Refused with** `--sshd`, `--exit`, `--no-e2e` (as the Approach says, and a route needs the channel) and
+  `--temporary`; a Unix TARGET with no route is refused, as the line names the route.
+
+The ask of podcrates (a COORD issue `(to podcrates)` at the merge): `pod-relay`'s `Route` takes a target of a
+Unix socket and a caller's line, so that this opener goes back into `Routes::open_with`.
+
 ## Prove
 
 ```sh
@@ -5162,3 +5188,43 @@ cargo test -p podssh-cli --test node_unix_route
 
 New test: a stand-in listener on a socket in a temp directory reads the line and echoes; two keys give two
 lines; a key the door refuses gives no connection. The Windows job of the gate runs it on AF_UNIX.
+
+## Correction
+
+2026-11-16, the drafting agent: the route and its dial moved to `pod-relay` of PodUtils/podcrates (T-684):
+`Route {name, host, port}` and `Routes::open_with` are
+`PodUtils/podcrates:crates/pod-relay/src/reverse/routes.rs:35-39` and `:82-126` at `v0.63.0`, and the dial
+`dial_target` is `PodUtils/podcrates:crates/pod-relay/src/reverse/tcp.rs:42-55`; `podssh-relay` re-exports them
+(`crates/podssh-relay/src/reverse.rs`, `reverse/tcp.rs`). The grant still gets the key and the route's name.
+So `cargo test -p podssh-relay --lib reverse::routes` has no test here: the unit tests of this entry are
+`cargo test -p podssh-cli --lib node_unix`. `pod-e2e`'s `serve_asked` runs the door (the allowlist, the
+net's policy, a grant, the person of `--ask`) before its opener, and gives the opener the key: the line is
+written after the door, as step 3 asks, with no change of podcrates.
+
+## Done
+
+Partial, 2026-11-16 (drafted on `draft-t714`; not built).
+
+- `crates/podssh-cli/src/node_unix.rs` (new): `unix-connect:` TARGETs, `--caller-line`, the checks, the
+  routes of the process, the first line, `caller_line` (`podssh-caller v1 SHA256:... ROUTE\n`);
+  `node_unix_tests.rs` its unit tests. `node_unix_open.rs` (new): the opener and `Routed`.
+- `node.rs`: `run_node` runs `node_unix::check`; `targets_of` reads the TCP words alone; `Routed` is the new
+  one, as in `node_quick.rs` and `node_carrier.rs`. `channel.rs`: `piped_by` opens through the new opener.
+  `node_target.rs`: a Unix route makes the node routed, and the first line names it. `pipe/unix.rs`:
+  `stream`, `is_named_pipe` and `af_unix` are `pub(crate)`. `node_args.rs`: `caller_line`;
+  `node_install/text.rs`: the unit keeps `--caller-line`.
+- The manual: the flag row (`flags/node.rs`), the TARGET's help (`positionals.rs`), the notes
+  (`man/notes_unix_route.rs`). `docs/reverse.md`: "A route to a Unix socket", with the line's contract.
+- The test `crates/podssh-cli/tests/node_unix_route.rs`: the stand-in relay, a service on a socket in a
+  temporary directory that echoes the line; two keys, two lines; a key that the door refuses, no
+  connection; a route with no `--caller-line`, no byte of the node; a socket that is gone, named; and the
+  refusals with exit 64. AF_UNIX by WinSock on Windows.
+- Merged 2026-11-17: `cargo test -p podssh-cli --lib node_unix` 5 passed; `--test node_unix_route` 3 passed (planted,
+  the caller line left out: `a_unix_route_gets_the_line_of_each_key_that_the_door_let_in` fails); `cargo test -p
+  podssh-cli` 2386 passed and one failed, the manual's check of names: its note named `ROUTE=` (read as an `-o`
+  keyword given a value) and `AF_UNIX` (read as a variable), reworded, then `--lib man::` 73 passed; clippy (the gate's
+  lints) and rustfmt clean. Not run: the Windows job on AF_UNIX (the gate's), and an upgrade in place that moves a
+  Unix route's session (the descriptor goes as a TCP one's; on Windows, WinSock's duplicate of an AF_UNIX socket is
+  untried).
+- Waits: podcrates' answer to COORD-099 (#295), the ask above; a relative PATH under `--install` (a service starts in another
+  directory) and a socket under a home that a system unit's `ProtectHome` hides are not checked yet.

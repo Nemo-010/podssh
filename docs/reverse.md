@@ -954,3 +954,47 @@ no route stays its own. A node of the channel serves its sessions through
 its routes from its start, so that a share added later is reached; such a
 session counts against the layer's budget once its key, its route and its
 grant passed, as a session of a node with no route did.
+
+## A route to a Unix socket
+
+A service on a node often listens on a Unix socket: a control API, a
+container runtime, an agent. `podssh node NAME ROUTE=unix-connect:PATH`
+offers it under ROUTE with no bridge of TCP (T-714); `@NAME` is a name in
+Linux's abstract namespace, and on Windows PATH is an AF_UNIX socket, as
+`podssh pipe`'s `unix-connect:` connects them; a named pipe of Windows is
+refused, as a route's target is a socket that an upgrade can move. The node connects
+to PATH for each session of the route, and only then: a connect is no
+listener (rule 2). A failure names PATH and its cause, and the operator
+gets it. Such a TARGET always has a route, which an operator names as
+`NAME/ROUTE`; it is refused with `--sshd` (a roost's sshd is on TCP), with
+`--exit` (an exit lends TCP), with `--no-e2e` (a route travels in the
+end-to-end channel) and with `--temporary`.
+
+**The caller's line.** `--caller-line ROUTES` (names by commas) asks the
+node to write one line to the socket before the first byte of each session
+of those routes:
+
+```text
+podssh-caller v1 SHA256:<the operator's key, base64 with no padding> <ROUTE>\n
+```
+
+Four words split by one space, then one newline: the tag, its version, the
+operator's key as OpenSSH prints the fingerprint of an Ed25519 key, and the
+route's name (letters, digits, `.`, `-` and `_`). The service reads up to
+the first newline; the rest is the session's stream. The node writes the
+line after its door let the key in (the allowlist and its `routes=`, the
+net's policy, a grant used once that named the route, the person of
+`--ask`) and before it carries any byte of the operator's, so the line is a
+fact of the door, not a claim of the caller: an operator cannot write it or
+change it, and a key that the door refused never reaches the socket.
+Without `--caller-line` the node writes nothing of its own: a plain bridge.
+A later version of the line changes the second word.
+
+The routes of TCP stay `pod-relay`'s (PodUtils/podcrates); a Unix route is
+podssh's own opener beside them, for each road of a node, until
+`pod-relay`'s routes take a target of this kind. The opener hands the Unix
+socket on as a `TcpStream` of the same descriptor (a connected stream
+socket of any family carries bytes as a TCP one does, as `podssh pipe`
+hands on an AF_UNIX socket of Windows), so that each target of a route is
+one type, and an upgrade in place moves a Unix route's session as it moves
+a TCP one's.

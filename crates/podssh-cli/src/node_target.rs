@@ -50,7 +50,9 @@ pub(crate) async fn probe(targets: &[Route], roost: bool) -> Result<Vec<String>,
 pub(crate) fn routes_of(targets: &[Route], grant: Arc<Grant>, roost: bool, me: Option<PublicKey>) -> Option<Routes> {
     let exit = me.and_then(crate::node_exit::dial);
     let shared = crate::share::serve::shared();
-    let routed = targets.iter().any(|t| t.name.is_some()) || crate::node_exit::asked() || shared.is_some();
+    // A route to a Unix socket is a route too (T-714).
+    let named = targets.iter().any(|t| t.name.is_some()) || crate::node_unix::any();
+    let routed = named || crate::node_exit::asked() || shared.is_some();
     routed.then(|| Routes {
         dialer: podssh_relay::reverse::tcp::dialer(),
         routes: Arc::new(targets.to_vec()),
@@ -82,7 +84,8 @@ fn failed(shown: &str, t: &Route, roost: bool, e: &DialError) -> String {
 /// The targets as the node's first line says them: a roost's, each with the
 /// version line that its sshd sent; and an exit's egress (T-431).
 pub(crate) fn serving(targets: &[Route], versions: &[String]) -> String {
-    crate::node_exit::beside(served(targets, versions), targets.is_empty())
+    // The routes to a Unix socket after the TCP ones (T-714); an exit has none.
+    crate::node_exit::beside(crate::node_unix::beside(served(targets, versions)), targets.is_empty())
 }
 
 fn served(targets: &[Route], versions: &[String]) -> String {

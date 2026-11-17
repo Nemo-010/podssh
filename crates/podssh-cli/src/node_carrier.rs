@@ -17,7 +17,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use podssh_relay::e2e::ends::Node;
-use podssh_relay::reverse::routes::{Route, Routed};
+use podssh_relay::reverse::routes::Route;
 use podssh_relay::reverse::{self, E2e, End, Handler, Layered};
 use podssh_relay::serve::reverse::carrier::{self, Link};
 use podssh_ws::session::RelaySession;
@@ -25,6 +25,8 @@ use tokio::process::Child;
 
 use crate::exitmap::Fault;
 use crate::node::{key_flags, probe, routes_of, serving, stop_signal, targets_of, words_of, NodeArgs, DIAL_LIMIT};
+// The routes with those to a Unix socket beside them (T-714).
+use crate::node_unix_open::Routed;
 use crate::pipe::address::Address;
 use crate::relay_settings::Refusal;
 

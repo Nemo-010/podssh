@@ -45,7 +45,7 @@ use podssh_relay::quick::register::Connector;
 use podssh_relay::quick::roads::{self, Link, Road};
 use podssh_relay::quick::{api, edge};
 use podssh_relay::reverse::framing::SessionId;
-use podssh_relay::reverse::routes::{Route, Routed};
+use podssh_relay::reverse::routes::Route;
 use podssh_relay::reverse::{self, E2e, Handler, Layered};
 use podssh_ws::ProxyChoice;
 use tokio::io::DuplexStream;
@@ -55,6 +55,8 @@ use crate::exitmap::{sysexits, Fault};
 use crate::node::NodeArgs;
 use crate::node_derp::Door;
 use crate::node_quick_relay::Role;
+// The routes with those to a Unix socket beside them (T-714).
+use crate::node_unix_open::Routed;
 use crate::node_warp::WarpRoad;
 use crate::relay_settings::Refusal;
 

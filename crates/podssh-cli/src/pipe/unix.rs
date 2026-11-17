@@ -52,8 +52,9 @@ pub(crate) async fn connect(path: &str) -> io::Result<End> {
     Ok(End::plain(Box::new(read), Box::new(write)))
 }
 
+/// The socket at `path` as one stream: a node's Unix route takes it too.
 #[cfg(unix)]
-async fn stream(path: &str) -> io::Result<tokio::net::UnixStream> {
+pub(crate) async fn stream(path: &str) -> io::Result<tokio::net::UnixStream> {
     #[cfg(target_os = "linux")]
     if let Some(name) = path.strip_prefix('@') {
         use std::os::linux::net::SocketAddrExt;
@@ -83,7 +84,7 @@ pub(crate) async fn connect(path: &str) -> io::Result<End> {
 
 /// `\\.\pipe\NAME`, either slash.
 #[cfg(windows)]
-pub(super) fn is_named_pipe(path: &str) -> bool {
+pub(crate) fn is_named_pipe(path: &str) -> bool {
     let lower = path.to_ascii_lowercase().replace('/', "\\");
     lower.starts_with(r"\\.\pipe\")
 }
@@ -137,7 +138,7 @@ pub(super) fn sockaddr(path: &str) -> windows_sys::Win32::Networking::WinSock::S
 /// standard library has none on Windows. A connected socket of any family
 /// carries bytes as a TCP one does, so it is handed on as one.
 #[cfg(windows)]
-pub(super) fn af_unix(path: &str) -> io::Result<std::net::TcpStream> {
+pub(crate) fn af_unix(path: &str) -> io::Result<std::net::TcpStream> {
     use std::os::windows::io::FromRawSocket;
     use windows_sys::Win32::Networking::WinSock as ws;
     wsa_start()?;

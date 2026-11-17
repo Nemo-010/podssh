@@ -201,7 +201,7 @@ pub fn add(cmd: Command, name: &str) -> Command {
                 Arg::new("target")
                     .value_name("TARGET")
                     .num_args(0..)
-                    .help("the TCP service that each session reaches: HOST:PORT, or [IPV6]:PORT; ROUTE=HOST:PORT offers one more under ROUTE, which an operator names as NAME/ROUTE; udp:HOST:PORT, alone, a UDP service; with --sshd and none, 127.0.0.1:22; with --quick-tunnel --relay and none, the relay alone; with --exit, none is needed"),
+                    .help("the TCP service that each session reaches: HOST:PORT, or [IPV6]:PORT; ROUTE=HOST:PORT offers one more under ROUTE, which an operator names as NAME/ROUTE; ROUTE=unix-connect:PATH, a Unix socket (@NAME, abstract, on Linux); udp:HOST:PORT, alone, a UDP service; with --sshd and none, 127.0.0.1:22; with --quick-tunnel --relay and none, the relay alone; with --exit, none is needed"),
             ),
         "pipe" => cmd
             .arg(

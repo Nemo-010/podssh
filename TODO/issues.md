@@ -351,6 +351,7 @@ trufflehog images) and #292 and #293 (the minor and patch group, rsa 0.10) are T
 | #288 | COORD-096: pod-manual: four things podssh's manual needs before its text, help and JSON move to the crate (to podcrates) | closed 2026-11-17: podcrates `v0.65.0` gives the four forms (its entry 807), taken (COORD-097) | T-790 |
 | #289 | COORD-097: podssh took podcrates v0.65.0 at 843e3c5, with pod-tor and pod-iroh (to podcrates) | open 2026-11-17: until podcrates records the take | T-684 |
 | #294 | COORD-098: pod-relay: renew reads the default relay's 400 for an unknown reverse path as an error, not as no renewal (to podcrates) | open 2026-11-17: until podcrates answers | T-713 |
+| #295 | COORD-099: pod-relay: a route of a node to a Unix socket, as a target kind of Route (to podcrates) | open 2026-11-17: until podcrates answers | T-714 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | open 2026-11-15: answers podnet's COORD-090 (PodUtils/podnet#584) | T-730, T-790 |
 | #268 | COORD-081: podssh's host classes and lane for pod-lab, and its manual for pod-manual (to podcrates) | open 2026-11-15: answers COORD-107 and COORD-108 | T-790, T-791 |
 | #269 | COORD-082: podssh's map of issues to entries, and its install (to podcrates) | open 2026-11-15: answers COORD-110 and COORD-109 | T-792, T-793 |

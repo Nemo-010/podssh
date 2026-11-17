@@ -131,6 +131,10 @@ pub mod node_exit;
 pub(crate) mod node_exit_own;
 // `podssh node NAME udp:HOST:PORT`: a UDP target, one flow for each session.
 pub mod node_udp;
+// `podssh node NAME ROUTE=unix-connect:PATH`: a route to a Unix socket, with
+// the caller's line of `--caller-line` (T-714).
+pub mod node_unix;
+pub mod node_unix_open;
 // `podssh node --derp`: the DERP road, and its fallback of a node with no
 // pair (T-379).
 pub mod node_derp;

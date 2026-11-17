@@ -204,6 +204,9 @@ pub const NODE_FLAGS: &[FlagRow] = &[
     super::grant::NODE_REVOKED,
     // The node's shares, by name, read again for each session (T-433).
     super::share::NODE_SHARES,
+    // The caller's line on a route to a Unix socket (T-714).
+    row(None, "caller-line", Some("ROUTES"), FlagKind::Supported,
+        "ROUTES, by commas, are routes to a Unix socket (ROUTE=unix-connect:PATH); before each session's first byte, the node writes podssh-caller v1 SHA256:KEY ROUTE and a newline to it", None),
     // A person at the node's terminal, after its door (T-638).
     row(None, "ask", None, FlagKind::Supported,
         "ask at this terminal of each operator key that the door or a grant lets in: y or n within 100 s, no answer a no; a yes lets the key in while one of its sessions is open and 120 s after its last, a no stands 15 s; stdin and stderr must be a terminal (else 78)", None),

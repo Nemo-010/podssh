@@ -9,7 +9,7 @@ pub struct NodeArgs {
     /// The label of a stored pair.
     pub name: Option<String>,
     /// Each TARGET: `HOST:PORT` or `[IPV6]:PORT`, and `ROUTE=TARGET` for a
-    /// route (T-089).
+    /// route (T-089), whose TARGET may be `unix-connect:PATH` (T-714).
     pub targets: Vec<String>,
     pub relay_addr: Option<String>,
     pub ca_file: Option<String>,
@@ -146,6 +146,9 @@ pub struct NodeArgs {
     pub publish_tls: Option<String>,
     pub acme: Option<String>,
     pub acme_directory: Option<String>,
+    /// `--caller-line ROUTES`: the routes to a Unix socket whose sessions
+    /// start with the caller's line (T-714), unparsed.
+    pub caller_line: Option<String>,
     pub refused: Vec<(String, &'static str, &'static str)>,
 }
 
@@ -227,6 +230,7 @@ impl NodeArgs {
             publish_tls: get("publish-tls"),
             acme: get("acme"),
             acme_directory: get("acme-directory"),
+            caller_line: get("caller-line"),
             refused,
         }
     }
