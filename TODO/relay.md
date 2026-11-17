@@ -6504,8 +6504,9 @@ test listener is in `tests/`). There a balancer's header of either version names
 balancer with no header is closed, and so is another peer with one; another peer's TLS keeps its address. Behind the
 role's listener with a brake of one mint a minute, the second mint of the client that the balancer names is `429`,
 another client's first is `200`, and a stranger's header is closed and said in the log. Planted: the stranger's header
-not checked fails both tests (`serve_proxy_header.rs:64`, `:146`); the header's source not used fails both
-(`:54`, `:142`). The Prove's `serve::listener` filter names no test: the listener's are in `tests/serve_proxy_header.rs`.
+not checked fails both tests; the header's source not used fails both. On 2026-11-17 the gate's `macos` job failed the
+test: macOS's loopback has 127.0.0.1 alone, and the test bound 127.0.0.2 and 127.0.0.3. Each connection now comes from
+127.0.0.1, and a stranger is a role whose `--proxy-protocol` names another address. The Prove's `serve::listener` filter names no test: the listener's are in `tests/serve_proxy_header.rs`.
 
 What waits: IPv6's header captured from haproxy (this container has no IPv6; the binary block of version 2 for
 AF_INET6 is tested by its layout), and nginx's stream module, whose header is the same version 1 line.

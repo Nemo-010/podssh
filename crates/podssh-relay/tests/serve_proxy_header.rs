@@ -32,11 +32,11 @@ fn ip(text: &str) -> IpAddr {
     text.parse().unwrap()
 }
 
-/// A connection to `listener` from the loopback address `from`, which
-/// sends `first`, as the listener sees it.
-async fn connect(listener: &TcpListener, from: &str, first: &[u8]) -> (TcpStream, TcpStream) {
+/// A connection to `listener` that sends `first`, as the listener sees it.
+/// From 127.0.0.1 alone, as macOS has no other loopback address: a test
+/// names the peer that `client_of` reads.
+async fn connect(listener: &TcpListener, first: &[u8]) -> (TcpStream, TcpStream) {
     let socket = TcpSocket::new_v4().unwrap();
-    socket.bind(format!("{from}:0").parse().unwrap()).unwrap();
     let (client, accepted) = tokio::join!(socket.connect(listener.local_addr().unwrap()), listener.accept());
     let mut client = client.unwrap();
     client.write_all(first).await.unwrap();
@@ -50,34 +50,35 @@ async fn a_trusted_balancer_must_send_the_header_and_no_other_peer_may() {
     let wait = Duration::from_secs(5);
     let (balancer, stranger) = (ip("127.0.0.1"), ip("127.0.0.3"));
     // The balancer's header names the client, and the client's bytes follow.
-    let (_c, mut tcp) = connect(&listener, "127.0.0.1", &hex(HAPROXY_V2)).await;
+    let (_c, mut tcp) = connect(&listener, &hex(HAPROXY_V2)).await;
     assert_eq!(client_of(&mut tcp, balancer, &trusted, wait).await, Ok(ip("127.0.0.2")));
     let mut hello = [0u8; 5];
     tcp.read_exact(&mut hello).await.unwrap();
     assert_eq!(&hello, b"HELLO");
     // The balancer with no header: closed.
-    let (_c, mut tcp) = connect(&listener, "127.0.0.1", b"\x16\x03\x01\x00").await;
+    let (_c, mut tcp) = connect(&listener, b"\x16\x03\x01\x00").await;
     assert!(client_of(&mut tcp, balancer, &trusted, wait).await.is_err());
     // Another peer that writes a header would pass for any address: closed.
     for header in [hex(HAPROXY_V1), hex(HAPROXY_V2)] {
-        let (_c, mut tcp) = connect(&listener, "127.0.0.3", &header).await;
+        let (_c, mut tcp) = connect(&listener, &header).await;
         let why = client_of(&mut tcp, stranger, &trusted, wait).await.unwrap_err();
         assert!(why.contains("does not name"), "{why}");
     }
     // Another peer's TLS is its own address, its bytes left to the peeks.
-    let (_c, mut tcp) = connect(&listener, "127.0.0.3", b"\x16\x03\x01\x00").await;
+    let (_c, mut tcp) = connect(&listener, b"\x16\x03\x01\x00").await;
     assert_eq!(client_of(&mut tcp, stranger, &trusted, wait).await, Ok(stranger));
     // With no flag, nothing changes: a header is the client's bytes.
-    let (_c, mut tcp) = connect(&listener, "127.0.0.3", &hex(HAPROXY_V1)).await;
+    let (_c, mut tcp) = connect(&listener, &hex(HAPROXY_V1)).await;
     assert_eq!(client_of(&mut tcp, stranger, &Trusted::default(), wait).await, Ok(stranger));
     assert!(Trusted::parse("").is_err() && Trusted::parse("10.0.0.5/8").is_err());
     assert!(trusted.holds("::ffff:127.0.0.1".parse().unwrap()), "an IPv4 peer of a socket of both families");
 }
 
-/// The role behind a balancer at 127.0.0.1 that the owner named, its brake
-/// one mint for each address in a minute; each connection as `podssh relay
-/// serve` takes a balancer's (`balanced`). The port, and what it said.
-async fn role_behind_balancer() -> (u16, Arc<Mutex<Vec<String>>>) {
+/// The role behind the balancers of `trusted`, its brake one mint for each
+/// address in a minute; each connection as `podssh relay serve` takes it
+/// (`balanced` for a balancer's). The port, and what it said. Each client
+/// is 127.0.0.1: a balancer where `trusted` holds it, else a stranger.
+async fn role_behind_balancer(trusted: &str) -> (u16, Arc<Mutex<Vec<String>>>) {
     let bound = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let port = bound.local_addr().unwrap().port();
     let events = Arc::new(Mutex::new(Vec::new()));
@@ -98,7 +99,7 @@ async fn role_behind_balancer() -> (u16, Arc<Mutex<Vec<String>>>) {
         events: Some(say),
     });
     let acceptor = acceptor_for(Served::new(None), &[HTTP1]).unwrap();
-    let proxy = Arc::new(Trusted::parse("127.0.0.1").unwrap());
+    let proxy = Arc::new(Trusted::parse(trusted).unwrap());
     let door = Door { acceptor, cleartext: true, sshd: None, published: Default::default(), proxy };
     let slots = Slots::default();
     tokio::spawn(async move {
@@ -112,13 +113,10 @@ async fn role_behind_balancer() -> (u16, Arc<Mutex<Vec<String>>>) {
     (port, events)
 }
 
-/// A mint of one session in cleartext from the loopback address `from`,
-/// after `header`: the status of its answer, or none for a connection
-/// closed with no answer.
-async fn mint(port: u16, from: &str, header: &[u8]) -> Option<String> {
-    let socket = TcpSocket::new_v4().unwrap();
-    socket.bind(format!("{from}:0").parse().unwrap()).unwrap();
-    let mut tcp = socket.connect(format!("127.0.0.1:{port}").parse().unwrap()).await.unwrap();
+/// A mint of one session in cleartext from 127.0.0.1, after `header`: the
+/// status of its answer, or none for a connection closed with no answer.
+async fn mint(port: u16, header: &[u8]) -> Option<String> {
+    let mut tcp = TcpStream::connect(format!("127.0.0.1:{port}")).await.unwrap();
     let mut ask = header.to_vec();
     ask.extend_from_slice(b"POST /v1/mint?once=1 HTTP/1.1\r\nHost: r.test\r\nContent-Length: 2\r\n\r\n{}");
     tcp.write_all(&ask).await.unwrap();
@@ -135,17 +133,19 @@ fn v1(client: &str) -> Vec<u8> {
 
 #[tokio::test]
 async fn the_brake_counts_the_client_that_the_balancer_names() {
-    let (port, events) = role_behind_balancer().await;
-    assert_eq!(mint(port, "127.0.0.1", &v1("192.0.2.1")).await.as_deref(), Some("200"));
-    assert_eq!(mint(port, "127.0.0.1", &v1("192.0.2.1")).await.as_deref(), Some("429"), "the client's second");
+    let (port, _) = role_behind_balancer("127.0.0.1").await;
+    assert_eq!(mint(port, &v1("192.0.2.1")).await.as_deref(), Some("200"));
+    assert_eq!(mint(port, &v1("192.0.2.1")).await.as_deref(), Some("429"), "the client's second");
     // haproxy's own header names 127.0.0.2, a client apart.
-    assert_eq!(mint(port, "127.0.0.1", &hex(HAPROXY_V2)[..28]).await.as_deref(), Some("200"));
-    assert_eq!(mint(port, "127.0.0.1", &v1("192.0.2.2")).await.as_deref(), Some("200"), "another client");
-    // The balancer with no header, and a stranger with one: closed.
-    assert_eq!(mint(port, "127.0.0.1", b"").await, None);
-    assert_eq!(mint(port, "127.0.0.3", &v1("192.0.2.9")).await, None);
-    // A stranger with no header is itself.
-    assert_eq!(mint(port, "127.0.0.3", b"").await.as_deref(), Some("200"));
+    assert_eq!(mint(port, &hex(HAPROXY_V2)[..28]).await.as_deref(), Some("200"));
+    assert_eq!(mint(port, &v1("192.0.2.2")).await.as_deref(), Some("200"), "another client");
+    // The balancer with no header: closed.
+    assert_eq!(mint(port, b"").await, None);
+    // A role whose balancer is elsewhere: 127.0.0.1 is a stranger, closed
+    // with a header, and itself with none.
+    let (port, events) = role_behind_balancer("192.0.2.1").await;
+    assert_eq!(mint(port, &v1("192.0.2.9")).await, None);
+    assert_eq!(mint(port, b"").await.as_deref(), Some("200"));
     let said = events.lock().unwrap().join("\n");
     assert!(said.contains("which --proxy-protocol does not name"), "{said}");
 }
