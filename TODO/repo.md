@@ -7086,7 +7086,7 @@ installer of a published release, with its signature checked, which the next bet
 **Milestone:** none
 **Priority:** P2
 **Effort:** S
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -7123,3 +7123,14 @@ cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli
 `roots_version::the_recorded_roots_are_the_ones_built`, as it should: a new webpki-roots needs
 `podssh_ws::tls::ROOTS_VERSION` and `ROOTS_PUBLISHED` (the day crates.io published it) moved with it. Its `windows` job
 failed T-709's seven tests of the system unit, which `5ad75b7` made Unix's alone (the branch is older).
+
+## Done
+
+Partial, 2026-11-17. Taken on `main`: rustls-pki-types 1.16.0 and cc 1.11.2 (`cargo update -p`), the root's `rsa`
+line at 0.10 (no crate of the workspace takes it), and the images of #290 and #291 (Tailscale v1.104.7, TruffleHog
+3.99.9, each by its digest). `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3566 passed, 0
+failed. A name with a trailing dot reaches the live relay (`podssh relay conform --relay-host
+tcp.ssh.relay.ajam.dev.`: 9 passed, 0 failed); a name whose last label is hex is refused before any connection,
+with its words (`"relay.0x1f" is not a valid server name: invalid dns name`). Held: webpki-roots 1.0.12, whose
+version `pod_tls::trust::ROOTS_VERSION` records in podcrates, and the one rsa 0.9 of the tree, which `pod-tls` takes:
+both asked of podcrates (COORD-101, #297). Then each Dependabot pull request closes once its update is on `main`.
