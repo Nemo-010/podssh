@@ -270,6 +270,24 @@ fn the_file_of_variables_carries_the_proxy_and_never_a_token() {
     assert!(SECRET.iter().all(|s| !CARRIED.contains(s)));
 }
 
+/// T-718: a service carries the files of a service token of Cloudflare
+/// Access, paths alone, and never the secret of its variable.
+#[test]
+fn the_file_of_variables_carries_the_files_of_access_and_never_its_secret() {
+    let pair = |n: &str, v: &str| (n.to_string(), v.to_string());
+    let env = [
+        pair("PODSSH_CF_ACCESS_CLIENT_ID_FILE", "/etc/podssh/access-id"),
+        pair("PODSSH_CF_ACCESS_CLIENT_SECRET_FILE", "/etc/podssh/access-secret"),
+        pair("PODSSH_CF_ACCESS_CLIENT_SECRET", "the-secret-of-this-test"),
+    ];
+    let (text, left) = body_of(env.into_iter());
+    assert!(text.contains("\nPODSSH_CF_ACCESS_CLIENT_ID_FILE=/etc/podssh/access-id\n"), "{text}");
+    assert!(text.contains("\nPODSSH_CF_ACCESS_CLIENT_SECRET_FILE=/etc/podssh/access-secret\n"), "{text}");
+    assert!(!text.contains("the-secret-of-this-test"), "{text}");
+    assert_eq!(left, ["PODSSH_CF_ACCESS_CLIENT_SECRET"]);
+    assert_eq!(parse(&text).unwrap().len(), 2, "it reads the paths back");
+}
+
 /// A retired name in a service's file (T-634), on the row of the tests: the
 /// reader refuses it with its line and what replaced it, an empty value
 /// passes, and the install leaves it out.

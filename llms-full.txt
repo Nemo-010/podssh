@@ -249,7 +249,9 @@ podssh ssh
   needs a service token (PODSSH_CF_ACCESS_CLIENT_ID and
   PODSSH_CF_ACCESS_CLIENT_SECRET) or a token made where its login runs
   (PODSSH_CF_ACCESS_TOKEN or PODSSH_CF_ACCESS_TOKEN_FILE); a refusal of Access
-  says so. The host key is recorded and checked under HOST. A tunnel has no
+  says so. The id and the secret may come from the files of
+  PODSSH_CF_ACCESS_CLIENT_ID_FILE and PODSSH_CF_ACCESS_CLIENT_SECRET_FILE
+  instead. The host key is recorded and checked under HOST. A tunnel has no
   port here, and -J, -4, -6, HostName and --direct cannot go with it. -J
   cf://HOST makes a tunnel the first hop of a chain, the hops after it in its
   channels. So a jump host whose sshd a tunnel publishes reaches the rest; a
@@ -3717,13 +3719,23 @@ podssh pipe
   ws://HOST[:PORT]/PATH and wss://HOST[:PORT]/PATH are a WebSocket by the URL
   that a user copies, reached through HTTPS_PROXY when it is set: wss: checks
   the certificate for HOST with the trust of --ca-file, and ws: is in the
-  clear, as tcp: is. No token goes on them; the path and its query are the
-  user's, and podssh's lines show the URL without its query. Bytes go out in
-  binary frames, and text and binary frames come in as bytes. At the end of
-  this side's input podssh sends a Close, and what the other end sends before
-  its own Close still comes; the other end's Close ends the pipe, and a code
-  other than 1000 is on stderr with its reason (69). A refused upgrade gives
-  its status: 77 for 401 and 403, else 69.
+  clear, as tcp: is. No token goes on them, but for --access-host; the path and
+  its query are the user's, and podssh's lines show the URL without its query.
+  Bytes go out in binary frames, and text and binary frames come in as bytes.
+  At the end of this side's input podssh sends a Close, and what the other end
+  sends before its own Close still comes; the other end's Close ends the pipe,
+  and a code other than 1000 is on stderr with its reason (69). A refused
+  upgrade gives its status: 77 for 401 and 403, else 69.
+
+  --access-host HOST, repeatable, or AccessHost in the settings, names a host
+  for the credentials of Cloudflare Access. A ws: or wss: side to HOST then
+  sends them in the headers that cloudflared sends. Those are the service token
+  of PODSSH_CF_ACCESS_CLIENT_ID and PODSSH_CF_ACCESS_CLIENT_SECRET, or of their
+  files, and the token of PODSSH_CF_ACCESS_TOKEN. No other host gets them. ws:
+  takes them to this host's loopback alone (64 else), and a flag that names no
+  side is refused (64). With no credential set, the run is refused (78). A
+  refusal of Access (401 or 403) gives 77 and names the variables; a value that
+  the far end quotes is not shown.
 
   ws-listen:[ADDR:]PORT or ws-listen:PATH is a WebSocket server, by the rules
   of tcp-listen: and unix-listen:, whose clients are joined to the other side
@@ -3933,6 +3945,9 @@ podssh pipe
         with --detach: a small process in the background starts the run again
         whenever it ends, but after 64, 77 or 78 or a stop of that process; it
         never gives up.
+    --access-host HOST
+        ws: and wss: to HOST carry the credentials of Cloudflare Access in
+        their headers; repeatable.
     --detach-name NAME
         with --detach: the run's name, letters, digits, _ and -, 64 at most; a
         second start of a name that runs refuses (75), and podssh detached
@@ -11126,6 +11141,13 @@ ENVIRONMENT
       that holds one: what cloudflared access token -app=https://HOST prints on
       a host where its login can run. The variable wins over the file; podssh
       never prints the token.
+  PODSSH_CF_ACCESS_CLIENT_ID_FILE, PODSSH_CF_ACCESS_CLIENT_SECRET_FILE
+      The files that hold a service token of Cloudflare Access, its id and its
+      secret, in place of the variables, which win. A file keeps the secret out
+      of the environment. podssh --install carries these paths, and never the
+      secret. The settings keywords AccessClientIdFile and
+      AccessClientSecretFile give them too. A file that cannot be read is
+      refused (78), and the line names the variable.
   PODSSH_NICK
       The nick of podssh chat, as --nick: the name that the peer sees. The flag
       wins.
@@ -12307,19 +12329,20 @@ FILES
       RelayFailover, CaFile, SessionLog, Forwarder, ForwarderFallback;
       DoctorJobs (the sections of podssh doctor at once), RelayKeys (the keys
       of a signed list of relay deployments; each line adds) and ECH (as
-      PODSSH_ECH), as Keyword value lines, below the flags and the variables.
-      The file of PODSSH_SETTINGS, else the first of these that exists
-      (~/.config/podssh/settings with no XDG_CONFIG_HOME; the second beside the
-      podssh binary); never one of the working directory. A symbolic link, a
-      file of another user than you or root, one that others can change, and a
-      bad line are refused (78). Each command that reaches the relay refuses
-      them. podssh never writes it, and no keyword holds a token. After a line
-      [groups], each line is NAME HOSTS: a group of hosts, parted by commas or
-      blanks (by commas alone on the command line), which podssh each takes as
-      @NAME. After a line [snippets], each line is NAME COMMAND: a command that
-      podssh ssh --snippet NAME and podssh each run, with its placeholders (see
-      podssh ssh). A COMMAND in double quotes, with none inside, loses them,
-      and a # in it is no comment.
+      PODSSH_ECH); AccessHost (each line adds), AccessClientIdFile and
+      AccessClientSecretFile (see podssh pipe), as Keyword value lines, below
+      the flags and the variables. The file of PODSSH_SETTINGS, else the first
+      of these that exists (~/.config/podssh/settings with no XDG_CONFIG_HOME;
+      the second beside the podssh binary); never one of the working directory.
+      A symbolic link, a file of another user than you or root, one that others
+      can change, and a bad line are refused (78). Each command that reaches
+      the relay refuses them. podssh never writes it, and no keyword holds a
+      token. After a line [groups], each line is NAME HOSTS: a group of hosts,
+      parted by commas or blanks (by commas alone on the command line), which
+      podssh each takes as @NAME. After a line [snippets], each line is NAME
+      COMMAND: a command that podssh ssh --snippet NAME and podssh each run,
+      with its placeholders (see podssh ssh). A COMMAND in double quotes, with
+      none inside, loses them, and a # in it is no comment.
   sessions.jsonl, sessions.1.jsonl
       The log of the sessions of this host, in the cache, when
       PODSSH_SESSION_LOG or SessionLog asks for it: a JSON line for each run of

@@ -43,6 +43,9 @@ pub const PIPE_FLAGS: &[FlagRow] = &[
         "a listening side: go to the background once it listens, as podssh itself; the other side may not be stdio", None),
     row(None, "restart", None, FlagKind::Supported,
         "with --detach: a small process in the background starts the run again whenever it ends, but after 64, 77 or 78 or a stop of that process; it never gives up", None),
+    // The hosts that get the headers of Cloudflare Access (T-718).
+    row(None, "access-host", Some("HOST"), FlagKind::Supported,
+        "ws: and wss: to HOST carry the credentials of Cloudflare Access in their headers; repeatable", None),
     super::detach::DETACH_NAME,
     super::via::VIA, super::via::VIA_AUTH_FILE, super::node::PIPE_EXIT,
     row(None, "proxy-auth-file", Some("FILE"), FlagKind::Supported,

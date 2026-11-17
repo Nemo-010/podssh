@@ -29,6 +29,9 @@ pub struct Settings {
     pub ssh: crate::ssh::args::SshArgs,
     /// `--via`: the second proxy that carries `tcp:` (T-439).
     pub via: Option<crate::via::Road>,
+    /// The credentials of Cloudflare Access for the hosts of
+    /// `--access-host` (T-718); none named, none sent.
+    pub access: podssh_ws::access::Named,
 }
 
 /// Whether `address` leaves this host.
@@ -80,7 +83,46 @@ pub fn settings(args: &PipeArgs, addresses: [&Address; 2]) -> Result<Settings, R
         true => crate::via::chosen(&crate::via::Flags::of(&args.ssh), trust.clone())?,
         false => None,
     };
-    Ok(Settings { relays, failover, trust, ssh: args.ssh.clone(), via })
+    let access = access(args, addresses)?;
+    Ok(Settings { relays, failover, trust, ssh: args.ssh.clone(), via, access })
+}
+
+/// `--access-host HOST` (T-718): the host of a `ws:` or `wss:` side, which
+/// then carries the credentials of Cloudflare Access. A flag that names no
+/// such side is refused (64), and so is `ws:` in the clear to a host that
+/// is not this one's loopback, as a secret goes over TLS alone.
+fn access(args: &PipeArgs, addresses: [&Address; 2]) -> Result<podssh_ws::access::Named, Refusal> {
+    use podssh_ws::access::{host_key, Named};
+    let flags = &args.ssh.access_hosts;
+    let hosts = crate::access::hosts(flags, crate::settings::here()).map_err(Refusal::usage)?;
+    let urls: Vec<&podssh_ws::url::WsUrl> =
+        addresses.iter().filter_map(|a| if let Address::Ws(url) = a { Some(url) } else { None }).collect();
+    let keys: Vec<String> = hosts.iter().map(|h| host_key(h)).collect();
+    let carried: Vec<_> = urls.iter().filter(|url| keys.contains(&host_key(&url.host))).collect();
+    // A line of the settings for another side reads no credential.
+    if carried.is_empty() && flags.is_empty() {
+        return Ok(Named::default());
+    }
+    if carried.is_empty() {
+        let named = hosts.join(",");
+        return Err(Refusal::usage(format!(
+            "{} {named} names no host of a ws: or wss: side",
+            crate::access::HOST_FLAG
+        )));
+    }
+    if let Some(url) = carried.iter().find(|url| !url.tls && !loopback(&url.host)) {
+        return Err(Refusal::usage(format!(
+            "{}: the credentials of Cloudflare Access go over TLS alone: use wss://",
+            url.shown()
+        )));
+    }
+    crate::access::named(flags)
+}
+
+/// Whether `host` is this host's loopback, where `ws:` leaves no machine.
+fn loopback(host: &str) -> bool {
+    let bare = host.trim_start_matches('[').trim_end_matches(']');
+    bare.eq_ignore_ascii_case("localhost") || bare.parse::<std::net::IpAddr>().is_ok_and(|ip| ip.is_loopback())
 }
 
 /// `--carrier ADDR` (T-595): the road of a `node:` or `udp:node:` side, with
@@ -179,7 +221,7 @@ pub async fn open(address: &Address, settings: &Settings, err: &mut dyn Write) -
         }
         Address::UdpNode(label) => super::datagram::open_node(label, &settings.ssh, &mut say).await,
         Address::Iroh(ticket) => super::iroh::open(ticket, &settings.ssh, &settings.trust, &mut say).await,
-        Address::Ws(url) => super::ws::open(url, &settings.trust, &mut say).await,
+        Address::Ws(url) => super::ws::open(url, &settings.trust, settings.access.for_host(&url.host), &mut say).await,
         _ => unreachable!("a local address"),
     }
 }

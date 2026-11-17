@@ -12,6 +12,7 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll};
 
+use podssh_ws::cloudflare::Access;
 use podssh_ws::session::close_code_and_reason;
 use podssh_ws::url::WsUrl;
 use podssh_ws::{frame, ConnectError, DialError, ProxyChoice, RelaySession, SessionError, Trust};
@@ -27,20 +28,47 @@ const PIPE: usize = 256 * 1024;
 /// The largest frame sent, as the pump reads.
 const CHUNK: usize = 32 * 1024;
 
-/// Dial `url`: the end, or the exit code once `say` has the line.
-pub async fn open(url: &WsUrl, trust: &Trust, say: &mut dyn FnMut(&str)) -> Result<End, i32> {
+/// Dial `url`, with the credentials of Cloudflare Access in the upgrade
+/// when `access` is given (a host of `--access-host`, T-718): the end, or
+/// the exit code once `say` has the line.
+pub async fn open(url: &WsUrl, trust: &Trust, access: Option<&Access>, say: &mut dyn FnMut(&str)) -> Result<End, i32> {
     if podssh_relay::open::offline() {
         say(&format!("{} is set, so podssh does not connect anywhere", podssh_relay::open::OFFLINE_ENV));
         return Err(EX_UNAVAILABLE);
     }
     let (timeout, idle) = (podssh_relay::open::CONNECT_TIMEOUT, Some(podssh_ws::DEFAULT_IDLE_TIMEOUT));
-    match podssh_ws::url::dial(url, trust, &ProxyChoice::FromEnvironment, timeout, idle).await {
+    let proxy = ProxyChoice::FromEnvironment;
+    let dialed = match access {
+        Some(access) => podssh_ws::access::dial(url, access, trust, &proxy, timeout, idle).await,
+        None => podssh_ws::url::dial(url, trust, &proxy, timeout, idle).await,
+    };
+    match dialed {
         Ok(session) => Ok(carry(session, url.shown())),
         Err(e) => {
-            say(&podssh_ws::url::failure(url, &e));
+            let line = podssh_ws::url::failure(url, &e);
+            // The far end may quote what it was sent.
+            say(&match access {
+                Some(access) => podssh_ws::access::masked(line, access),
+                None => line,
+            });
+            if let (Some(_), ConnectError::Refused { status: 401 | 403, .. }) = (access, &e) {
+                say(&access_refused());
+            }
             Err(code(&e))
         }
     }
+}
+
+/// What to check when Access refused the credentials: the variables by
+/// name, never a value.
+fn access_refused() -> String {
+    use crate::ssh::cloudflare::{CLIENT_ID_ENV, CLIENT_SECRET_ENV};
+    format!(
+        "Cloudflare Access refused the credentials: check {CLIENT_ID_ENV} and {CLIENT_SECRET_ENV}, or the files of {} \
+         and {}",
+        crate::access::CLIENT_ID_FILE_ENV,
+        crate::access::CLIENT_SECRET_FILE_ENV
+    )
 }
 
 /// The exit code of a dial that failed: 77 for a refusal, 78 for a setting.

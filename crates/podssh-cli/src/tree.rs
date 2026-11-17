@@ -38,7 +38,7 @@ fn appended(long: &str) -> bool {
     #[rustfmt::skip]
     const EACH: &[&str] = &[
         "option", "identity-file", "allow-host", "allow-dir", "sftp-option", "exclude", "deployment", "publish",
-        "authorized-key", "authorized-keys", "accept-env", "allow-command",
+        "authorized-key", "authorized-keys", "accept-env", "allow-command", "access-host",
     ];
     EACH.contains(&long)
 }

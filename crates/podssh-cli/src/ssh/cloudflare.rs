@@ -14,7 +14,6 @@
 mod layer;
 
 use std::future::Future;
-use std::io::Read;
 use std::pin::Pin;
 use std::sync::Arc;
 
@@ -25,10 +24,10 @@ use podssh_ws::client::{ConnectError, DEFAULT_IDLE_TIMEOUT};
 use podssh_ws::cloudflare::{self, Access};
 use podssh_ws::{ProxyChoice, Trust};
 use tokio::io::DuplexStream;
-use zeroize::Zeroizing;
 
 use super::resolve::{Env, Transport};
 use super::transport::{NotReached, Reached};
+use crate::access;
 use crate::exitmap::sysexits;
 
 /// The form of a destination on this road.
@@ -40,8 +39,6 @@ pub const CLIENT_SECRET_ENV: &str = "PODSSH_CF_ACCESS_CLIENT_SECRET";
 /// file that holds one.
 pub const TOKEN_ENV: &str = "PODSSH_CF_ACCESS_TOKEN";
 pub const TOKEN_FILE_ENV: &str = "PODSSH_CF_ACCESS_TOKEN_FILE";
-/// The longest credential: a token of Access is about 1 KiB.
-const MAX_VALUE: usize = 8192;
 
 /// `cf://[user@]HOST` as the user and HOST, in lower case; `None` for each
 /// other destination.
@@ -97,52 +94,21 @@ pub(super) fn transport(r: &super::node::Ask<'_>, env: &Env) -> Result<Transport
 }
 
 /// The credentials of Cloudflare Access, as `read` gives each variable: a
-/// refusal names the variable, never the value.
+/// value, else the file of its `_FILE` variable (T-718). A refusal names the
+/// variable, never the value.
 pub fn access_from(read: &dyn Fn(&str) -> Option<String>) -> Result<Access, String> {
-    let value = |name: &str| -> Result<Option<Zeroizing<String>>, String> {
-        let Some(raw) = read(name).map(Zeroizing::new) else { return Ok(None) };
-        let trimmed = raw.trim();
-        if trimmed.is_empty() {
-            return Ok(None);
-        }
-        check(name, trimmed)?;
-        Ok(Some(Zeroizing::new(trimmed.to_string())))
-    };
-    let client_id = value(CLIENT_ID_ENV)?;
-    let client_secret = value(CLIENT_SECRET_ENV)?;
+    let client_id = access::value_or_file(read, CLIENT_ID_ENV, access::CLIENT_ID_FILE_ENV)?;
+    let client_secret = access::value_or_file(read, CLIENT_SECRET_ENV, access::CLIENT_SECRET_FILE_ENV)?;
     if client_id.is_some() != client_secret.is_some() {
         return Err(format!(
-            "{CLIENT_ID_ENV} and {CLIENT_SECRET_ENV} go together: a service token of Cloudflare Access is both"
+            "{CLIENT_ID_ENV} and {CLIENT_SECRET_ENV} go together, or the files of {} and {}: a service token of \
+             Cloudflare Access is both",
+            access::CLIENT_ID_FILE_ENV,
+            access::CLIENT_SECRET_FILE_ENV
         ));
     }
-    let token = match value(TOKEN_ENV)? {
-        Some(token) => Some(token),
-        None => read(TOKEN_FILE_ENV).filter(|p| !p.trim().is_empty()).map(|p| token_file(p.trim())).transpose()?,
-    };
+    let token = access::value_or_file(read, TOKEN_ENV, TOKEN_FILE_ENV)?;
     Ok(Access { client_id, client_secret, token })
-}
-
-fn check(name: &str, value: &str) -> Result<(), String> {
-    if value.len() > MAX_VALUE || !value.bytes().all(|b| (0x21..=0x7e).contains(&b)) {
-        return Err(format!(
-            "{name} is not a credential of Cloudflare Access: 1 to {MAX_VALUE} printable characters, with no space"
-        ));
-    }
-    Ok(())
-}
-
-/// The token in the file of `path`, trimmed.
-fn token_file(path: &str) -> Result<Zeroizing<String>, String> {
-    let mut text = Zeroizing::new(String::new());
-    std::fs::File::open(path)
-        .and_then(|file| file.take(MAX_VALUE as u64 + 1).read_to_string(&mut text))
-        .map_err(|e| format!("{TOKEN_FILE_ENV}: {path}: {e}"))?;
-    let token = text.trim();
-    if token.is_empty() {
-        return Err(format!("{TOKEN_FILE_ENV}: {path} holds no token"));
-    }
-    check(TOKEN_FILE_ENV, token)?;
-    Ok(Zeroizing::new(token.to_string()))
 }
 
 /// Why the tunnel of `host` did not take the session, and the code of a
@@ -154,8 +120,10 @@ pub fn refusal(host: &str, e: &ConnectError) -> (String, i32) {
             (
                 format!(
                     "{SCHEME}{host}: Cloudflare Access refused the session (HTTP {status}{said}): give a service \
-                     token in {CLIENT_ID_ENV} and {CLIENT_SECRET_ENV}, or a token of \
-                     `cloudflared access token -app=https://{host}` in {TOKEN_ENV} or the file of {TOKEN_FILE_ENV}"
+                     token in {CLIENT_ID_ENV} and {CLIENT_SECRET_ENV} (or the files of {} and {}), or a token of \
+                     `cloudflared access token -app=https://{host}` in {TOKEN_ENV} or the file of {TOKEN_FILE_ENV}",
+                    access::CLIENT_ID_FILE_ENV,
+                    access::CLIENT_SECRET_FILE_ENV
                 ),
                 sysexits::EX_NOPERM,
             )
@@ -187,8 +155,7 @@ pub(super) async fn reach(
         let line = format!("{} is set, so podssh does not connect anywhere", podssh_relay::open::OFFLINE_ENV);
         return Err(NotReached { lines: vec![line], code: sysexits::EX_UNAVAILABLE });
     }
-    let access = access_from(&|name| std::env::var(name).ok())
-        .map_err(|why| NotReached { lines: vec![why], code: sysexits::EX_CONFIG })?;
+    let access = access_from(&access::var).map_err(|why| NotReached { lines: vec![why], code: sysexits::EX_CONFIG })?;
     log.verbose(&format!("connecting to {SCHEME}{host} over its Cloudflare tunnel"));
     let link = open(host, &access, trust).await.map_err(|(line, code)| NotReached { lines: vec![line], code })?;
     log.verbose(&format!("the tunnel of {host} took the session"));

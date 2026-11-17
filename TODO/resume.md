@@ -354,7 +354,7 @@ the node then exits (docs/reverse.md, line 19 at `fb228e9`).
    `/v1/connect/<name>`. If none does, "each relay host" means each address of
    the control host (pins, resolver, DNS over HTTPS). Write it in
    `docs/relay.md`, with `docs/reverse.md` and the manual's relay section
-   (`crates/podssh-cli/src/man/facts.rs:301-455`).
+   (`crates/podssh-cli/src/man/facts.rs:308-462`).
 6. A node keeps the replay buffer of each session (T-152): with the relay's
    limit of 64 sessions and 4 MiB each, 256 MiB. Bound the node's whole
    replay memory (a session past the bound gets `REFUSE` busy, code 6), and
@@ -858,8 +858,8 @@ Measured on `3ee70dc`, offline (`PODSSH_OFFLINE=1`, a `.invalid` host):
 4. On the resumable road, do not print the warning of
    `crates/podssh-cli/src/ssh/resolve.rs:334-344` (the `warnings` of keepalives).
 5. In the same commit: "Liveness" and "Idle limit" in the manual
-   (`crates/podssh-cli/src/man/facts.rs:381-396`,
-   `crates/podssh-cli/src/man/facts.rs:416-425`), the note at
+   (`crates/podssh-cli/src/man/facts.rs:388-403`,
+   `crates/podssh-cli/src/man/facts.rs:423-432`), the note at
    `crates/podssh-cli/src/man/notes_ssh_more.rs:119`, `docs/relay.md`, `README.md`.
 
 ## Decision
@@ -989,7 +989,7 @@ node's side (`crates/podssh-probe/tests/spec/relay-spec-2026-10-03-r2.txt:133-13
 6. When the client knows the expiry of the pair (from the node's ticket,
    T-163), it warns 1 h before; at the expiry the session ends with the reason.
 7. `-v` prints one line for each move. Docs: `docs/relay.md` ("Limits that
-   users see") and the manual (`crates/podssh-cli/src/man/facts.rs:301-455`).
+   users see") and the manual (`crates/podssh-cli/src/man/facts.rs:308-462`).
 
 ## Decision
 
@@ -4177,8 +4177,8 @@ same setting.
   `Transport::Node`, `Transport::Iroh` and `Transport::Derp`. `Transport::Cloudflare` is not in the
   list.
 - The warning at `crates/podssh-cli/src/ssh/resolve.rs:336-341` sits inside `if resumable`.
-- `crates/podssh-cli/src/ssh/cloudflare.rs:199` branches on `greeted.layer()`;
-  `crates/podssh-cli/src/ssh/cloudflare.rs:233` returns `layer: Some(done)`. The greeting is known
+- `crates/podssh-cli/src/ssh/cloudflare.rs:166` branches on `greeted.layer()`;
+  `crates/podssh-cli/src/ssh/cloudflare.rs:200` returns `layer: Some(done)`. The greeting is known
   only after the connection, so the list at `resolve.rs:375` cannot decide it.
 - The guard at `crates/podssh-cli/src/ssh/mod.rs:435` removes the keepalives only when
   `resolved.alive_default` holds, which `crates/podssh-cli/src/ssh/resolve.rs:421` sets when the user

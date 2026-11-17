@@ -42,7 +42,7 @@ impl Tunnel {
     ) -> Result<Option<Tunnel>, Refusal> {
         let Some(host) = host_of(name, pair_file, carrier)? else { return Ok(None) };
         // A quick tunnel has no Access; a named tunnel of the user's may.
-        let access = cloudflare::access_from(&|var| std::env::var(var).ok()).map_err(Refusal::config)?;
+        let access = cloudflare::access_from(&crate::access::var).map_err(Refusal::config)?;
         Ok(Some(Tunnel { host, access, trust: crate::pairs::trust(ca_file) }))
     }
 }

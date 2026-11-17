@@ -190,8 +190,8 @@ the file that `--ts-state` names (`crates/podssh-cli/src/flags.rs:375-376`,
 5. The node prints its ticket and its fingerprint on stderr when it starts.
    `podssh ssh iroh:TICKET` dials it (the address of `docs/design.md:1154`).
 6. Add the key files to FILES in the manual
-   (`crates/podssh-cli/src/man/data.rs:162-496`), and each new variable to
-   `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-273`).
+   (`crates/podssh-cli/src/man/data.rs:162-497`), and each new variable to
+   `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-280`).
 
 ## Decision
 
@@ -381,7 +381,7 @@ sandbox can block what iroh needs, so the fallback is necessary
 6. With `-v`, print the road that won and its time.
 7. Each resume of T-153 runs the same race.
 8. Docs: the rule of the race in `docs/design.md` section 2, and the notes of
-   `ssh` in the manual (`crates/podssh-cli/src/man/notes_ssh.rs:4-490` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`).
+   `ssh` in the manual (`crates/podssh-cli/src/man/notes_ssh.rs:4-491` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175`).
 
 ## Decision
 
@@ -519,9 +519,9 @@ in iroh's source at the pinned version.
    not in the list.
 6. `doctor`, with the feature, reports the `/ping` of each relay and the home
    relay.
-7. Add the variable to `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-273`),
+7. Add the variable to `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-280`),
    the flag to the flag table, and the default to the relay section of the
-   manual (`crates/podssh-cli/src/man/facts.rs:301-455`). The tests compare
+   manual (`crates/podssh-cli/src/man/facts.rs:308-462`). The tests compare
    `VARIABLES` with the source in both directions
    (`crates/podssh-cli/src/man/facts.rs:44-45`), so a variable that only the
    feature reads is in the manual only with the feature.
@@ -4411,7 +4411,7 @@ allows podssh as a client of Cloudflare (`docs/decisions.md:80`).
   `cf` with the port `//HOST`, which is refused as a port
   (`crates/podssh-cli/src/ssh/hop.rs:58-60`); `jump_hop` refuses a node only (`:68-74`).
 - Read: a `cf://` destination refuses `-J`:
-  `crates/podssh-cli/src/ssh/cloudflare.rs:75` says "a Cloudflare tunnel cannot be reached
+  `crates/podssh-cli/src/ssh/cloudflare.rs:72` says "a Cloudflare tunnel cannot be reached
   through a -J hop yet", and `docs/cli.md:220-221` says so too.
 - Read: the road of a run is chosen for the first hop's host
   (`crates/podssh-cli/src/ssh/resolve.rs:256`), and each later hop runs in a `direct-tcpip`
@@ -4435,7 +4435,7 @@ allows podssh as a client of Cloudflare (`docs/decisions.md:80`).
    SSH channel has no road to Cloudflare's edge.
 2. The road of the run is the `cf://` road when the first hop is one: `cloudflare::transport` for
    that hop, with its refusals of `--direct`, a port, `HostName`, `-4` and `-6` as today
-   (`crates/podssh-cli/src/ssh/cloudflare.rs:71-89`), and no refusal of the hops after it.
+   (`crates/podssh-cli/src/ssh/cloudflare.rs:68-86`), and no refusal of the hops after it.
 3. The first hop's host key is kept under HOST, as for a `cf://` destination; the next hops run in
    its `direct-tcpip` channels, as each hop does today. A node behind the tunnel (a roost with
    `--quick-tunnel`) carries the first hop in the layer, as for a destination.
@@ -5014,7 +5014,7 @@ Endpoint puts a credential in its URL.
   `docs/decisions.md:96` says "in a header or a 0600 file and never in a URL" of the relay's
   tokens. The presigned URL carries an access key id and a signature in its query.
 - Read: the `cf://` road uses podssh-ws's WebSocket client through the proxy
-  (`crates/podssh-cli/src/ssh/cloudflare.rs:256`); an RSA key signs through aws-lc-rs in the
+  (`crates/podssh-cli/src/ssh/cloudflare.rs:223`); an RSA key signs through aws-lc-rs in the
   binary (`deny.toml`, the reason of RUSTSEC-2023-0071); `podssh cp` opens a new session before
   the relay's caps (`docs/relay.md:488-494`), as an hour of EICE would need.
 - Inferred: a proxy that re-terminates TLS passes either road where it passes a WebSocket.
@@ -8538,7 +8538,7 @@ puts the fallback in its `ok` column without a probe.
   measure (`crates/podssh-cli/src/doctor/report.rs:107-109`).
 - Read: the operator's rulings Q56 and Q65 (`docs/decisions.md`) let the binary try the forwarders,
   and the Wisp demo server last, "when each relay host fails", unasked (T-370, T-438); since T-438
-  there are four: mudlet, ssheasy, mudix and wisp (`crates/podssh-cli/src/man/notes_ssh.rs:247-259`).
+  there are four: mudlet, ssheasy, mudix and wisp (`crates/podssh-cli/src/man/notes_ssh.rs:248-260`).
   A default of off is a change of that ruling.
 - Not measured here: #106's times. Inferred from the code: with the direct road's dial refused at
   once by the tester's proxy, the 20.8 s are the forwarders' own dials of a dead address.
@@ -10485,7 +10485,7 @@ stranger, a client that names another node's key, was refused ("refused the node
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** open
+**Status:** partial
 
 ## Problem
 
@@ -10496,12 +10496,12 @@ the service token on `cf://` only, and reads it from variables (the secret in th
 ## Premise
 
 - Read: `cf://` reads `PODSSH_CF_ACCESS_CLIENT_ID` and `PODSSH_CF_ACCESS_CLIENT_SECRET` from variables, and a
-  user's token from `PODSSH_CF_ACCESS_TOKEN` or a file (`crates/podssh-cli/src/ssh/cloudflare.rs:37-42`,
+  user's token from `PODSSH_CF_ACCESS_TOKEN` or a file (`crates/podssh-cli/src/ssh/cloudflare.rs:36-41`,
   `:112-122`); the headers are `access.headers()` (`PodUtils/podcrates:crates/pod-egress/src/cloudflare.rs`).
 - Read: the relay client sends `X-Relay-Token` and no other credential header
   (`PodUtils/podssh:crates/podssh-ws/src/client.rs:183-205`, `crates/podssh-ws/src/handshake.rs:3`); `https_request` takes
   headers (`client.rs:343`).
-- Read: `--install` never carries a secret variable (`crates/podssh-cli/src/node_install/env.rs:36`); a
+- Read: `--install` never carries a secret variable (`crates/podssh-cli/src/node_install/env.rs:38`); a
   service needs the file form.
 - Read: a refusal by Access is exit 77 on `cf://` (`cloudflare.rs`, `refusal`).
 
@@ -10520,6 +10520,38 @@ the service token on `cf://` only, and reads it from variables (the secret in th
 5. Tell the podcrates session: T-111 of podcrates ports the headers to `pod-relay`. `pod-egress` (T-117)
    takes the TCP client later.
 
+## Decision
+
+- **The roads of `pod-relay` wait (Rule Q3).** The relay's road, a pair's road and `operator` open their
+  WebSocket in `pod-relay` (`pod_relay::h2_road::connect` calls `pod_ws::connect`, whose request is
+  `pod_ws::handshake::build_request`: `X-Relay-Token` and nothing else), and a forwarder's in `pod-egress`
+  (`pod_ws::url::dial`); neither crate takes a header of the caller at v0.67.0. podssh does its part: the
+  files, the hosts, the splice of the headers into a request (`podssh_ws::access`), and the one road that
+  podssh builds itself, `podssh pipe ws:`/`wss:`. Lost: a copy of `pod_ws::connect` in podssh-ws for the
+  relay's road (a fork of a taken crate, which Q3 forbids), and headers through the `Way`'s dial (the
+  dial is under TLS, so it cannot write in the upgrade).
+- **`--access-host` on `pipe` alone for now** (also `AccessHost` in the settings, whose lines add up; the
+  flags beat the file). It is an id of `ssh`'s table, read by `SshArgs`, so that `ssh`, `node` and
+  `operator` take it with the take of podcrates' T-111. Lost: the flag on each command now, where it would
+  do nothing on the relay's road, which is worse than no flag.
+- **A `wss:` URL's own host is not named by itself**, unlike `cf://HOST`: a user who keeps the credentials
+  in the environment for `cf://` would else send them to each WebSocket that a pipe opens. Lost: the
+  URL's host as named, which the Approach's "a forwarder's own URL" would allow.
+- **`ws:` carries the credentials to the loopback alone** (64 else): a secret goes over TLS. The loopback
+  is a local front, and the stand-in of the test.
+- **A `_FILE` that cannot be read is 78, not 77**, as `PODSSH_CF_ACCESS_TOKEN_FILE`, the files of WARP and
+  of IAP are: a missing file is a setting, which no retry repairs. A refusal by Access (401 or 403) with
+  the headers sent stays 77 and names the variables and their files. The Prove's "a missing file gives 77"
+  is changed to 78 in the test. Lost: 77, which would mix a setting with a refusal of the far end.
+- **The variable beats its file**, as with the token; the id may come from its variable and the secret
+  from its file. The settings keywords `AccessClientIdFile` and `AccessClientSecretFile` stand for the two
+  `_FILE` variables below the environment.
+- **A credential set and no host named reads nothing**, and a line of the settings for a host that is no
+  side reads nothing either; a flag that names no side is 64, and a named side with no credential 78.
+- **`RestartPreventExitStatus` keeps `64 78`** until a node sends the headers (the node's road is
+  `pod-relay`'s): with no header on a node's road, Access cannot refuse one, and the node's own 77 for an
+  expired pair must stay restarted. Approach 3's case for the node comes with the take of T-111.
+
 ## Prove
 
 ```sh
@@ -10532,6 +10564,70 @@ New test, with a stand-in edge that demands the two headers (no account): the re
 and `operator` reach it with the files, and a host that was not named gets no header. A missing file gives
 77 and its variable's name. Planted: headers sent to every host fail the "not named" check. The live step
 with a Cloudflare account waits (the owner, 2026-11-09).
+
+## Correction
+
+2026-11-17. The Premise's lines moved: `crates/podssh-ws/src/client.rs` is 160 lines, `connect` at
+`:82` and `https_with_token` at `:131`; `https_request` is `pod-ws`'s, and private (`PodUtils/podcrates:
+crates/pod-ws/src/client.rs:355`, v0.67.0). `access.headers()` of `pod-egress` is private: podssh builds
+the lines from the public fields and the header names. More: the relay's road, a pair's road and
+`operator` are not podssh's code any more (`pod-relay`, taken), so the headers there are podcrates' work
+(Decision, Blocker). The `--install` of a service carries each `PODSSH_` variable but those of
+`SECRET` already (`crates/podssh-cli/src/node_install/env.rs:36`), so the two `_FILE` names were carried
+before this entry: a test now holds it.
+
+## Done
+
+Partial, 2026-11-17 (drafted, then merged, built and run). Done so far:
+
+- `crates/podssh-cli/src/access.rs`: `PODSSH_CF_ACCESS_CLIENT_ID_FILE` and
+  `PODSSH_CF_ACCESS_CLIENT_SECRET_FILE`, read as the token's file (a cap of 8 KiB, a trim, the
+  variable and the path in a refusal, never the value, in `Zeroizing`); `value_or_file` (the variable
+  wins); `var` (the environment, else the settings keywords of the two files); `hosts` (`--access-host`,
+  a list too, else `AccessHost`); `named`. `cf://` (`ssh`, `proxy`, an exit's tunnel) reads them through
+  `access_from`, whose refusals name the files too.
+- `crates/podssh-ws/src/access.rs`: `Named::for_host` (a host that the user named, compared in lower
+  case with no last dot), `splice` (the headers before the empty line, in memory that is wiped),
+  `masked`/`masked_error`, and `dial`, the URL road with the headers.
+- `podssh pipe --access-host HOST` (`crates/podssh-cli/src/flags/pipe.rs`, `SshArgs::access_hosts`,
+  `crates/podssh-cli/src/pipe/remote.rs`, `pipe/ws.rs`): the headers on a `ws:`/`wss:` side to a named
+  host; 64 for a flag that names no side and for `ws:` off the loopback; 78 for no credential or a bad
+  file; a 401 or 403 says the variables; a value quoted by the far end is masked.
+- The settings keywords `AccessHost`, `AccessClientIdFile`, `AccessClientSecretFile`; the manual
+  (ENVIRONMENT, `pipe`'s notes, `cf://`'s note, FILES), `docs/cli.md`.
+- Tests: `crates/podssh-ws/src/access.rs` (4), `crates/podssh-cli/src/access.rs` (4),
+  `node_install/tests.rs` (the `_FILE` paths carried, the secret not), and
+  `crates/podssh-cli/tests/access_headers.rs` (a stand-in edge on the loopback that demands the two
+  headers: the named host reaches it with the files; a host not named gets no header, the planted
+  defect of headers to each host; a missing file 78 with its variable and no connection; an edge that
+  quotes the secret in its 403 does not get it onto stderr, the planted leak).
+
+Results, 2026-11-17: `cargo test -p podssh-ws -p podssh-ssh -p podssh-cli` 3074 passed, 0 failed (`podssh-ws --lib
+access` 4, `podssh-cli --lib access` 6, `--test access_headers` 4); clippy (the gate's lints) and rustfmt clean;
+`llms.txt` and `llms-full.txt` written again (the manual changed). The draft's test of the headers failed once at the
+merge: its four tests ran at once in one process and named their files by the process alone, so one test's end took
+another's file; each file has a number of its own now, and the test passed 3 runs in 3. Planted, each caught: a
+credential quoted by the far end left unmasked (`a_refusal_that_quotes_the_secret_does_not_show_it`); the credentials of
+the environment sent to each `ws:` side with no host named (`a_host_that_was_not_named_gets_no_header`). A first plant,
+`Named::for_host` true for each host, was not caught, as with no host named podssh reads no credential at all: the
+plant at that outer guard is the one that the test holds.
+
+What waits: the relay's road, a pair's road, `operator` and the forwarders (Blocker); then
+`--access-host` on `ssh`, `node` and `operator`, the node's 77 for a refusal of Access kept from a
+restart (`RestartPreventExitStatus`), and the Prove's stand-in for those roads. The live step with a
+Cloudflare account waits (the owner, 2026-11-09).
+
+Waits for podUtils/podcrates (its T-111, `pod-relay`, and `pod-egress`'s forwarder): a header of the caller on each
+WebSocket road. The ask, filed as COORD-105 (#302):
+
+> T-718 of podssh (A-C-04): please give `pod-relay`'s roads (forward, `/v1/node/`, `/v1/connect/`, on
+> HTTP/1.1, HTTP/2, cleartext and QUIC) and `pod-egress`'s forwarder a set of extra headers for a host,
+> e.g. `Settings::headers: Arc<dyn Fn(&str) -> Vec<(&'static str, Zeroizing<String>)>>` or a field of
+> `WsClientConfig`, written after `X-Relay-Token` by `handshake::build_request`, refused with the header's
+> name (never its value) for a control character, and masked in `ConnectError::Refused`'s body. podssh
+> gives the host's credentials of Cloudflare Access only for a host that the user named
+> (`podssh_ws::access::Named::for_host`); a host of the pool gets none. A refusal of 401 or 403 with the
+> headers sent should keep its status, so that podssh says 77 with the variables.
 
 # T-727: SSH login with a short-lived Access certificate over `cf://`
 
@@ -10550,7 +10646,7 @@ sign a short-lived user certificate for the user's key, and sshd trusts the Acce
 
 ## Premise
 
-- `crates/podssh-cli/src/ssh/cloudflare.rs:1`-`10`, `:41`-`:42`: `cf://` reads a token from
+- `crates/podssh-cli/src/ssh/cloudflare.rs:1`-`10`, `:40`-`:41`: `cf://` reads a token from
   `PODSSH_CF_ACCESS_TOKEN` or its file; it makes no certificate.
 - `crates/podssh-cli/src/ssh/keywords.rs`: `CertificateFile` is read for authentication (T-021, T-027, T-289).
 - The endpoint, the request and the answer of Access's certificate service are not in this repository. Read
@@ -10599,7 +10695,7 @@ can run. The owner wants the Access TCP client in podssh on each system it serve
 
 ## Premise
 
-- `crates/podssh-cli/src/ssh/cloudflare.rs:1`-`10`, `:41`-`:42`: a token only, from a variable or file.
+- `crates/podssh-cli/src/ssh/cloudflare.rs:1`-`10`, `:40`-`:41`: a token only, from a variable or file.
 - `PodUtils/podcrates:crates/pod-egress/src/cloudflare.rs`: the WebSocket client of an Access TCP rule.
 - `crates/podssh-cli/src/man/facts.rs:125`: the manual says that `cloudflared` prints the token.
 

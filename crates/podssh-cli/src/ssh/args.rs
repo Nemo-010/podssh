@@ -38,6 +38,9 @@ pub struct SshArgs {
     pub compression: bool,
     pub version: bool,
     pub relay_host: Option<String>,
+    /// `--access-host`: the hosts that get the credentials of Cloudflare
+    /// Access (T-718), on `pipe` for now.
+    pub access_hosts: Vec<String>,
     /// `--relay-failover`: how the relay hosts are tried (T-220).
     pub relay_failover: Option<String>,
     pub relay_addr: Option<String>,
@@ -346,6 +349,7 @@ impl SshArgs {
             compression: flag("compress"),
             version: flag("version"),
             relay_host: one("relay-host"),
+            access_hosts: many("access-host"),
             relay_failover: one("relay-failover"),
             relay_addr: one("relay-addr"),
             ca_file: one("ca-file"),

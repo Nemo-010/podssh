@@ -211,7 +211,9 @@ scripts. The facts about OpenSSH on this page were measured with OpenSSH
   its upgrade, through `HTTPS_PROXY` when one is set: no relay, and no
   program of Cloudflare's. A name behind Cloudflare Access needs a service
   token, `PODSSH_CF_ACCESS_CLIENT_ID` and `PODSSH_CF_ACCESS_CLIENT_SECRET`
-  (both or neither), or a token that `cloudflared access token
+  (both or neither; each also from the file of its `_FILE` variable or of
+  the settings keywords `AccessClientIdFile` and `AccessClientSecretFile`,
+  T-718), or a token that `cloudflared access token
   -app=https://HOST` made where its login runs, in `PODSSH_CF_ACCESS_TOKEN`
   or the file of `PODSSH_CF_ACCESS_TOKEN_FILE`; each goes in its header,
   never in a URL, and a bad one exits 78 (255 for `ssh`) naming the
@@ -5264,6 +5266,17 @@ once the edge registered the tunnel.
   pipe, and a code other than 1000 gives its code and its reason on stderr
   and 69. Pings every 10 s find a link that died, as on the relay's road.
   A refused upgrade gives its status: 77 for 401 and 403, 69 else.
+  **Cloudflare Access (T-718).** `--access-host HOST` (repeatable, a list
+  too; or `AccessHost` lines of the settings, which add up; the flags beat
+  the file) names a host for the credentials of Access: a side to HOST
+  sends `Cf-Access-Client-Id` and `Cf-Access-Client-Secret` (and
+  `Cf-Access-Token` when one is set) in the upgrade, from the variables or
+  the files of `PODSSH_CF_ACCESS_CLIENT_ID_FILE` and
+  `PODSSH_CF_ACCESS_CLIENT_SECRET_FILE`; no other host gets them. `ws:`
+  carries them to the loopback alone (64 else); a flag that names no side
+  is 64, and a named side with no credential 78. The request is built in
+  memory that is wiped, and a refusal that quotes a value has it masked;
+  a 401 or 403 also names the variables.
 - **A WebSocket server** (T-368). `ws-listen:[ADDR:]PORT` and
   `ws-listen:PATH` listen by the rules of `tcp-listen:` and `unix-listen:`
   (the same probe, `PODSSH_LISTEN`, the mode 0600 and the peer's user), and

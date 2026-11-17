@@ -183,7 +183,7 @@ leave a short or wrong file under the destination's name.
 ## Approach
 
 1. `CpArgs` in a new module crates/podssh-cli/src/cp/, read as `SshArgs` is
-   (`crates/podssh-cli/src/ssh/args.rs:274-422`). An operand is remote when a
+   (`crates/podssh-cli/src/ssh/args.rs:277-426`). An operand is remote when a
    `:` comes before any `/`; on Windows, `C:\x` is local. Fewer than two
    operands, or none remote, exit 64.
 2. Build an `SshArgs` (host, `-P` as the port, `-i`, `-o`) for
@@ -657,7 +657,7 @@ old writer can race the new one.
    ways; 11 h 30 min) go in `crates/podssh-relay/src/relay.rs`, beside
    `RELAY_IDLE_SECS`. A variable `PODSSH_SESSION_BUDGET` can lower the byte
    budget (a relay with smaller caps, the tests), never raise it; add it to
-   `crates/podssh-cli/src/man/facts.rs:46-273`.
+   `crates/podssh-cli/src/man/facts.rs:46-280`.
 2. Count the payload bytes both ways in the relay stream (an atomic counter
    beside `RelayStatus`), and keep the session's start time.
 3. Invariant: no session passes a budget. Before a data request that would
@@ -670,7 +670,7 @@ old writer can race the new one.
 5. Only the relay transport counts: `--direct` has no cap. With `-J`, the
    one relay session carries the whole chain.
 6. A "Session limits" item in the manual's relay section
-   (`crates/podssh-cli/src/man/facts.rs:302-455`), from the constants;
+   (`crates/podssh-cli/src/man/facts.rs:309-462`), from the constants;
    `docs/relay.md` and `docs/cli.md`. T-155 does the same for the
    resumable layer of M6; this entry needs no M6 work.
 
@@ -958,7 +958,7 @@ Where podssh must replace them, OpenSSH's own `scp` and `sftp` cannot run
 
 Recommendation: `scp` and `sftp` get no `--timeout` row, as in OpenSSH, so
 the gate of `crates/podssh-cli/src/dispatch.rs:379-400` skips them; T-133's
-limits keep each wait finite. Usage errors stay 64 (`docs/cli.md:6404-6407`)
+limits keep each wait finite. Usage errors stay 64 (`docs/cli.md:6417-6420`)
 where OpenSSH gives 1; a script that tests for "not zero" works with both.
 `--timeout` required with no terminal, as for `cp`, lost: each script that
 runs `scp` in a pipe would exit 64 under `podssh scp`.
@@ -2012,7 +2012,7 @@ host, and the copy back then destroys that change with no word.
   probe (`crates/podssh-cli/src/pager.rs:96`) and runs it with
   `run_program` (`crates/podssh-cli/src/pager.rs:134`).
 - Read: `VISUAL` and `EDITOR` are not in the manual's variables
-  (`crates/podssh-cli/src/man/facts.rs:46-273`).
+  (`crates/podssh-cli/src/man/facts.rs:46-280`).
 - Read: the relay cuts a session after 180 s with no payload
   (`PodUtils/podssh:crates/podssh-relay/src/relay.rs:19-21`); an editor stays open longer.
 

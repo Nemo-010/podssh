@@ -50,12 +50,19 @@ pub const PIPE: &[&str] = &[
      CONNECT, before the 200, go to the road once it is open.",
     "ws://HOST[:PORT]/PATH and wss://HOST[:PORT]/PATH are a WebSocket by the URL that a user copies, \
      reached through HTTPS_PROXY when it is set: wss: checks the certificate for HOST with the trust of \
-     --ca-file, and ws: is in the clear, as tcp: is. No token goes on them; the path and its query are the \
-     user's, and podssh's lines show the URL without its query. Bytes go out in binary frames, and text and \
+     --ca-file, and ws: is in the clear, as tcp: is. No token goes on them, but for --access-host; the path \
+     and its query are the user's, and podssh's lines show the URL without its query. Bytes go out in binary frames, and text and \
      binary frames come in as bytes. At the end of this side's input podssh sends a Close, and what the \
      other end sends before its own Close still comes; the other end's Close ends the pipe, and a code other \
      than 1000 is on stderr with its reason (69). A refused upgrade gives its status: 77 for 401 and 403, \
      else 69.",
+    "--access-host HOST, repeatable, or AccessHost in the settings, names a host for the credentials of \
+     Cloudflare Access. A ws: or wss: side to HOST then sends them in the headers that cloudflared sends. \
+     Those are the service token of PODSSH_CF_ACCESS_CLIENT_ID and PODSSH_CF_ACCESS_CLIENT_SECRET, or of their \
+     files, and the token of PODSSH_CF_ACCESS_TOKEN. No other host gets them. ws: takes them to this host's \
+     loopback alone (64 else), and a flag that names no side is refused (64). With no credential set, the \
+     run is refused (78). A refusal of Access (401 or 403) gives 77 and names the variables; a value that the \
+     far end quotes is not shown.",
     "ws-listen:[ADDR:]PORT or ws-listen:PATH is a WebSocket server, by the rules of tcp-listen: and unix-listen:, \
      whose clients are joined to the other side as given. A client's upgrade is checked as RFC 6455 asks (GET, \
      Upgrade, Connection, version 13, a key of 16 bytes). A bad one is refused with its status (405, 400, 426); a \

@@ -102,7 +102,8 @@ const FIRST: &[&str] = &[
      HTTPS_PROXY when one is set, with no relay and no program of Cloudflare's. A name behind Cloudflare \
      Access needs a service token (PODSSH_CF_ACCESS_CLIENT_ID and PODSSH_CF_ACCESS_CLIENT_SECRET) or a \
      token made where its login runs (PODSSH_CF_ACCESS_TOKEN or PODSSH_CF_ACCESS_TOKEN_FILE); a refusal \
-     of Access says so. The host key is recorded and checked under HOST. A tunnel has no port here, and \
+     of Access says so. The id and the secret may come from the files of PODSSH_CF_ACCESS_CLIENT_ID_FILE and \
+     PODSSH_CF_ACCESS_CLIENT_SECRET_FILE instead. The host key is recorded and checked under HOST. A tunnel has no port here, and \
      -J, -4, -6, HostName and --direct cannot go with it. -J cf://HOST makes a tunnel the first hop of a chain, the \
      hops after it in its channels. So a jump host whose sshd a tunnel publishes reaches the rest; a tunnel after the \
      first hop is refused. podssh proxy cf://HOST is the same pipe. A \

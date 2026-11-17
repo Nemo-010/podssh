@@ -189,7 +189,7 @@ measured: the debug binary has no `ts`).
 1. In the `Parsed::Command` arm, refuse a verb of `VERB_OWNER`
    (`crates/podssh-cli/src/flags.rs`, line 453 at `7aa955a`) before the gate. Keep one usage
    error first: a `--timeout` value that was given and does not parse is 64
-   (`docs/cli.md:6404-6405`).
+   (`docs/cli.md:6417-6418`).
 2. Give `require_timeout` the verb's name. The message names that verb, gives
    one true reason, and shows an example for that verb only. Replace
    `({attachment:?})` with words: "stdin or stdout is not a terminal", or
@@ -199,7 +199,7 @@ measured: the debug binary has no `ts`).
    (`crates/podssh-cli/src/dispatch.rs`, lines 424-477 at `7aa955a`,
    `crates/podssh-cli/tests/non_interactive.rs` lines 252-284 at `37ace00`). `ts` is the only verb
    that runs the gate today (`crates/podssh-cli/tests/ts_behave.rs:221-227`).
-5. Same commit: `docs/STATUS.md`. `docs/cli.md:6479` needs no change.
+5. Same commit: `docs/STATUS.md`. `docs/cli.md:6492` needs no change.
 
 ## Decision
 
@@ -493,7 +493,7 @@ Read, at `61e55d1`: no option made podssh start a program: `ProxyCommand` is ref
    `[OPTIONS] [--] [user@]host [COMMAND...]` for `ssh` and
    `[OPTIONS] [--] HOST PORT` for `proxy`; `--help` and the synopsis of the
    manual (`PodUtils/podssh:crates/podssh-cli/src/man/model.rs:186-190`) read it.
-2. A note for `ssh` and `proxy` (`crates/podssh-cli/src/man/notes_ssh.rs:4-490` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175` and `crates/podssh-cli/src/man/notes.rs:75-245`)
+2. A note for `ssh` and `proxy` (`crates/podssh-cli/src/man/notes_ssh.rs:4-491` and `crates/podssh-cli/src/man/notes_ssh_more.rs:4-175` and `crates/podssh-cli/src/man/notes.rs:75-245`)
    and an example (`crates/podssh-cli/src/man/examples.rs:8-316`). Pitfall: the
    notes test reads a bare `--` as a flag that does not exist
    (`crates/podssh-cli/src/man/notes_tests.rs:56-72`); teach `flag_exists`
@@ -602,11 +602,11 @@ variable matters when `cp`, `mv` and `relay` exist. `ssh` and `proxy` have no
 3. A malformed value names its source: `--timeout` (exit 64), or
    `PODSSH_TIMEOUT` (exit 78, see Decision). The variable never bounds `ssh`
    or `proxy`.
-4. Same commit: a row in `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-273`),
+4. Same commit: a row in `VARIABLES` (`crates/podssh-cli/src/man/facts.rs:46-280`),
    which `each_variable_in_the_source_is_documented` requires
    (`crates/podssh-cli/src/man/facts/tests.rs:68-81`); "default: env
    PODSSH_TIMEOUT" in the help of each `--timeout` row, as `--relay-host` says
-   it (`crates/podssh-cli/src/flags.rs:175-176`); `docs/cli.md:6584-6586`;
+   it (`crates/podssh-cli/src/flags.rs:175-176`); `docs/cli.md:6597-6599`;
    `docs/STATUS.md`.
 5. Do this after T-008, so that a verb that does nothing still exits 70 first.
 
@@ -986,10 +986,10 @@ Read then: each value flag but `-i` and `-o` was `ArgAction::Set`.
    `crates/podssh-cli/src/tree.rs:73-83`).
 2. `SshArgs::from_matches` picks the value as OpenSSH does: the first `-p` and
    `-l`, the last `-e`, `-E` and `-F`, and the first value of each `-o`
-   keyword (`crates/podssh-cli/src/ssh/args.rs:274-422`).
+   keyword (`crates/podssh-cli/src/ssh/args.rs:277-426`).
 3. `ONCE` and `repeated` refuse a second `-J`, `-W`, `--relay-host`,
    `--relay-addr` or `--ca-file` with exit 64 before anything connects
-   (`crates/podssh-cli/src/ssh/args.rs:202-269`, called at
+   (`crates/podssh-cli/src/ssh/args.rs:205-272`, called at
    `crates/podssh-cli/src/tree.rs:488-492`).
 4. `docs/cli.md:971-976` and a note of the manual
    (`crates/podssh-cli/src/man/notes_ssh_more.rs:98-100`) state the rule.
@@ -1764,7 +1764,7 @@ file); measured here on `3ee70dc`.
 A `PODSSH_RELAY` or `PODSSH_RELAY_ADDR` that cannot be used makes
 `podssh proxy`, `podssh ssh` and `podssh doctor` exit 64, the code of a usage
 error. The command line is correct; a setting of the environment is not.
-`docs/cli.md:6404-6405` and `docs/decisions.md` ("Exit codes") give 78
+`docs/cli.md:6417-6418` and `docs/decisions.md` ("Exit codes") give 78
 (`EX_CONFIG`) for a configuration error. A script that reads 64 looks for the
 fault in its arguments.
 
@@ -1879,7 +1879,7 @@ flag (`crates/podssh-cli/tests/non_interactive.rs`, line 185 at `8c05b5e`).
 The real gate is `can_ask` (`crates/podssh-ssh/src/prompt.rs:85`), called at
 `crates/podssh-ssh/src/auth.rs:251`, `crates/podssh-ssh/src/auth.rs:368`,
 `crates/podssh-ssh/src/keys.rs:339` and `crates/podssh-cli/src/keygen.rs:382`.
-Its refusals name the real remedies (`docs/cli.md:6541-6543`). Commands use
+Its refusals name the real remedies (`docs/cli.md:6554-6556`). Commands use
 these parts of the module, which stay: `Attachment`, `resolve`, `resolve_tty`,
 `parse_timeout`, `require_timeout` (`crates/podssh-cli/src/dispatch.rs:379-400`,
 `crates/podssh-cli/src/ts.rs:56-65`) and `refuse_jsonl_in_proxy`
@@ -3605,7 +3605,7 @@ of `job fetch`; why a file given by process substitution is refused; the direct 
   follow here" (`crates/podssh-relay/src/cache/own.rs`, lines 37-38 at `38f424c`);
   `--allow <(...)` gives such a link (`/dev/fd/63`), and the line does not say that a regular
   file works.
-- Read (L-27): `podssh proxy` has no direct road (`crates/podssh-cli/src/man/notes_ssh.rs:253`);
+- Read (L-27): `podssh proxy` has no direct road (`crates/podssh-cli/src/man/notes_ssh.rs:254`);
   `podssh pipe - tcp:%h:%p` is that road as a `ProxyCommand` (`crates/podssh-cli/src/man/notes_pipe.rs:5-14`),
   and the notes of `proxy` do not name it (`crates/podssh-cli/src/man/notes.rs:238`).
 - Read (L-29): a bad line of the settings file or of an `ssh_config` file is 78, and the same
@@ -3711,10 +3711,10 @@ Read at `2042200`:
 - A flag's refusal names its replacement: `crates/podssh-cli/src/refuse.rs:51` says
   "pub fn refused(verb: &str, given: &str, instead: &str, reason: &str) -> String {".
 - A service's file of variables takes each `PODSSH_` name but the secrets:
-  `crates/podssh-cli/src/node_install/env.rs:43` says "name.starts_with(OWN) && !SECRET.contains(&name)",
-  and the install writes each such variable that is set (`crates/podssh-cli/src/node_install/env.rs:68-87`);
+  `crates/podssh-cli/src/node_install/env.rs:45` says "name.starts_with(OWN) && !SECRET.contains(&name)",
+  and the install writes each such variable that is set (`crates/podssh-cli/src/node_install/env.rs:70-89`);
   its reader refuses a secret and an unknown name with their line
-  (`crates/podssh-cli/src/node_install/env.rs:110-118`), so a retired name is a third case beside them.
+  (`crates/podssh-cli/src/node_install/env.rs:112-120`), so a retired name is a third case beside them.
 - No module holds retired names (no `retired` in `crates/podssh-cli/src/`), and no variable has been
   retired, as the issue says: the table starts empty.
 - The manual's variables are checked both ways: `crates/podssh-cli/src/man/facts/tests.rs:111` (each

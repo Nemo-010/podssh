@@ -2368,7 +2368,7 @@ no reason (`docs/target-environment.md:88-89`).
    (`crates/podssh-cli/src/doctor/host.rs:12-28`) from the same function.
 6. T-108 runs the result. Never call `getpwuid`. Same commit: `--shell` in
    `crates/podssh-cli/src/flags.rs`, `SHELL` in
-   `crates/podssh-cli/src/man/facts.rs:46-273`, `docs/cli.md`.
+   `crates/podssh-cli/src/man/facts.rs:46-280`, `docs/cli.md`.
 
 ## Decision
 
@@ -3000,7 +3000,7 @@ without a user manager gets a cron line. The unit has no hardening.
 - Read: the unit has `Restart=always` and no `User=`, `NoNewPrivileges` or `ProtectSystem`
   (`crates/podssh-cli/src/node_install/text.rs:136-164`).
 - Read: no token is in a unit now. The variables go to a private file beside the pair, and a secret is
-  never carried (`crates/podssh-cli/src/node_install/env.rs:36`, `:7-9`). Keep that.
+  never carried (`crates/podssh-cli/src/node_install/env.rs:38`, `:7-9`). Keep that.
 - Read: T-593 made the cache follow `HOME` into another user's home; a system unit of a named user must name
   that user's `HOME` and `XDG_CACHE_HOME`.
 - Not measured: the hardening set on a systemd of 2026's hosts.

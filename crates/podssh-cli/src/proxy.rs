@@ -331,7 +331,7 @@ fn run_cloudflare(host: &str, args: &ProxyArgs, err: &mut dyn Write) -> i32 {
             writeln!(err, "podssh: {} is set, so podssh does not connect anywhere", podssh_relay::open::OFFLINE_ENV);
         return EX_UNAVAILABLE;
     }
-    let access = match crate::ssh::cloudflare::access_from(&|name| std::env::var(name).ok()) {
+    let access = match crate::ssh::cloudflare::access_from(&crate::access::var) {
         Ok(access) => access,
         Err(why) => {
             let _ = writeln!(err, "podssh proxy: {why}");

@@ -125,6 +125,13 @@ pub const VARIABLES: &[(&[&str], &str)] = &[
       cloudflared access token -app=https://HOST prints on a host where its login can run. The variable \
       wins over the file; podssh never prints the token.",
     ),
+    (
+        &["PODSSH_CF_ACCESS_CLIENT_ID_FILE", "PODSSH_CF_ACCESS_CLIENT_SECRET_FILE"],
+        "The files that hold a service token of Cloudflare Access, its id and its secret, in place of the \
+      variables, which win. A file keeps the secret out of the environment. podssh --install carries these \
+      paths, and never the secret. The settings keywords AccessClientIdFile and AccessClientSecretFile give \
+      them too. A file that cannot be read is refused (78), and the line names the variable.",
+    ),
     (&["PODSSH_NICK"], "The nick of podssh chat, as --nick: the name that the peer sees. The flag wins."),
     (
         &["PODSSH_REPLAY_BUFFER"],

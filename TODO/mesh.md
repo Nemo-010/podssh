@@ -5022,7 +5022,7 @@ of podssh's.
 ## Premise
 
 - `crates/podssh-cli/src/man/notes_pair.rs:172` says "Tailscale's free servers for tailcat", and
-  `crates/podssh-cli/src/man/notes_ssh.rs:241` says "Four words name public forwarders".
+  `crates/podssh-cli/src/man/notes_ssh.rs:242` says "Four words name public forwarders".
 - `docs/carriers.md` (the forward road, item 7 and its "Ruled out"; the reverse road, item 2):
   Tailscale's main fleet serves Tailscale's clients; the public Wisp lists come from web proxies
   that serve a network's users against that network's own filter, with no operator, terms or
@@ -8406,7 +8406,7 @@ with no listener; behind this tunnel it would give the node a road where its egr
 2026-11-10 (the drafting agent), each call with what lost:
 
 - **The client's road is a WebSocket at `/` of the tunnel's name**, as the quick tunnel of a record
-  is taken (`crates/podssh-cli/src/ssh/cloudflare.rs:254`), under the resumable layer and the
+  is taken (`crates/podssh-cli/src/ssh/cloudflare.rs:221`), under the resumable layer and the
   end-to-end channel, in place of Step 3's relay road to `https://DOMAIN`. Lost: a pair at the
   node's own relay role, as a relay of another deployment (Q49), as a client of `node://NAME` holds
   neither a pair nor a token of that role, and a node paired with itself has both ends in one

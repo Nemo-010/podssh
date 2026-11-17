@@ -4,7 +4,9 @@
 //! of the user's shell: with no proxy variable, a node behind a proxy cannot
 //! reach the relay. No token of the environment is carried: the node's
 //! credentials are its pair's, a tunnel's its keys', and
-//! `PODSSH_CF_ACCESS_TOKEN_FILE` names a file for Cloudflare Access.
+//! `PODSSH_CF_ACCESS_TOKEN_FILE`, `PODSSH_CF_ACCESS_CLIENT_ID_FILE` and
+//! `PODSSH_CF_ACCESS_CLIENT_SECRET_FILE` name files for Cloudflare Access
+//! (T-718): paths, which are carried, never a secret.
 
 use std::path::{Path, PathBuf};
 
