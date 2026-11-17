@@ -364,8 +364,7 @@ jobs:
         run: python scripts/smoke-operator.py --plant target/debug/podssh.exe
 
   # T-728: the operator commands on Windows for Arm (aarch64), the same rows
-  # as on windows. Outside `all` until a run proves the runner and its
-  # tools: its result is read in docs/STATUS.md.
+  # as on windows (22 passed at 6cda86b and b95cda5).
   windows-arm:
     name: windows-arm
     needs: plan
@@ -553,7 +552,7 @@ jobs:
   all:
     name: all
     if: always()
-    needs: [plan, gate, plant, checks, windows, macos, tor-net, box]
+    needs: [plan, gate, plant, checks, windows, windows-arm, macos, tor-net, box]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

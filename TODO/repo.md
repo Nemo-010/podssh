@@ -6399,7 +6399,7 @@ is `75a0596` (this entry's aes 0.9.4 and its pins) with v2.90.0; the three pins 
 **Milestone:** M10
 **Priority:** P1
 **Effort:** L
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -6411,7 +6411,7 @@ test runs each operator command there (`ssh`, `each`, `run`, `job`, `session`, `
 
 ## Premise
 
-- `.github/workflows/build.yml:296` (`windows`, `windows-2025`) and `:403` (`macos`, `macos-15`): tests, the
+- `.github/workflows/build.yml:296` (`windows`, `windows-2025`) and `:402` (`macos`, `macos-15`): tests, the
   system stores, repository checks, the console checks against MSYS2's sshd. No step per command.
 - `scripts/release-short.sh`: the check of a release's binary; it runs on Linux.
 - T-383 (done): `--detach` measured on Windows and macOS. T-678 (open): a node on Windows ends its sessions
@@ -6459,7 +6459,7 @@ fails and the table names the command.
 
 ## Done
 
-Partial, 2026-11-17. Written: `scripts/smoke-operator.py` (the table of 22 rows, `--list`, `--only`, `--install`,
+2026-11-17. Written: `scripts/smoke-operator.py` (the table of 22 rows, `--list`, `--only`, `--install`,
 `--plant`) and `scripts/smoke_servers.py` (the sshd, the relay role with a throwaway CA, the environment of a run
 in `.work/`). Steps in `build.yml`: `windows` and `macos` run the rows and the plant; the new job `windows-arm`
 runs the rows. Windows' own `ssh.exe` with `ProxyCommand podssh proxy` is the row `proxy` on Windows.
@@ -6467,8 +6467,11 @@ runs the rows. Windows' own `ssh.exe` with `ProxyCommand podssh proxy` is the ro
 Measured here (Linux, 2026-11-17): `python scripts/smoke-operator.py target/debug/podssh`, 22 passed, each row
 under 2 s. `--plant`: the row `proxy` alone fails ("banner exchange: ... invalid format"), as it must.
 
-Next: read the steps of `windows`, `macos` and `windows-arm` in the gate's run; each failure there is a defect
-entry or a repair (Approach 4). Then add `windows-arm` to `all`.
+The runs, 2026-11-17: the gate's `windows-arm` (`windows-11-arm`, the image's Rust, MSYS2's sshd and openssl by
+pacman) at `6cda86b`: 22 passed; `windows` (`windows-2025`, Windows' own `ssh.exe` with `ProxyCommand podssh proxy`)
+at `6cda86b`: 22 passed and the plant failed the row `proxy` alone; `macos` (`macos-15`, the system's sshd as a non-root user,
+LibreSSL) at `b95cda5`: 22 passed and the plant failed the row `proxy` alone. No row found a
+defect of podssh on these hosts. `windows-arm` joins `all` (two runs passed).
 
 # T-754: Dependabot's updates of 2026-11-12: trufflehog, two actions, four crates of the minor and patch group, Arti's tor-rtcompat and tor-error 0.48, and num-bigint 0.5
 

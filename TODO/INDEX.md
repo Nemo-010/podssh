@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**763 entries: 32 open, 39 partial, 11 blocked, 681 done.**
+**763 entries: 32 open, 38 partial, 11 blocked, 682 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
-| P1 | 0 | 10 | 3 | 81 | 94 |
+| P1 | 0 | 9 | 3 | 82 | 94 |
 | P2 | 0 | 22 | 2 | 290 | 314 |
 | P3 | 32 | 7 | 6 | 309 | 354 |
-| **All** | 32 | 39 | 11 | 681 | 763 |
+| **All** | 32 | 38 | 11 | 682 | 763 |
 
 ## Entries
 
@@ -758,7 +758,7 @@ repository and CI).
 | [T-725](mesh.md) | P3 | L | M10 | feature | open | A one-way carrier through an object store (an S3-compatible bucket) |
 | [T-726](machine.md) | P3 | M | M10 | feature | open | A local forward as a service, and the measured rate of the relay role |
 | [T-727](roads.md) | P3 | M | backlog | feature | blocked | SSH login with a short-lived Access certificate over `cf://` |
-| [T-728](repo.md) | P1 | L | M10 | measurement | partial | Windows (x86_64, aarch64) and macOS smoke tests of each operator command, and `ProxyCommand` with Windows OpenSSH |
+| [T-728](repo.md) | P1 | L | M10 | measurement | done | Windows (x86_64, aarch64) and macOS smoke tests of each operator command, and `ProxyCommand` with Windows OpenSSH |
 | [T-729](roads.md) | P1 | M | M10 | feature | blocked | The Access TCP client on `cf://`: the login of a user, on Windows, macOS and Linux |
 | [T-730](machine.md) | P3 | S | none | feature | done | `llms.txt`, `llms-full.txt` and `--help --json` |
 | [T-731](machine.md) | P3 | M | none | feature | done | `podssh mcp` for fleet work: a read-only mode and a command allowlist |
