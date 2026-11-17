@@ -344,7 +344,7 @@ failure at `PodUtils/podssh:crates/podssh-relay/src/failures.rs:289-309`. `open`
 the hosts at `PodUtils/podssh:crates/podssh-relay/src/open.rs:221-227` and keeps the record
 after each round at `PodUtils/podssh:crates/podssh-relay/src/open.rs:266-273`; the race
 gives the silent hosts at `PodUtils/podssh:crates/podssh-relay/src/failover.rs:245-248`.
-`podssh status` at `crates/podssh-cli/src/status.rs:139-146`, `podssh
+`podssh status` at `crates/podssh-cli/src/status.rs:142-149`, `podssh
 doctor` at `crates/podssh-cli/src/doctor/mod.rs:99-109`, THE RELAY in the
 manual at `crates/podssh-cli/src/man/facts/failed.rs:11-27`, and
 `docs/relay.md` and `docs/cli.md`.
@@ -2842,7 +2842,7 @@ session on 2026-11-03.
   (`crates/podssh-cli/src/proxy.rs:425`) and the relay's end of `podssh pipe` (`carry_opened`)
   tell it at their end (`crates/podssh-cli/src/pipe/relay.rs:221-223`).
 - `podssh status`: `relay_failures` names the road, and `relay_opened` gives the hosts that opened
-  lately (`crates/podssh-cli/src/status.rs:242-252`); `podssh doctor`'s line `failed relays` says
+  lately (`crates/podssh-cli/src/status.rs:245-255`); `podssh doctor`'s line `failed relays` says
   each host tried last, and a line `opened relays` those tried first
   (`crates/podssh-cli/src/doctor/mod.rs:349-377`). THE RELAY in the manual
   (`crates/podssh-cli/src/man/facts/failed.rs:11-27`), `docs/relay.md` (step 5 of the selection) and
@@ -4240,7 +4240,7 @@ Read at `2042200`:
   (`crates/podssh-relay/src/serve/http_road/mod.rs:188`) and `/trace`
   (`crates/podssh-relay/src/serve/docs.rs:141`); one change there serves each.
 - podssh has this list already for an exit: `podssh node --exit --routes` takes ranges
-  (`crates/podssh-cli/src/node_exit.rs:91`), each a `Range` of `ADDR/BITS` or one address
+  (`crates/podssh-cli/src/node_exit.rs:96`), each a `Range` of `ADDR/BITS` or one address
   (`crates/podssh-cli/src/net/policy_words.rs`, lines 123 at `c3a9b89` and on), and an address that is not public is let
   through only inside one (`crates/podssh-cli/src/node_exit.rs:218-222`). `Range::parse` takes a
   prefix with host bits and reads it as its network (the same file, lines 131 to 147 at `c3a9b89`):
@@ -4740,7 +4740,7 @@ listener given no sshd, and OpenSSH's login through the role's port fails.
 `crates/podssh-relay/src/serve/mod.rs:85` says "const HEAD_WAIT". The policy refuses the loopback
 as an address that is not public:
 `crates/podssh-relay/src/serve/policy.rs:145` says "self.unlisted(&wanted)", and
-`crates/podssh-relay/src/serve/policy.rs:193` says "ip.is_loopback()". What the Premise says of them
+`crates/podssh-relay/src/serve/policy.rs:194` says "ip.is_loopback()". What the Premise says of them
 holds. Its Approach, item 3, now follows the Decision of 2026-11-05.
 
 ## Done
@@ -5459,7 +5459,7 @@ range with `400` before any dial (`TODO/roads.md:8528` knew it): either refusal 
 **Milestone:** M10
 **Priority:** P3
 **Effort:** M
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -5487,16 +5487,121 @@ bytes and connects for each caller. Today the exit serves the owner's own forwar
 4. A stand-in Worker in the tests: an HTTP client that opens the reverse road with a grant. No Cloudflare
    account (owner, 2026-11-09): offline only.
 
+## Decision
+
+1. **A grant of the exit is the route `+exit` of the node's principal** (`node:SHA256:.../+exit`), which
+   podssh maps an exit's ask to before `pod-relay`'s door redeems it
+   (`crates/podssh-relay/src/reverse/exit_caller.rs`). A route's name never holds a '+' (`check_node_name`), so a
+   grant of a route never opens the exit, nor one of the exit a route. Lost: a change of `pod-relay`'s `Door` to
+   take `Ask::Exit` (Rule Q3: podcrates' crate; the mapping needs none); the bare route name `exit` (a node may
+   have a route of that name, and its grant would open the exit); a new flag `--grant-exit` (one more row, man
+   page and parse for what `--grant-route +exit` says).
+2. **Who issues an exit's grant**: the node's own key, or a member whose policy lets it out through the exit
+   itself (`Asks::Egress`), so a grant never reaches more than its issuer; never a key of `--allow`, which the
+   exit never lets out (T-431). Lost: the issuers of the node's routes (an `--allow` key would then lend the
+   egress that it does not have).
+3. **A caller of a grant goes to public addresses alone**, never to a range of `--routes` nor to the node's own
+   host, refused in the role's words that name no address (GitHub #126). The issuer of a grant is not known at
+   the dial (`Redeemed` reaches the dial as a line), so the issuer's ranges cannot be checked there. Lost: the
+   member's words, which name the address and the range (they map the node's network for a stranger); the
+   issuer's own ranges (needs the issuer at the dial: a change of `pod-e2e`).
+4. **One check, shared**: `Policy::port_allowed` is public, and the exit asks `exit_caller::denied_port` and
+   `exit_caller::outside` (the role's `Policy::unlisted`) where it asked `serve::policy::public` and its ranges.
+   A member keeps the exit's own words for an address (its tests name them); port 25 has the role's words for
+   each caller. Lost: a copy of the check in `node_exit.rs` (the two drift); the role's words for a member's
+   address (they say less to the owner's own members, and T-431's tests hold the exit's).
+5. **Metadata addresses**: `169.254.169.254`, `fd00:ec2::254` and `100.100.100.200` were refused already
+   (link-local, unique-local, CGNAT); Azure's `168.63.129.16` is public in form, and `public_v4` now refuses it,
+   for the role and the exit alike. Lost: a list of metadata addresses apart from `public` (two places to read).
+6. **The bytes are counted at the channel's link**, the caller's ciphertext with its framing, in
+   `exit_caller::serve` around `ends::serve_asked`. The exit's target must stay a `TcpStream`: `pod-e2e`'s
+   handover downcasts it (`PodUtils/podcrates:crates/pod-e2e/src/hold/mod.rs`), so a meter on it would end each
+   exit session at an upgrade in place. Lost: a meter on the target (breaks the handover); `TCP_INFO` of a
+   duplicated socket (Linux only, and the duplicate holds the socket open after the session); an ask of
+   podcrates for a hook of plain bytes (not needed for counts of a caller; it can come later).
+7. **The counts of a process**: `exit_caller::counts()`, at most 1,024 callers (the one seen least recently
+   forgotten), written by a thread of the node each 2 s while a count moved to `exit-LABEL.json` of the cache,
+   which `podssh status` reads (it asks no node, as for `renews`, T-710). Refusals are the exit's own (its denies,
+   the net's verdict for an address, a dial that failed); a key that the admission or the door refused never
+   reaches the exit, and is the channel's event. Lost: a field of `status` that asks the node (a listener, Rule 2);
+   the role's `serve::usage` ledger (it counts tokens of a relay, not keys of a channel, and keeps days).
+8. **The allowlist is the net's signed document** (T-430): a Worker whose key the owner adds as a member, with a
+   rule `exit:NODE`, already goes out (T-431). No new allowlist file. Lost: a file of `--exit-callers` (a second
+   door beside the net's, unsigned).
+
 ## Prove
 
 ```sh
 export CARGO_BUILD_JOBS=4
-cargo test -p podssh-cli --test node_exit -- caller_allowlist denies counters
-cargo test -p podssh-relay --features pair,serve --test reverse_exit_caller
+cargo test -p podssh-cli --lib -- node_exit node_exit_count grants::tests
+cargo test -p podssh-cli --test status -- the_counters_of_an_exit_s_callers_are_shown_by_label
+cargo test -p podssh-relay --features pair,serve,grant --lib -- reverse::exit serve::policy
+cargo test -p podssh-relay --features pair,serve,grant --test reverse_exit_caller
+sh scripts/plant-each.sh --here t721-deny-skipped t721-refusal-counted-as-connect
 ```
 
-Plants: skip the deny check (the private target is dialed; the test fails); count a refused connect as a
-success (the counter test fails).
+Plants: skip the deny check (`t721-deny-skipped`: the grant's caller reaches the private target, and
+`denies_a_grant_s_caller_the_range_of_members_and_never_dials_it` fails); count a refused connect as a success
+(`t721-refusal-counted-as-connect`: `denies_port_25_in_the_role_s_words_and_counters_count_a_refusal` fails).
+
+## Correction
+
+- 2026-11-17: the exit already checked each address by the role's `serve::policy::public` (T-431), but not port 25:
+  a member could reach port 25 through the exit. The two now share `exit_caller::denied_port` and
+  `exit_caller::outside`.
+- 2026-11-17: the caller "in a signed allowlist" exists: a member of the net's document whose policy lets it reach
+  `exit:NODE` goes out (T-431, `crates/podssh-cli/src/net/admit.rs`). The new caller is the one with a grant.
+- 2026-11-17: `pod-relay`'s door refuses a grant for an exit's target ("a grant names a node, or a route of it, never
+  an exit's target", `PodUtils/podcrates:crates/pod-relay/src/grant/door.rs`); podssh maps the ask to the route
+  `+exit` before the door (Decision 1), so podcrates needs no change.
+- 2026-11-17: the grant is `pod-relay`'s (`PodUtils/podcrates:crates/pod-relay/src/grant/door.rs`), which
+  `crates/podssh-relay/src/grant.rs` re-exports; podssh has no `grant/mod.rs` of its own.
+- 2026-11-17: `serve::usage` counts a relay's tokens by key and by day; a node's exit has no token. Its counts are
+  `crates/podssh-relay/src/reverse/exit_count.rs`.
+- 2026-11-17: `podssh status` has no `--json`: it writes one line of JSON always. The field is `exits`.
+- 2026-11-17: the Prove named `--test node_exit` of podssh-cli, which does not exist: the exit's tests are the
+  library's (`crates/podssh-cli/src/node_exit_tests.rs`), now with `denies_*` and `caller_allowlist_*`; the counts'
+  are `crates/podssh-cli/src/node_exit_count.rs`'s and `crates/podssh-relay/src/reverse/exit_count.rs`'s. The relay
+  test needs the feature `grant` too. The stand-in caller is the end-to-end channel over a pipe: a Worker's HTTP is
+  the relay's, which the exit never sees.
+
+## Done
+
+2026-11-17 (drafted on `draft-t721`, then merged, built and run).
+
+Written:
+
+- `crates/podssh-relay/src/reverse/exit_caller.rs` (new): `denied_port`, `outside`, `not_dialed` over the role's
+  `Policy`; `GRANT_ROUTE`; `counts()` of the process; `serve`, `ends::serve_asked` with each exit's connect and
+  refusal counted and the link metered; `redeem` (feature `grant`), the exit's door beside the routes'.
+- `crates/podssh-relay/src/reverse/exit_count.rs` (new): `Counts`, `Row`, `Tally`, `Metered`, with unit tests.
+- `crates/podssh-relay/src/serve/policy.rs`: `port_allowed` public; Azure's `168.63.129.16` not public; tests.
+- `crates/podssh-relay/src/reverse.rs`: the two modules.
+- `crates/podssh-relay/tests/reverse_exit_caller.rs` (new): 4 tests, the stand-in caller.
+- `crates/podssh-cli/src/node_exit.rs`: port 25 before the resolve; a granted caller (`granted_checked`); each
+  address by `exit_caller::outside`; the writer of the counts at `ready`.
+- `crates/podssh-cli/src/node_exit_tests.rs`: `denies_port_25_*`, `denies_the_metadata_*`, `caller_allowlist_*`.
+- `crates/podssh-cli/src/node_exit_count.rs` (new): the file `exit-LABEL.json` and `status`'s `exits`.
+- `crates/podssh-cli/src/grants.rs`: the exit's door and issuers; `--grant-route +exit` mints; a test.
+- `crates/podssh-cli/src/node_unix_open.rs`, `channel.rs`: `exit_caller::serve` in place of `ends::serve_asked`.
+- `crates/podssh-cli/src/status.rs`, `lib.rs`; `crates/podssh-cli/tests/status.rs` (one test).
+- The manual: `man/notes.rs` (`exits`), `man/notes_grant.rs`, `flags/grant.rs` (`+exit`).
+- `docs/cli.md` ("The exit of the net", `podssh status`, the grant), `docs/mesh.md` (section 5), `docs/relay.md`
+  (the metadata address), `docs/STATUS.md` (a row, UNVERIFIED).
+- `scripts/plants/t721-deny-skipped.patch` and `scripts/plants/t721-deny-skipped.plant`;
+  `scripts/plants/t721-refusal-counted-as-connect.patch` and `scripts/plants/t721-refusal-counted-as-connect.plant`.
+- `scripts/plants/t431-exit-public-check.patch`, made again on the new check (its old hunk no longer applied): the
+  same mutation, each address taken for a public one; caught: UNVERIFIED.
+
+Results at the merge, 2026-11-17: `cargo test -p podssh-relay --features pair,serve,grant --test reverse_exit_caller`
+4 passed; `--features serve --lib -- serve::policy reverse::exit` 15 passed; `cargo test -p podssh-cli --lib --
+node_exit grants status man::` passed once `llms.txt` and `llms-full.txt` were written again; `--test exit --test
+exit_routes --test m6_exit --test status` passed (`status`'s live tests ignored, as before); `podssh-relay --features
+quick,serve,plain-ws --test quick_exit` 2 passed. Planted (`sh scripts/plant-each.sh --here`): `t721-deny-skipped`,
+`t721-refusal-counted-as-connect`, and the plants of the changed check `t431-exit-public-check`,
+`t432-own-address-dialled`, `t635-any-address-of-a-name`, `t635-any-private-with-a-range` and `t635-routes-unread`: 7
+caught, 0 missed. Clippy (the gate's lints, `pair,serve,grant` and podssh-cli) and rustfmt clean; the citations moved by
+`cargo todo remap`.
 
 # T-722: A lease header `X-Relay-Lease` on the forward and reverse roads
 

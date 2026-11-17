@@ -1,7 +1,7 @@
 This file holds the work on configuration files: OpenSSH's `ssh_config` (`-F`, `Host`,
 `Include`, `Match` and `-G`), host lists from other clients, and a settings file for podssh's
 own options. The rules of OpenSSH that podssh follows were measured with `ssh -G` and are in
-`docs/cli.md:6656-6768`. Since T-043, `podssh ssh` reads `~/.ssh/config` and the file of `-F`.
+`docs/cli.md:6681-6793`. Since T-043, `podssh ssh` reads `~/.ssh/config` and the file of `-F`.
 
 # T-043: Read `ssh_config`: `~/.ssh/config`, `-F FILE`, `Host` patterns, and `Match` refused by name (GitHub #14, #22)
 
@@ -206,7 +206,7 @@ No glob code exists in podssh. `known_hosts::wildcard`
    stands, and `Match final all` applies after the last line and fills only unset values, as
    measured. Each other `Match` stays refused by name until T-045.
 6. Check each included file as T-043 checks the user file: its owner and its mode.
-7. Change `docs/cli.md:6656-6777`, FILES (`crates/podssh-cli/src/man/data.rs:162-498`) and the
+7. Change `docs/cli.md:6681-6802`, FILES (`crates/podssh-cli/src/man/data.rs:162-498`) and the
    `ssh` notes in the same commit.
 
 ## Prove
@@ -763,8 +763,8 @@ failover below the flag and the variable at
 of a bad file at `crates/podssh-cli/src/pins.rs:13-40`, the CA file at
 `crates/podssh-cli/src/settings.rs:361-371` and, for `podssh ssh`,
 `crates/podssh-cli/src/ssh/resolve.rs:95-99`; `status` at
-`crates/podssh-cli/src/status.rs:75` and
-`crates/podssh-cli/src/status.rs:91`, `doctor` at
+`crates/podssh-cli/src/status.rs:76` and
+`crates/podssh-cli/src/status.rs:92`, `doctor` at
 `crates/podssh-cli/src/doctor/mod.rs:229` and
 `crates/podssh-cli/src/doctor/mod.rs:252`.
 - `cargo test -p podssh-cli --test settings`: 4 passed here, and 5 in the
@@ -946,7 +946,7 @@ try after the first reaches each hop (`crates/podssh-ssh/src/options.rs:350-358`
 - `scripts/interop.sh:327-337`: `ssh.config.jump_alias`, `-F FILE -J openssh-alias dropbear-alias`
   with podssh and with OpenSSH's `ssh`, each to exit 6 (the floor of ssh is 72). The gate runs it
   at this push.
-- `docs/cli.md:163-169` and `docs/cli.md:6701-6713`, and the manual's file `~/.ssh/config`, say what
+- `docs/cli.md:163-169` and `docs/cli.md:6726-6738`, and the manual's file `~/.ssh/config`, say what
   a hop takes.
 - `cargo test -p podssh-ssh`: 142 passed; `cargo test -p podssh-cli`: 565 passed, 0 failed,
   31 ignored; clippy; rustfmt.

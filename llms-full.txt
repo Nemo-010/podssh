@@ -4837,13 +4837,17 @@ podssh node
   key. The resumable layer carries the session on with no new check. podssh
   node NAME --grant-to KEY prints one on stdout and serves nothing: the node's
   key signs it for KEY (ssh-ed25519 BASE64, or its 64 hex digits), for its
-  TARGET or for --grant-route ROUTE. It is for --grant-for TIME (1h by
-  default), with a random serial; the operator gives it with podssh operator
-  --grant FILE. An issuer of --allow makes one with OpenSSH: ssh-keygen -s
-  ISSUER -I ID -n node:SHA256:... -O clear -O critical:once@podssh -V +1h
-  KEY.pub. With PODSSH_CACHE_DIR=none no use can be recorded, and each grant is
-  refused. A node with no --allow and no net says that the pair's token alone
-  is its door. A TARGET that is not SSH has no other gate behind it.
+  TARGET or for --grant-route ROUTE. --grant-route +exit names the node's exit:
+  its caller goes out to public addresses alone, never to a range of --routes.
+  Port 25, private, loopback and metadata addresses are refused as podssh relay
+  serve refuses them. Its issuer is the node's key, or a member that may go out
+  through the exit itself. It is for --grant-for TIME (1h by default), with a
+  random serial; the operator gives it with podssh operator --grant FILE. An
+  issuer of --allow makes one with OpenSSH: ssh-keygen -s ISSUER -I ID -n
+  node:SHA256:... -O clear -O critical:once@podssh -V +1h KEY.pub. With
+  PODSSH_CACHE_DIR=none no use can be recorded, and each grant is refused. A
+  node with no --allow and no net says that the pair's token alone is its door.
+  A TARGET that is not SSH has no other gate behind it.
 
   With --ask, a person at the node's terminal lets each operator key in, after
   the node's door, on each road of the node: for each key that --allow, the net
@@ -5500,7 +5504,8 @@ podssh node
         node's key is read, never made.
     --grant-route ROUTE
         with --grant-to: the grant names ROUTE of the node, node://NAME/ROUTE,
-        in place of its TARGET with no route.
+        in place of its TARGET with no route; +exit names the node's exit, to
+        public addresses alone.
     --grant-for TIME
         with --grant-to: the grant's window, from now: 90s, 30m, 8h or 3d, from
         1 minute to 30 days (default 1h).
@@ -8806,6 +8811,12 @@ podssh status
   an Ed25519 key in iroh's hex, the node's name on the iroh road. With
   PODSSH_CACHE_DIR=none, each key is absent. --keys with a destination is
   refused (64); without --keys, keys is null.
+
+  exits lists each exit node of this host by its label, as the node last wrote
+  it: at_ms, and its callers. Each caller has key (its fingerprint), connects,
+  refusals, bytes_up, bytes_down and last_ms. Bytes are counted at the
+  end-to-end channel, its framing included. The list is empty when no node of
+  this host is an exit.
 
   It shows no token and no proxy credentials, opens no connection, asks no DNS
   and writes nothing. A bad --relay-host or destination is a usage error (64),

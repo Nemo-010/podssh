@@ -15,6 +15,7 @@ use std::io;
 
 use podssh_relay::e2e::{ends, Ask, Refusal as NodeRefusal};
 use podssh_relay::identity::PublicKey;
+use podssh_relay::reverse::exit_caller;
 use podssh_relay::reverse::node::{Admit, NO_ROOM};
 use podssh_relay::reverse::routes::Routes;
 use podssh_relay::reverse::{Handler, Opening, SessionId};
@@ -113,7 +114,8 @@ impl Routed {
         let holds = node.holds.clone();
         tokio::spawn(holds.holding(async move {
             let opened = move |key: PublicKey, ask: Ask| async move { open(&routes, &key, &ask, admit).await };
-            ends::serve_asked(theirs, &node, opened).await;
+            // Each caller of the exit counted (T-721).
+            exit_caller::serve(theirs, &node, exit_caller::counts(), opened).await;
         }));
         Box::pin(async move { Ok(ours) })
     }

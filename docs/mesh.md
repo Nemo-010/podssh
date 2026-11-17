@@ -405,6 +405,12 @@ it on a paused clock.
   the tunnel's name, the channel's word naming the first hop, and so do
   `podssh exit`, `proxy --exit` and `pipe --exit`, each session a WebSocket
   of the tunnel in place of a relay's legs, the word naming its target.
+- **A caller with no key of a member** (T-721). A Cloudflare Worker, or any
+  caller with a grant of the exit (`--grant-route +exit`), goes out to
+  public addresses alone; the exit applies the relay role's fixed denies
+  (port 25, private and metadata addresses) by the role's own check, and
+  counts each caller's connects, refusals and bytes, which `podssh status`
+  shows as `exits` ([cli.md](cli.md), "The exit of the net").
 - **Routes** (T-432). `--routes CIDR,...` lets the net's members reach the
   private networks that the node reaches, within the policy, as a Tailscale
   subnet router does; the node's own host (its loopback and its own

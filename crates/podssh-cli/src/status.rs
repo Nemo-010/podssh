@@ -4,7 +4,8 @@
 //! until when; never the token), the proxy (never its credentials), whether
 //! podssh has a terminal, and, given a destination, whether its host key is
 //! known; the net held, and with `--net` its members (T-435); with `--keys`
-//! the public part of each key kept here (`keys`). It opens no connection,
+//! the public part of each key kept here (`keys`); each exit's callers, as
+//! its node counted them (`exits`, T-721). It opens no connection,
 //! asks no DNS and writes nothing: `podssh doctor` is the report that
 //! measures.
 
@@ -107,6 +108,8 @@ pub fn run_status(args: &StatusArgs, tty: Tty, out: &mut dyn Write, err: &mut dy
         "open_files": open_files(),
         "pairs": pairs_state(),
         "net": crate::net::state::status_value(args.net),
+        // Each exit's callers that a node of this host counted (T-721).
+        "exits": crate::node_exit_count::status_value(),
         "keys": keys_held,
     });
     let _ = writeln!(out, "{line}");

@@ -39,7 +39,7 @@ pub const NODE_GRANT_ROUTE: FlagRow = row(
     "grant-route",
     Some("ROUTE"),
     FlagKind::Supported,
-    "with --grant-to: the grant names ROUTE of the node, node://NAME/ROUTE, in place of its TARGET with no route",
+    "with --grant-to: the grant names ROUTE of the node, node://NAME/ROUTE, in place of its TARGET with no route; +exit names the node's exit, to public addresses alone",
     None,
 );
 pub const NODE_GRANT_FOR: FlagRow = row(

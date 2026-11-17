@@ -4,7 +4,8 @@
 //! `NodeState` for the process ([`node_state`]), as one node runs in a
 //! process; its lines go where podssh sends them: the line of the spares to
 //! the sink of [`spares::tell`], the line of a relay's close to the budget's
-//! sink (`crate::session::budget`).
+//! sink (`crate::session::budget`). The callers of an exit, with the relay
+//! role's denies and their counts, are podssh's (`exit_caller`, T-721).
 
 use std::sync::{Arc, OnceLock};
 
@@ -12,6 +13,11 @@ use pod_core::{Event, Events};
 
 pub use pod_relay::reverse::*;
 
+// The callers of a node's exit (T-721): the role's denies, a grant of the
+// exit, and each caller's counts.
+#[cfg(feature = "serve")]
+pub mod exit_caller;
+pub mod exit_count;
 pub mod legs;
 pub mod node;
 pub mod spares;

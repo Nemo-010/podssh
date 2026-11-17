@@ -15,7 +15,12 @@
 //!    address; a loopback address, or one of the node's own host, only
 //!    where a range names it alone (T-432, `crate::node_exit_own`); a name
 //!    with one address that fails is refused whole, as the relay refuses it;
-//! 4. dials those addresses alone, never the name again, so that a name
+//! 4. refuses port 25 before the name resolves, with the role's words and by
+//!    its check (`podssh_relay::reverse::exit_caller`, T-721);
+//! 5. lets in a key that brings a grant of the exit (T-721, `--grant-route
+//!    +exit`), as a Cloudflare Worker with no key of a member does: to
+//!    public addresses alone, refused in the role's words;
+//! 6. dials those addresses alone, never the name again, so that a name
 //!    that resolves anew to another address (DNS rebinding) reaches nothing
 //!    that was not checked; through HTTPS_PROXY when one is set, as a node
 //!    dials each TARGET, with the address in place of the name.
@@ -120,6 +125,8 @@ pub(crate) fn ready(label: &str, me: &PublicKey) -> Result<(), Refusal> {
     if let Some(note) = listed_apart(&plan.ranges, &listed) {
         podssh_ssh::err_line!("podssh node: {label}: {note}");
     }
+    // Each caller's counts, for `podssh status` (T-721).
+    crate::node_exit_count::keep(label);
     Ok(())
 }
 
@@ -190,15 +197,50 @@ async fn open(
     if podssh_relay::reverse::unix_target::unix_path(host).is_some() || host.starts_with("unix:") {
         return Err(NodeRefusal::NoTarget(format!("{host}: an exit dials TCP, never a Unix socket")));
     }
+    // The relay role's fixed denies, before any name resolves (T-721).
+    if let Some(why) = podssh_relay::reverse::exit_caller::denied_port(host, port) {
+        return Err(NodeRefusal::Other(why));
+    }
+    // A caller that a grant of the exit let in (T-721), as a Worker with no
+    // key of a member: the node must still be an exit of its net.
+    let granted = podssh_relay::e2e::ends::granted();
+    if granted {
+        crate::net::admit::exit_ready(me).map_err(NodeRefusal::Other)?;
+    }
     let shown = podssh_ws::dial::authority(host, port);
     let deadline = Instant::now() + RESOLVE_LIMIT;
     let found = podssh_ws::resolve::resolve(host, port, deadline)
         .await
         .map_err(|why| NodeRefusal::NoTarget(format!("could not resolve {host}: {why}")))?;
     let own = crate::node_exit_own::addresses();
-    let net = |addr, public| verdict(me, peer, Asks::Dial { addr, public });
-    let addresses = checked(&shown, found, ranges, &own, &net)?;
-    dial_each(&shown, addresses, ranges).await
+    let addresses = match granted {
+        true => granted_checked(host, port, found, &own)?,
+        false => {
+            let net = |addr, public| verdict(me, peer, Asks::Dial { addr, public });
+            checked(&shown, found, ranges, &own, &net)?
+        }
+    };
+    // A range lends the host's own address to members alone.
+    let lent: &[Range] = if granted { &[] } else { ranges };
+    dial_each(&shown, addresses, lent).await
+}
+
+/// The addresses of `host:port` that the exit dials for a caller of a
+/// grant (T-721): public ones alone, and none of the host's own, as the
+/// relay role dials for a stranger; a range of `--routes` is for members.
+/// Refused in the role's words, which tell a stranger nothing of the
+/// node's network (GitHub #126).
+pub(crate) fn granted_checked(
+    host: &str,
+    port: u16,
+    found: Vec<SocketAddr>,
+    own: &[std::net::IpAddr],
+) -> Result<Vec<SocketAddr>, NodeRefusal> {
+    let mine = found.iter().any(|addr| crate::node_exit_own::kind(addr.ip(), own).is_some());
+    if found.is_empty() || mine || podssh_relay::reverse::exit_caller::outside(&found, &[]).is_some() {
+        return Err(NodeRefusal::Other(podssh_relay::reverse::exit_caller::not_dialed(host, port)));
+    }
+    Ok(found)
 }
 
 /// The addresses of `shown` that the exit may dial, each checked: public,
@@ -219,7 +261,8 @@ pub(crate) fn checked(
     for addr in &found {
         let ip = addr.ip();
         let public = podssh_relay::serve::policy::public(ip);
-        if !public && !ranges.iter().any(|range| range.contains(ip)) {
+        // The relay role's own check of an address and its ranges (T-721).
+        if podssh_relay::reverse::exit_caller::outside(std::slice::from_ref(addr), ranges).is_some() {
             return Err(NodeRefusal::Other(format!(
                 "{shown} resolves to {ip}, which is not a public address, and no range of the exit's --routes holds it"
             )));

@@ -290,3 +290,25 @@ mod open_files {
         assert!(err.lines().next().is_some_and(|line| line.contains("open file limit")), "said first: {err}");
     }
 }
+
+/// Each exit's callers as its node counted them (T-721): a fingerprint and
+/// the counts of each, by the node's label; an empty list with none.
+#[test]
+fn the_counters_of_an_exit_s_callers_are_shown_by_label() {
+    let home = scratch("exits");
+    let (rc, out, err) = status(&home, &[], &[]);
+    assert_eq!(rc, 0, "{err}");
+    assert_eq!(one_line(&out)["exits"], serde_json::json!([]));
+    let dir = cache_dir(&home);
+    let caller = r#"{"key":"SHA256:abc","connects":2,"refusals":1,"bytes_up":10,"bytes_down":20,"last_ms":5}"#;
+    let body = format!(r#"{{"label":"gw","at_ms":5,"callers":[{caller}]}}"#);
+    podssh_relay::cache::store_file_in_first(std::slice::from_ref(&dir), "exit-gw.json", body.as_bytes())
+        .expect("the node's file");
+    let (rc, out, err) = status(&home, &[], &[]);
+    assert_eq!(rc, 0, "{err}");
+    let exits = one_line(&out)["exits"].clone();
+    assert_eq!(exits[0]["label"], "gw", "{exits}");
+    let caller = &exits[0]["callers"][0];
+    assert_eq!((caller["connects"].as_u64(), caller["refusals"].as_u64()), (Some(2), Some(1)), "{exits}");
+    assert_eq!((caller["bytes_up"].as_u64(), caller["bytes_down"].as_u64()), (Some(10), Some(20)), "{exits}");
+}

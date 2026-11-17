@@ -159,8 +159,9 @@ impl Policy {
         wanted.iter().map(SocketAddr::ip).find(|&ip| !public(ip) && !listed(ip))
     }
 
-    /// `Err` for a port that is never dialed, before any name resolves.
-    fn port_allowed(&self, host: &str, port: u16) -> Result<(), Refused> {
+    /// `Err` for a port that is never dialed, before any name resolves: the
+    /// role's, and a node's exit's (T-721, `crate::reverse::exit_caller`).
+    pub fn port_allowed(&self, host: &str, port: u16) -> Result<(), Refused> {
         match self.denied_ports.contains(&port) {
             true => {
                 Err(Refused::Policy(format!("{} not in the ALLOW list: port {port} is refused", shown(host, port))))
@@ -188,7 +189,7 @@ pub fn public(ip: IpAddr) -> bool {
 }
 
 fn public_v4(ip: Ipv4Addr) -> bool {
-    let [a, b, c, _] = ip.octets();
+    let [a, b, c, d] = ip.octets();
     let reserved = ip.is_unspecified()
         || ip.is_loopback()
         || ip.is_private()
@@ -201,7 +202,10 @@ fn public_v4(ip: Ipv4Addr) -> bool {
         // CGNAT (RFC 6598), the IETF's assignments, benchmarking (RFC 2544).
         || (a == 100 && (64..128).contains(&b))
         || (a == 192 && b == 0 && c == 0)
-        || (a == 198 && (b == 18 || b == 19));
+        || (a == 198 && (b == 18 || b == 19))
+        // Azure's host address (DHCP, DNS, its agent): public in form, the
+        // cloud host's own in fact, as 169.254.169.254 is (T-721).
+        || (a == 168 && b == 63 && c == 129 && d == 16);
     !reserved
 }
 
@@ -263,10 +267,15 @@ mod tests {
             "::ffff:10.0.0.1",
             "ff02::1",
             "2001::1",
+            "168.63.129.16",
+            "::ffff:168.63.129.16",
+            "100.100.100.200",
+            "fd00:ec2::254",
         ] {
             assert!(!public(ip(text)), "{text} is not public");
         }
-        for text in ["140.82.112.3", "1.1.1.1", "2606:4700::1111", "::ffff:140.82.112.3", "100.128.0.1"] {
+        let public_ones = ["140.82.112.3", "1.1.1.1", "2606:4700::1111", "::ffff:140.82.112.3", "100.128.0.1"];
+        for text in public_ones.into_iter().chain(["168.63.129.17"]) {
             assert!(public(ip(text)), "{text} is public");
         }
     }

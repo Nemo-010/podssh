@@ -1,0 +1,13 @@
+--- a/crates/podssh-relay/src/reverse/exit_caller.rs
++++ b/crates/podssh-relay/src/reverse/exit_caller.rs
+@@ -79,7 +79,9 @@
+             if exit {
+                 match &opened {
+                     Ok(_) => tally.attach(counts.connected(&key), counts.clone()),
+-                    Err(_) => counts.refused(&key),
++                    Err(_) => {
++                        counts.connected(&key);
++                    }
+                 }
+             }
+             opened

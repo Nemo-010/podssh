@@ -135,6 +135,8 @@ pub mod node_install;
 pub mod node_flags;
 // `podssh node --exit`: the node lends its egress to its net (T-431).
 pub mod node_exit;
+// Each caller's counts of the exit, for `podssh status` (T-721).
+pub(crate) mod node_exit_count;
 pub(crate) mod node_exit_own;
 // `podssh node NAME udp:HOST:PORT`: a UDP target, one flow for each session.
 pub mod node_udp;

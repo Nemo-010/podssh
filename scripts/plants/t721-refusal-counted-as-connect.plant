@@ -1,0 +1,6 @@
+# T-721: each caller's counts of a node's exit; a refused connect counted as
+# a connect must fail the test of the refusal of port 25 and its count.
+ENTRY=T-721
+GROUP=resume
+EXPECT='test denies_port_25_in_the_role_s_words_and_counters_count_a_refusal \.\.\. FAILED'
+RUN='cargo test --locked -p podssh-relay --features pair,serve,grant --test reverse_exit_caller -- denies_port_25_in_the_role_s_words_and_counters_count_a_refusal'

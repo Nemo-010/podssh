@@ -13696,7 +13696,7 @@ output that lists what is on.
 - Read: the switches now are `PODSSH_FORWARDER_FALLBACK` (`crates/podssh-cli/src/forwarder/fallback.rs:36`),
   `PODSSH_DERP`, `PODSSH_DERP_MAIN`, `PODSSH_PIPING`, `PODSSH_IROH_PKARR`, `PODSSH_IROH_RELAY`,
   `PODSSH_TRANSIT`, `PODSSH_OPENTUNNEL`, `PODSSH_OFFLINE` (all of `PodUtils/podssh:crates/*/src`); there is no common one.
-- Read: `podssh status` is JSON already (`crates/podssh-cli/src/status.rs:84-111`); it has `offline` and no
+- Read: `podssh status` is JSON already (`crates/podssh-cli/src/status.rs:85-114`); it has `offline` and no
   public set.
 - Read: the lists of other parties' hosts moved to `pod-services` (v0.7.0 is taken,
   `crates/podssh-cli/Cargo.toml:102`); no host is named in this entry or in the new code.
@@ -13899,7 +13899,7 @@ reached each and measures nothing.
 - Read: `ping NAME` races the roads of a member and gives each its time and the winner
   (T-435; `crates/podssh-cli/src/ping/node.rs:87-185`); `--json` exists (`crates/podssh-cli/src/flags/ping.rs:51`).
 - Read: `ping` takes one destination (`crates/podssh-cli/src/flags/ping.rs`, the positional).
-- Read: `status --net` measures no road (`crates/podssh-cli/src/status.rs:29`).
+- Read: `status --net` measures no road (`crates/podssh-cli/src/status.rs:30`).
 - Read: each probe drops its link before `OPEN` (`TODO/mesh.md`, T-435 Decision), so no session starts.
 
 ## Approach
@@ -13959,7 +13959,7 @@ others past `--timeout`.
 The Premise holds in substance; its lines moved. One node's measure is `crates/podssh-cli/src/ping/node.rs`'s
 `run`, which calls `crate::ssh::node_roads::measure` and gives the object of `node`; `--json` is the row at
 `crates/podssh-cli/src/flags/ping.rs:50`; `status --net` reads `crate::net::state::status_value` and measures
-nothing (`crates/podssh-cli/src/status.rs:33`-`34`, `:109`). `--timeout` takes a duration (`20s`, a bare
+nothing (`crates/podssh-cli/src/status.rs:34`-`34`, `:110`). `--timeout` takes a duration (`20s`, a bare
 `20` is 20 s), as every other `--timeout` of podssh does, and `PODSSH_TIMEOUT` is its default, as the manual's
 fact of that variable says of each command with the flag.
 

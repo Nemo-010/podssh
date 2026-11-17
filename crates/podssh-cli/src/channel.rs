@@ -440,7 +440,9 @@ where
         let open = move |key: PublicKey, ask: Asking| async move {
             crate::node_unix_open::open(&routes, &key, &ask, || true).await
         };
-        ends::serve_asked(theirs, &node, open).await
+        // Each caller of the exit counted (T-721).
+        let counts = podssh_relay::reverse::exit_caller::counts();
+        podssh_relay::reverse::exit_caller::serve(theirs, &node, counts, open).await
     }));
     Ok(ours)
 }

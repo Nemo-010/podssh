@@ -20,6 +20,7 @@ use podssh_relay::e2e::ends::Redeem;
 use podssh_relay::e2e::Ask;
 use podssh_relay::grant::{self, Cert, Door, Mint, Spent};
 use podssh_relay::identity::{allow, file, Identity, PublicKey};
+use podssh_relay::reverse::exit_caller;
 use podssh_relay::session::{Entropy, OsEntropy};
 
 use crate::node::NodeArgs;
@@ -111,9 +112,24 @@ pub fn node(args: &NodeArgs, out: &mut dyn Write, err: &mut dyn Write) -> Option
 /// member of the net may, for what it may reach itself.
 pub fn door(label: &str, me: PublicKey, allow: Option<PathBuf>) -> Option<Arc<Redeem>> {
     let door = Door { node: me, issuers: issuers(me, allow), spent: spent_of(label), revoked: REVOKED.get().cloned() };
+    // An exit's grant (T-721): its own issuers, the same record of each use.
+    let exit = crate::node_exit::asked().then(|| Door { issuers: exit_issuers(me), ..door.clone() });
     Some(Arc::new(move |peer: &PublicKey, ask: &Ask, blob: &[u8]| {
-        door.redeem(peer, ask, blob, now()).map(|redeemed| redeemed.to_string())
+        exit_caller::redeem(&door, exit.as_ref(), peer, ask, blob, now()).map(|redeemed| redeemed.to_string())
     }))
+}
+
+/// Who may grant the exit of the node `me` beside its own key (T-721): a
+/// member of the net that may go out through it itself, so that a grant
+/// never reaches more than its issuer; never a key of `--allow`, which the
+/// exit does not let out either.
+fn exit_issuers(me: PublicKey) -> Arc<grant::Issuers> {
+    use crate::net::admit::{verdict, Asks, Verdict};
+    Arc::new(move |issuer: &PublicKey, _: &Ask| match verdict(&me, issuer, Asks::Egress) {
+        Verdict::Member(_) => Ok(()),
+        Verdict::Refused(why) => Err(why),
+        Verdict::Outside => Err("this node is in no net, so its own key alone grants its exit".into()),
+    })
 }
 
 /// The node's line of its door for grants, as it starts.
@@ -171,7 +187,8 @@ fn minted(args: &NodeArgs) -> Result<(String, String), Refusal> {
     let to = args.grant_to.as_deref().unwrap_or_default();
     let key = grantee(to)?;
     let route = args.grant_route.as_deref();
-    if let Some(route) = route {
+    // `+exit` names the node's exit (T-721), which no route's name can be.
+    if let Some(route) = route.filter(|r| *r != exit_caller::GRANT_ROUTE) {
         podssh_ws::names::check_node_name(route)
             .map_err(|_| Refusal::usage(format!("--grant-route {route:?} is not the name of a route")))?;
     }
@@ -313,6 +330,17 @@ mod tests {
         assert_eq!((read.valid_after, read.valid_before), (1_000, 1_060));
         assert_eq!(read.critical, [(grant::ONCE.to_string(), Vec::new())]);
         assert_ne!(sign(&node, key, "lab", None, 1_000, Duration::from_secs(60)).unwrap().serial, read.serial);
+    }
+
+    /// A grant of the exit names the node's principal with `+exit` (T-721),
+    /// which no route's name can be, so no grant of a route opens it.
+    #[test]
+    fn a_grant_of_the_exit_names_the_reserved_route() {
+        let node = Identity::from_seed(&[0x22; 32]);
+        let key = Identity::from_seed(&[0x11; 32]).public();
+        let cert = sign(&node, key, "gw", Some(exit_caller::GRANT_ROUTE), 1_000, Duration::from_secs(60)).unwrap();
+        assert_eq!(cert.principals, [format!("node:{}/+exit", node.public().fingerprint())]);
+        assert!(podssh_ws::names::check_node_name(exit_caller::GRANT_ROUTE).is_err(), "no route is named so");
     }
 
     #[test]

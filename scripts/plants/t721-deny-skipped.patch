@@ -1,0 +1,11 @@
+--- a/crates/podssh-relay/src/reverse/exit_caller.rs
++++ b/crates/podssh-relay/src/reverse/exit_caller.rs
+@@ -40,7 +40,7 @@
+ /// The first address of `found` that the relay role would not dial: not
+ /// public, and in no range of `ranges`.
+ pub fn outside(found: &[SocketAddr], ranges: &[Range]) -> Option<IpAddr> {
+-    Policy { ranges: ranges.to_vec(), ..Policy::default() }.unlisted(found)
++    Policy { ranges: ranges.to_vec(), ..Policy::default() }.unlisted(found).filter(|_| false)
+ }
+ 
+ /// The role's words for a target that it does not dial for its addresses,

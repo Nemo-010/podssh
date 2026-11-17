@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**763 entries: 29 open, 39 partial, 11 blocked, 684 done.**
+**763 entries: 28 open, 39 partial, 11 blocked, 685 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 0 | 9 | 3 | 82 | 94 |
 | P2 | 0 | 22 | 2 | 290 | 314 |
-| P3 | 29 | 8 | 6 | 311 | 354 |
-| **All** | 29 | 39 | 11 | 684 | 763 |
+| P3 | 28 | 8 | 6 | 312 | 354 |
+| **All** | 28 | 39 | 11 | 685 | 763 |
 
 ## Entries
 
@@ -751,7 +751,7 @@ repository and CI).
 | [T-718](roads.md) | P2 | M | M10 | feature | partial | Access service-token headers from files on each WebSocket road |
 | [T-719](ws.md) | P1 | M | M10 | feature | blocked | `podssh link`: the held link of the node agent |
 | [T-720](mesh.md) | P3 | L | M10 | feature | partial | `podssh relay serve` serves the iroh relay protocol and DERP on its one 443 listener |
-| [T-721](relay.md) | P3 | M | M10 | feature | open | An exit on the reverse road that a Worker calls, with fixed denies and counters |
+| [T-721](relay.md) | P3 | M | M10 | feature | done | An exit on the reverse road that a Worker calls, with fixed denies and counters |
 | [T-722](relay.md) | P3 | M | M10 | feature | blocked | A lease header `X-Relay-Lease` on the forward and reverse roads |
 | [T-723](relay.md) | P3 | M | M10 | docs | done | The versioned wire document of the relay and the reverse road, with test vectors |
 | [T-724](mesh.md) | P3 | M | M10 | feature | done | `-J node://NAME` and `mcp` destinations that name a node |

@@ -1,0 +1,8 @@
+# T-721: a node's exit applies the relay role's check of each address
+# (`exit_caller::outside`) before it dials; with the check skipped, the
+# caller of a grant reaches a private address on the loopback, and the
+# test that it is refused and never dialled must fail.
+ENTRY=T-721
+GROUP=resume
+EXPECT='test denies_a_grant_s_caller_the_range_of_members_and_never_dials_it \.\.\. FAILED'
+RUN='cargo test --locked -p podssh-relay --features pair,serve,grant --test reverse_exit_caller -- denies_a_grant_s_caller_the_range_of_members_and_never_dials_it'

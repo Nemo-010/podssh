@@ -155,3 +155,60 @@ async fn a_host_of_a_unix_socket_is_refused_before_any_resolve() {
         }
     }
 }
+
+/// The relay role's fixed denies at the exit (T-721): port 25 is refused in
+/// the role's words before the name resolves, so nothing is asked of DNS.
+#[tokio::test]
+async fn denies_port_25_before_any_resolve_in_the_role_s_words() {
+    let key = |b: u8| podssh_relay::identity::PublicKey([b; 32]);
+    for host in ["140.82.112.3", "mail.example.invalid"] {
+        match open(&key(1), &key(2), host, 25, &[]).await {
+            Err(NodeRefusal::Other(why)) => {
+                assert_eq!(why, format!("{host}:25 not in the ALLOW list: port 25 is refused"), "{host}")
+            }
+            Err(other) => panic!("{host}: {other:?}"),
+            Ok(_) => panic!("{host}: dialed"),
+        }
+    }
+}
+
+/// A member's addresses go through the role's own check: the clouds'
+/// metadata addresses are no public address, and no range lends them by
+/// accident unless it names them.
+#[test]
+fn denies_the_metadata_addresses_as_the_role_does() {
+    let none: Vec<Range> = Vec::new();
+    for meta in ["169.254.169.254:80", "[fd00:ec2::254]:80", "168.63.129.16:80", "100.100.100.200:80"] {
+        match checked("metadata:80", at(&[meta]), &none, &[], &open_net) {
+            Err(NodeRefusal::Other(why)) => assert!(why.contains("which is not a public address"), "{meta}: {why}"),
+            other => panic!("{meta}: {other:?}"),
+        }
+    }
+}
+
+/// Who may go out (T-721): a member of the net's signed document goes by
+/// the net's verdict, to the ranges that it lends too; a caller of a grant
+/// goes to public addresses alone, refused elsewhere in the role's words,
+/// which name no address.
+#[test]
+fn caller_allowlist_and_a_grant_each_reach_what_they_may() {
+    let lent = vec![Range::parse("10.0.0.0/8").unwrap()];
+    assert!(checked("db:5432", at(&["10.1.2.3:5432"]), &lent, &[], &open_net).is_ok(), "a member, inside a range");
+    let public = granted_checked("github.com", 22, at(&["140.82.112.3:22"]), &[]).unwrap();
+    assert_eq!(public.len(), 1);
+    let own: Vec<std::net::IpAddr> = vec!["140.82.112.3".parse().unwrap()];
+    for (list, own) in [
+        (vec!["10.1.2.3:5432"], &[][..]),
+        (vec!["140.82.112.3:5432", "10.1.2.3:5432"], &[][..]),
+        (vec!["127.0.0.1:5432"], &[][..]),
+        (vec!["140.82.112.3:5432"], &own[..]),
+        (vec![], &[][..]),
+    ] {
+        match granted_checked("db", 5432, at(&list), own) {
+            Err(NodeRefusal::Other(why)) => {
+                assert_eq!(why, "db:5432 not in the ALLOW list: this relay dials no address of it", "{list:?}");
+            }
+            other => panic!("{list:?}: {other:?}"),
+        }
+    }
+}

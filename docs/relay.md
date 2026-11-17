@@ -503,7 +503,7 @@ What podssh does about it (T-253):
 | Session length | 720 min (12 h) |
 | Session volume | 64 MiB, both directions together |
 | Attempts with no token | 120 per minute per address (mint, pair, upgrades with no token) |
-| Targets | Public TCP only. The relay refuses RFC 1918, CGNAT, link-local, unique-local, multicast and documentation ranges, internal suffixes, and names that resolve to private addresses. It refuses Cloudflare ranges on the direct road, and port 25 (the contract says "on the direct road"; `/relays.json` says "on every road", 2026-10-08). podssh's relay role dials the private ranges of its `--routes` too, or each address with `--allow-private` (T-635). |
+| Targets | Public TCP only. The relay refuses RFC 1918, CGNAT, link-local, unique-local, multicast and documentation ranges, internal suffixes, and names that resolve to private addresses. podssh's relay role refuses the clouds' metadata addresses too (Azure's `168.63.129.16` beside the link-local `169.254.169.254`, T-721), and a node's exit applies the same check. It refuses Cloudflare ranges on the direct road, and port 25 (the contract says "on the direct road"; `/relays.json` says "on every road", 2026-10-08). podssh's relay role dials the private ranges of its `--routes` too, or each address with `--allow-private` (T-635). |
 
 podssh's own role (`podssh relay serve`) moves each of these with `--idle`,
 `--session-hours`, `--max-session-mib` and `--connect` (T-704) and publishes

@@ -674,7 +674,7 @@ stdin and stdout gives typed tools, with no shell quoting.
 
 Measured: `podssh mcp` exits 64 (unknown subcommand).
 
-Read: a prompt goes to the controlling terminal or to `SSH_ASKPASS` (`docs/cli.md:6558-6588`),
+Read: a prompt goes to the controlling terminal or to `SSH_ASKPASS` (`docs/cli.md:6583-6613`),
 and the terminal of an agent can be the user's own. The session output goes straight to the
 process's stdout (`crates/podssh-ssh/src/io/msg.rs:78-95`), which an MCP server over stdio uses for
 its protocol. podssh never listens (`docs/architecture.md:284-301`), and stdio needs no listener.
@@ -910,7 +910,7 @@ pump at `crates/podssh-cli/src/pipe/pump.rs:120` and
 `crates/podssh-cli/src/pipe/pump.rs:130-158`, and the relay's close at
 `crates/podssh-cli/src/pipe/relay.rs:239`. `SessionLog` at
 `crates/podssh-cli/src/settings.rs:284-287`, and `podssh status` at
-`crates/podssh-cli/src/status.rs:150-161`. The variable in VARIABLES, the
+`crates/podssh-cli/src/status.rs:153-164`. The variable in VARIABLES, the
 two files in FILES, and `docs/cli.md`.
 
 The test `crates/podssh-cli/tests/session_log.rs`, 4 tests, against the
@@ -1932,7 +1932,7 @@ node's, the client's, the iroh key, the net owner's) sit in the cache, and the t
 
 - Read: `keygen -y` and `-l` take one file (`crates/podssh-cli/src/flags/keygen.rs:23-28`), with no JSON.
 - Read: `status` is one line of JSON that opens no connection and writes nothing
-  (`crates/podssh-cli/src/status.rs:1-8`); `--net` is its precedent for a flag (`status.rs:26`).
+  (`crates/podssh-cli/src/status.rs:1-9`); `--net` is its precedent for a flag (`status.rs:26`).
 - Read: the key files and places are in `pod-identity`, taken
   (`crates/podssh-relay/src/identity.rs:5-25`, `Place`, `existing`, which reads and never makes a key); the
   iroh key reuses them (`PodUtils/podcrates:crates/pod-iroh/src/keys.rs`); the net owner's key is in the net's store

@@ -351,6 +351,9 @@ const STATUS: &[&str] = &[
      renews it, as its node last learned: true or false, and null when no node learned it of this pair.",
     super::notes_net::STATUS_NET,
     super::notes_keygen::STATUS_KEYS,
+    "exits lists each exit node of this host by its label, as the node last wrote it: at_ms, and its callers. Each \
+     caller has key (its fingerprint), connects, refusals, bytes_up, bytes_down and last_ms. Bytes are counted at \
+     the end-to-end channel, its framing included. The list is empty when no node of this host is an exit.",
     "It shows no token and no proxy credentials, opens no connection, asks no DNS and writes nothing. A \
      bad --relay-host or destination is a usage error (64), a bad PODSSH_RELAY a configuration error \
      (78). podssh doctor is the report that measures.",

@@ -766,7 +766,7 @@ So a local TCP TARGET exists only where the host allows it; `podssh serve` (M5) 
    FILE, and prints only the label and the expiry. `podssh relay revoke NAME` stops the pair and deletes the
    local copies. `podssh relay status NAME` gives presence; agree on the form with T-058, whose `relay status`
    has no NAME.
-4. Exit codes as `podssh proxy` (`docs/cli.md:6444`): 64 usage; 69 the relay or TARGET cannot be reached; 77 a
+4. Exit codes as `podssh proxy` (`docs/cli.md:6469`): 64 usage; 69 the relay or TARGET cannot be reached; 77 a
    refused pair (`403`); 78 no usable pair; 0 after a stop by a signal. Add the rows to
    `crates/podssh-cli/src/man/facts/exit.rs:8`.
 5. `doctor`: one line for each stored pair, with its expiry and its presence, as in
@@ -904,7 +904,7 @@ Read: `parse_hop` strips `ssh://` and reads `host:PORT` (`crates/podssh-cli/src/
 operator leg receives text frames (`docs/relay.md:660-663`). A host key is recorded under the target
 host, never the relay's name (`SECURITY.md:263-273`); `HostKeyAlias` exists
 (`crates/podssh-cli/src/ssh/resolve.rs:360`). `podssh ssh` uses the exit codes of OpenSSH, and
-`podssh proxy` sysexits (`docs/cli.md:6440-6444`).
+`podssh proxy` sysexits (`docs/cli.md:6465-6469`).
 
 ## Approach
 
@@ -1770,7 +1770,7 @@ The command line: the targets at `crates/podssh-cli/src/node.rs:249-286`,
 target at `crates/podssh-cli/src/node_target.rs:18-43`, the routes at
 `crates/podssh-cli/src/node.rs:303-311`; the channel's glue at
 `crates/podssh-cli/src/channel.rs:370-379` and
-`crates/podssh-cli/src/channel.rs:424-446`; `node://NAME/ROUTE` at
+`crates/podssh-cli/src/channel.rs:424-448`; `node://NAME/ROUTE` at
 `crates/podssh-cli/src/ssh/node.rs:36-67`, and `iroh:TICKET/ROUTE` at
 `crates/podssh-cli/src/ssh/iroh.rs:59-80`. The manual's notes of `node`
 and `operator`, the file of `--allow`, `docs/cli.md` and
@@ -4044,7 +4044,7 @@ version's check refuses nothing until the first change of the dialect, as the is
    `channel::around`, which drops the line. Lost: a sayer of two levels through `channel::around`,
    which changes the sayer of each of its callers, in a dozen files.
 8. `podssh status` does not say it (Approach item 4): it reads this host's state and opens nothing
-   (`crates/podssh-cli/src/status.rs:1-8`), and a session's channel is no state that outlives it.
+   (`crates/podssh-cli/src/status.rs:1-9`), and a session's channel is no state that outlives it.
    Lost: a record for each node in the cache, read by `status --net`, whose rows are the net's
    members, where a node outside the net, the case at hand, has none.
 
@@ -5049,7 +5049,7 @@ the net's key legs in one run. The beta that has the code (`v1.1.0-beta.2`) has 
 2. Repair each defect that the test finds (rule 8). Say in `docs/mesh.md` what lasts: the renewal, the
    key legs, and what ends a node (a revoked key, a pair that the relay refuses).
 3. `status` shows the end of the pair and whether a renewal is on (`pairs` of `status --json`,
-   `crates/podssh-cli/src/status.rs:108`); add `renews` there if it does not show.
+   `crates/podssh-cli/src/status.rs:109`); add `renews` there if it does not show.
 4. The beta: betas are allowed again (the owner, 2026-11-09). Cut `v1.1.0-beta.4` when the test passes and
    the gate is green at its commit (AGENTS.md section 2, "Releases"). Its notes (`docs/releases/`) name this
    test and the ask. T-446 carries the clause.

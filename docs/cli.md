@@ -3202,7 +3202,7 @@ before anything else; `podssh doctor` is the report that measures.
   be used), `proxy` (the variable, `HOST:PORT` and the kind, `http` or
   `socks5`), `offline`, `attachment`, `stdin_tty`, `stdout_tty`,
   and `host` for a destination (its name in `known_hosts`, whether a key is
-  recorded, the key types); `session_log` (T-056) and `relay_failures`, the
+  recorded, the key types); `exits`, each exit node of this host by its `label`, as it last wrote its file, with `at_ms` and its `callers`: each one's `key` (a fingerprint), `connects`, `refusals`, `bytes_up`, `bytes_down` and `last_ms`, an empty list with none (T-721); `session_log` (T-056) and `relay_failures`, the
   relay hosts that each run tries last now, with `ago_s`, the `reason` and the `road` (T-059), and
   `relay_opened`, those that opened lately, with `ago_s` and `opens` (T-563); `relay_rank`, the rank kept, with `age_s`, `this_egress`, `holds`, `named`, `source` (`relay rank`, or `background` for a session's, T-608), `partial`, `first` and `hosts`, null with none (T-606); `relay_rank_auto`, whether a setting asks for a rank in a session's background and which (`asked`, `by`), and when the last was made (`last_ms`, `last_age_s`) and whether it is `partial` (T-608); `open_files`, the limit of open files: podssh raises its soft limit at start to the hard one, at most 65,536 (on macOS within `kern.maxfilesperproc`, then `OPEN_MAX` if the host refuses more), and gives the `soft` limit, the `hard` one (null for none), the soft one `at_start`, whether it was `raised` and the host's `refused` answer, a line at `-v` ("open file limit: 256 -> 10240") and the limit after an error of too many open files; null on Windows (T-564); `pairs`, each stored pair's `label`, `expires_ms`, whether it
   `expired`, and `next_now`, whether `relay pair LABEL` makes its next pair
@@ -4316,7 +4316,8 @@ commands. The rules behind them:
   window and the critical option `once@podssh`. `podssh node NAME
   --grant-to KEY` prints one on stdout and serves nothing: the node's key
   signs it, read and never made, for KEY (`ssh-ed25519 BASE64`, 64 hex
-  digits, or a file of one line), `--grant-route ROUTE` and `--grant-for
+  digits, or a file of one line), `--grant-route ROUTE` (or `+exit`, the
+  node's exit, T-721, "The exit of the net") and `--grant-for
   TIME` (1 minute to 30 days, 1 h by default); `ssh-keygen -s` of OpenSSH
   makes one with an issuer's key. The operator gives it with `--grant FILE`
   on `operator`, `proxy node://`, `ssh node://` and `pipe`'s `node:` side:
@@ -5032,9 +5033,33 @@ own, and the forward road starts at the node.
   name that resolves anew elsewhere reaches nothing that was not checked. A
   public address is one that the relay role dials (`crates/podssh-relay/src/serve/policy.rs`):
   private, loopback, link-local, CGNAT, unique-local, multicast,
-  documentation and NAT64 addresses are not; such an address needs a range
-  of `--routes`. A name with one address that fails is refused whole. No
-  port is refused: the members are the owner's.
+  documentation and NAT64 addresses are not, nor the clouds' metadata
+  addresses (`169.254.169.254`, `fd00:ec2::254`, `100.100.100.200`, and
+  Azure's `168.63.129.16`, T-721); such an address needs a range of
+  `--routes`. A name with one address that fails is refused whole. Port 25
+  is refused before the name resolves, in the role's words ("HOST:25 not in
+  the ALLOW list: port 25 is refused"), as the relay role refuses it: the
+  exit and the role share one check
+  (`crates/podssh-relay/src/reverse/exit_caller.rs`, T-721).
+- **A caller with a grant** (T-721). A key that no member's line names,
+  as a Cloudflare Worker's, goes out with a grant used once of the exit:
+  `podssh node NAME --grant-to KEY --grant-route +exit` mints it, with the
+  principal `node:SHA256:.../+exit`, which no route's name can be (a route
+  never holds a `+`), so a grant of a route never opens the exit, nor one of
+  the exit a route. Its issuer is the node's own key, or a member that the
+  policy lets out through the exit itself; never a key of `--allow`. The
+  caller goes to public addresses alone, never to a range of `--routes` nor
+  to the node's own host, and a refusal is in the role's words, which name
+  no address ("HOST:PORT not in the ALLOW list: this relay dials no address
+  of it"). The node must still hold the role `exit` of its net.
+- **Each caller's counts** (T-721). The node counts, for each caller's key,
+  the targets that its exit opened (`connects`), those that it refused or
+  could not reach (`refusals`), and the bytes of those sessions each way,
+  counted at the end-to-end channel (its framing included: the target's
+  socket stays a `TcpStream`, which the upgrade in place hands on). It
+  keeps 1,024 callers, the one seen least recently forgotten first, and
+  writes them each 2 s while one moved to `exit-NAME.json` of the cache,
+  which `podssh status` shows as `exits`.
 - **The node's own host** (T-432). A loopback address (with the
   unspecified one, which reaches the host too), or an address of the
   node's own host, is dialled only when a range of `--routes` names it
