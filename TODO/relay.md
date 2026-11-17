@@ -6283,7 +6283,7 @@ podcrates' entry 813.
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -6305,10 +6305,31 @@ legs), its mint or session setup, or the study's client (tokio-tungstenite 0.24)
    beside a fast one, and repair it where it is podssh's; else ask podcrates where it is a shared crate's.
 3. Answer COORD-127 with the numbers.
 
+## Decision
+
+2026-11-17. No change of the role. Its forward session is one task (`crates/podssh-relay/src/serve/forward.rs:353`,
+both directions in one `select!`, no queue between its legs), and the split is the multi-thread runtime's placement
+of the tasks that wake on each socket: on one thread the run has one mode. Lost: a runtime of one thread for the role
+(its sessions would share one core), or a pinning of each session (a cost on every session for a rate that, in its
+slow mode, is still far over any link that the role serves).
+
 ## Prove
 
 The twenty runs' rates in `docs/STATUS.md`, with no run under half the median, or the slow mode's cause named and
 repaired.
+
+## Done
+
+Done, 2026-11-17. `crates/podssh-relay/tests/relay_serve_rate.rs` (ignored, a measurement): the study's shape on the
+loopback, plain `ws://`, 16 MiB in frames of 49,152 bytes, a new session for each of 20 runs, the rate to the last byte
+that the target took. `cargo test --release -p podssh-relay --features serve,plain-ws --test relay_serve_rate --
+--ignored --nocapture`, on this cloud host:
+- four worker threads: two modes, 236.6 to 251.9 MiB/s in 11 runs, 557.8 to 687.3 MiB/s in 9 (median 251.9);
+- two worker threads: the same two modes (203.7 to 638.6, median 236.7);
+- one thread (`current_thread`): one mode, 380.9 to 429.7 MiB/s (median 406.5), no run under half the median.
+So the slow mode comes back here (near 240 against near 650, where the study saw 75 against 330 on its machine), and
+its part is the runtime's placement of the tasks across threads, not the role's brake, queue or setup. Answered on
+COORD-127 (PodUtils/podcrates#217) through podssh's COORD-103.
 
 # T-804: The ideas of the dig study for the relay server: a ban, PROXY's ranges, STUN, deadlines, an address check
 

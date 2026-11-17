@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**760 entries: 41 open, 36 partial, 11 blocked, 672 done.**
+**760 entries: 40 open, 36 partial, 11 blocked, 673 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 2 | 8 | 3 | 81 | 94 |
-| P2 | 4 | 22 | 2 | 286 | 314 |
+| P2 | 3 | 22 | 2 | 287 | 314 |
 | P3 | 35 | 6 | 6 | 304 | 351 |
-| **All** | 41 | 36 | 11 | 672 | 760 |
+| **All** | 40 | 36 | 11 | 673 | 760 |
 
 ## Entries
 
@@ -833,6 +833,6 @@ repository and CI).
 | [T-800](robustness.md) | P1 | S | M10 | defect | done | `node_cut`'s test of podssh's role failed at random: a relay session's id held the digits 1003 |
 | [T-801](relay.md) | P2 | S | M10 | defect | done | The relay role drops a node's socket at once after a reset or a failed write, and says why a node does not open |
 | [T-802](repo.md) | P2 | S | none | chore | partial | Dependabot's updates of 2026-11-17: the minor and patch group, and rsa 0.10 |
-| [T-803](relay.md) | P2 | S | M10 | measurement | open | `podssh relay serve` moved 16 MiB at two speeds on the loopback, 75 or 330 MiB/s |
+| [T-803](relay.md) | P2 | S | M10 | measurement | done | `podssh relay serve` moved 16 MiB at two speeds on the loopback, 75 or 330 MiB/s |
 | [T-804](relay.md) | P3 | S | M10 | research | open | The ideas of the dig study for the relay server: a ban, PROXY's ranges, STUN, deadlines, an address check |
 | [T-805](repo.md) | P3 | S | M10 | chore | open | podssh's private files written by `pod_core::files::replace_private` |
