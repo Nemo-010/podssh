@@ -26,7 +26,7 @@ the verb, the address grammar, the copy loop, and the local addresses `-`,
 
 - Measured: `PODSSH_OFFLINE=1 podssh pipe stdio relay:example.org:80` exits
   64 with `podssh: unknown subcommand 'pipe'.` The verb table has no `pipe`
-  row (`crates/podssh-cli/src/flags.rs:386-456`).
+  row (`crates/podssh-cli/src/flags.rs:385-455`).
 - Read: the only pump is `crates/podssh-cli/src/pipe/relay.rs:118-258`. At the end
   of input it stops sending and keeps receiving
   (`crates/podssh-cli/src/proxy.rs:8-11`). T-101 is the opposite defect in
@@ -37,7 +37,7 @@ the verb, the address grammar, the copy loop, and the local addresses `-`,
 
 ## Approach
 
-1. The verb: a `pipe` row in `crates/podssh-cli/src/flags.rs:386-456`, two
+1. The verb: a `pipe` row in `crates/podssh-cli/src/flags.rs:385-455`, two
    required positionals (`crates/podssh-cli/src/positionals.rs:7-281`), a
    `Parsed::Pipe` variant (`crates/podssh-cli/src/parsed.rs:10-246`), a
    dispatch arm, and `pipe` in `DISPATCHED`
@@ -593,7 +593,7 @@ running on the server (`docs/design.md:734-738`).
 ## Approach
 
 1. Flags `--persist` and `--persist-name NAME` (default `podssh`; letters,
-   digits, `_` and `-`, 32 at most) in `crates/podssh-cli/src/flags.rs:116-295`.
+   digits, `_` and `-`, 32 at most) in `crates/podssh-cli/src/flags.rs:116-294`.
    With a command, `-W`, `-N`, `-s` or `RemoteCommand`, exit 64.
 2. The probe, after the login: one exec runs `command -v tmux`. No tmux:
    exit 255 with "the server has no tmux on PATH; --persist needs it". T-193
@@ -775,7 +775,7 @@ the examples must refuse it.
 ## Correction
 
 2026-10-12: the Prove's plant no longer fails. T-038 made `-L` a flag of
-`podssh ssh` (`crates/podssh-cli/src/flags.rs:252` says "forward-local"),
+`podssh ssh` (`crates/podssh-cli/src/flags.rs:251` says "forward-local"),
 so an example with `podssh ssh -L 5901:127.0.0.1:5901 user@host` parses. The
 plant that the test of the examples must refuse gives `-L` to the
 ProxyCommand's `podssh proxy`, which has no such flag:

@@ -167,6 +167,8 @@ fn to_operator(text: &str, args: &ProxyArgs) -> Result<OperatorArgs, Refusal> {
         carrier: args.node.carrier.clone(),
         // A grant used once, as `operator --grant` takes it (T-226).
         grant: args.node.grant.clone(),
+        // proxy takes no --access-host: the settings' hosts hold (T-718).
+        access_hosts: Vec::new(),
         refused: Vec::new(),
     })
 }

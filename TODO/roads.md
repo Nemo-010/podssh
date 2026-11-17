@@ -167,7 +167,7 @@ access is by an allowlist of keys or a relay token (`docs/design.md:1431-1432`).
 Read in the reports, not verified here: iroh-ssh warns when a server's key is
 ephemeral (`rustonbsd/iroh-ssh:src/ssh.rs`); zuko hands over a ticket out of
 band (`adonm/zuko:docs/protocol.md`). Read: `podssh ts` keeps its node key in
-the file that `--ts-state` names (`crates/podssh-cli/src/flags.rs:378-379`,
+the file that `--ts-state` names (`crates/podssh-cli/src/flags.rs:377-378`,
 `crates/podssh-cli/src/ts.rs:182`). Credentials never go on argv
 (`AGENTS.md`, section 4).
 
@@ -9179,7 +9179,7 @@ as a firewall or a wrong port; it never says that this host has no sshd, or what
   the dial's error, with 69 (`crates/podssh-cli/src/node_target.rs:28-29`); only a dial that
   worked reaches the check of the version line, whose refusal names `--sshd` (`:33-39`).
 - Read: the row of `--sshd` says that each TARGET "is a standard sshd"
-  (`crates/podssh-cli/src/flags/node.rs:129-130`), and the manual that the node "serves a standard
+  (`crates/podssh-cli/src/flags/node.rs:134-135`), and the manual that the node "serves a standard
   sshd" (`crates/podssh-cli/src/man/notes_pair.rs:34`); neither says that it must run already.
 - Read: no line of `doctor` names sshd (searched in `crates/podssh-cli/src/doctor/` at `3bb42ea`).
 - Read: T-481 (open) names the command that installs tmux, from the package managers that a probe
@@ -10644,9 +10644,13 @@ the variables named). The process's hosts can be set again (`podssh_ws::access::
 cell set once), so the flag wins over the settings. `podssh-ws --lib access` 6 passed, among them
 `the_way_of_the_process_carries_the_hosts_that_were_set` (`client::way` gives a named host the headers, another host
 none, and none once unset; planted, the way without the process's headers, caught); `podssh ssh --access-host
-edge.example me@host true` with no credential exits 78 with its words. Still waits: the flag on `node` and `operator`
-(their own arguments), `Headers::in_cleartext` for `cf://` and `pipe --access-host` on `ws:`, a stand-in of the relay's
-road that demands the headers, and the live step with a Cloudflare account.
+edge.example me@host true` with no credential exits 78 with its words. Then on `operator` and `node` too (one flag row,
+`flags::node::ACCESS_HOST`; read where a verb's table has it, so `proxy node://` keeps the settings'); a node's
+`--install` keeps the hosts by name (`the_service_of_a_node_keeps_its_hosts_of_access`); `podssh operator
+--access-host edge.example lab` and `podssh node lab 127.0.0.1:22 --access-host edge.example` with no credential each
+exit 78. `--lib -- man:: node_install:: operator` 98 passed. Still waits: `Headers::in_cleartext` for `cf://` and
+`pipe --access-host` on `ws:`, a stand-in of the relay's road that demands the headers, and the live step with a
+Cloudflare account.
 
 
 # T-727: SSH login with a short-lived Access certificate over `cf://`

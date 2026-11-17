@@ -73,6 +73,11 @@ pub(super) fn service_args(args: &NodeArgs, name: &str, env_file: &Path) -> Resu
             words.extend([flag.to_string(), path.display().to_string()]);
         }
     }
+    // The hosts of Cloudflare Access (T-718): host names alone; the
+    // credentials' files go in the file of variables.
+    for host in &args.access_hosts {
+        words.extend(["--access-host".to_string(), host.clone()]);
+    }
     let switches = [
         ("--plain", args.plain),
         ("--iroh", args.iroh),

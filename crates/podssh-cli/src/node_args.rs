@@ -6,6 +6,8 @@ use clap::ArgMatches;
 /// What `podssh node` was asked to do.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct NodeArgs {
+    /// `--access-host`: the hosts of Cloudflare Access (T-718).
+    pub access_hosts: Vec<String>,
     /// The label of a stored pair.
     pub name: Option<String>,
     /// Each TARGET: `HOST:PORT` or `[IPV6]:PORT`, and `ROUTE=TARGET` for a
@@ -174,6 +176,12 @@ impl NodeArgs {
     pub fn from_matches(matches: &ArgMatches, refused: Vec<(String, &'static str, &'static str)>) -> NodeArgs {
         let get = |id: &str| matches.get_one::<String>(id).cloned();
         NodeArgs {
+            access_hosts: matches
+                .try_get_many::<String>("access-host")
+                .ok()
+                .flatten()
+                .map(|v| v.cloned().collect())
+                .unwrap_or_default(),
             name: get("name"),
             targets: matches.get_many::<String>("target").map(|v| v.cloned().collect()).unwrap_or_default(),
             relay_addr: get("relay-addr"),

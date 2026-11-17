@@ -46,6 +46,8 @@ pub struct OperatorArgs {
     /// `--ConnectTimeout SECONDS`, the bound on the session's open, unparsed
     /// (T-589).
     pub connect_timeout: Option<String>,
+    /// `--access-host`: the hosts of Cloudflare Access (T-718).
+    pub access_hosts: Vec<String>,
     /// `--timeout DURATION`, another name of the bound (T-613), unparsed.
     pub timeout: Option<String>,
     /// `--carrier ADDR`: the node at the other end of a stream that exists
@@ -74,6 +76,7 @@ impl OperatorArgs {
             timeout: get("timeout"),
             carrier: get("carrier"),
             grant: get("grant"),
+            access_hosts: many(m, "access-host"),
             refused,
         }
     }
@@ -86,6 +89,12 @@ impl OperatorArgs {
     }
 }
 
+/// The values of `id`, none where the verb's table has no such row (`proxy`
+/// builds its own arguments).
+fn many(m: &clap::ArgMatches, id: &str) -> Vec<String> {
+    m.try_get_many::<String>(id).ok().flatten().map(|v| v.cloned().collect()).unwrap_or_default()
+}
+
 /// Run the verb; returns the process exit code.
 pub fn run_operator(args: &OperatorArgs, err: &mut dyn Write) -> i32 {
     run_as(args, "operator", err)
@@ -95,6 +104,10 @@ pub fn run_operator(args: &OperatorArgs, err: &mut dyn Write) -> i32 {
 /// (T-595), for `operator` and for `proxy node://NAME`, each line naming
 /// `verb`.
 pub(crate) fn run_as(args: &OperatorArgs, verb: &'static str, err: &mut dyn Write) -> i32 {
+    // The hosts of Cloudflare Access on the pair's road (T-718).
+    if let Err(refusal) = crate::access::take_flags(&args.access_hosts) {
+        return refusal.report(verb, err);
+    }
     // A grant used once (T-226), on either road, read before anything else.
     if let Err(refusal) = crate::grants::ask(args.grant.as_deref(), args.no_e2e) {
         return refusal.report(verb, err);

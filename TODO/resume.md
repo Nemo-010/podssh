@@ -1355,7 +1355,7 @@ new SSH login to a far end that kept the shell (T-159). Read: podssh knows
 the escapes `~.`, `~R`, `~?` and `~~`, and another character after `~` goes
 to the server with the `~` (`crates/podssh-ssh/src/escape.rs:1-9`,
 `crates/podssh-ssh/src/escape.rs:90-138`). The flag table has 469 lines, near
-the limit of 500 (the table of `ssh`: `crates/podssh-cli/src/flags.rs:116-295`).
+the limit of 500 (the table of `ssh`: `crates/podssh-cli/src/flags.rs:116-294`).
 
 ## Approach
 
@@ -3952,7 +3952,7 @@ Read at `2042200`:
 - Sessions of the layer with no channel above it: the relay role's road for a standard sshd
   (`crates/podssh-relay/src/serve/layer.rs:1-8`), which `proxy` and `ssh` take unasked for a relay
   host that the user named and that offers it (Q96, `docs/decisions.md:31`); and a node's sessions with
-  `--no-e2e` (`crates/podssh-cli/src/flags/node.rs:139`).
+  `--no-e2e` (`crates/podssh-cli/src/flags/node.rs:144`).
 - The plain forward road keeps a half-close: `crates/podssh-relay/src/serve/forward.rs:284-287` shuts
   the target's writing side at the client's Close and goes on, as the default relay does
   (`docs/relay.md:367-370`). So `podssh proxy` to a target that reads until its end loses the answer on

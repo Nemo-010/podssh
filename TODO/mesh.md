@@ -13753,7 +13753,7 @@ that a person copies (`net join`, `net invite`).
 ## Premise
 
 - Read: the node takes its door from `--allow FILE` or from the net held on its host
-  (`crates/podssh-cli/src/flags/node.rs:137`, `crates/podssh-cli/src/node_members.rs:1-10`,
+  (`crates/podssh-cli/src/flags/node.rs:142`, `crates/podssh-cli/src/node_members.rs:1-10`,
   `crates/podssh-cli/src/net/store.rs:62`).
 - Read: `store::take(signed, owner, now)` verifies a document against its owner's key and its end
   (`crates/podssh-cli/src/net/store.rs:171`); the document is signed (`crates/podssh-cli/src/net/sign.rs`).

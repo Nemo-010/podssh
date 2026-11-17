@@ -1006,7 +1006,7 @@ and no other.
 ## Approach
 
 1. Add the long flag `--host-key-fingerprint SHA256:B64[,SHA256:B64...]` to
-   `SSH_FLAGS` (`crates/podssh-cli/src/flags.rs:116-295`), and to `ONCE`
+   `SSH_FLAGS` (`crates/podssh-cli/src/flags.rs:116-294`), and to `ONCE`
    (`crates/podssh-cli/src/ssh/args.rs:209-258`). Refuse a malformed value with
    exit 64 before anything connects.
 2. Carry it in `Options` (`crates/podssh-ssh/src/options.rs:195-332`) and
@@ -1176,7 +1176,7 @@ M1, and the NOPASSWD check fails.
 `crates/podssh-ssh/src/session.rs:270-279`), and the pump filters the output,
 asks, and holds its input until the start (`crates/podssh-ssh/src/io.rs:182-196`,
 `crates/podssh-ssh/src/io.rs:431-438`). The flags at
-`crates/podssh-cli/src/flags.rs:225-230`, and their check in
+`crates/podssh-cli/src/flags.rs:224-229`, and their check in
 `crates/podssh-cli/src/ssh/elevate.rs:1-43`.
 - `cargo test -p podssh-ssh -- elevate`: 5 passed: the quoting of the
   command, both markers removed, one password for each prompt, a marker split
@@ -1241,7 +1241,7 @@ and no player.
 4. Playback: a new verb `podssh play FILE`, with `--speed` and
    `--idle-limit`. Not `replay`: it is one edit from `relay`, and the
    suggestion step would mix them (`docs/cli.md:2228-2237`). Add it to `VERBS`
-   (`crates/podssh-cli/src/flags.rs:386-456`), to
+   (`crates/podssh-cli/src/flags.rs:385-455`), to
    `crates/podssh-cli/src/positionals.rs`, to dispatch, and to `DISPATCHED`
    (`crates/podssh-cli/tests/flag_table.rs:110-146`).
 5. Refuse a file whose header is not version 2. Skip unknown event types.
@@ -1283,7 +1283,7 @@ byte boundary, and the UTF-8 test fails.
 session starts with the size of its start
 (`crates/podssh-ssh/src/session.rs:184-191`) and its output passes through
 (`crates/podssh-ssh/src/io.rs:113-172`). The flag at
-`crates/podssh-cli/src/flags.rs:227-228`, its check and its file in
+`crates/podssh-cli/src/flags.rs:226-227`, its check and its file in
 `crates/podssh-cli/src/ssh/recording.rs:1-42`; the verb in
 `crates/podssh-cli/src/play.rs:1-86`, its flags in
 `crates/podssh-cli/src/flags/play.rs:1-14`.
@@ -1373,7 +1373,7 @@ runs: with no user database entry, OpenSSH's programs stop at once
 6. When the probe fails, refuse with the reason and the other ways: key
    files with `-i`, and the helper of T-228.
 7. In the same commit: the verb in `VERBS`
-   (`crates/podssh-cli/src/flags.rs:386-456`), in
+   (`crates/podssh-cli/src/flags.rs:385-455`), in
    `crates/podssh-cli/src/positionals.rs` and in `DISPATCHED`
    (`crates/podssh-cli/tests/flag_table.rs:110-146`); `docs/cli.md`;
    "Nothing listens" in `SECURITY.md:274-309`; `docs/STATUS.md`.
@@ -1382,7 +1382,7 @@ runs: with no user database entry, OpenSSH's programs stop at once
 
 Recommendation: the agent stays in the foreground, and the user starts it
 with `&`. podssh refuses to go to the background (`-f`,
-`crates/podssh-cli/src/flags.rs:269-270`), and one life cycle is easier to
+`crates/podssh-cli/src/flags.rs:268-269`), and one life cycle is easier to
 test. The alternative, the fork of `ssh-agent`, lost: it works on Unix only,
 and it hides a failure that comes after the fork.
 
@@ -1779,7 +1779,7 @@ with the key file of one, and has no agent to hold one.
   (`crates/podssh-ssh/src/keys.rs:212-281`), so an `sk-` key in OpenSSH's
   `ssh-agent`, with its device present, can work today. Not measured.
 - Read: `-I` (PKCS#11) is refused by name
-  (`crates/podssh-cli/src/flags.rs:273-274`).
+  (`crates/podssh-cli/src/flags.rs:272-273`).
 - A device needs USB access (`/dev/hidraw*` on Linux) or the WebAuthn API of
   Windows. A sandbox has neither, so each use needs a probe.
 
@@ -4253,7 +4253,7 @@ A defect: `ssh node://` is the documented way to log in to a node.
   `keep.v1` (`crates/podssh-cli/src/layered.rs:224`), the far end's shells learned and its
   silence watched (`:255-261`), and the SSH client and the carriage joined in one task
   (`crates/podssh-cli/src/ssh/node.rs:333-336`); `operator` carries with `carry_through`, with
-  none of these (`crates/podssh-cli/src/operator.rs:164-165`). These are the client's differences
+  none of these (`crates/podssh-cli/src/operator.rs:177-178`). These are the client's differences
   between the run that stopped and the one that worked; which one stopped it is not known.
 - Read: the tester's lines show the layer's session open and its features (`replay.v1`,
   `heartbeat.v1`, `move.v1`), so the relay, the pair and the layer's handshake worked; a roost

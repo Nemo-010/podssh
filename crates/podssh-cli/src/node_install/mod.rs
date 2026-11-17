@@ -169,6 +169,10 @@ const WAYS: &[Way] = &[];
 /// `podssh node`: the variables of `--env-file` and the lock of its service
 /// first, then the node, or its install or uninstall.
 pub fn dispatch(args: &NodeArgs, out: &mut dyn Write, err: &mut dyn Write) -> i32 {
+    // The hosts of Cloudflare Access on the pair's road (T-718).
+    if let Err(refusal) = crate::access::take_flags(&args.access_hosts) {
+        return refusal.report("node", err);
+    }
     // Grants used once (T-226): one minted with the node's key, which serves
     // nothing, and the serials that a node refuses, on each road.
     if let Some(code) = crate::grants::node(args, out, err) {

@@ -5556,6 +5556,10 @@ podssh node
         with --net-url: read the copy for SECONDS more past --net-ttl while its
         server fails, 0 to 604800 (default 3600); past that, the net lets
         nobody in.
+    --access-host HOST
+        the relay's roads to HOST carry the credentials of Cloudflare Access in
+        their headers, in the place of AccessHost of the settings; HOST[,...],
+        repeatable; no other host gets them.
     --help
         Print help for this subcommand and exit.
 
@@ -5752,6 +5756,10 @@ podssh operator
         end-to-end channel carries it to the node, never a relay; it lets in
         one session, once, of the node or route that it names; a URL is
         refused.
+    --access-host HOST
+        the relay's roads to HOST carry the credentials of Cloudflare Access in
+        their headers, in the place of AccessHost of the settings; HOST[,...],
+        repeatable; no other host gets them.
     --ConnectTimeout SECONDS
         the bound on the time to the session's open, 1 to 86400: the relay's
         answer, the node's ready, and the handshakes of the layer and of the

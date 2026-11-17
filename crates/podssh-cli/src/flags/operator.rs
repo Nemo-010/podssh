@@ -27,6 +27,8 @@ pub const PAIR_FLAGS: &[FlagRow] = &[
     super::node::OPERATOR_NO_RESUME,
     // A grant used once (T-226).
     super::grant::OPERATOR_GRANT,
+    // The hosts of Cloudflare Access on the pair's road (T-718).
+    super::node::ACCESS_HOST,
     OPERATOR_CONNECT_TIMEOUT, TIMEOUT,
     // The node at the other end of a stream that exists already (T-595).
     row(None, "carrier", Some("ADDR"), FlagKind::Supported,

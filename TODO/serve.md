@@ -50,7 +50,7 @@ core: the handshake, a host key that does not change, and key authentication.
    `$HOME/.ssh/authorized_keys`. Lines with options wait for T-114. No usable
    key: exit 78. Invariant: no setting accepts each key. `auth_publickey`
    compares `key_data()`; the login name selects nothing.
-5. The verb: rows in `crates/podssh-cli/src/flags.rs:382-456` and
+5. The verb: rows in `crates/podssh-cli/src/flags.rs:381-455` and
    `crates/podssh-cli/src/positionals.rs:8-281`, an arm beside
    `crates/podssh-cli/src/dispatch.rs:356-430`, the manual, `docs/cli.md`,
    `docs/STATUS.md`. The first source is `--stdio`, as `sshd -i`: OpenSSH
@@ -2338,7 +2338,7 @@ no reason (`docs/target-environment.md:88-89`).
 ## Premise
 
 - Read: no source in `crates/` reads `SHELL` or selects a shell; `serve` is
-  not a verb (`crates/podssh-cli/src/flags.rs:382-456`). The line numbers in
+  not a verb (`crates/podssh-cli/src/flags.rs:381-455`). The line numbers in
   the report are older; the content is at the lines given here.
 - Read: the report says that `docs/cli.md` records why podssh does not call
   `getpwuid`. It does not; that record is `docs/target-environment.md:37-44`.
@@ -2655,10 +2655,10 @@ logon after a reboot; and a reverse tunnel of `podssh ssh -N -R --persist` canno
 ## Premise
 
 - Read: `Restart=on-failure`, `RestartSec=10`, no `StartLimitIntervalSec`
-  (`crates/podssh-cli/src/node_install/text.rs:160`).
+  (`crates/podssh-cli/src/node_install/text.rs:165`).
 - Read: the cron line is `@reboot` alone (`crates/podssh-cli/src/node_install/unix.rs:137`).
 - Read: the Windows task restarts each minute, 999 times, at a logon
-  (`crates/podssh-cli/src/node_install/text.rs:305`).
+  (`crates/podssh-cli/src/node_install/text.rs:310`).
 
 ## Approach
 
@@ -2998,7 +2998,7 @@ without a user manager gets a cron line. The unit has no hardening.
   (`crates/podssh-cli/src/node_install/unix.rs:19-27`); the units go to `~/.config/systemd/user`
   (`unix.rs:29-36`).
 - Read: the unit has `Restart=always` and no `User=`, `NoNewPrivileges` or `ProtectSystem`
-  (`crates/podssh-cli/src/node_install/text.rs:141-169`).
+  (`crates/podssh-cli/src/node_install/text.rs:146-174`).
 - Read: no token is in a unit now. The variables go to a private file beside the pair, and a secret is
   never carried (`crates/podssh-cli/src/node_install/env.rs:38`, `:7-9`). Keep that.
 - Read: T-593 made the cache follow `HOME` into another user's home; a system unit of a named user must name

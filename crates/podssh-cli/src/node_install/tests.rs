@@ -308,3 +308,17 @@ fn a_retired_variable_in_an_env_file_is_refused_with_its_line() {
     assert!(!written.contains("PODSSH_RETIRED_FOR_TESTS") && written.contains("\nPODSSH_CACHE_DIR=/c\n"), "{written}");
     assert_eq!(left, ["PODSSH_RETIRED_FOR_TESTS"]);
 }
+
+/// T-718: a node's service keeps its hosts of Cloudflare Access, by name;
+/// their credentials are files of the file of variables, never words.
+#[test]
+fn the_service_of_a_node_keeps_its_hosts_of_access() {
+    let args = crate::node_args::NodeArgs {
+        access_hosts: vec!["edge.example".into(), "a.example,b.example".into()],
+        targets: vec!["127.0.0.1:22".into()],
+        ..Default::default()
+    };
+    let words = super::text::service_args(&args, "lab", Path::new("/e/node-lab.env")).unwrap();
+    let at = words.iter().position(|w| w == "--access-host").expect("the flag");
+    assert_eq!(&words[at..at + 4], ["--access-host", "edge.example", "--access-host", "a.example,b.example"]);
+}

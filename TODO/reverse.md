@@ -919,7 +919,7 @@ host, never the relay's name (`SECURITY.md:263-273`); `HostKeyAlias` exists
 4. Host keys: record and check the node's key under the name `node://NAME`, which no DNS name can be;
    `-o HostKeyAlias` still wins.
 5. Refuse by name a node as a `-J` hop, and `-W` through a node; record them for later.
-6. Flags: `--pair-file FILE` for `operator` and `ssh` (`crates/podssh-cli/src/flags.rs:116-295`,
+6. Flags: `--pair-file FILE` for `operator` and `ssh` (`crates/podssh-cli/src/flags.rs:116-294`,
    lines 418-419 at `3cbf215`). Update the manual's examples and notes, `docs/cli.md` (lines 62-75 at `3cbf215`) and `docs/reverse.md`.
 
 ## Decision
@@ -2312,7 +2312,7 @@ podssh knew in advance, and said nowhere.
 
 ## Premise
 
-- Read, at `ea2bd4f`: a unit of T-121 does not restart after 77 (`crates/podssh-cli/src/node_install/text.rs:131`).
+- Read, at `ea2bd4f`: a unit of T-121 does not restart after 77 (`crates/podssh-cli/src/node_install/text.rs:136`).
 - Read: the node's hook for a new pair is unset (`crates/podssh-cli/src/node.rs:377`, `repair:
   None`).
 
@@ -2681,7 +2681,7 @@ documents works; the form that a user expects is missing.
 - Read: `operator NAME` is "the ProxyCommand of OpenSSH for a node"
   (`crates/podssh-cli/src/man/notes_pair.rs:340-342`), and `pipe` takes `node:NAME`
   (`crates/podssh-cli/src/pipe/address.rs:32-33`); the about of `proxy` is "ProxyCommand form: a
-  byte pipe, not an SSH client" (`crates/podssh-cli/src/flags.rs:400`), with no word of a node.
+  byte pipe, not an SSH client" (`crates/podssh-cli/src/flags.rs:399`), with no word of a node.
 - Read: `proxy` takes other schemes of its own, each with no PORT: `cf://HOST`, and the roads of
   `iap://`, `eice://`, `warp://` and `tor://` (`crates/podssh-cli/src/proxy.rs:142-157`).
 
@@ -2803,7 +2803,7 @@ cannot set.
   have no ConnectTimeout; `ssh` has one
   (`crates/podssh-cli/src/flags.rs:173-174`).
 - Read: `operator`'s waits are 30 s for each request of the relay
-  (`crates/podssh-cli/src/operator.rs:142`, `crates/podssh-cli/src/pairs.rs:18`) and 20 s for the
+  (`crates/podssh-cli/src/operator.rs:155`, `crates/podssh-cli/src/pairs.rs:18`) and 20 s for the
   node's `ready` (`PodUtils/podssh:crates/podssh-relay/src/reverse/operator.rs:59`); `proxy`'s, 20 s for each
   relay host (`PodUtils/podssh:crates/podssh-relay/src/open.rs:33`), in the order of the failover.
 - Inferred, which the Prove measures: OpenSSH's ConnectTimeout bounds the wait for the server's
@@ -4826,8 +4826,8 @@ dropped in the same way.
 ## Premise
 
 - Read, at `47e1eba`: `crates/podssh-cli/src/proxy_node.rs:31` holds the reason "the pair names its
-  relay". `crates/podssh-cli/src/proxy_node.rs:176-193` lists the flags (`--relay-host` at line 180,
-  `--relay-failover` at line 181). The test at `crates/podssh-cli/src/proxy_node.rs:258-282` pins
+  relay". `crates/podssh-cli/src/proxy_node.rs:178-195` lists the flags (`--relay-host` at line 180,
+  `--relay-failover` at line 181). The test at `crates/podssh-cli/src/proxy_node.rs:260-284` pins
   `--relay-host does not apply` with exit 64. It has no case for `--relay-failover`.
 - `crates/podssh-cli/src/ssh/node.rs:138-154` refuses `--direct`, `-J`, `-W`, a port, `-o HostName`
   and the family for a node. It has no clause for the relay flags.
@@ -4845,7 +4845,7 @@ dropped in the same way.
 
 ## Approach
 
-1. Lift the relay clauses of `beside` (`crates/podssh-cli/src/proxy_node.rs:176-193`) and their
+1. Lift the relay clauses of `beside` (`crates/podssh-cli/src/proxy_node.rs:178-195`) and their
    reasons to one shared helper. `proxy` and `ssh` call it, so the words cannot drift.
 2. Call it in `crates/podssh-cli/src/ssh/node.rs`, `transport`, for `node://NAME`, and in
    `or_exit` of `crates/podssh-cli/src/ssh/exit_road.rs` for `--exit NAME`. Refuse `--relay-host`
@@ -5322,7 +5322,7 @@ a TCP `HOST:PORT` only, so the service needs a TCP bridge, and the bridge cannot
 - Read: the grant gets the caller's key and the route's name (`routes.rs:43`), so the node has both.
 - Read: `podssh pipe` has `unix-connect:PATH`, with abstract names on Linux and AF_UNIX on Windows
   (`crates/podssh-cli/src/pipe/unix.rs:1-12`); a connect is no listener (rule 2).
-- Read: the TARGET words of the node are `HOST:PORT` and `ROUTE=TARGET` (`crates/podssh-cli/src/node_args.rs:11`).
+- Read: the TARGET words of the node are `HOST:PORT` and `ROUTE=TARGET` (`crates/podssh-cli/src/node_args.rs:13`).
 
 ## Approach
 

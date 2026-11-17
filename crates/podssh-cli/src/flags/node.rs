@@ -24,6 +24,11 @@ pub const SSH_UNINSTALL: FlagRow = row(
 pub const SSH_ENV_FILE: FlagRow = row(None, "env-file", Some("FILE"), FlagKind::Supported,
     "read the variables of FILE, a private file of NAME=VALUE lines, before anything else; hold FILE.lock while it runs, so that a second start ends at once: the file that --install writes", None);
 
+/// The hosts that get the headers of Cloudflare Access on the relay's roads
+/// (T-718), of `ssh`, `operator` and `node`.
+pub const ACCESS_HOST: FlagRow = row(None, "access-host", Some("HOST"), FlagKind::Supported,
+    "the relay's roads to HOST carry the credentials of Cloudflare Access in their headers, in the place of AccessHost of the settings; HOST[,...], repeatable; no other host gets them", None);
+
 /// A client's own resume deadline (T-306), of `ssh` and `operator`.
 pub const OWN_DEADLINE: FlagRow = row(None, "resume-deadline", Some("TIME"), FlagKind::Supported,
     "node://NAME and iroh:TICKET: wait at most TIME for a new link after a loss, though the node keeps the session longer: 90s, 30m, 8h or 3d, from 1 minute to 72 h (default: as long as the node keeps it)", None);
@@ -226,6 +231,7 @@ pub const NODE_FLAGS: &[FlagRow] = &[
         "with --net-url: fetch the document again each SECONDS, 60 to 86400 (default 300)", None),
     row(None, "net-stale", Some("SECONDS"), FlagKind::Supported,
         "with --net-url: read the copy for SECONDS more past --net-ttl while its server fails, 0 to 604800 (default 3600); past that, the net lets nobody in", None),
+    ACCESS_HOST,
 ];
 
 /// **`net`** (T-429): the net of a user's own nodes, a list of their names
