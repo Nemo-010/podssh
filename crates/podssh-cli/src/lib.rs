@@ -25,6 +25,9 @@
 #[cfg(all(feature = "zerotier", not(unix)))]
 use podssh_zerotier as _;
 
+// The credentials of Cloudflare Access from files, and the hosts that the
+// user named for them (T-718).
+pub mod access;
 // The ACME client of `podssh relay serve --acme NAME` (T-447).
 pub mod acme;
 pub mod agent;

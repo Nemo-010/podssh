@@ -31,6 +31,9 @@
 //! Verdicts from [`doctor`] are three-valued: `ok`, `FAIL`, and `????` for a
 //! check that could not run, which is never reported as passing.
 
+// The headers of Cloudflare Access on a road that podssh builds, to a host
+// that the user named for them (T-718).
+pub mod access;
 // A Bare server of TompHTTP's v3 as a hop of a WebSocket road (T-740).
 pub mod bare;
 pub mod bundle;

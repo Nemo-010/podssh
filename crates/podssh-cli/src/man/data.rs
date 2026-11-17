@@ -438,7 +438,8 @@ pub fn files() -> Vec<(Vec<String>, String)> {
             },
             "podssh's own settings: RelayHost, RelayAddr (each line adds), RelayFailover, CaFile, SessionLog, \
              Forwarder, ForwarderFallback; DoctorJobs (the sections of podssh doctor at once), RelayKeys (the keys of \
-             a signed list of relay deployments; each line adds) and ECH (as PODSSH_ECH), as Keyword value lines, \
+             a signed list of relay deployments; each line adds) and ECH (as PODSSH_ECH); AccessHost (each line \
+             adds), AccessClientIdFile and AccessClientSecretFile (see podssh pipe), as Keyword value lines, \
              below the flags and the variables. The file of PODSSH_SETTINGS, else the first of these that exists \
              (~/.config/podssh/settings with no XDG_CONFIG_HOME; the second beside the podssh binary); never one of \
              the working directory. A symbolic link, a file of another user than you or root, one that others can \

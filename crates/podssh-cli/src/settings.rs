@@ -3,7 +3,8 @@
 //! file has `Keyword value` lines, `#` comments and `Keyword=value` too, as
 //! an `ssh_config` has: `RelayHost`, `RelayAddr` (which adds up), `RelayFailover`
 //! and `CaFile`, `SessionLog` (T-056), `Direct` (T-363), `Forwarder` (T-369), `ForwarderFallback`
-//! (T-370), `DoctorJobs` (T-511), `RelayKeys` (T-346, which adds up) and `ECH` (T-642). It
+//! (T-370), `DoctorJobs` (T-511), `RelayKeys` (T-346, which adds up), `ECH` (T-642), and
+//! `AccessHost` (which adds up), `AccessClientIdFile` and `AccessClientSecretFile` (T-718). It
 //! is found once for the process: the file that
 //! `PODSSH_SETTINGS` names (`none` names none), else the first that exists
 //! of `$XDG_CONFIG_HOME/podssh/settings` (`~/.config/podssh/settings`, and
@@ -40,6 +41,9 @@ pub const KEYWORDS: &[(&str, &str)] = &[
     ("DoctorJobs", "N: at most N sections of podssh doctor at once, 1 to 64, as --jobs (default: each at once)"),
     ("RelayKeys", "KEY[,...]: also trust these keys (SHA256:... or 64 hex digits) for a signed list of relay deployments, as PODSSH_RELAY_KEYS; each line adds to the others"),
     ("ECH", "yes, no or strict: seal each name that publishes a list in its HTTPS record inside the TLS hello, as PODSSH_ECH (default no)"),
+    ("AccessHost", "HOST[,...]: hosts that get the credentials of Cloudflare Access, as --access-host; each line adds to the others"),
+    ("AccessClientIdFile", "FILE: the id of a service token of Cloudflare Access, as PODSSH_CF_ACCESS_CLIENT_ID_FILE; ~ is the home"),
+    ("AccessClientSecretFile", "FILE: its secret, as PODSSH_CF_ACCESS_CLIENT_SECRET_FILE; ~ is the home"),
 ];
 /// The largest file read.
 const MAX_FILE: u64 = 1 << 20;
@@ -78,6 +82,11 @@ pub struct Defaults {
     pub relay_keys: Vec<Value>,
     /// `ECH`: Encrypted Client Hello, below `PODSSH_ECH` (T-642).
     pub ech: Option<Value>,
+    /// `AccessHost`, whose lines add up, and the files of a service token
+    /// of Cloudflare Access (T-718): paths, never a secret.
+    pub access_host: Vec<Value>,
+    pub access_client_id_file: Option<Value>,
+    pub access_client_secret_file: Option<Value>,
     /// The `[groups]` table (T-184): each group's name and its hosts.
     pub groups: crate::hosts::Groups,
     /// The `[snippets]` table (T-187): each snippet's name and its command.
@@ -305,6 +314,19 @@ pub fn parse(text: &str, file: &str, home: Option<&Path>) -> Result<Defaults, St
             "ech" => {
                 podssh_ws::ech::Mode::parse(Some(text.as_str())).map_err(|why| format!("{at}: ECH {text:?}: {why}"))?;
                 d.ech.get_or_insert(value);
+            }
+            "accesshost" => {
+                crate::access::hosts(std::slice::from_ref(text), &Defaults::default())
+                    .map_err(|why| format!("{at}: AccessHost {}", why.trim_start_matches(crate::access::HOST_FLAG).trim_start()))?;
+                d.access_host.push(value);
+            }
+            "accessclientidfile" | "accessclientsecretfile" => {
+                let text = crate::ssh::tokens::tilde(&value.text, home).display().to_string();
+                let slot = match keyword.to_ascii_lowercase().as_str() {
+                    "accessclientidfile" => &mut d.access_client_id_file,
+                    _ => &mut d.access_client_secret_file,
+                };
+                slot.get_or_insert(Value { text, ..value });
             }
             _ => {
                 let names: Vec<&str> = KEYWORDS.iter().map(|(k, _)| *k).collect();
