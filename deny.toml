@@ -51,9 +51,8 @@ ignore = [
   { id = "RUSTSEC-2026-0459", reason = "no arti release takes the fixed libsqlite3-sys; arti opens only podssh's own cache, which its permission check keeps to the user" },
   # chrono is unmaintained (no vulnerability, no fixed version). russh-sftp
   # and the Tailscale fork bring it whatever podssh does; podssh-ssh's own two
-  # uses (a signature's validity dates, sftp's long listing) read the local
-  # time zone, and T-808 moves them to another crate. Read 2026-11-17.
-  { id = "RUSTSEC-2026-0543", reason = "unmaintained, not a vulnerability; russh-sftp and the Tailscale fork bring it; podssh-ssh's own uses move in T-808" },
+  # uses moved to jiff (T-808). Read 2026-11-17.
+  { id = "RUSTSEC-2026-0543", reason = "unmaintained, not a vulnerability; only russh-sftp and the Tailscale fork bring it; podssh's own code uses jiff (T-808)" },
 ]
 
 [licenses]

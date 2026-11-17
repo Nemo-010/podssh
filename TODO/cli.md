@@ -1364,7 +1364,7 @@ OpenSSH's verify with `-n git` then fails.
 
 ## Done
 
-2026-10-11. Signatures and allowed signers in `crates/podssh-ssh/src/sshsig.rs:1-367`; an RSA key
+2026-10-11. Signatures and allowed signers in `crates/podssh-ssh/src/sshsig.rs:1-388`; an RSA key
 signs through `RsaSigner::sign_sha512` (`crates/podssh-ssh/src/rsa_key.rs:81-88`), and the keys of
 the agent come from `agent_keys` (`crates/podssh-ssh/src/keys.rs:402-408`). The command is
 `crates/podssh-cli/src/keygen_sign.rs:1-479`, its flags at `crates/podssh-cli/src/flags/keygen.rs:41-52` and `:69-70`.
@@ -2388,8 +2388,8 @@ allows, where OpenSSH's own signature of `-f KEY` passes. The check
 `crates/podssh-ssh/src/sshsig_cert.rs:1-197`: the blob read (`:74`) and written (`:109`), the
 checks of a line (`not_authorized`, `:145`) and the principals of `find-principals` (`:178`).
 `read_signature` gives a `Signed`, the signature and its certificate
-(`crates/podssh-ssh/src/sshsig.rs:24-30`, `:137-143`); `names_key` names a CA's certificate
-(`:362-367`); an agent that holds a key only in a certificate signs by it (`:109-122`). The
+(`crates/podssh-ssh/src/sshsig.rs:26-32`, `:139-145`); `names_key` names a CA's certificate
+(`:383-388`); an agent that holds a key only in a certificate signs by it (`:111-124`). The
 command: `-f KEY-cert.pub` in `crates/podssh-cli/src/keygen_sign.rs:183-237`, the lines of `verify`
 and `check-novalidate` (`:340-398`) and `find-principals` (`:415-455`). The manual's note
 (`crates/podssh-cli/src/man/notes_keygen.rs:24-28`), the help of `-f`

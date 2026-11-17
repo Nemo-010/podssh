@@ -7328,7 +7328,7 @@ Done, 2026-11-17 (drafted, then merged, built and run):
 **Milestone:** none
 **Priority:** P3
 **Effort:** S
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -7356,4 +7356,19 @@ cargo tree -p podssh-ssh -e normal --depth 1 | grep -c chrono
 ```
 
 The tests of each date form pass with no change of their expected text; the second command prints 0.
+
+## Done
+
+2026-11-17. podssh-ssh takes jiff 0.2.37 (already in the lock) in the place of chrono: `sshsig::parse_time` reads
+`YYYYMMDD[HHMM[SS]][Z]` with `jiff::civil::DateTime` in the system's zone (`parse_time_in` with a zone, for the tests),
+refuses a local time that a change of the clock skips and takes the earlier of one that it repeats, as chrono's
+`earliest()` did; `format_time` and sftp's long listing (`long_line_in` takes a `jiff::tz::TimeZone`) format with
+`strftime`, byte for byte as before. `deny.toml` keeps RUSTSEC-2026-0543 ignored, as russh-sftp and the Tailscale fork
+still bring chrono; its reason says so.
+
+Prove, 2026-11-17: `cargo test -p podssh-ssh --lib -- sshsig sftp::long` passed, also with `TZ=America/New_York`; the new
+`a_local_time_reads_its_zone_and_its_changes` reads a POSIX zone with a skipped and a repeated hour; `cargo tree -p
+podssh-ssh -e normal --depth 1 | grep -c chrono` prints 0. `cargo test -p podssh-ssh` 563 passed; `-p podssh-cli --test
+keygen_sign --test serve_sftp_openssh --test sftp_near_cap` 14 passed; clippy (the gate's lints) and rustfmt clean.
+Planted: the local zone read as UTC fails the new test.
 

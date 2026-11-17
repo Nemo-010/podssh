@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**763 entries: 31 open, 38 partial, 11 blocked, 683 done.**
+**763 entries: 30 open, 38 partial, 11 blocked, 684 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 0 | 9 | 3 | 82 | 94 |
 | P2 | 0 | 22 | 2 | 290 | 314 |
-| P3 | 31 | 7 | 6 | 310 | 354 |
-| **All** | 31 | 38 | 11 | 683 | 763 |
+| P3 | 30 | 7 | 6 | 311 | 354 |
+| **All** | 30 | 38 | 11 | 684 | 763 |
 
 ## Entries
 
@@ -838,4 +838,4 @@ repository and CI).
 | [T-805](repo.md) | P3 | S | M10 | chore | done | podssh's private files written by `pod_core::files::replace_private` |
 | [T-806](relay.md) | P3 | S | M10 | feature | done | An upgrade of the relay role with a wrong token counts against its address |
 | [T-807](relay.md) | P3 | M | M10 | feature | done | The relay role reads the client's address from PROXY protocol's header of a trusted balancer |
-| [T-808](repo.md) | P3 | S | none | chore | open | podssh-ssh's dates without chrono, which RUSTSEC-2026-0543 calls unmaintained |
+| [T-808](repo.md) | P3 | S | none | chore | done | podssh-ssh's dates without chrono, which RUSTSEC-2026-0543 calls unmaintained |

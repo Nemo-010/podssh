@@ -13,7 +13,9 @@
 
 use std::io::Read;
 
-use chrono::{Local, NaiveDate, NaiveDateTime, TimeZone, Utc};
+use jiff::civil::DateTime;
+use jiff::tz::{AmbiguousOffset, TimeZone};
+use jiff::Timestamp;
 use russh::keys::agent::AgentIdentity;
 use russh::keys::ssh_key::{Algorithm, Certificate, HashAlg, LineEnding, Signature, SshSig};
 use russh::keys::{PrivateKey, PublicKey};
@@ -288,6 +290,11 @@ fn split_commas(text: &str) -> Vec<&str> {
 /// A time of ssh-keygen(1): `YYYYMMDD[HHMM[SS]]`, local time, or UTC with
 /// `Z` at its end; seconds since 1970.
 pub fn parse_time(text: &str) -> Option<i64> {
+    parse_time_in(text, &TimeZone::system())
+}
+
+/// [`parse_time`] with `local` as the local zone: the tests name one.
+pub fn parse_time_in(text: &str, local: &TimeZone) -> Option<i64> {
     let (digits, utc) = match text.strip_suffix(['Z', 'z']) {
         Some(digits) => (digits, true),
         None => (text, false),
@@ -295,21 +302,35 @@ pub fn parse_time(text: &str) -> Option<i64> {
     if !matches!(digits.len(), 8 | 12 | 14) || !digits.bytes().all(|b| b.is_ascii_digit()) {
         return None;
     }
-    let n = |range: std::ops::Range<usize>| digits.get(range).and_then(|d| d.parse::<u32>().ok());
-    let date = NaiveDate::from_ymd_opt(n(0..4)? as i32, n(4..6)?, n(6..8)?)?;
-    let time = date.and_hms_opt(n(8..10).unwrap_or(0), n(10..12).unwrap_or(0), n(12..14).unwrap_or(0))?;
-    if utc {
-        Some(Utc.from_utc_datetime(&time).timestamp())
-    } else {
-        Local.from_local_datetime(&time).earliest().map(|t| t.timestamp())
+    let n = |range: std::ops::Range<usize>| digits.get(range).and_then(|d| d.parse::<i16>().ok());
+    // Two digits of a month, a day or a time fit an i8.
+    let small = |range: std::ops::Range<usize>| n(range).and_then(|v| i8::try_from(v).ok());
+    let time = DateTime::new(
+        n(0..4)?,
+        small(4..6)?,
+        small(6..8)?,
+        small(8..10).unwrap_or(0),
+        small(10..12).unwrap_or(0),
+        small(12..14).unwrap_or(0),
+        0,
+    )
+    .ok()?;
+    let zone = if utc { TimeZone::UTC } else { local.clone() };
+    let at = zone.to_ambiguous_timestamp(time);
+    // A local time that a change of the clock skips is no time; one that it
+    // repeats is the earlier, as ssh-keygen's mktime gives with no hint.
+    if matches!(at.offset(), AmbiguousOffset::Gap { .. }) {
+        return None;
     }
+    at.earlier().ok().map(|t| t.as_second())
 }
 
 /// A time as `ssh-keygen` prints it: local time, `YYYY-MM-DDTHH:MM:SS`.
 pub fn format_time(seconds: i64) -> String {
-    match Local.timestamp_opt(seconds, 0).earliest() {
-        Some(t) => t.format("%Y-%m-%dT%H:%M:%S").to_string(),
-        None => NaiveDateTime::default().format("%Y-%m-%dT%H:%M:%S").to_string(),
+    match Timestamp::from_second(seconds) {
+        Ok(t) => t.to_zoned(TimeZone::system()).strftime("%Y-%m-%dT%H:%M:%S").to_string(),
+        // Past the range of a time: the epoch, as chrono's default gave.
+        Err(_) => "1970-01-01T00:00:00".to_string(),
     }
 }
 

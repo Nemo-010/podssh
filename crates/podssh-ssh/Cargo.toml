@@ -60,11 +60,12 @@ md5 = "0.8"
 pkcs5 = { version = "0.8.1", default-features = false, features = ["sha1-insecure", "3des"] }
 pkcs8 = { version = "0.11", default-features = false, features = ["encryption"] }
 # SSH signatures (T-020): the digest of a file read in pieces, and the times
-# of an allowed-signers file, which are local unless they end in Z. The
-# versions and features that the build has (sha2 the workspace's; chrono
-# russh-sftp's), so nothing new is compiled.
+# of an allowed-signers file, which are local unless they end in Z; and the
+# times of sftp's long listing. jiff, as chrono is unmaintained
+# (RUSTSEC-2026-0543, T-808): it reads the system's time zone with no
+# unsound call, and on Windows its bundled database.
 sha2 = { workspace = true }
-chrono = "0.4.45"
+jiff = "0.2.37"
 # The signer that ssh-key's certificate builder calls (T-021): an RSA CA
 # signs through aws-lc-rs, and a CA in an agent through the agent. The
 # version that ssh-key builds.

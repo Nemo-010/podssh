@@ -7,7 +7,8 @@
 //! change in the local zone, then the name. A script that reads OpenSSH's
 //! columns reads podssh's the same.
 
-use chrono::{Local, TimeZone};
+use jiff::tz::TimeZone;
+use jiff::Timestamp;
 
 use super::FileAttributes;
 
@@ -108,32 +109,29 @@ pub fn long_line(
     group: Option<&str>,
     now: i64,
 ) -> String {
-    long_line_in(&Local, name, attrs, si, user, group, now)
+    long_line_in(&TimeZone::system(), name, attrs, si, user, group, now)
 }
 
 /// [`long_line`] in the zone `zone`: the tests use UTC.
-pub fn long_line_in<Z: TimeZone>(
-    zone: &Z,
+pub fn long_line_in(
+    zone: &TimeZone,
     name: &str,
     attrs: &FileAttributes,
     si: bool,
     user: Option<&str>,
     group: Option<&str>,
     now: i64,
-) -> String
-where
-    Z::Offset: std::fmt::Display,
-{
+) -> String {
     // A field that the server did not send is 0, as `attrib_to_stat` leaves it.
     let uid = attrs.uid.unwrap_or(0).to_string();
     let gid = attrs.gid.unwrap_or(0).to_string();
     let user = user.unwrap_or(&uid);
     let group = group.unwrap_or(&gid);
     let mtime = i64::from(attrs.mtime.unwrap_or(0));
-    let time = match zone.timestamp_opt(mtime, 0).single() {
-        Some(at) if now - HALF_YEAR < mtime && now >= mtime => at.format("%b %e %H:%M").to_string(),
-        Some(at) => at.format("%b %e  %Y").to_string(),
-        None => String::new(),
+    let time = match Timestamp::from_second(mtime).map(|t| t.to_zoned(zone.clone())) {
+        Ok(at) if now - HALF_YEAR < mtime && now >= mtime => at.strftime("%b %e %H:%M").to_string(),
+        Ok(at) => at.strftime("%b %e  %Y").to_string(),
+        Err(_) => String::new(),
     };
     let size = attrs.size.unwrap_or(0);
     let size = if si { scaled(size) } else { size.to_string() };
@@ -148,7 +146,6 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::Utc;
 
     /// 2026-11-02 12:00:00 UTC.
     const NOW: i64 = 1_793_620_800;
@@ -166,7 +163,7 @@ mod tests {
     }
 
     fn line(name: &str, a: &FileAttributes, si: bool, user: Option<&str>, group: Option<&str>) -> String {
-        long_line_in(&Utc, name, a, si, user, group, NOW)
+        long_line_in(&TimeZone::UTC, name, a, si, user, group, NOW)
     }
 
     #[test]

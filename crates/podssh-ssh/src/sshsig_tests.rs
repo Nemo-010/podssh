@@ -113,12 +113,31 @@ fn times_are_local_unless_utc() {
     assert_eq!(parse_time("20200101Z"), Some(1_577_836_800));
     assert_eq!(parse_time("202001011230Z"), Some(1_577_836_800 + 12 * 3600 + 30 * 60));
     assert_eq!(parse_time("20200101123045Z"), Some(1_577_836_800 + 12 * 3600 + 30 * 60 + 45));
-    let local = Local.from_local_datetime(&NaiveDate::from_ymd_opt(2020, 1, 1).unwrap().and_hms_opt(0, 0, 0).unwrap());
-    assert_eq!(parse_time("20200101"), Some(local.earliest().unwrap().timestamp()));
+    let local = jiff::civil::date(2020, 1, 1).at(0, 0, 0, 0).to_zoned(jiff::tz::TimeZone::system()).unwrap();
+    assert_eq!(parse_time("20200101"), Some(local.timestamp().as_second()));
+    // A day past its month, and a time past the day's, are no time.
+    for bad in ["20200230", "202001012460", "20200101000060"] {
+        assert_eq!(parse_time(bad), None, "{bad}");
+    }
     for bad in ["2020010", "20201301", "2020-01-01", "20200101X", ""] {
         assert_eq!(parse_time(bad), None, "{bad}");
     }
     assert_eq!(format_time(parse_time("20200101").unwrap()), "2020-01-01T00:00:00");
+}
+
+/// A local time is read in the local zone: a change of the clock that
+/// skips it refuses it, and one that repeats it gives the earlier.
+#[test]
+fn a_local_time_reads_its_zone_and_its_changes() {
+    let zone = jiff::tz::TimeZone::posix("EST5EDT,M3.2.0,M11.1.0").unwrap();
+    // Winter: 5 h behind UTC.
+    assert_eq!(parse_time_in("20200101", &zone), Some(1_577_836_800 + 5 * 3600));
+    assert_eq!(parse_time_in("20200101Z", &zone), Some(1_577_836_800), "Z is UTC whatever the zone");
+    // 2020-03-08 02:30 does not exist there.
+    assert_eq!(parse_time_in("202003080230", &zone), None);
+    // 2020-11-01 01:30 comes twice: the first, in daylight time, 4 h behind.
+    let first = parse_time_in("202011010130Z", &zone).unwrap() + 4 * 3600;
+    assert_eq!(parse_time_in("202011010130", &zone), Some(first));
 }
 
 /// Principals match with their case, wildcards and negation, as OpenSSH's
