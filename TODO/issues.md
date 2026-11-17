@@ -356,7 +356,7 @@ the four once `main` held them, and opened #301 for webpki-roots 1.0.12 alone, a
 | #296 | COORD-100: podssh took podcrates v0.66.0 at ae9cf1b (to podcrates) | open 2026-11-17: until podcrates records the take | T-684 |
 | #297 | COORD-101: pod-tls: webpki-roots 1.0.12 with its ROOTS_VERSION, and rsa 0.10 (to podcrates) | open 2026-11-17: until podcrates answers | T-802 |
 | #298 | COORD-102: podssh took podcrates v0.67.0 at a4b1436; a Unix route of pod-relay on Windows (to podcrates) | open 2026-11-17: until podcrates records the take and answers the Windows path | T-684, T-714 |
-| #299 | COORD-103: the two speeds of podssh relay serve: the runtime's placement of tasks, not the role (to podcrates) | open 2026-11-17: until podcrates has read it | T-803 |
+| #299 | COORD-103: the two speeds of podssh relay serve: the runtime's placement of tasks, not the role (to podcrates) | closed 2026-11-17: podcrates read it and closed COORD-127 (PodUtils/podcrates#217); T-806 and T-807, its item 2, done | T-803, T-806, T-807 |
 | #300 | COORD-104: pod-relay and pod-session: a relay's liveness offer, so a Durable Object relay can hibernate (to podcrates) | open 2026-11-17: until podcrates answers | T-712 |
 | #302 | COORD-105: pod-relay and pod-egress: headers of the caller on each WebSocket road, for Cloudflare Access (to podcrates) | open 2026-11-17: until podcrates answers | T-718 |
 | #267 | COORD-080: what podssh's help and manual need of the shared crate (to all) | closed 2026-11-17: T-790 and T-730 done; podnet closed its COORD-090 (PodUtils/podnet#584) | T-730, T-790 |

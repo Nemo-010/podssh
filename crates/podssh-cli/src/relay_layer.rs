@@ -173,6 +173,17 @@ async fn unasked(relay: &Relay, trust: &Trust) -> Result<offer::Offer, String> {
     read
 }
 
+/// `settings` for a session whose first host is that of `relays`: with no
+/// heartbeat of the layer where its kept offer names a pace of liveness
+/// (T-712), as an idle link then carries no frame of the layer, and the
+/// relay's own Pings at that pace find a dead link.
+pub(crate) fn paced(relays: &RelayList, settings: Settings) -> Settings {
+    match kept::kept_now(relays.primary()).and_then(|offer| offer.liveness) {
+        Some(_) => settings.quiet(),
+        None => settings,
+    }
+}
+
 /// The line of a session that the role had no room for, by its words.
 pub(crate) fn no_room_line(at: &str, words: &str) -> String {
     let words = podssh_ws::text::one_line(words);
@@ -218,7 +229,7 @@ pub async fn run(relays: &RelayList, trust: &Trust, (host, port): (&str, u16), e
     // OpenSSH's SIGHUP is the end of the bytes, which the role hears.
     let hangup = crate::hangup::take(crate::hangup::Which::All);
     // The end of stdin ends its direction alone, where the role takes it.
-    let settings = Settings { half_close: true, ..crate::layered::settings().off_the_pair() };
+    let settings = paced(relays, Settings { half_close: true, ..crate::layered::settings().off_the_pair() });
     let begun = async { client::start(first, Ask::New, settings, &mut OsEntropy).await };
     let client = match crate::hangup::unless(Some(&hangup), Box::pin(begun)).await {
         Some(Ok(client)) => client,

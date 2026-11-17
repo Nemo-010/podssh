@@ -304,7 +304,7 @@
 296 issue open
 297 issue open
 298 issue open
-299 issue open
+299 issue closed
 300 issue open
 301 pull open
 302 issue open

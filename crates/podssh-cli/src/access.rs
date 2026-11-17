@@ -137,6 +137,20 @@ pub fn named(flags: &[String]) -> Result<Named, Refusal> {
     Ok(Named::new(hosts, access))
 }
 
+/// The hosts of `AccessHost` in the settings, with their credentials, for
+/// each road of this process (pod-ws's headers, podcrates `v0.68.0`): the
+/// relay's roads, a pair's and the forwarders. None named, none sent. A
+/// host named with no credential set sends nothing here; the command that
+/// names it says why ([`named`]).
+pub fn install() {
+    if crate::settings::here().access_host.is_empty() {
+        return;
+    }
+    if let Ok(named) = named(&[]) {
+        podssh_ws::access::set_process(named);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

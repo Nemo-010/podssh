@@ -62,15 +62,15 @@ repository and CI).
 
 ## Counts
 
-**762 entries: 33 open, 39 partial, 11 blocked, 679 done.**
+**762 entries: 33 open, 37 partial, 11 blocked, 681 done.**
 
 | Priority | open | partial | blocked | done | total |
 | --- | --- | --- | --- | --- | --- |
 | P0 | 0 | 0 | 0 | 1 | 1 |
 | P1 | 1 | 9 | 3 | 81 | 94 |
-| P2 | 0 | 24 | 2 | 288 | 314 |
+| P2 | 0 | 22 | 2 | 290 | 314 |
 | P3 | 32 | 6 | 6 | 309 | 353 |
-| **All** | 33 | 39 | 11 | 679 | 762 |
+| **All** | 33 | 37 | 11 | 681 | 762 |
 
 ## Entries
 
@@ -742,7 +742,7 @@ repository and CI).
 | [T-709](serve.md) | P1 | M | M10 | feature | partial | A node as a hardened system service of a named user: `--print-unit`, `--install --system --run-as` |
 | [T-710](reverse.md) | P1 | M | M10 | measurement | open | A node stays reachable for months: pair renewal and legs by key, proven over 90 days and in a beta |
 | [T-711](mesh.md) | P1 | M | M10 | feature | blocked | One switch `PODSSH_PUBLIC` over each third-party service, and `status --json` gives the set |
-| [T-712](reverse.md) | P2 | M | M10 | feature | partial | Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s |
+| [T-712](reverse.md) | P2 | M | M10 | feature | done | Liveness that lets a Durable Object relay hibernate: the `hello` offer, a ping each 60 s |
 | [T-713](relay.md) | P2 | M | M10 | feature | done | `podssh relay conform --relay-host HOST [--reverse] --json` |
 | [T-714](reverse.md) | P2 | M | M10 | feature | partial | A node route to a Unix socket, with a first line that names the caller's key and route |
 | [T-715](mesh.md) | P2 | M | M10 | feature | done | A node's door from a signed net document at an HTTPS URL, with a TTL and a stale limit |
@@ -832,7 +832,7 @@ repository and CI).
 | [T-799](ssh.md) | P1 | M | M10 | defect | done | russh 0.65.2 and ssh-key 0.7.0-rc.12 in the place of the copies; tailscale-rs v0.7.1 read and held |
 | [T-800](robustness.md) | P1 | S | M10 | defect | done | `node_cut`'s test of podssh's role failed at random: a relay session's id held the digits 1003 |
 | [T-801](relay.md) | P2 | S | M10 | defect | done | The relay role drops a node's socket at once after a reset or a failed write, and says why a node does not open |
-| [T-802](repo.md) | P2 | S | none | chore | partial | Dependabot's updates of 2026-11-17: the minor and patch group, and rsa 0.10 |
+| [T-802](repo.md) | P2 | S | none | chore | done | Dependabot's updates of 2026-11-17: the minor and patch group, and rsa 0.10 |
 | [T-803](relay.md) | P2 | S | M10 | measurement | done | `podssh relay serve` moved 16 MiB at two speeds on the loopback, 75 or 330 MiB/s |
 | [T-804](relay.md) | P3 | S | M10 | research | done | The ideas of the dig study for the relay server: a ban, PROXY's ranges, STUN, deadlines, an address check |
 | [T-805](repo.md) | P3 | S | M10 | chore | done | podssh's private files written by `pod_core::files::replace_private` |

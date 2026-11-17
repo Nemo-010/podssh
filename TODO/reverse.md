@@ -5072,7 +5072,7 @@ The live part (one node for 5 days on the live relay) waits for the release chec
 **Milestone:** M10
 **Priority:** P2
 **Effort:** M
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -5082,7 +5082,7 @@ relay needs to say that it wants a slower, protocol-level ping.
 
 ## Premise
 
-- Read: the client pings each 10 s and allows 3 silent checks (`crates/podssh-ws/src/client.rs:39-40`); the
+- Read: the client pings each 10 s and allows 3 silent checks (`crates/podssh-ws/src/client.rs:42-43`); the
   reverse node and operator legs read their own limits (`PodUtils/podssh:crates/podssh-relay/src/reverse/serve.rs:63-88`,
   `PodUtils/podssh:crates/podssh-relay/src/reverse/operator.rs:40-62`).
 - Read: `Hello` keeps each field that podssh does not model (`PodUtils/podssh:crates/podssh-relay/src/reverse/control.rs:65-79`),
@@ -5203,6 +5203,12 @@ Partial, 2026-11-17 (drafted on `draft-t712`, then merged, built and run).
   relay_stream` 7 passed; `cargo test -p podssh-ssh -p podssh-cli` 2954 passed, 0 failed; clippy (the gate's lints)
   and rustfmt clean. Planted: the forward pump's pace at 60 s in the place of 10 s fails
   `relay_stream::pace_tests::a_relay_that_offers_nothing_sees_six`.
+- 2026-11-17, podcrates `v0.68.0` (COORD-129, PodUtils/podcrates#219, answering COORD-104): `pod-relay`'s node and
+  operator watch Pongs at the offered pace. podssh's two tests of the reverse road run (no longer ignored). The forward road
+  takes the pace of the host's kept offer: `relay_ends::spawn` runs `spawn_paced` at `Offer.liveness`, else at
+  podssh's own 10 s. A session of the layer opens with `Settings::quiet()` while that offer holds (`relay_layer::paced`).
+  `--features pair --test liveness_offer` 5 passed, 0 ignored; `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3619 passed, 0 failed. Done.
+
 
 # T-714: A node route to a Unix socket, with a first line that names the caller's key and route
 
@@ -5320,3 +5326,7 @@ Partial, 2026-11-16 (drafted on `draft-t714`; not built).
 - 2026-11-17: podcrates `v0.67.0` gives `Route::unix` (COORD-099, #295, closed), with no Windows path yet; podssh's
   opener stays until a tag carries one (COORD-102). Waits: a relative PATH under `--install` (a service starts in another
   directory) and a socket under a home that a system unit's `ProtectHome` hides are not checked yet.
+- 2026-11-17, podcrates `v0.68.0` (COORD-129, answering COORD-102): `reverse::unix_target::connect` reaches an AF_UNIX
+  socket on Windows by WinSock. podssh's own opener of a route's socket is gone: `node_unix_open::connect` is that
+  function, with a 10 s bound. `--test node_unix_route` passed among `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3619 passed, 0 failed. Still waits: a relative PATH under
+  `--install`, a socket under a home that `ProtectHome` hides, and an upgrade in place of a Unix route.

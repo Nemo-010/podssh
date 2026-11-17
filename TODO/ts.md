@@ -533,7 +533,7 @@ supervision (`vendor/tailscale-rs/ts_runtime/src/lib.rs` lines 161-170): five re
 most, with no wait
 (`tqwewe/kameo:src/supervision.rs`). podssh's relay client has the rules to copy: a capped backoff
 with jitter (`PodUtils/podssh:crates/podssh-relay/src/open.rs:421-435`), and a ping every 10 s with three silent
-checks allowed (`crates/podssh-ws/src/client.rs:39-40`, `docs/relay.md:387-389`).
+checks allowed (`crates/podssh-ws/src/client.rs:42-43`, `docs/relay.md:387-389`).
 
 ## Approach
 

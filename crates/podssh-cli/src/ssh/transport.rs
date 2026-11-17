@@ -222,7 +222,7 @@ pub async fn reach_skipping(resolved: &Resolved, skip: usize, log: &Arc<Log>) ->
                         log.verbose(&note);
                     }
                     podssh_ssh::outcome::relay_host(&opened.relay.host);
-                    let (stream, status) = crate::relay_ends::spawn(opened.session, &opened.relay.host);
+                    let (stream, status) = crate::relay_ends::spawn(opened.session, &opened.relay);
                     // The relay's silence, for the notice (T-307).
                     let heard = status.clone();
                     opts.silence.attach(move || heard.silent(tokio::time::Instant::now(), SILENCE_WAIT));

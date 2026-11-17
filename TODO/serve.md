@@ -2886,7 +2886,7 @@ connection.
   (`harden::give_up()`); `crates/podssh-cli/src/relay_serve/certs.rs:123` only reads
   `harden::dropped()`. The files are `harden.rs` (284 lines), `harden_sys.rs` (118) and
   `harden_tests.rs` (228).
-- `crates/podssh-cli/src/first_thread.rs` and `crates/podssh-cli/src/main.rs:29` hold the hand-off
+- `crates/podssh-cli/src/first_thread.rs` and `crates/podssh-cli/src/main.rs:32` hold the hand-off
   of the first thread. A drop on the calling thread alone is not enough (T-629's Correction); a
   drop of `serve` inherits this.
 - T-107's Approach (`TODO/serve.md:36`, steps 1 to 5) does not mention capabilities. No entry

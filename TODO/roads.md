@@ -6225,7 +6225,7 @@ relay's path and token.
   path is `/connect/<host>/<port>` (`:188-201`); a run has one road, of five kinds
   (`crates/podssh-cli/src/ssh/transport_kind.rs:9-72`).
 - Read: `validate` refuses a query other than the relay's knobs, and `connect` always sends a token
-  (`PodUtils/podssh:crates/podssh-ws/src/client.rs:74-113`, now `crates/podssh-ws/src/client.rs:54-83`); a token goes only to the deployment that
+  (`PodUtils/podssh:crates/podssh-ws/src/client.rs:74-113`, now `crates/podssh-ws/src/client.rs:57-86`); a token goes only to the deployment that
   minted it (`docs/decisions.md:108`).
 - Read: a SOCKS5 proxy that the user names in `ALL_PROXY` carries each road already (T-070;
   `PodUtils/podssh:crates/podssh-ws/src/socks5.rs:1-7`): podssh takes a third party's proxy that the user chooses.
@@ -10568,7 +10568,7 @@ with a Cloudflare account waits (the owner, 2026-11-09).
 ## Correction
 
 2026-11-17. The Premise's lines moved: `crates/podssh-ws/src/client.rs` is 160 lines, `connect` at
-`:82` and `https_with_token` at `:131`; `https_request` is `pod-ws`'s, and private (`PodUtils/podcrates:
+`:85` and `https_with_token` at `:134`; `https_request` is `pod-ws`'s, and private (`PodUtils/podcrates:
 crates/pod-ws/src/client.rs:355`, v0.67.0). `access.headers()` of `pod-egress` is private: podssh builds
 the lines from the public fields and the header names. More: the relay's road, a pair's road and
 `operator` are not podssh's code any more (`pod-relay`, taken), so the headers there are podcrates' work
@@ -10628,6 +10628,16 @@ WebSocket road. The ask, filed as COORD-105 (#302):
 > gives the host's credentials of Cloudflare Access only for a host that the user named
 > (`podssh_ws::access::Named::for_host`); a host of the pool gets none. A refusal of 401 or 403 with the
 > headers sent should keep its status, so that podssh says 77 with the variables.
+
+2026-11-17, podcrates `v0.68.0` (COORD-129, answering COORD-105): `pod_ws::Way::with_headers` reaches each road.
+`podssh_ws::client::way` gives each road the headers of `podssh_ws::access::process_headers`: the hosts that the
+settings name (`AccessHost`, set at the start by `access::install`) and their credentials, by `Named::for_host`. A host
+not named gets none, and a road in cleartext none. A 401 or 403 of `ConnectError::Refused` was already 77.
+`--lib access` 5 passed in podssh-ws, among them `each_road_gets_the_headers_for_a_named_host_alone` (planted: the
+headers for each host, caught); `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3619 passed, 0 failed. Still waits: `--access-host` on `ssh`, `node` and `operator`, `Headers::in_cleartext`
+for `cf://` and `pipe --access-host` on `ws:`, a stand-in of the relay's road that demands the headers, and the live
+step with a Cloudflare account.
+
 
 # T-727: SSH login with a short-lived Access certificate over `cf://`
 

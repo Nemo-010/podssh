@@ -32,6 +32,9 @@ pub fn way(proxy: &ProxyChoice) -> pod_ws::Way {
     let dial = Arc::new(dial::dialer(proxy, false));
     pod_ws::Way::new(tls::context().clone(), dial, dial::user_agent())
         .with_records(Arc::new(crate::ech::Records(proxy.clone())))
+        // The credentials of Cloudflare Access, for a host that the user
+        // named alone (T-718).
+        .with_headers(crate::access::process_headers())
 }
 
 /// How to connect. (Named so it is not confused with `rustls::ClientConfig`.)

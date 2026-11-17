@@ -5,8 +5,8 @@
 //! `--ask`) ran before [`open`]: a key that it refused never reaches the
 //! socket.
 //!
-//! A Unix socket is handed on as a `TcpStream`, as `podssh pipe` hands on
-//! an AF_UNIX socket of Windows: a connected stream socket of any family
+//! A Unix socket is handed on as a `TcpStream`, as `pod-relay` connects it
+//! (on Windows too): a connected stream socket of any family
 //! carries bytes as a TCP one does. So each target of a route is one type,
 //! and the upgrade in place moves its socket to the next binary as it
 //! moves a TCP target's.
@@ -82,26 +82,14 @@ async fn open_unix(
     Ok(stream)
 }
 
-/// One connection to the socket at `path`, as `podssh pipe`'s
-/// `unix-connect:` makes it (`@NAME` in Linux's abstract namespace), as a
-/// `TcpStream` of the same descriptor.
-#[cfg(unix)]
-pub(crate) async fn connect(path: &str) -> io::Result<TcpStream> {
-    use std::os::fd::{FromRawFd, IntoRawFd};
-    let unix = crate::pipe::unix::stream(path).await?.into_std()?;
-    // SAFETY: a connected stream socket, whose descriptor `into_raw_fd`
-    // gave up; the stream owns it from here, and closes it once.
-    let stream = unsafe { std::net::TcpStream::from_raw_fd(unix.into_raw_fd()) };
-    stream.set_nonblocking(true)?;
-    TcpStream::from_std(stream)
-}
+/// How long a connection to a route's socket may take.
+const CONNECT_WAIT: std::time::Duration = std::time::Duration::from_secs(10);
 
-/// An AF_UNIX socket of Windows, by WinSock, as `podssh pipe` connects it.
-#[cfg(windows)]
+/// One connection to the socket at `path` (`@NAME` in Linux's abstract
+/// namespace; an AF_UNIX socket by WinSock on Windows), by `pod-relay`
+/// (podcrates `v0.68.0`), as a `TcpStream` of the same descriptor.
 pub(crate) async fn connect(path: &str) -> io::Result<TcpStream> {
-    let stream = crate::pipe::unix::af_unix(path)?;
-    stream.set_nonblocking(true)?;
-    TcpStream::from_std(stream)
+    podssh_relay::reverse::unix_target::connect(path, CONNECT_WAIT).await.map_err(io::Error::other)
 }
 
 /// `pod-relay`'s handler of routes, with [`open`] in the place of its own

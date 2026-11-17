@@ -62,6 +62,34 @@ impl Named {
     }
 }
 
+/// The hosts and credentials of this process, which [`client::way`] gives
+/// each road that pod-ws builds (pod-ws's `Headers`, podcrates `v0.68.0`):
+/// none until the command line sets them.
+static PROCESS: std::sync::OnceLock<Named> = std::sync::OnceLock::new();
+
+/// Set the hosts and credentials of this process, once; `false` when they
+/// were set before.
+pub fn set_process(named: Named) -> bool {
+    PROCESS.set(named).is_ok()
+}
+
+/// The headers of each road of this process: the credentials for a host
+/// that the user named, and nothing for any other host.
+pub fn process_headers() -> pod_ws::Headers {
+    match PROCESS.get().filter(|named| !named.hosts.is_empty() && !is_empty(&named.access)) {
+        Some(named) => headers_of(named),
+        None => pod_ws::Headers::default(),
+    }
+}
+
+/// The headers of `named` for each host that a road names.
+fn headers_of(named: &'static Named) -> pod_ws::Headers {
+    pod_ws::Headers::new(move |host: &str| {
+        let Some(access) = named.for_host(host) else { return Vec::new() };
+        headers(access).into_iter().map(|(name, value)| (name, Zeroizing::new(value.to_string()))).collect()
+    })
+}
+
 /// Whether `access` holds no credential at all.
 pub fn is_empty(access: &Access) -> bool {
     access.client_id.is_none() && access.client_secret.is_none() && access.token.is_none()
@@ -198,6 +226,17 @@ mod tests {
         let unset = Named::new(["edge.example".to_string()], Access::default());
         assert!(unset.for_host("edge.example").is_none(), "no credential, no header");
         assert!(!format!("{named:?}").contains("\"s\""), "{named:?}");
+    }
+
+    #[test]
+    fn each_road_gets_the_headers_for_a_named_host_alone() {
+        let named: &'static Named = Box::leak(Box::new(Named::new(["edge.example".to_string()], service("id", "s"))));
+        let headers = headers_of(named);
+        let shown = format!("{:?}", headers.for_host("EDGE.example").unwrap());
+        assert!(shown.contains(CLIENT_ID) && shown.contains(CLIENT_SECRET) && !shown.contains("\"s\""), "{shown}");
+        let other = format!("{:?}", headers.for_host("relay.example").unwrap());
+        assert!(!other.contains(CLIENT_ID), "{other}");
+        assert!(format!("{:?}", headers.for_cleartext("edge.example").unwrap()).ends_with("([])"), "TLS alone");
     }
 
     #[test]

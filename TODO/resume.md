@@ -2643,7 +2643,7 @@ show on that road.
 ## Premise
 
 - Read: the relay's session pings each 10 s, and a link with no frame for three intervals is dead
-  (`crates/podssh-ws/src/client.rs:35-40`); the relay stream of the SSH client runs that check
+  (`crates/podssh-ws/src/client.rs:38-43`); the relay stream of the SSH client runs that check
   (`crates/podssh-ssh/src/relay_stream.rs:243`).
 - Read: on that road nothing below SSH answers a key: the relay copies the bytes to the target's
   TCP connection. A Ping of podssh's, which the relay answers with a Pong, is the one question

@@ -109,7 +109,6 @@ async fn operator_minute(ready: String) -> (usize, usize) {
 }
 
 #[tokio::test(start_paused = true)]
-#[ignore = "waits for pod-relay's port of the offer"]
 async fn a_node_pings_once_a_minute_where_its_relay_offers_it() {
     let hello = format!(r#"{{"type":"hello","version":1,"maxSessions":64,"maxFrameBytes":65536,{OFFER}}}"#);
     assert_eq!(node_minute(hello).await, (1, 0));
@@ -128,7 +127,6 @@ async fn a_node_keeps_ten_seconds_for_an_offer_it_cannot_take() {
 }
 
 #[tokio::test(start_paused = true)]
-#[ignore = "waits for pod-relay's port of the offer"]
 async fn an_operator_leg_pings_once_a_minute_where_its_relay_offers_it() {
     let ready = format!(r#"{{"type":"ready","id":"{ID}",{OFFER}}}"#);
     assert_eq!(operator_minute(ready).await, (1, 0));

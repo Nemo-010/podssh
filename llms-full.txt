@@ -10974,7 +10974,7 @@ THE RELAY
   Trust
       TLS is always verified, and no option turns the check off. With --ca-file
       or SSL_CERT_FILE, only that file is trusted. Else the trust store is the
-      Mozilla roots in the binary (webpki-roots 1.0.11 of 2026-10-23), and
+      Mozilla roots in the binary (webpki-roots 1.0.12 of 2026-11-10), and
       podssh-ca.pem next to the binary. It also takes the roots of the system's
       stores, and the first system bundle. The stores are, on Windows, ROOT of
       the current user and of the machine. There a certificate is left out when

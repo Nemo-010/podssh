@@ -167,7 +167,7 @@ async fn carried(road: Road, tell: oneshot::Sender<Begun>) {
             return;
         }
     };
-    let settings = layered::ssh_settings().off_the_pair();
+    let settings = super::paced(&relays, layered::ssh_settings().off_the_pair());
     let client = match client::start(first, Ask::New, settings, &mut OsEntropy).await {
         Ok(client) => client,
         Err(e) => {

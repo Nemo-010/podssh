@@ -42,11 +42,17 @@ pub struct Told<S> {
     host: String,
 }
 
-/// [`podssh_ssh::relay_stream::spawn`] of a session that `host` opened, with
-/// the stream that tells the record how it ended.
-pub fn spawn(session: RelaySession, host: &str) -> (Told<DuplexStream>, RelayStatus) {
-    let (stream, status) = podssh_ssh::relay_stream::spawn(session);
-    (Told { inner: stream, status: status.clone(), host: host.to_string() }, status)
+/// [`podssh_ssh::relay_stream::spawn`] of a session that `relay` opened, with
+/// the stream that tells the record how it ended. Its Pings go at the pace
+/// that the host's kept offer names (`forward.liveness`, T-712), else at
+/// podssh's own: a relay that sleeps between frames is woken less.
+pub fn spawn(session: RelaySession, relay: &podssh_relay::relay::Relay) -> (Told<DuplexStream>, RelayStatus) {
+    let pace = podssh_relay::forward_layer::kept::kept_now(relay).and_then(|offer| offer.liveness);
+    let (stream, status) = match pace {
+        Some(every) => podssh_ssh::relay_stream::spawn_paced(session, every, podssh_ws::LIVENESS_ALLOWED),
+        None => podssh_ssh::relay_stream::spawn(session),
+    };
+    (Told { inner: stream, status: status.clone(), host: relay.host.clone() }, status)
 }
 
 impl<S> Drop for Told<S> {

@@ -5959,6 +5959,13 @@ when its local side did not read for 2 s or past 4 times its queue (its entry 83
 for podssh's two writes of a private file and the record of spent grants is T-805. Each dependency and
 `issue-sync.yml` name `v0.67.0`; `get-core.sh` keeps its pins.
 
+2026-11-17, podcrates `v0.68.0` (`4efa6042`, COORD-129, PodUtils/podcrates#219): no public API breaks (`pod_session::Settings`
+has `heartbeat`, `pod_relay::reverse::Handler` has `liveness`, `pod_ws::Way` has `headers`, each with a default). Taken
+with podssh's parts: the liveness offer (T-712, COORD-104), the headers of Cloudflare Access on each road (T-718, COORD-105),
+a Unix route on Windows (T-714, COORD-102), and webpki-roots 1.0.12 with one rsa (T-802, COORD-101). Each dependency and
+`issue-sync.yml` name `v0.68.0`; `get-core.sh` keeps its pins. `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3619 passed, 0 failed; clippy (the gate's lints) and rustfmt clean.
+podssh's answer is COORD-106.
+
 Next: `pod-cloudflare` and `pod-ts` as podcrates names them, then `pod-relay-serve`.
 # T-685: The checks of the retired rules: the gate's `CC=/nonexistent` and its steps at a minimum Rust, edition 2021
 
@@ -7125,7 +7132,7 @@ installer of a published release, with its signature checked, which the next bet
 **Milestone:** none
 **Priority:** P2
 **Effort:** S
-**Status:** partial
+**Status:** done
 
 ## Problem
 
@@ -7173,6 +7180,12 @@ tcp.ssh.relay.ajam.dev.`: 9 passed, 0 failed); a name whose last label is hex is
 with its words (`"relay.0x1f" is not a valid server name: invalid dns name`). Held: webpki-roots 1.0.12, whose
 version `pod_tls::trust::ROOTS_VERSION` records in podcrates, and the one rsa 0.9 of the tree, which `pod-tls` takes:
 both asked of podcrates (COORD-101, #297). Then each Dependabot pull request closes once its update is on `main`.
+
+2026-11-17, podcrates `v0.68.0` (COORD-129, answering COORD-101): `pod-tls` takes webpki-roots 1.0.12 and rsa 0.10.
+`cargo update -p webpki-roots` (1.0.11 to 1.0.12); `--test roots_version` 1 passed; the default tree builds rsa 0.10.0
+alone (`cargo tree -i rsa@0.10.0`), and rsa 0.9.10 comes only with the feature `tor`, through arti's
+`ssh-key-fork-arti` and `tor-key-forge` (`pod-tor`). `cargo test -p podssh-ws -p podssh-ssh -p podssh-relay -p podssh-cli` 3619 passed, 0 failed. Done; each Dependabot pull request of these closes as its
+update is on `main`.
 
 
 # T-805: podssh's private files written by `pod_core::files::replace_private`

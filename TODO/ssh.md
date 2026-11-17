@@ -1507,7 +1507,7 @@ Read:
   that timer in `flush_or_timeout`; with `None`, the timer never fires, so
   only the write can end the wait.
 - The relay leg limits each write: `WRITE_TIMEOUT` is 60 s
-  (`crates/podssh-ws/src/client.rs:42-43`, given to the session at
+  (`crates/podssh-ws/src/client.rs:45-46`, given to the session at
   `PodUtils/podssh:crates/podssh-ws/src/client.rs:204`), and `write` applies it
   (`PodUtils/podssh:crates/podssh-ws/src/session.rs:420-427`). Then the copy task stops
   (`crates/podssh-ssh/src/relay_stream.rs:226-242`), the next ping meets the
@@ -1537,7 +1537,7 @@ Read:
    124 (the time limit): change the code, as below.
 2. Preferred change: wrap the direct stream in a writer that fails a write
    that makes no progress for 60 s, with the constant of the relay leg
-   (`crates/podssh-ws/src/client.rs:42-43`). Only
+   (`crates/podssh-ws/src/client.rs:45-46`). Only
    `crates/podssh-cli/src/ssh/transport.rs:297-341` changes, and both roads behave
    the same.
 3. The other change: set `inactivity_timeout` at
