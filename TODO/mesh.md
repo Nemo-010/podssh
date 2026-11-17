@@ -14171,6 +14171,7 @@ static musl release with `RELEASE_FEATURES` `iroh,warp,zerotier`, and `iroh` of 
 iroh-relay's `server` crates are in it; `check-static.sh` passed. Open: Approach step 5, a member's use of `meet`
 (its net's relay host first as its iroh relay and its DERP home). It needs the role's `meet` read before a session
 (rule 2's exception 8, at most once a day for each host) beside the list of relay members that `pod-relay` reads.
+`pod_relay::pool::members` keeps no `meet`: asked of podcrates as COORD-110 (#307).
 
 # T-724: `-J node://NAME` and `mcp` destinations that name a node
 
