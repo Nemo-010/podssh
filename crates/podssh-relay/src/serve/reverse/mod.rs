@@ -30,6 +30,7 @@
 
 pub mod carrier;
 pub mod halt;
+pub mod lost;
 pub mod node;
 pub mod operator;
 pub mod outbox;
@@ -51,9 +52,9 @@ use self::pairs::{NotMade, Role};
 use super::{answer, docs, Config, Mint};
 use crate::reverse::{control::PROTO, framing::SessionId};
 
-/// The role pings each reverse socket this often, and drops one that answers
-/// nothing for so many intervals: a dead node's socket would else hold its
-/// name, and the node that comes back would meet `409` for ever. The default
+/// The role pings an operator's or a carrier's socket this often, and drops
+/// one that answers nothing for so many intervals; a node's, sooner
+/// ([`lost`]), as it would else hold its name against its `409`s. The default
 /// relay sends no keepalive; a Ping is no payload, and a peer answers it.
 pub const PING_EVERY: Duration = Duration::from_secs(20);
 pub const PINGS_ALLOWED: u32 = 3;

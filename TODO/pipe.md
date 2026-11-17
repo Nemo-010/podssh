@@ -1918,8 +1918,8 @@ Read at `2042200`:
   "Content-Type: text/plain; charset=utf-8".
 - Its reason phrases: `PodUtils/podssh:crates/podssh-ws/src/http/request.rs:244-267` has no arm for 404, 409, 411, 413
   or 429, so each reads "Error"; the relay role sends four of them through it (`404` in
-  `crates/podssh-relay/src/serve/reverse/mod.rs:104`, `409` and `429` in
-  `crates/podssh-relay/src/serve/reverse/mod.rs:207-211`, `413` in
+  `crates/podssh-relay/src/serve/reverse/mod.rs:105`, `409` and `429` in
+  `crates/podssh-relay/src/serve/reverse/mod.rs:208-212`, `413` in
   `crates/podssh-relay/src/serve/mod.rs:420`). A small defect, found here (rule 8 of `AGENTS.md`).
 - The check reads no path (`PodUtils/podssh:crates/podssh-ws/src/server.rs:52-107`), so a page is for a request that is
   no upgrade, whatever its path, as the issue corrects itself.
@@ -2064,7 +2064,7 @@ Read at `2042200`:
   carries raw bytes (`crates/podssh-cli/src/pipe/serve.rs:52`).
 - The relay role's roads call the same check, and their contract is framed:
   `crates/podssh-relay/src/serve/forward.rs:83`, `crates/podssh-relay/src/serve/layer.rs:179`,
-  `crates/podssh-relay/src/serve/reverse/node.rs:41` and `crates/podssh-relay/src/serve/reverse/operator.rs:53`;
+  `crates/podssh-relay/src/serve/reverse/node.rs:57` and `crates/podssh-relay/src/serve/reverse/operator.rs:53`;
   they keep it.
 - No TLS on `ws-listen:`: a WebTunnel client of a bridge speaks `https://`, so a front that ends TLS is
   needed before this listener, as the issue says.

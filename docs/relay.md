@@ -795,8 +795,8 @@ does not know it reads the answer as before:
   relay restarting` with `Retry-After: 1`. podssh's node says that the
   relay is restarting and connects again at once, and each session of the
   layer resumes once the role is back with the pairs of `--pairs FILE`.
-- The role pings each reverse socket every 20 s, and drops one that answers
-  nothing for 60 s, so that a dead node's socket does not hold its name.
+- The role drops a node's socket at once when it resets or a write fails,
+  or when it is silent for 30 s after a ping (an operator's, 60 s; T-801).
 - Beside the contract, a renewal (T-592): `POST /v1/renew/<name>` with the
   pair's stop token, which its owner alone holds, answers `{"expires": MS}`,
   72 h from then and never earlier than the pair's end, and the pair keeps

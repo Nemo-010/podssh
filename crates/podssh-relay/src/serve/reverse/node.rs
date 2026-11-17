@@ -9,6 +9,10 @@
 //! Beside the contract, a node registers tokens of one leg with `token`
 //! frames, which the role's `hello` offers to the node of a pair (T-615), and
 //! asks for sessions readied ahead with a `spares` frame (T-650).
+//!
+//! A socket whose read reset, whose write failed, or that answers nothing
+//! ([`super::lost`]) is let go at once: the node that comes back finds its
+//! name free, and each operator of it hears `1011 node disconnected`.
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -32,6 +36,18 @@ use crate::serve::{answer, tokens, Config};
 
 /// A fault of the node's bytes: the code and the reason of the table's row.
 type Fault = (u16, &'static str);
+
+/// How the node's socket came to the role.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Came {
+    /// By an upgrade of the role's: its `hello` offers the tokens of one leg
+    /// and the stop token's rotation (T-615), and its silence is watched as
+    /// a node's ([`super::lost`]).
+    Upgraded,
+    /// A carrier's (T-595), on a stream of the user's, which may be slow:
+    /// it keeps the client's watch, which waits for a first Pong.
+    Carried,
+}
 
 /// Join the node of `pair` on `stream`, and serve its socket until it ends.
 pub async fn join<S>(mut stream: S, head: Request, pending: Vec<u8>, pair: Arc<Pair>, cfg: Arc<Config>)
@@ -66,7 +82,7 @@ where
         outbox.close(1001, "pair expired");
         return;
     }
-    socket(session, outbox, pair, cfg, serial, true).await
+    socket(session, outbox, pair, cfg, serial, Came::Upgraded).await
 }
 
 /// A node's socket that is a WebSocket from its first byte, with no upgrade
@@ -91,7 +107,7 @@ where
         return Err("the carrier's role ended".into());
     }
     // A carrier's legs take no token: its `hello` offers none (T-615).
-    Ok(tokio::spawn(socket(session, outbox, pair, cfg, serial, false)))
+    Ok(tokio::spawn(socket(session, outbox, pair, cfg, serial, Came::Carried)))
 }
 
 /// Give the node's socket under `serial` its writer, unless the pair ended,
@@ -109,21 +125,20 @@ fn joined(pair: &Pair, serial: u64, outbox: &Outbox) -> bool {
 }
 
 /// Serve the node's socket of `pair`, joined under `serial` with its writer
-/// `outbox`, until it ends; `offers`: its `hello` offers the tokens of one
-/// leg and the stop token's rotation (T-615).
+/// `outbox`, until it ends; `came` says how it came.
 async fn socket<S>(
     session: Arc<RelaySession<S>>,
     outbox: Outbox,
     pair: Arc<Pair>,
     cfg: Arc<Config>,
     serial: u64,
-    offers: bool,
+    came: Came,
 ) where
     S: AsyncRead + AsyncWrite + Send + 'static,
 {
     // Until the node answered a Close: a planned stop waits for it (T-255).
     let _live = cfg.pairs.live.counted();
-    outbox.text(hello(offers));
+    outbox.text(hello(came == Came::Upgraded));
     // A node that joins a halted pair hears so at once (T-647).
     if let Some(halt) = pair.halted() {
         outbox.text(halt.frame());
@@ -131,8 +146,16 @@ async fn socket<S>(
     cfg.event("reverse node");
 
     let (mut frames, reader) = frames_of(session.clone());
-    let liveness = session.watch_liveness(PING_EVERY, PINGS_ALLOWED);
+    let watched = session.clone();
+    let liveness = async move {
+        match came {
+            Came::Upgraded => super::lost::silent(&watched, super::lost::EVERY, super::lost::ALLOWED).await,
+            Came::Carried => watched.watch_liveness(PING_EVERY, PINGS_ALLOWED).await.to_string(),
+        }
+    };
     tokio::pin!(liveness);
+    // Why the link was lost, when it was: the role's line says it.
+    let mut lost: Option<String> = None;
     let left = Duration::from_millis(pair.expires_ms().saturating_sub(tokens::now_ms()));
     let expiry = tokio::time::sleep(left);
     tokio::pin!(expiry);
@@ -163,9 +186,21 @@ async fn socket<S>(
                 }
                 Some(Ok(f)) if f.opcode == frame::OPCODE_CLOSE => break,
                 Some(Ok(_)) => {}
-                _ => break,
+                // A reset, or an end with no Close: the name is free now.
+                Some(Err(e)) => {
+                    // After the role's own Close, the end of the link is
+                    // expected, not a loss.
+                    if closing.is_none() {
+                        lost = Some(e.to_string());
+                    }
+                    break;
+                }
+                None => break,
             },
-            _ = &mut liveness => break,
+            why = &mut liveness => {
+                lost = Some(why);
+                break;
+            }
             () = &mut expiry, if !expired => {
                 // A renewal (T-592) moved the end: its new time is waited for.
                 match renewed(&pair) {
@@ -177,7 +212,18 @@ async fn socket<S>(
                     }
                 }
             }
-            () = outbox.ended(), if closing.is_none() => closing = Some(Instant::now()),
+            () = outbox.ended(), if closing.is_none() => {
+                // A write that failed: no Close of the node's comes, and to
+                // wait for one would hold its name for nothing.
+                if outbox.broke() {
+                    // A write after the answer to the node's Close fails too.
+                    if !session.close_sent() {
+                        lost = Some("a write to the node failed".into());
+                    }
+                    break;
+                }
+                closing = Some(Instant::now());
+            }
             () = sleep_until(give_up), if give_up.is_some() => break,
             _ = ahead.tick() => super::spares::keep(&pair, cfg.pairs.spacing()),
         }
@@ -185,6 +231,9 @@ async fn socket<S>(
     reader.abort();
     detach(&pair, serial, cause);
     outbox.abort(1011, "socket error");
+    if let Some(why) = lost {
+        cfg.event(&format!("reverse node lost: {why}"));
+    }
     cfg.event("reverse node gone");
 }
 

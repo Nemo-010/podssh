@@ -6157,7 +6157,7 @@ the fix.
 **Milestone:** M10
 **Priority:** P2
 **Effort:** S
-**Status:** open
+**Status:** done
 
 ## Problem
 
@@ -6168,8 +6168,33 @@ operator whose node does not open should hear why.
 
 ## Premise
 
-- To be read at the start: where podssh's role keeps a node's socket and answers `409`
-  (`crates/podssh-relay/src/serve/reverse/`), and what it does with a reset on the read or a failed write.
+Read at `60d5426` (the drafting agent, 2026-11-17), and at the cited lines, which the fix did not change:
+
+- The role keeps a node's socket in its pair's state, `NodeLink { serial, outbox }` in `state.node`
+  (`crates/podssh-relay/src/serve/reverse/pairs.rs:126` says "pub node: Option<NodeLink>,"), and a second node's
+  upgrade meets `409` while that field is set: `crates/podssh-relay/src/serve/reverse/node.rs:64` says
+  "let held = state.node.is_some();", and `:72` answers "refusal(409, why, &[])". Only `detach` clears it
+  (`crates/podssh-relay/src/serve/reverse/node.rs:264` says "state.node = None;"), at the end of the socket's
+  loop, and its sessions' operators then hear `1011 node disconnected` (`:270`).
+- A read that reset: the socket's reader task sends the error and stops, and the loop's last arm of the read,
+  `_ => break` at `60d5426`, ended the loop at once, and `detach` ran. So a reset of the node's read already freed
+  its name at once.
+- A failed write: the socket's writer stops at its first failed write
+  (`crates/podssh-relay/src/serve/reverse/outbox.rs:197` says "if sent.is_err() {") and says that it ended
+  (`:206`). The node's loop took that end as the role's own Close and waited `CLOSE_WAIT`
+  (`crates/podssh-relay/src/serve/reverse/mod.rs:62` says "pub const CLOSE_WAIT: Duration = Duration::from_secs(5);")
+  for the node's Close, which never comes (`crates/podssh-relay/src/serve/reverse/node.rs:227` says
+  "() = sleep_until(give_up), if give_up.is_some() => break,"): 5 s of `409` for a socket known dead, and an
+  operator's `open` written to it was lost.
+- A link lost with no reset (no read error, no failed write, as a NAT that forgot the connection): the socket was
+  watched by the client's `watch_liveness(PING_EVERY, PINGS_ALLOWED)`, 20 s and 3, which ends a socket only after
+  a first Pong: `PodUtils/podcrates:crates/pod-ws/src/session.rs:338` (at `v0.65.0`) says
+  "if self.pongs_received() > 0 && missed >= allowed {". A node lost before the role's first Ping was answered
+  (its first 20 s) held its name until the kernel gave the connection up, many minutes later; one lost after it
+  held it for 60 s to 80 s. Each operator meanwhile got its `open` written into the dead connection and ended with
+  `1013 node open timeout` (`crates/podssh-relay/src/serve/reverse/operator.rs:165`), the silent end of the
+  Problem; and `pod-relay`'s node gives the route up after 60 s of `409` for its lost socket
+  (`Settings::lost_hold`, `PodUtils/podcrates:crates/pod-relay/src/reverse/serve.rs:80`, podcrates' entry 805).
 
 ## Approach
 
@@ -6179,16 +6204,76 @@ operator whose node does not open should hear why.
    lost, not a silent end.
 3. A test: a node's socket reset (its TCP closed with RST), then the node's next socket is accepted at once and an
    operator reaches it.
+4. (The Correction.) A node's socket that answers nothing is let go within 40 s of its last frame, under the
+   node's 60 s of `409`, with no first Pong needed; a test proves it on paused time, and a test of a failed write
+   proves item 1 for the write.
+
+## Decision
+
+- The operator's Close keeps the contract's reason `1011 node disconnected`, not new words such as "node link
+  lost": `pod-relay` classifies a Close by its exact reason
+  (`PodUtils/podcrates:crates/pod-relay/src/reverse/closes.rs:157`), and a reason of no row is `Unknown`, which
+  neither reconnects nor resumes; podssh's own operator already reads the row as "the node's link to the relay
+  ended" (`crates/podssh-cli/src/pairs.rs:212`). The cause goes to the role's line instead.
+- A silent node is let go after 30 s to 40 s, not 60 s to 80 s: under `pod-relay`'s `Settings::lost_hold` of 60 s,
+  so that the node finds its name free before it gives the route up. A live node pings the role each 10 s
+  (`pod_ws::LIVENESS_EVERY`) and answers each Ping, so it is heard well within that. Lost: the client's watch
+  with a shorter interval, which still waits for a first Pong and so never ends a node lost in its first seconds.
+- A carrier's node keeps the client's watch: its stream is the user's and can be slow, and its role holds one
+  node of its own process, whom no `409` reaches.
+- The role does not take the name over from a held socket at a second node's upgrade: the contract's `409` stays,
+  as another node of the name must not cut the one that holds it.
 
 ## Prove
 
 ```sh
 export CARGO_BUILD_JOBS=4
 cargo test -p podssh-relay --features serve --lib serve::reverse
+cargo test -p podssh-relay --features serve,plain-ws --test relay_serve_lost
 ```
 
 A planted hold of the dead socket makes the test's second socket get `409`.
 
+## Correction
+
+A reset of the node's read was not held: the read's error ended the socket at once at `60d5426`. What held a dead
+socket was a failed write (5 s, the wait for a Close that never comes) and, above all, a link lost with no reset
+(60 s to 80 s, or many minutes before the first Pong), the case of "for minutes" in podnet's report. The Approach
+now covers the three, and its test proves each:
+
+1. A reset of the read: kept (the arm `Some(Err(e))` of the loop ends it, and says why); the test proves it.
+2. A failed write: the writer says that it broke (`Outbox::broke`), and the node's loop ends at once on it,
+   with no wait for a Close.
+3. A silent link: the role watches a node's socket with `super::lost::silent`, a Ping each 10 s and no first
+   Pong needed, and lets it go after 3 intervals with nothing heard, between 30 s and 40 s after the last frame,
+   under the node's 60 s of `409`. A carrier's node keeps the client's watch.
+4. The operator's Close stays the contract's row `1011 node disconnected`, which says that the node's link was
+   lost; the role's own line names the cause: `reverse node lost: WHY`.
+
+## Done
+
+Done, 2026-11-17: drafted, then merged, built and run.
+
+- `crates/podssh-relay/src/serve/reverse/outbox.rs`: `Outbox::broke`, set by the writer at a failed write.
+- `crates/podssh-relay/src/serve/reverse/node.rs`: the loop ends at once on a broken writer and names the cause
+  of a loss in the line `reverse node lost: WHY`; a node's socket is watched by the new
+  `crates/podssh-relay/src/serve/reverse/lost.rs`, a carrier's by the client's watch.
+- The tests in `crates/podssh-relay/src/serve/reverse/lost_tests.rs`, on pipes (a library's tests hold no
+  listener, `scripts/check-repo.py`): a read that resets, then the node's next socket taken (`101`, not `409`) and
+  an operator that reaches the node; a write that fails, then the operator's `1011 node disconnected` within 2 s
+  and the next socket taken; a silent node let go between 30 s and 55 s (paused time), and a node that answers
+  pings kept for 5 minutes. And `crates/podssh-relay/tests/relay_serve_lost.rs`: a real TCP connection of the
+  node closed with RST (`SO_LINGER` 0) on the loopback, then its next socket and an operator, as above.
+- Prove: `cargo test -p podssh-relay --features serve --lib serve::reverse` 46 passed; `--features serve,plain-ws
+  --test relay_serve_lost` 1 passed; each `relay_serve*` and `reverse*` test of podssh-relay with `serve,plain-ws,pair`
+  89 passed, 0 failed; `cargo test -p podssh-cli` 2390 passed, 0 failed; clippy (the gate's lints, the role's
+  features) and rustfmt clean.
+- Planted: the old watch for a silent node (`watch_liveness`, which waits for a first Pong) fails
+  `a_node_that_answers_nothing_is_let_go_within_the_nodes_minute`; the broken writer not read (the old wait for a
+  Close) fails `a_node_whose_write_failed_is_let_go_at_once_and_its_operator_hears_why`.
+- Answered to podnet through podcrates in podssh's next COORD: its node's `409` held for minutes was the silent link
+  that the role watched with the client's watch; the role lets such a node go in 30 to 40 s now, under `pod-relay`'s
+  60 s `lost_hold`.
 
 # T-803: `podssh relay serve` moved 16 MiB at two speeds on the loopback, 75 or 330 MiB/s
 

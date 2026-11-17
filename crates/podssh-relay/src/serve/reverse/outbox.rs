@@ -8,7 +8,7 @@
 //! backlog to a node delays no other session's bytes (T-648,
 //! `crate::reverse::fair`), and a session's `close` goes after its bytes.
 
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -130,6 +130,8 @@ pub struct Outbox {
     lines: Fair<Line, Piece>,
     abort: Arc<Abort>,
     done: watch::Receiver<bool>,
+    /// A write failed: the socket is dead, and no Close of its peer's comes.
+    broken: Arc<AtomicBool>,
 }
 
 impl Outbox {
@@ -144,8 +146,9 @@ impl Outbox {
         let lines = Fair::new(BOUND, BOUND);
         let abort = Arc::new(Abort::default());
         let (ended, done) = watch::channel(false);
+        let broken = Arc::new(AtomicBool::new(false));
         writers.join();
-        let (task_lines, task_abort) = (lines.clone(), abort.clone());
+        let (task_lines, task_abort, task_broken) = (lines.clone(), abort.clone(), broken.clone());
         tokio::spawn(async move {
             // The Close asked for, which goes once each line went out; `None`
             // inside when each sender is gone, which ends with no Close.
@@ -192,6 +195,8 @@ impl Outbox {
                     }
                 };
                 if sent.is_err() {
+                    // Said before `ended`, so that its watcher reads it.
+                    task_broken.store(true, Ordering::SeqCst);
                     break;
                 }
             }
@@ -201,7 +206,7 @@ impl Outbox {
             let _ = ended.send(true);
             writers.leave();
         });
-        Outbox { tx, lines, abort, done }
+        Outbox { tx, lines, abort, done, broken }
     }
 
     /// A text frame, before the sessions' bytes that wait; control is small
@@ -263,6 +268,12 @@ impl Outbox {
     pub async fn ended(&self) {
         let mut done = self.done.clone();
         let _ = done.wait_for(|ended| *ended).await;
+    }
+
+    /// Whether the writer ended on a write that failed (a reset, a stall):
+    /// the socket is dead, so waiting for its peer's Close only holds it.
+    pub fn broke(&self) -> bool {
+        self.broken.load(Ordering::SeqCst)
     }
 }
 

@@ -3972,7 +3972,7 @@ Read at `2042200`:
 - `PodUtils/podssh:crates/podssh-relay/src/reverse/control.rs` at `78b5fc8`, line 70, holds the version, and
   `PodUtils/podssh:crates/podssh-relay/src/reverse/control.rs:104-108` reads the two limits alone;
   `PodUtils/podssh:crates/podssh-relay/src/reverse/serve.rs:199` is its one call. The role sends `"version": 1`
-  (`crates/podssh-relay/src/serve/reverse/mod.rs:351-360`), as the default relay does
+  (`crates/podssh-relay/src/serve/reverse/mod.rs:352-361`), as the default relay does
   (`PodUtils/podssh:crates/podssh-relay/src/reverse/control.rs:64-65`). The issue's line numbers are of an older tree.
 - `PodUtils/podssh:crates/podssh-relay/src/reverse/serve.rs:240` says "Ok(NodeInbound::Unknown) | Err(_) => {}".
 - `PodUtils/podssh:crates/podssh-relay/src/reverse/node.rs:306` says "Next::Exit(_) => Next::Reconnect,", and
@@ -4152,15 +4152,15 @@ from one that is down.
 
 Read at `2042200`:
 
-- The reverse road's paths: `crates/podssh-relay/src/serve/reverse/mod.rs:80-84`, with `renew` and
+- The reverse road's paths: `crates/podssh-relay/src/serve/reverse/mod.rs:81-85`, with `renew` and
   `rotate` beside the issue's list; each path but `node`, `connect` and `status` takes the stop token
-  (`crates/podssh-relay/src/serve/reverse/mod.rs:110-114`).
+  (`crates/podssh-relay/src/serve/reverse/mod.rs:111-115`).
 - `status` answers `online`, `sessions` and `expires`
-  (`crates/podssh-relay/src/serve/reverse/mod.rs:148`); `stop` ends the pair with
-  `crates/podssh-relay/src/serve/reverse/mod.rs:161`, which says "operator stopped reverse relay", and
+  (`crates/podssh-relay/src/serve/reverse/mod.rs:149`); `stop` ends the pair with
+  `crates/podssh-relay/src/serve/reverse/mod.rs:162`, which says "operator stopped reverse relay", and
   the node exits on it (`PodUtils/podssh:crates/podssh-relay/src/reverse/node.rs:137`).
 - A refusal with a cause before the upgrade exists for a planned stop alone: `503` with `Retry-After: 1`
-  (`crates/podssh-relay/src/serve/reverse/mod.rs:171-174`). Since T-255 a planned stop sends `1012`,
+  (`crates/podssh-relay/src/serve/reverse/mod.rs:172-175`). Since T-255 a planned stop sends `1012`,
   and the node joins the role that comes back, so a restart costs no 409's wait; the issue's waits
   (`PodUtils/podssh:crates/podssh-relay/src/reverse/serve.rs:81` and `PodUtils/podssh:crates/podssh-relay/src/session/resume.rs:44`)
   are for a node whose old socket the role still holds.
@@ -4423,14 +4423,14 @@ Read at `2042200`:
 - The role's leg: a new id (`crates/podssh-relay/src/serve/reverse/operator.rs:82`), room under
   `MAX_SESSIONS` (`crates/podssh-relay/src/serve/reverse/operator.rs:91`), `open` to the node
   (`crates/podssh-relay/src/serve/reverse/operator.rs:111`) and the wait for `ready` (`:114`), 15 s at
-  most (`crates/podssh-relay/src/serve/reverse/mod.rs:70`); no node is `1011 node unavailable`
+  most (`crates/podssh-relay/src/serve/reverse/mod.rs:71`); no node is `1011 node unavailable`
   (`crates/podssh-relay/src/serve/reverse/operator.rs:99`).
 - A node readies a session only after its local side accepted:
   `PodUtils/podssh:crates/podssh-relay/src/reverse/control.rs:183` says "Only after the local side has accepted", so a
   spare is a live connection to the target with no one on it, and only a node that says it may make one
   gets one.
 - The role's `hello` already carries offers that a node of before keeps and skips
-  (`crates/podssh-relay/src/serve/reverse/mod.rs:351-360`, T-615); a node's word back is a podssh frame
+  (`crates/podssh-relay/src/serve/reverse/mod.rs:352-361`, T-615); a node's word back is a podssh frame
   of its socket, as T-615's `token` frame is.
 - `crates/podssh-relay/src/serve/reverse/pairs.rs` is 486 lines, so the spares go in a module beside it.
 - With T-615 each leg takes a token of its own; a spare is a session, not a leg, so it changes no token.
@@ -4937,8 +4937,8 @@ An operator must reproduce the cut on the relay to learn that it was the cap.
 
 ## Premise
 
-- Read: `crates/podssh-relay/src/serve/reverse/node.rs:353` sends the `close` with the reason
-  "session byte cap" (the limit is `SESSION_BYTES`, 64 MiB, `crates/podssh-relay/src/serve/reverse/mod.rs:72`).
+- Read: `crates/podssh-relay/src/serve/reverse/node.rs:402` sends the `close` with the reason
+  "session byte cap" (the limit is `SESSION_BYTES`, 64 MiB, `crates/podssh-relay/src/serve/reverse/mod.rs:73`).
 - Read: the wire form carries the reason: `PodUtils/podssh:crates/podssh-relay/src/reverse/control.rs:31-35`
   (`reason: Option<String>`).
 - Read: the node's reader binds only the id: `PodUtils/podssh:crates/podssh-relay/src/reverse/serve.rs:229`
@@ -5088,7 +5088,7 @@ relay needs to say that it wants a slower, protocol-level ping.
 - Read: `Hello` keeps each field that podssh does not model (`PodUtils/podssh:crates/podssh-relay/src/reverse/control.rs:65-79`),
   and one field is already an offer of the relay: `stopRotation` (`PodUtils/podssh:crates/podssh-relay/src/reverse/legs.rs:29`).
   The same shape carries this offer.
-- Read: podssh's role pings each reverse socket each 20 s (`crates/podssh-relay/src/serve/reverse/mod.rs:58`);
+- Read: podssh's role pings each reverse socket each 20 s (`crates/podssh-relay/src/serve/reverse/mod.rs:59`);
   that is the role's own choice and stays.
 - Not measured: what an idle session sends above the ping (the layer's frames, T-663).
 
